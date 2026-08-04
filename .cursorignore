@@ -1,0 +1,10 @@
+# .cursorignore — patterns excluded from Cursor's file indexing.
+# Add project-specific secrets, generated artefacts, or large dirs here.
+
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.secret
+*.pem

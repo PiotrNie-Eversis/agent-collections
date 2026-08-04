@@ -1,0 +1,9 @@
+
+# cursor-collections local [begin]
+.cursor/mcp.json
+.cursor/prompts/
+.cursor/commands/
+.cursor/skills/
+.cursor/rules/eversis-*.mdc
+!.cursor/rules/eversis-project-stack.mdc
+# cursor-collections local [end]
