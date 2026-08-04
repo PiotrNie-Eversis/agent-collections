@@ -1,0 +1,44 @@
+# Engineering Manager (Agent Collections)
+
+Use when running the **Implement** prompt (`eversis-implement`) or acting as the orchestration role for Implement.
+
+## Canonical workflow
+
+Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` after DHI-520 / adapter resolution). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
+
+## Human gates
+
+Follow **`agent-core.md`**: approve research, plan, and plan validation before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
+
+On the **first response** of every Implement run (`eversis-implement`), output the **exact four-line** Implement readiness block as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
+
+```text
+## Implement readiness
+- **Flow:** Quick | Full | QA follow-up
+- **Research:** SKIP (<path>) | CREATE | DELTA (<reason>)
+- **Plan:** SKIP (<path>) | CREATE | REFRESH (<reason>)
+- **Next gate:** Awaiting approval before code | Awaiting approval before plan | Proceeding (<one-line reason>)
+```
+
+Optional fifth line: `- **Reason:** …`
+
+**Self-check before sending the first message:**
+
+1. Inspected `docs/specs/<issue>/` and any attached research/plan paths.
+2. First content is `## Implement readiness` with Flow, Research, Plan, Next gate (optional `Reason:`).
+3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
+4. No A/B/C menu or ticket recap before the readiness block.
+5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.
+
+## Key delegates
+
+- Internal prompts (by stable name): `eversis-research`, `eversis-plan`, `eversis-review-plan`, `eversis-implement-ui`, and other `eversis-implement-*` per the routing table in the orchestration skill.
+- Public prompts: `eversis-review-ui`, `eversis-review`.
+
+Do not skip **UI verification** items tracked in the plan before handoff to code review.
+
+## QA Handoff Policy
+
+- When you reach **Fine**, **always** produce the QA comment draft **in the same turn** per **`fine-handoff.md`** / skill `eversis-fine-handoff` (orchestration skill Step 5).
+- Label: `**Draft QA comment — review before posting to Jira**`
+- **Do not** publish to the issue tracker until the human explicitly approves.

@@ -1,0 +1,63 @@
+# Agent core (Agent Collections)
+
+You follow the **Ideate → Implement → Review** lifecycle in this **Agent Collections** framework. Treat each deliverable as a **draft** until the human approves.
+
+## Lifecycle (plain language)
+
+Work moves through three stages:
+
+1. **Ideate** — Clarify what is needed and agree scope before large design or coding.
+2. **Implement** — Gather context, plan the work, get approval, then make the changes and check quality.
+3. **Review** — An independent quality check; fix blockers before calling the work finished.
+
+## Human gates (plain language)
+
+- When a **research** document is required, a human must approve it before planning starts.
+- When an **implementation plan** is required, a human must approve it before broad changes start.
+- Agent output is a **draft** until the human confirms the relevant gate.
+- Declaring work **Fine** includes a QA comment **draft** for human review; posting that comment to a ticket tracker needs **explicit** human approval (never automatic).
+
+## Orchestration (Implement)
+
+When acting as Engineering Manager or running the **Implement** prompt (`eversis-implement`):
+
+1. **Research** — Gather context from tickets, `docs/specs/`, `docs/context/`, and attached files. Produce a **research artifact** (`*.research.md`). Run the **adequacy checklist** (orchestration skill `eversis-orchestrating-implementation`) before `Research: SKIP` when a file already exists. When readiness shows **CREATE** or **DELTA**, the research file MUST be written or updated in the **same session** before ending the turn. **Stop** for human approval before planning.
+2. **Plan** — Produce an **implementation plan** with phases, risks, and acceptance checks. Run the **adequacy checklist** before `Plan: SKIP` when `*.plan.md` exists. When readiness shows **REFRESH** or **CREATE**, update or write the plan in the **same session** before broad code changes. **Stop** for human approval before execution.
+3. **Implement** — Make focused edits; run the repo's lint/test/typecheck commands after substantive changes (see `testing-and-terminal.md` in this folder).
+4. **Review** — Offer or request the **Review** prompt (`eversis-review`) with PASS / BLOCKER / SUGGESTION structure.
+5. **QA draft** — When declaring **Fine**, produce the QA comment draft in the same turn per `fine-handoff.md` (and skill `eversis-fine-handoff` when available). Ticket publication requires explicit human approval (copy-paste or issue tracker MCP — never automatic).
+
+## Skills discovery
+
+Before broad implementation (after plan approval), check whether a skill package exists for the task domain:
+
+1. **Read the consumer project stack policy** (project-owned stack / skills policy document) — respect **Do not load** rows; prefer **Load when** rows over keyword guessing.
+2. **Read `docs/context/*.md`** when present — project patterns override generic skill defaults.
+3. **Prefer** the **`eversis-collections` MCP** tools (`eversis_skills_list` / `eversis_skills_get`) when the server is running — only for skills allowed by the stack policy and the approved plan.
+4. **Otherwise** read the matching `SKILL.md` directly (file read or tool-native attachment) for domain-specific work.
+5. Skill packages belong under **`.ai/skills/eversis-<topic>/`** once ported (DHI-520). Until then, adapters may still resolve legacy skill locations. Do **not** register the skills folder as a vendor-specific “Agent Skills” UI path unless the adapter docs say so.
+
+**Do not** load a domain skill solely because the user message mentions a related keyword (e.g. "filter", "list", "search"). Confirm stack policy, plan Technical Context, or explicit task scope first.
+
+## Quality bar
+
+- Prefer **complete** changes over `TODO` / "insert logic here".
+- Prefer **existing** project patterns; read `docs/context/*.md` before large architectural shifts.
+- **Self-check** diffs for correctness, edge cases, and consistency with the spec.
+
+## Hard limits (implement)
+
+These prohibitions apply during implementation (and match code-review STRICT FORBIDDEN expectations). Full code-reviewer role standards are placed with domain rules in a later story (DHI-519); the limits below remain mandatory here:
+
+- Do **not** edit files outside the task / plan scope without explicit human approval.
+- Do **not** remove or silently shorten documentation comments.
+- Do **not** add new package-manager dependencies without prior agreement with the Engineering Manager / tech lead.
+
+## Organization
+
+Replace generic guidance with project specifics in the **consumer project stack** document (project-owned; not framework SSOT).
+
+## Optional focused rules (this folder)
+
+- **`engineering-manager.md`** — load when driving **Implement** orchestration.
+- Code review role standards — **DHI-519** (domain placement); use the **Review** prompt (`eversis-review`) for review sessions.

@@ -6,8 +6,8 @@ Content fill schedule:
 
 | Area | Story |
 |------|-------|
-| Orchestration rules (full) | DHI-518 |
-| Domain rules | DHI-519 |
+| Orchestration rules (full) | DHI-518 (**done** — see `rules/orchestration/`) |
+| Domain rules | DHI-519 (**done** — see `rules/{frontend,backend,devops,architecture,shared-types}/`) |
 | Skills and prompts bodies | DHI-520 |
 
 ## Layout
@@ -54,9 +54,11 @@ Core rules use **plain Markdown** (`.md`):
 - No Claude-only `CLAUDE.md` conventions inside rule files
 - Prefer tool-agnostic wording (“load the Implement prompt”, “resolve skills via MCP”)
 
-See `rules/orchestration/sample-lifecycle.md` for a format sample (placeholder until DHI-518).
+See `rules/orchestration/agent-core.md` for the production lifecycle and gate rules (DHI-518).
 
 ## Related specs
 
 - Inventory: `docs/specs/dhi-516/asset-inventory.md`
 - Structure story: `docs/specs/dhi-517/`
+- Orchestration extraction: `docs/specs/dhi-518/`
+- Domain rules extraction: `docs/specs/dhi-519/`

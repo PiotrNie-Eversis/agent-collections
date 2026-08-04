@@ -1,5 +1,11 @@
 # DevOps rules
 
-Neutral guidance for CI/CD, infrastructure-as-code, secrets, and operations patterns.
+Neutral guidance for CI/CD, infrastructure, and operations discipline.
 
-**Content:** arrives in **DHI-519** (domain-scoped core rules). This folder is a structural stub from DHI-517.
+| File | Source |
+|------|--------|
+| [`devops-principles.md`](./devops-principles.md) | **Seed** from skills `eversis-implementing-ci-cd`, `eversis-implementing-kubernetes`, `eversis-managing-secrets` |
+
+**Testing discipline:** [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md).
+
+**Full devops skill bodies:** **DHI-520**.

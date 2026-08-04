@@ -1,5 +1,11 @@
 # Shared-types rules
 
-Neutral guidance for shared contracts, DTOs, and cross-package type boundaries.
+Neutral guidance for shared contracts, DTOs, and data boundaries across packages.
 
-**Content:** arrives in **DHI-519** (domain-scoped core rules). This folder is a structural stub from DHI-517.
+| File | Source |
+|------|--------|
+| [`data-and-contracts.md`](./data-and-contracts.md) | **Seed** from skill `eversis-sql-and-database-understanding` (principles) |
+
+**Testing discipline:** [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md).
+
+**Full database/SQL skill body:** **DHI-520**.

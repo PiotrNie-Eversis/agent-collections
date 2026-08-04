@@ -2,4 +2,10 @@
 
 Neutral guidance for APIs, services, and data-access layers.
 
-**Content:** arrives in **DHI-519** (domain-scoped core rules). This folder is a structural stub from DHI-517.
+| File | Source |
+|------|--------|
+| [`backend-principles.md`](./backend-principles.md) | **Seed** from skill `eversis-implementing-backend` |
+
+**Testing discipline:** [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md).
+
+**Full backend skill body:** **DHI-520**.

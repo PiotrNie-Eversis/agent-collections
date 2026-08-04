@@ -1,0 +1,9 @@
+# Testing and terminal discipline
+
+After non-trivial code changes:
+
+1. Discover commands from the **consumer project stack** document, **`package.json`** scripts, **`Makefile`**, **`task`**, or **`nx.json`** / workspace docs — whichever this repository uses.
+2. Run at least **lint** and **typecheck** (if applicable), and **tests** when behavior changed.
+3. Fix failures you introduce before declaring the task done.
+
+Do **not** assume Nx: only use `nx` when this repo is an Nx workspace and targets are documented.

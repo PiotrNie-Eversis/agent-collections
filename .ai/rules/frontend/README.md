@@ -1,5 +1,11 @@
 # Frontend rules
 
-Neutral guidance for UI / web client work (components, accessibility, frontend quality).
+Neutral guidance for UI / web client work.
 
-**Content:** arrives in **DHI-519** (domain-scoped core rules). This folder is a structural stub from DHI-517.
+| File | Source |
+|------|--------|
+| [`accessibility.md`](./accessibility.md) | Legacy `eversis-accessibility.mdc` (neutralized) |
+
+**Testing discipline:** shared under [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md) — do not duplicate here.
+
+**Full frontend skill procedures** (components, forms, optimization, …): **DHI-520**.
