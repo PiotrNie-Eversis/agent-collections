@@ -8,7 +8,7 @@ Content fill schedule:
 |------|-------|
 | Orchestration rules (full) | DHI-518 (**done** — see `rules/orchestration/`) |
 | Domain rules | DHI-519 (**done** — see `rules/{frontend,backend,devops,architecture,shared-types}/`) |
-| Skills and prompts bodies | DHI-520 |
+| Skills and prompts bodies | DHI-520 (**done** — see `skills/`, `prompts/`; manifest `docs/specs/dhi-520/port-manifest.md`; MCP resolveRoot → DHI-535) |
 
 ## Layout
 
@@ -35,7 +35,7 @@ Content fill schedule:
 | Core asset | Path under `.ai/` | Later consumer role |
 |------------|-------------------|---------------------|
 | Domain & orchestration **rules** | `rules/<domain>/*.md` | Cursor adapter → `.cursor/rules/*.mdc`; Claude → sections in `CLAUDE.md` |
-| **Skills** | `skills/eversis-<topic>/` (packages arrive in DHI-520) | MCP skill tools resolve from `.ai/skills/`; adapters may surface or symlink |
+| **Skills** | `skills/eversis-<topic>/` (45 packages — DHI-520) | MCP skill tools resolve from `.ai/skills/` after **DHI-535**; adapters may surface or symlink |
 | **Prompts** | `prompts/public/`, `prompts/internal/` | Public = user entrypoints; Internal = orchestration delegation; adapters may mirror under tool-specific paths |
 | **Orchestration contracts** | `rules/orchestration/` plus this README | Lifecycle, human gates, Fine/QA handoff, SDD expectations — **not** only IDE rule packaging |
 
@@ -62,3 +62,4 @@ See `rules/orchestration/agent-core.md` for the production lifecycle and gate ru
 - Structure story: `docs/specs/dhi-517/`
 - Orchestration extraction: `docs/specs/dhi-518/`
 - Domain rules extraction: `docs/specs/dhi-519/`
+- Skills & prompts port: `docs/specs/dhi-520/` (manifest: `port-manifest.md`)

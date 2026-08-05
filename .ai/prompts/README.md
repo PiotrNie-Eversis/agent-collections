@@ -1,12 +1,14 @@
 # Prompts (core)
 
-Tool-neutral prompt bodies will live under:
+Tool-neutral prompt bodies live under:
 
-| Subfolder | Role |
-|-----------|------|
-| `public/` | User-facing entrypoints |
-| `internal/` | Engineering Manager / delegation prompts |
+| Subfolder | Role | Count (DHI-520) |
+|-----------|------|----------------:|
+| `public/` | User-facing entrypoints | 16 |
+| `internal/` | Engineering Manager / delegation prompts | 12 |
 
-**Content:** arrives in **DHI-520**. Preserve the public vs internal split when porting.
+**Status:** Ported in **DHI-520**. Full accounting: `docs/specs/dhi-520/port-manifest.md`.
+
+Load by stable id (`eversis-<name>`) via file read under `.ai/prompts/…` or tool-native attach. Cursor `@` attach and `/eversis-*` slash commands are optional adapter UX, not core SSOT requirements.
 
 Adapters may later mirror these into tool-specific locations; this tree remains SSOT.
