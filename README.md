@@ -47,15 +47,40 @@ Upgrade and sync **must not** overwrite these without an **explicit** consumer o
 
 ### Specs and research (local only)
 
-Story specs under `docs/specs/dhi-*/` are **local agent artifacts** in MVP (gitignored). They are not part of the published framework documentation surface. Committed docs for versioning/upgrade are this README and `CHANGELOG.md` only.
+Story specs under `docs/specs/dhi-*/` are **local agent artifacts** in MVP (gitignored). They are not part of the published framework documentation surface. Committed docs for versioning/upgrade and Delivery Standard are this README and `CHANGELOG.md` (plus `.ai/` rules).
+
+## Delivery standard (spec-driven development)
+
+Agent Collections deliveries follow **mandatory spec-driven development** (SDD):
+
+```text
+Ideate → Research → Plan → Implement → Review → Fine
+```
+
+| Artifact | Path |
+|----------|------|
+| Spec folder | `docs/specs/<issue-kebab>/` |
+| Research | `<issue-kebab>.research.md` (approve before plan) |
+| Plan | `<issue-kebab>.plan.md` (approve before implement) |
+
+- Canonical rule: [`.ai/rules/orchestration/spec-driven-development.md`](./.ai/rules/orchestration/spec-driven-development.md)
+- Always-on pointer: [`.ai/rules/orchestration/agent-core.md`](./.ai/rules/orchestration/agent-core.md)
+- Folder guide: [`docs/specs/README.md`](./docs/specs/README.md)
+
+**Implement** (`eversis-implement`) must print **Implement readiness** first and run the **adequacy checklist** before Research/Plan SKIP (skill `eversis-orchestrating-implementation`). **Fine** drafts a QA comment; do not post to Jira without explicit human approval.
+
+Primary prompt entry = stable ids (`eversis-implement`, `eversis-review`). Optional (Cursor): `@`-attach the same files if your project surfaces them.
+
+Copy-ready **Delivery Standard** text for Jira stories lives in the SDD rule and in `.ai/skills/eversis-jira-task-formatting/jira-task.example.md`.
 
 ## Layout (core)
 
 ```text
 .ai/                 # SSOT — rules, skills, prompts
 AGENTS.md            # Short agent entry map for this repo
-README.md            # This file — versioning & upgrade contract
+README.md            # This file — versioning, upgrade, Delivery Standard
 CHANGELOG.md         # Release history and migration notes
+docs/specs/README.md # Specs convention (dhi-* local-only in this repo)
 ```
 
 See [`.ai/README.md`](./.ai/README.md) for the core mapping contract.
@@ -64,6 +89,7 @@ See [`.ai/README.md`](./.ai/README.md) for the core mapping contract.
 
 1. Clone this repository.
 2. Read `.ai/README.md` and work under `.ai/` as the source of truth.
-3. Do not treat sibling `cursor-collections` symlinks under `.cursor/` (if present) as the long-term SSOT — they are a temporary scaffold.
+3. For feature work: create `docs/specs/<issue-kebab>/` with research → plan → human gates (see Delivery standard above).
+4. Do not treat sibling `cursor-collections` symlinks under `.cursor/` (if present) as the long-term SSOT — they are a temporary scaffold.
 
 Installer, multi-agent wizard, and production upgrade CLI land in later stories.

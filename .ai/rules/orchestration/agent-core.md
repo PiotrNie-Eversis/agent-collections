@@ -1,14 +1,19 @@
 # Agent core (Agent Collections)
 
-You follow the **Ideate → Implement → Review** lifecycle in this **Agent Collections** framework. Treat each deliverable as a **draft** until the human approves.
+You follow the **Ideate → Research → Plan → Implement → Review** lifecycle in this **Agent Collections** framework (see **`spec-driven-development.md`** for the mandatory Delivery Standard). Treat each deliverable as a **draft** until the human approves.
 
 ## Lifecycle (plain language)
 
-Work moves through three stages:
+Work moves through these stages:
 
 1. **Ideate** — Clarify what is needed and agree scope before large design or coding.
-2. **Implement** — Gather context, plan the work, get approval, then make the changes and check quality.
-3. **Review** — An independent quality check; fix blockers before calling the work finished.
+2. **Research** — Gather context and write `*.research.md` when required; **stop** for human approval before planning.
+3. **Plan** — Write `*.plan.md` with phases and acceptance checks when required; **stop** for human approval before broad code.
+4. **Implement** — Make the changes and run quality commands.
+5. **Review** — An independent quality check; fix blockers before calling the work finished.
+6. **Fine** — QA comment draft in the same turn; ticket publish only with explicit human approval.
+
+**Mandatory Delivery Standard:** follow [`spec-driven-development.md`](./spec-driven-development.md) (spec folder convention, gates, copy-ready Jira block, adequacy before SKIP).
 
 ## Human gates (plain language)
 
@@ -35,7 +40,7 @@ Before broad implementation (after plan approval), check whether a skill package
 2. **Read `docs/context/*.md`** when present — project patterns override generic skill defaults.
 3. **Prefer** the **`eversis-collections` MCP** tools (`eversis_skills_list` / `eversis_skills_get`) when the server is running — only for skills allowed by the stack policy and the approved plan.
 4. **Otherwise** read the matching `SKILL.md` directly (file read or tool-native attachment) for domain-specific work.
-5. Skill packages belong under **`.ai/skills/eversis-<topic>/`** once ported (DHI-520). Until then, adapters may still resolve legacy skill locations. Do **not** register the skills folder as a vendor-specific “Agent Skills” UI path unless the adapter docs say so.
+5. Skill packages belong under **`.ai/skills/eversis-<topic>/`**. Do **not** register the skills folder as a vendor-specific “Agent Skills” UI path unless the adapter docs say so.
 
 **Do not** load a domain skill solely because the user message mentions a related keyword (e.g. "filter", "list", "search"). Confirm stack policy, plan Technical Context, or explicit task scope first.
 
@@ -47,7 +52,7 @@ Before broad implementation (after plan approval), check whether a skill package
 
 ## Hard limits (implement)
 
-These prohibitions apply during implementation (and match code-review STRICT FORBIDDEN expectations). Full code-reviewer role standards are placed with domain rules in a later story (DHI-519); the limits below remain mandatory here:
+These prohibitions apply during implementation (and match code-review STRICT FORBIDDEN expectations):
 
 - Do **not** edit files outside the task / plan scope without explicit human approval.
 - Do **not** remove or silently shorten documentation comments.
@@ -59,5 +64,6 @@ Replace generic guidance with project specifics in the **consumer project stack*
 
 ## Optional focused rules (this folder)
 
+- **`spec-driven-development.md`** — mandatory Delivery Standard (load with this core).
 - **`engineering-manager.md`** — load when driving **Implement** orchestration.
-- Code review role standards — **DHI-519** (domain placement); use the **Review** prompt (`eversis-review`) for review sessions.
+- Code review role standards — domain `architecture/code-reviewer.md`; use the **Review** prompt (`eversis-review`) for review sessions.

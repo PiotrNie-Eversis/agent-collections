@@ -24,6 +24,7 @@ Placeholder pre-distribution version. Adapters, self-contained bootstrap, and in
   - Skill packages (45) under `.ai/skills/` and prompts (16 public + 12 internal) under `.ai/prompts/`
 - **Versioning and upgrade contract** — documented in root `README.md` (local sync, submodule bump, CLI upgrade forward-ref; project-owned opt-in rules)
 - **Local-only story specs** — `docs/specs/dhi-*/` gitignored for MVP (research/plan stay on disk, not published with the framework tree)
+- **Mandatory spec-driven development (Delivery Standard)** — `.ai/rules/orchestration/spec-driven-development.md` (+ pointer from `agent-core`); documented in README / AGENTS / `docs/specs/README.md`; Jira story template block in `eversis-jira-task-formatting` (stable prompt ids + optional Cursor attach note)
 
 ### Migration
 

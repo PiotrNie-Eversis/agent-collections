@@ -6,7 +6,7 @@ Content fill schedule:
 
 | Area | Story |
 |------|-------|
-| Orchestration rules (full) | DHI-518 (**done** — see `rules/orchestration/`) |
+| Orchestration rules (full) | DHI-518 (**done** — see `rules/orchestration/`) + DHI-522 SDD (`spec-driven-development.md`) |
 | Domain rules | DHI-519 (**done** — see `rules/{frontend,backend,devops,architecture,shared-types}/`) |
 | Skills and prompts bodies | DHI-520 (**done** — see `skills/`, `prompts/`; manifest `docs/specs/dhi-520/port-manifest.md`; MCP resolveRoot → DHI-535) |
 
