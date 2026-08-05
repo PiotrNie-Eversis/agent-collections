@@ -25,6 +25,7 @@ Placeholder pre-distribution version. Adapters, self-contained bootstrap, and in
 - **Versioning and upgrade contract** — documented in root `README.md` (local sync, submodule bump, CLI upgrade forward-ref; project-owned opt-in rules)
 - **Local-only story specs** — `docs/specs/dhi-*/` gitignored for MVP (research/plan stay on disk, not published with the framework tree)
 - **Mandatory spec-driven development (Delivery Standard)** — `.ai/rules/orchestration/spec-driven-development.md` (+ pointer from `agent-core`); documented in README / AGENTS / `docs/specs/README.md`; Jira story template block in `eversis-jira-task-formatting` (stable prompt ids + optional Cursor attach note)
+- **Adapter mapping specification** — canonical architecture/mapping doc at `docs/architecture/adapter-mapping.md` (Cursor / Claude / OpenCode field maps, emit matrix, `rule-map` contract); pointer from `.ai/README.md` (DHI-523)
 
 ### Migration
 
