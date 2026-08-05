@@ -7,3 +7,6 @@
 .cursor/rules/eversis-*.mdc
 !.cursor/rules/eversis-project-stack.mdc
 # cursor-collections local [end]
+
+# Agent specs / research / plan — local only (MVP; DHI-521)
+docs/specs/dhi-*/
