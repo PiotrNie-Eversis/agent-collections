@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Wave D — docs + validation (DHI-515 / 541, 539, 540, 542)**
+  - Getting-started guides under `website/docs/getting-started/` (CC-analog stems) + migration from Cursor Collections
+  - Framework reference `documentation/agent-collection.md` and WF/WNF `docs/architecture/requirements-traceability.md`
+  - Docusaurus site under `website/` (rebrand Agent Collections; local build; **public hosting deferred**)
+  - EOG pilot context / WNF-03 measurement notes under `docs/context/eog/`
 - **Wave C — self-contained distribution (DHI-515 / 533–538, 530, 532; 521 verify)**
   - Bootstrap without sibling `cursor-collections` symlinks (skills/prompts/commands + BA Docs rule links removed; Q1: no full `.cursor` skills mirror)
   - MCP package `mcp/eversis-collections-mcp/` resolving `.ai/skills` via `AGENT_COLLECTIONS_HOME` (Q2; no `CURSOR_COLLECTIONS_HOME` in default template)
@@ -26,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **DHI-541** — Root README rewritten for human-first documentation UX (progressive disclosure: hero → workflows with human gates → quick start → install/upgrade facts), aligned with cursor-collections README pattern while keeping Agent Collections facts (`AGENT_COLLECTIONS_HOME`, adapters, MVP limits)
+- README links getting-started + migration; documents deferred docs hosting
 - README quick start is self-contained; upgrade CLI path implemented via installer
 - Adapter sync accepts `--agents cursor,claude,opencode` (OpenCode remains placeholder)
 
