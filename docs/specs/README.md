@@ -2,6 +2,8 @@
 
 Feature **research** and **implementation plan** artifacts for Agent Collections delivery (mandatory Delivery Standard).
 
+Part of the project deliverables triad with [`docs/context/`](../context/) and [`docs/plans/`](../plans/) — see [`docs/architecture/agents-md-standard.md`](../architecture/agents-md-standard.md).
+
 Canonical rule: [`.ai/rules/orchestration/spec-driven-development.md`](../../.ai/rules/orchestration/spec-driven-development.md).
 
 ## Naming convention

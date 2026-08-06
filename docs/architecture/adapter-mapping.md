@@ -282,7 +282,7 @@ Optional later fields (document as **TBD / deferred**, do not invent proprietary
 
 ### 6.2 `AGENTS.md`
 
-OpenCode also supports project `AGENTS.md` as an instructions surface. Framework-wide `AGENTS.md` standardization is **DHI-531 / DHI-532**. This placeholder may:
+OpenCode also supports project `AGENTS.md` as an instructions surface. Framework-wide `AGENTS.md` standardization: canonical standard **[`agents-md-standard.md`](./agents-md-standard.md)** (**DHI-531**); reference fill for this repo **DHI-532**. This placeholder may:
 
 - Point OpenCode users at root `AGENTS.md`, and/or
 - Use `instructions` globs only
@@ -325,7 +325,8 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | **DHI-528** | Canonical isolation strategy — [`isolation-strategy.md`](./isolation-strategy.md) (**done** in this story’s delivery) |
 | **DHI-529** | Ignore triad materialization (root `.cursorignore` / `.claudeignore` / `.opencodeignore`) — **done** |
 | **DHI-530** | Monorepo area glob scoping (consume isolation strategy) |
-| **DHI-531–532** | AGENTS.md standard |
+| **DHI-531** | AGENTS.md standard + template — [`agents-md-standard.md`](./agents-md-standard.md) |
+| **DHI-532** | Reference `AGENTS.md` fill for this repository |
 
 **Out of scope here:** creating `adapters/`, generators, live `rule-map.yaml`, slash commands, prompt/skill mirrors, MCP rewrite, installer, ignore files.
 

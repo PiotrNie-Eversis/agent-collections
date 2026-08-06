@@ -38,6 +38,7 @@ Upgrade and sync **must not** overwrite these without an **explicit** consumer o
 |--------------|-----|
 | `eversis-project-stack` (project rule / stack template) | Consumer-owned stack and skills policy |
 | `docs/context/` | Project context and task baselines |
+| `docs/plans/` | Optional flat plans (prefer `docs/specs/` for Implement) |
 | `docs/specs/` | Project research / plan / local agent artifacts |
 | Local `AGENTS.md` extensions beyond the framework template | Project-specific agent instructions |
 | `.env*`, secrets, credentials | Security |
@@ -78,10 +79,14 @@ Copy-ready **Delivery Standard** text for Jira stories lives in the SDD rule and
 ```text
 .ai/                 # SSOT — rules, skills, prompts
 adapters/            # Tool packaging (cursor, claude, opencode) + sync.mjs
-AGENTS.md            # Short agent entry map for this repo
+AGENTS.md            # Short agent entry map (standard: docs/architecture/agents-md-standard.md)
+templates/           # Install seeds (e.g. AGENTS.template.md)
 README.md            # This file — versioning, upgrade, Delivery Standard
 CHANGELOG.md         # Release history and migration notes
-docs/specs/README.md # Specs convention (dhi-* local-only in this repo)
+docs/context/        # Project context triad (with plans + specs)
+docs/plans/          # Optional flat plans
+docs/specs/          # SDD artifacts (dhi-* local-only in this repo)
+docs/architecture/   # Mapping, isolation, AGENTS standard
 ```
 
 After changing `.ai/rules` or adapter `rule-map.yaml` files, refresh generated surfaces:
@@ -97,7 +102,8 @@ See [`.ai/README.md`](./.ai/README.md) for the core mapping contract.
 
 1. Clone this repository.
 2. Read `.ai/README.md` and work under `.ai/` as the source of truth.
-3. For feature work: create `docs/specs/<issue-kebab>/` with research → plan → human gates (see Delivery standard above).
-4. Do not treat sibling `cursor-collections` symlinks under `.cursor/` (if present) as the long-term SSOT — they are a temporary scaffold.
+3. Read root [`AGENTS.md`](./AGENTS.md) (format: [`docs/architecture/agents-md-standard.md`](./docs/architecture/agents-md-standard.md); consumer seed: [`templates/AGENTS.template.md`](./templates/AGENTS.template.md)).
+4. For feature work: use the docs triad `docs/context/`, `docs/plans/`, `docs/specs/` — create `docs/specs/<issue-kebab>/` with research → plan → human gates (see Delivery standard above).
+5. Do not treat sibling `cursor-collections` symlinks under `.cursor/` (if present) as the long-term SSOT — they are a temporary scaffold.
 
 Installer, multi-agent wizard, and production upgrade CLI land in later stories.

@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking changes:** every breaking release **must** include a **Migration** subsection with consumer steps (see [README](./README.md) upgrade contract).
 - **Project-owned paths** are never overwritten by upgrade tooling without explicit opt-in (see README).
 
+## [Unreleased]
+
+### Added
+
+- **AGENTS.md standard (DHI-531)** — canonical [`docs/architecture/agents-md-standard.md`](./docs/architecture/agents-md-standard.md); copyable [`templates/AGENTS.template.md`](./templates/AGENTS.template.md); root `AGENTS.md` restructured to template shape (placeholders; full reference → DHI-532); docs triad scaffold `docs/plans/README.md`; install contract documented (create-if-absent, wiring → 5.x)
+
 ## [0.0.1] — 2026-08-05
 
 Placeholder pre-distribution version. Self-contained bootstrap and installer are not included yet. Cursor rules adapter generator is present under `adapters/cursor/`; Claude Code adapter under `adapters/claude/` (root `CLAUDE.md`); OpenCode placeholder under `adapters/opencode/`; umbrella sync CLI at `adapters/sync.mjs`.

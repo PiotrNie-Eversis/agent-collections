@@ -199,7 +199,8 @@ Deliver profile-driven path scoping that:
 
 | Story | Role |
 |-------|------|
-| **DHI-531 / DHI-532** | `AGENTS.md` template and reference content (orientation layer body) |
+| **DHI-531** | `AGENTS.md` standard + template — [`agents-md-standard.md`](./agents-md-standard.md) |
+| **DHI-532** | Reference `AGENTS.md` fill for this repository (orientation layer body) |
 | **DHI-542** | Empirical WNF-03 validation on a consumer install; migration notes as needed |
 | **DHI-523** | Adapter emit mapping — see [`adapter-mapping.md`](./adapter-mapping.md); ignore deferred here |
 

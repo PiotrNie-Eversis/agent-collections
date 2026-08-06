@@ -36,6 +36,8 @@ Content fill schedule:
 
 **Isolation strategy (DHI-528):** [`docs/architecture/isolation-strategy.md`](../docs/architecture/isolation-strategy.md) — cross-tool packaging visibility and area/path profiles (`frontend-scope` / `backend-scope` / `fullstack`). Ignore triad materialized at repo root (**DHI-529**); monorepo path globs → DHI-530.
 
+**AGENTS.md standard (DHI-531):** [`docs/architecture/agents-md-standard.md`](../docs/architecture/agents-md-standard.md) — agnostic orientation map (sections, role matrix, docs triad `docs/{context,plans,specs}`, install contract). Copyable seed: [`templates/AGENTS.template.md`](../templates/AGENTS.template.md). Full reference fill for this repo → **DHI-532**.
+
 **OpenCode placeholder (DHI-525):** materialized under [`adapters/opencode/`](../adapters/opencode/) (plus root `opencode.jsonc`). Maturity remains **`placeholder`** — not a full / shipped OpenCode adapter.
 
 | Core asset | Path under `.ai/` | Later consumer role |
