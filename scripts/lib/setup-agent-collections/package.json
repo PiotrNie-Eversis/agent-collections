@@ -1,0 +1,8 @@
+{
+  "name": "cursor-setup-mcp-prompt",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@inquirer/prompts": "^7.5.3"
+  }
+}

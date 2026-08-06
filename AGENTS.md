@@ -5,12 +5,15 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 ## Framework
 
 - **Core SSOT:** `.ai/` — rules, skills, prompts (see [`.ai/README.md`](./.ai/README.md))
-- **Adapters:** [`adapters/`](./adapters/) — Cursor, Claude Code, OpenCode placeholder; refresh with `node adapters/sync.mjs`
+- **Adapters:** [`adapters/`](./adapters/) — Cursor, Claude Code, OpenCode placeholder; refresh with `node adapters/sync.mjs` (optional `--agents cursor,claude`)
+- **Domain / area profiles:** [`adapters/profiles/`](./adapters/profiles/) — Frontend / Backend / Fullstack + area globs
+- **Installer:** [`scripts/setup-agent-collections.sh`](./scripts/setup-agent-collections.sh) — local / submodule / copy; selection at `.agent-collections/install-selection.json`
+- **MCP:** package [`mcp/eversis-collections-mcp/`](./mcp/eversis-collections-mcp/); server id **`eversis-collections`**; env **`AGENT_COLLECTIONS_HOME`**; skills resolve from `.ai/skills/`
 - **Orchestration:** [`.ai/rules/orchestration/agent-core.md`](./.ai/rules/orchestration/agent-core.md) + [`spec-driven-development.md`](./.ai/rules/orchestration/spec-driven-development.md); load `engineering-manager` for Implement
 - **Prompts:** load by stable id under [`.ai/prompts/`](./.ai/prompts/) (e.g. `eversis-implement`, `eversis-review`)
-- **Skills:** MCP server **`eversis-collections`** when enabled; otherwise read `.ai/skills/*/SKILL.md`
+- **Skills:** MCP **`eversis-collections`** when enabled; otherwise read `.ai/skills/*/SKILL.md`
 - **AGENTS standard / template:** [`docs/architecture/agents-md-standard.md`](./docs/architecture/agents-md-standard.md), [`templates/AGENTS.template.md`](./templates/AGENTS.template.md)
-- **Versioning / upgrade:** [`README.md`](./README.md), [`CHANGELOG.md`](./CHANGELOG.md)
+- **Versioning / upgrade:** [`README.md`](./README.md), [`CHANGELOG.md`](./CHANGELOG.md), install selection [`docs/architecture/install-selection.md`](./docs/architecture/install-selection.md)
 - **Isolation / adapters:** [`docs/architecture/isolation-strategy.md`](./docs/architecture/isolation-strategy.md), [`docs/architecture/adapter-mapping.md`](./docs/architecture/adapter-mapping.md)
 
 ## Project deliverables
@@ -26,9 +29,11 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 | Area | Path | Notes |
 |------|------|-------|
 | Core SSOT | `.ai/` | Rules, skills, prompts |
-| Adapters | `adapters/` | Tool packaging + `sync.mjs` |
-| Architecture docs | `docs/architecture/` | Mapping, isolation, AGENTS standard |
-| <!-- more areas --> | <!-- path --> | <!-- DHI-532: complete reference fill --> |
+| Adapters | `adapters/` | Tool packaging + `sync.mjs` + `profiles/` |
+| MCP | `mcp/eversis-collections-mcp/` | Skills MCP; build with `npm run mcp:build` |
+| Installer | `scripts/` | `setup-agent-collections.sh` + lib |
+| Templates | `templates/` | AGENTS / stack / MCP seed |
+| Architecture docs | `docs/architecture/` | Mapping, isolation, AGENTS standard, selection schema |
 
 ## Role matrix
 
@@ -60,8 +65,10 @@ Ideate → Research → Plan → Implement → Review → Fine
 
 ## Project specifics
 
-<!-- Framework-repo-specific notes; full reference fill → DHI-532. -->
-<!-- Stack / quality commands → consumer or local project-stack rule. -->
+- This repository is the **framework** product (not a consumer app). Stack policy: [`.cursor/rules/eversis-project-stack.mdc`](./.cursor/rules/eversis-project-stack.mdc).
+- Quality commands: `npm run sync:adapters`, `npm run sync:adapters:check`, `npm run mcp:build`, `npm run mcp:test`, installer smoke `bash scripts/setup-agent-collections.test.sh`.
+- Skills UX: MCP + `.ai/` load-by-id / `@` attach. Full `.cursor/skills|prompts|commands` mirror and slash-commands are **not** MVP (Q1).
+- BA Docs skills: **Do not load** in this framework repo unless a plan explicitly requires them.
 
 ---
 
@@ -69,9 +76,9 @@ Ideate → Research → Plan → Implement → Review → Fine
 
 Optional. Ignored by non-Cursor tools.
 
-On the **Cursor** channel, Implement can be started with either:
+On the **Cursor** channel, Implement can be started by attaching the prompt by stable id / file stem:
 
-- `/eversis-implement` — Cursor command (when `.cursor/commands/` is scaffolded)
-- `@eversis-implement` — attach the prompt by file stem
+- `@eversis-implement` — attach the prompt (when surfaced under `.ai/prompts` or a generated Cursor prompt path)
+- Primary entry remains prompt id **`eversis-implement`**
 
-Both refer to prompt id `eversis-implement`. Temporary Cursor scaffold may still reference a sibling cursor-collections checkout under `.cursor/` until self-contained bootstrap lands.
+Slash-commands under `.cursor/commands/` are **not** generated in MVP; do not assume `/eversis-*` works until a thin command generator ships.

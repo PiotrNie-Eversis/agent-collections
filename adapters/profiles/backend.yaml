@@ -1,0 +1,26 @@
+# Domain profile: backend (DHI-536)
+id: backend
+description: Backend-oriented domain content (shared-types + orchestration + backend + devops subset)
+domains:
+  - backend
+  - shared-types
+  - orchestration
+  - devops
+skills:
+  - eversis-implementing-backend
+  - eversis-sql-and-database-understanding
+  - eversis-implementing-ci-cd
+  - eversis-implementing-observability
+  - eversis-implementing-kubernetes
+  - eversis-implementing-terraform-modules
+  - eversis-managing-secrets
+  - eversis-designing-multi-cloud-architecture
+  - eversis-optimizing-cloud-cost
+  - eversis-orchestrating-implementation
+  - eversis-technical-context-discovering
+  - eversis-creating-implementation-plans
+  - eversis-task-analysing
+  - eversis-code-reviewing
+  - eversis-fine-handoff
+  - eversis-writing-repo-documentation
+defaultAreaProfile: backend-scope

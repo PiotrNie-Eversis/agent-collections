@@ -1,0 +1,27 @@
+# Domain profile: frontend (DHI-536)
+# Maps to domain rule folders + skill allowlist. Consumed by installer — not hardcoded in bash.
+id: frontend
+description: Frontend-oriented domain content (shared-types + orchestration + frontend)
+domains:
+  - frontend
+  - shared-types
+  - orchestration
+skills:
+  - eversis-implementing-frontend
+  - eversis-implementing-forms
+  - eversis-implementing-filters
+  - eversis-optimizing-frontend
+  - eversis-ensuring-accessibility
+  - eversis-accessibility-auditing
+  - eversis-reviewing-frontend
+  - eversis-ui-verifying
+  - eversis-writing-hooks
+  - eversis-e2e-testing
+  - eversis-orchestrating-implementation
+  - eversis-technical-context-discovering
+  - eversis-creating-implementation-plans
+  - eversis-task-analysing
+  - eversis-code-reviewing
+  - eversis-fine-handoff
+  - eversis-writing-repo-documentation
+defaultAreaProfile: frontend-scope

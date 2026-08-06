@@ -1,0 +1,58 @@
+---
+description: "Project stack — replace with your product stack and skills policy"
+globs: []
+alwaysApply: true
+---
+
+# Project stack — this repository
+
+<!-- TODO: one-line description of this repository / product -->
+
+## Stack
+
+| Area | Path | Role | Stack |
+| ---- | ---- | ---- | ----- |
+| <!-- TODO --> | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> |
+
+## Quality commands
+
+<!-- TODO: document lint, test, typecheck, and build commands for this repo -->
+
+Run from the **repo root** unless noted.
+
+```bash
+# TODO: npm run lint
+# TODO: npm run test
+# TODO: npm run build
+```
+
+## Conventions
+
+- **Agent entry:** [AGENTS.md](../../AGENTS.md)
+- **Framework:** Agent Collections (`.ai/` SSOT; MCP `eversis-collections`)
+- **Specs / plans:** `docs/specs/<issue-kebab>/` — `*.research.md`, `*.plan.md`
+
+## Agent skills policy
+
+Cursor / Agent Collections ships many optional `eversis-*` skills. **Presence does not mean every skill applies.** Before `eversis_skills_get`, read this section and any `docs/context/*.md` filter/stack notes.
+
+### Always applicable
+
+| Skill | When |
+| ----- | ---- |
+| `eversis-fine-handoff` | Fine turn after Implement |
+| `eversis-orchestrating-implementation` | Implement orchestration |
+
+### Load when task and stack match
+
+| Skill | Load when |
+| ----- | --- |
+| `eversis-writing-repo-documentation` | README, CHANGELOG, docs updates |
+| `eversis-implementing-frontend` | Frontend work (if this repo has UI) |
+| `eversis-implementing-backend` | Backend work (if this repo has APIs) |
+
+### Do not load (unless plan explicitly requires)
+
+| Skill | Reason |
+| ----- | --- |
+| <!-- add product-inappropriate skills --> | <!-- reason --> |

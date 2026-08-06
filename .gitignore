@@ -1,13 +1,13 @@
-
-# cursor-collections local [begin]
+# Agent Collections — local / generated surfaces
 .cursor/mcp.json
-.cursor/prompts/
-.cursor/commands/
-.cursor/skills/
-# Temporary BA Docs role rules (symlink bootstrap until core BA rules exist)
-.cursor/rules/eversis-ba-docs-*.mdc
-# Generated framework rules + consumer project-stack are tracked (DHI-524)
-# cursor-collections local [end]
+
+# Consumer selection + local install metadata (framework tree may keep docs only)
+# Selection is written in consumer projects; do not commit sample selection here.
 
 # Agent specs / research / plan — local only (MVP; DHI-521)
 docs/specs/dhi-*/
+
+# MCP package
+mcp/eversis-collections-mcp/node_modules/
+mcp/eversis-collections-mcp/dist/
+scripts/lib/setup-agent-collections/node_modules/

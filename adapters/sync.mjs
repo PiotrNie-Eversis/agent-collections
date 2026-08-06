@@ -50,6 +50,8 @@ function findRepoRoot(startDir) {
 function parseArgs(argv) {
   let outRoot = null;
   let check = false;
+  /** @type {Set<string>|null} */
+  let agents = null;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--out") {
@@ -61,17 +63,38 @@ function parseArgs(argv) {
       i++;
       continue;
     }
+    if (arg === "--agents") {
+      const next = argv[i + 1];
+      if (!next || next.startsWith("-")) {
+        fail("--agents requires a comma-separated list (cursor,claude,opencode)");
+      }
+      agents = new Set(
+        next
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+      );
+      for (const id of agents) {
+        if (!["cursor", "claude", "opencode"].includes(id)) {
+          fail(`unknown agent id: ${id} (allowed: cursor, claude, opencode)`);
+        }
+      }
+      i++;
+      continue;
+    }
     if (arg === "--check") {
       check = true;
       continue;
     }
     if (arg === "--help" || arg === "-h") {
       console.log(
-        "Usage: node adapters/sync.mjs [--check] [--out <dir>]\n" +
+        "Usage: node adapters/sync.mjs [--check] [--out <dir>] [--agents cursor,claude,opencode]\n" +
           "  Default: regenerate Cursor (.mdc) then Claude (CLAUDE.md) from core.\n" +
           "  --check: compare fresh generation to disk; exit 0 if no drift (also checks\n" +
           "           Cursor↔Claude id/source map parity). Does not write in-place.\n" +
-          "  --out: pass through to both generators (write or compare under <dir>).\n" +
+          "  --out: pass through to generators (write or compare under <dir>).\n" +
+          "  --agents: only run selected adapters (default: cursor,claude).\n" +
+          "            opencode is placeholder-only (copies opencode.jsonc when present).\n" +
           "\n" +
           "npm: npm run sync:adapters | npm run sync:adapters:check",
       );
@@ -79,7 +102,7 @@ function parseArgs(argv) {
     }
     fail(`unknown argument: ${arg}`);
   }
-  return { outRoot, check };
+  return { outRoot, check, agents };
 }
 
 function stripQuotes(value) {
@@ -332,22 +355,47 @@ function runCheck(repoRoot, outRoot) {
   }
 }
 
-function runWrite(outRoot) {
-  console.log("adapter sync: regenerating Cursor…");
-  runGenerator(CURSOR_GENERATE, outRoot, "Cursor");
-  console.log("adapter sync: regenerating Claude…");
-  runGenerator(CLAUDE_GENERATE, outRoot, "Claude");
+function runOpenCodePlaceholder(repoRoot, outRoot) {
+  const src = path.join(repoRoot, "opencode.jsonc");
+  const destRoot = outRoot || repoRoot;
+  const dest = path.join(destRoot, "opencode.jsonc");
+  if (!fs.existsSync(src)) {
+    console.warn(
+      "adapter sync: OpenCode placeholder requested but opencode.jsonc missing in framework home — skipping",
+    );
+    return;
+  }
+  fs.mkdirSync(destRoot, { recursive: true });
+  fs.copyFileSync(src, dest);
+  console.log(
+    "adapter sync: OpenCode placeholder copied (maturity=placeholder — not a full adapter)",
+  );
+}
+
+function runWrite(repoRoot, outRoot, agents) {
+  const selected = agents ?? new Set(["cursor", "claude"]);
+  if (selected.has("cursor")) {
+    console.log("adapter sync: regenerating Cursor…");
+    runGenerator(CURSOR_GENERATE, outRoot, "Cursor");
+  }
+  if (selected.has("claude")) {
+    console.log("adapter sync: regenerating Claude…");
+    runGenerator(CLAUDE_GENERATE, outRoot, "Claude");
+  }
+  if (selected.has("opencode")) {
+    runOpenCodePlaceholder(repoRoot, outRoot);
+  }
   console.log("adapter sync: done");
 }
 
 function main() {
-  const { outRoot, check } = parseArgs(process.argv.slice(2));
+  const { outRoot, check, agents } = parseArgs(process.argv.slice(2));
   const repoRoot = findRepoRoot(process.cwd());
 
   if (check) {
     runCheck(repoRoot, outRoot);
   } else {
-    runWrite(outRoot);
+    runWrite(repoRoot, outRoot, agents);
   }
 }
 

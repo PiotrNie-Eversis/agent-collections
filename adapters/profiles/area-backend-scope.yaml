@@ -1,0 +1,11 @@
+# Area profile: backend-scope (isolation-strategy §5 / DHI-530)
+id: backend-scope
+include:
+  - apps/api/**
+  - packages/shared-types/**
+  - docs/**
+  - scripts/**
+exclude:
+  - apps/web/**
+  - charts/**
+  - "**/node_modules/**"

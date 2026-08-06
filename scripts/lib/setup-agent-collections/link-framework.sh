@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# lib/setup-agent-collections/link-framework.sh — materialise adapters into target (no skills mirror).
+
+readonly STACK_RULE_BASENAME="eversis-project-stack.mdc"
+
+_make_symlink() {
+  local src="$1" dst="$2"
+  if [[ "$OS_TYPE" == "windows" ]]; then
+    cmd //c "mklink /J \"${dst}\" \"${src}\"" 2>/dev/null && return 0
+    return 1
+  fi
+  local rel=""
+  local rel_script="${LIB_DIR}/relative-path.mjs"
+  if [[ -f "$rel_script" ]] && command -v node >/dev/null 2>&1; then
+    rel="$(node "$rel_script" "$(dirname "$dst")" "$src" 2>/dev/null || true)"
+  fi
+  if [[ -n "$rel" ]] && [[ "$rel" != /* ]]; then
+    ln -sfn "$rel" "$dst"
+  else
+    ln -sfn "$src" "$dst"
+  fi
+}
+
+_seed_stack_rule() {
+  local stack_dst="${TARGET_DIR}/.cursor/rules/${STACK_RULE_BASENAME}"
+  mkdir -p "$(dirname "$stack_dst")"
+  if [[ -f "$stack_dst" ]]; then
+    log_info "eversis-project-stack.mdc already exists — not overwritten (project-owned)."
+    return 0
+  fi
+  local template="${COLLECTIONS_HOME}/templates/eversis-project-stack.example.mdc"
+  if [[ ! -f "$template" ]]; then
+    template="${COLLECTIONS_HOME}/.cursor/rules/${STACK_RULE_BASENAME}"
+  fi
+  if [[ -f "$template" ]]; then
+    cp "$template" "$stack_dst"
+    log_ok "Created ${STACK_RULE_BASENAME} from template — customise for your project."
+  else
+    log_warn "No stack rule template found — create ${stack_dst} manually."
+  fi
+}
+
+_run_adapter_sync() {
+  require_cmd node "Install Node.js ≥ 18 from https://nodejs.org"
+  local sync_mjs="${COLLECTIONS_HOME}/adapters/sync.mjs"
+  [[ -f "$sync_mjs" ]] || die "Missing adapters/sync.mjs in framework home."
+
+  local agents_csv="${SELECTED_AGENTS:-cursor}"
+  local args=(--out "${TARGET_DIR}" --agents "${agents_csv}")
+  log_info "Running adapter sync → ${TARGET_DIR} (agents: ${agents_csv}) …"
+  (cd "$COLLECTIONS_HOME" && node "$sync_mjs" "${args[@]}") \
+    || die "adapters/sync.mjs failed."
+  log_ok "Adapter sync complete."
+}
+
+link_framework_files() {
+  local link_mode="${ARG_LINK_MODE:-auto}"
+  if [[ "$link_mode" == "auto" ]]; then
+    if [[ "$OS_TYPE" == "windows" ]]; then
+      link_mode="copy"
+    else
+      link_mode="symlink"
+    fi
+  fi
+  EFFECTIVE_LINK_MODE="$link_mode"
+  export EFFECTIVE_LINK_MODE
+
+  mkdir -p "${TARGET_DIR}/.cursor/rules"
+
+  # Q1: do NOT mirror .cursor/skills|prompts|commands — skills via MCP + .ai/
+  _run_adapter_sync
+  _seed_stack_rule
+
+  # Optional: relative pointer for local mode documentation
+  local home_marker="${TARGET_DIR}/.agent-collections"
+  mkdir -p "$home_marker"
+  echo "${COLLECTIONS_HOME}" > "${home_marker}/framework-home.txt"
+  return 0
+}

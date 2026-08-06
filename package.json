@@ -5,6 +5,10 @@
   "description": "Agent Collections — vendor-neutral multi-agent framework core",
   "scripts": {
     "sync:adapters": "node adapters/sync.mjs",
-    "sync:adapters:check": "node adapters/sync.mjs --check"
+    "sync:adapters:check": "node adapters/sync.mjs --check",
+    "mcp:build": "npm --prefix mcp/eversis-collections-mcp run build",
+    "mcp:test": "npm --prefix mcp/eversis-collections-mcp test",
+    "mcp:install": "npm --prefix mcp/eversis-collections-mcp install",
+    "installer:smoke": "bash scripts/setup-agent-collections.test.sh"
   }
 }

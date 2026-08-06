@@ -1,0 +1,49 @@
+# Domain profile: fullstack (DHI-536)
+id: fullstack
+description: Full domain set + default monorepo area scoping (fullstack)
+domains:
+  - frontend
+  - backend
+  - devops
+  - shared-types
+  - orchestration
+  - architecture
+skills:
+  # Frontend-oriented
+  - eversis-implementing-frontend
+  - eversis-implementing-forms
+  - eversis-implementing-filters
+  - eversis-optimizing-frontend
+  - eversis-ensuring-accessibility
+  - eversis-accessibility-auditing
+  - eversis-reviewing-frontend
+  - eversis-ui-verifying
+  - eversis-writing-hooks
+  - eversis-e2e-testing
+  # Backend / devops
+  - eversis-implementing-backend
+  - eversis-sql-and-database-understanding
+  - eversis-implementing-ci-cd
+  - eversis-implementing-observability
+  - eversis-implementing-kubernetes
+  - eversis-implementing-terraform-modules
+  - eversis-managing-secrets
+  - eversis-designing-multi-cloud-architecture
+  - eversis-optimizing-cloud-cost
+  # Shared / orchestration
+  - eversis-orchestrating-implementation
+  - eversis-technical-context-discovering
+  - eversis-creating-implementation-plans
+  - eversis-architecture-designing
+  - eversis-codebase-analysing
+  - eversis-task-analysing
+  - eversis-code-reviewing
+  - eversis-fine-handoff
+  - eversis-writing-repo-documentation
+  - eversis-creating-skills
+  - eversis-creating-prompts
+  - eversis-creating-agents
+  - eversis-creating-instructions
+notes:
+  - Monorepo installs should also apply area profile fullstack (or explicit frontend-scope / backend-scope).
+defaultAreaProfile: fullstack

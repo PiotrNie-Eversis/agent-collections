@@ -1,0 +1,17 @@
+{
+  "servers": [
+    "context7",
+    "sequential-thinking",
+    "figma",
+    "atlassian",
+    "pdf-reader",
+    "awslabs.aws-api-mcp-server",
+    "awslabs.aws-documentation-mcp-server",
+    "gcp-gcloud",
+    "gcp-observability",
+    "gcp-storage",
+    "eversis-collections",
+    "playwright"
+  ],
+  "defaultChecked": ["eversis-collections"]
+}

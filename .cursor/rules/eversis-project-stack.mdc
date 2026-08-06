@@ -1,54 +1,57 @@
 ---
-description: Per-repository stack and quality commands — CUSTOMISE FOR THIS REPO
+description: Per-repository stack and quality commands — Agent Collections framework repo
 alwaysApply: true
 ---
 
 # Project stack — this repository
 
-<!-- TODO: one-line description of this repository / product -->
+Agent Collections framework repository (vendor-neutral multi-agent core).
 
 ## Stack
 
 | Area | Path | Role | Stack |
 | ---- | ---- | ---- | ----- |
-| <!-- TODO --> | <!-- TODO --> | <!-- TODO --> | <!-- TODO --> |
+| Core | `.ai/` | SSOT rules/skills/prompts | Markdown |
+| Adapters | `adapters/` | Cursor / Claude / OpenCode packaging | Node `*.mjs` |
+| MCP | `mcp/eversis-collections-mcp/` | Skills MCP server | TypeScript |
+| Installer | `scripts/` | Consumer install / upgrade | Bash + Node |
+| Docs | `docs/architecture/` | Mapping, isolation, AGENTS, selection | Markdown |
 
 ## Quality commands
-
-<!-- TODO: document lint, test, typecheck, and build commands for this repo -->
-<!-- Source: package.json scripts, Makefile, nx.json, or CONTRIBUTING.md -->
 
 Run from the **repo root** unless noted.
 
 ```bash
-# TODO: npm run lint
-# TODO: npm run test
-# TODO: npm run build
+npm run sync:adapters
+npm run sync:adapters:check
+npm run mcp:build
+npm run mcp:test
+bash scripts/setup-agent-collections.test.sh
 ```
 
 ## Conventions
 
 - **Agent entry:** [AGENTS.md](../../AGENTS.md)
-- **Framework docs:** see your `cursor-collections` checkout (`documentation/cursor-collection.md` Part C) or vendor path `vendor/cursor-collections/documentation/cursor-collection.md`
+- **Framework SSOT:** `.ai/` — adapters and MCP consume it
 - **Specs / plans:** `docs/specs/<issue-kebab>/` — `*.research.md`, `*.plan.md`
 
 ## Agent skills policy
 
-Cursor Collections ships many optional `eversis-*` skills. **Presence in `.cursor/skills/` does not mean every skill applies to this repo.** Before `eversis_skills_get`, read this section and any `docs/context/*.md` filter/stack notes.
+Presence of a skill package does **not** mean it applies. Before `eversis_skills_get`, read this section and any `docs/context/*.md` notes.
 
 ### Always applicable (this framework repo)
 
 | Skill | When |
 | ----- | ---- |
-| `eversis-fine-handoff` | Fine turn after `@eversis-implement` |
+| `eversis-fine-handoff` | Fine turn after Implement |
 | `eversis-creating-skills`, `eversis-creating-prompts`, `eversis-creating-agents`, `eversis-creating-instructions` | Framework customization work |
+| `eversis-orchestrating-implementation` | Implement orchestration |
 
 ### Load when task and stack match
 
 | Skill | Load when |
 | ----- | --------- |
-| `eversis-writing-repo-documentation` | README, CHANGELOG, `website/docs` updates |
-| `eversis-orchestrating-implementation` | `@eversis-implement` orchestration (via MCP or prompt) |
+| `eversis-writing-repo-documentation` | README, CHANGELOG, docs updates |
 
 ### Do not load in this repo (unless plan explicitly requires)
 
@@ -58,19 +61,13 @@ Cursor Collections ships many optional `eversis-*` skills. **Presence in `.curso
 | `eversis-implementing-backend`, `eversis-implementing-frontend` | No application backend/frontend in scope |
 | `eversis-ba-docs-planner`, `eversis-ba-docs-writer` | Word `.docx` release docs — not this repo's workflow |
 
-**Consumer projects:** replace this section with your product stack (Next, Nest, Liferay, etc.). See `documentation/cursor-collection.md` § Agent skills policy.
-
-## Reference
-
-For a **filled-in example** of this file (Earth observation / GIS web), see Part C **Reference** in the upstream `documentation/cursor-collection.md`. Copy ideas manually — do not commit the example profile as-is.
+**Consumer projects:** replace this section with your product stack.
 
 ## Status: Fine — QA comment (mandatory contract)
 
 When **all** planned agent work for an **eversis-implement** thread is finished:
 
 1. Declare **`Fine`** explicitly.
-2. **In the same assistant response**, draft the QA comment following the **`eversis-fine-handoff`** skill (`eversis_skills_get` via MCP, or read `.cursor/skills/eversis-fine-handoff/SKILL.md` when vendored).
-3. Label: **`Draft QA comment — review before posting to Jira`**
+2. **In the same assistant response**, draft the QA comment following the **`eversis-fine-handoff`** skill.
+3. Label: **`Draft QA comment — review before posting to Jira`** (or per-story labels when requested).
 4. **Never** post to Jira in that turn; publication only after explicit human approval.
-
-See upstream framework docs (`website/docs/workflow/overview.md`) for the full workflow contract.

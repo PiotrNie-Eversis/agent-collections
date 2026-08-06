@@ -1,0 +1,68 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "type": "stdio"
+    },
+    "figma": {
+      "url": "https://mcp.figma.com/mcp",
+      "type": "http"
+    },
+    "atlassian": {
+      "url": "https://mcp.atlassian.com/v1/mcp",
+      "type": "http"
+    },
+    "pdf-reader": {
+      "command": "npx",
+      "args": ["@sylphx/pdf-reader-mcp"],
+      "type": "stdio"
+    },
+    "eversis-collections": {
+      "command": "node",
+      "args": [
+        "${env:AGENT_COLLECTIONS_HOME}/mcp/eversis-collections-mcp/dist/index.js"
+      ],
+      "type": "stdio",
+      "env": {
+        "AGENT_COLLECTIONS_HOME": "${env:AGENT_COLLECTIONS_HOME}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "type": "stdio"
+    },
+    "awslabs.aws-api-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.aws-api-mcp-server@latest"],
+      "type": "stdio"
+    },
+    "awslabs.aws-documentation-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.aws-documentation-mcp-server@latest"],
+      "type": "stdio"
+    },
+    "gcp-gcloud": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/gcloud-mcp"],
+      "type": "stdio"
+    },
+    "gcp-observability": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/observability-mcp"],
+      "type": "stdio"
+    },
+    "gcp-storage": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/storage-mcp"],
+      "type": "stdio"
+    }
+  },
+  "inputs": []
+}
