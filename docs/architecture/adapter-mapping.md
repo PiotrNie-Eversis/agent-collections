@@ -40,7 +40,7 @@ adapters (future)
 
 | Adapter | Rules | Prompts | Skills | Commands / other | Maturity |
 |---------|-------|---------|--------|------------------|----------|
-| **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** (MVP) | **No** emit — resolve via MCP after DHI-535 | **No** slash commands in MVP (Cursor-specific / later) | Generator: DHI-524 |
+| **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** (MVP) | **No** emit — resolve via MCP after DHI-535 | **No** slash commands in MVP (Cursor-specific / later) | Generator: **DHI-524** (`adapters/cursor/`) |
 | **Claude Code** | One root **`CLAUDE.md`** (H2 section per mapped rule) | **No** | **No** emit — MCP / `AGENTS.md` | Instructional “load prompt id …” inside `CLAUDE.md` only — **not** `.cursor/commands` | Generator: DHI-526 |
 | **OpenCode** | Point at core (or generated) paths via `opencode.json` `instructions` | Deferred | Deferred | Config placeholder; optional `AGENTS.md` | **placeholder** (DHI-525) |
 
@@ -129,8 +129,8 @@ alwaysApply: false
 
 ## 4. Cursor `rule-map.yaml` contract
 
-**File (DHI-524):** `adapters/cursor/rule-map.yaml`  
-**This story:** documents the contract only — **do not** create `adapters/` or the YAML file here.
+**File (DHI-524):** [`adapters/cursor/rule-map.yaml`](../../adapters/cursor/rule-map.yaml)  
+**Generator (DHI-524):** [`adapters/cursor/generate.mjs`](../../adapters/cursor/generate.mjs) — run from repo root: `node adapters/cursor/generate.mjs` (optional `--out <dir>`).
 
 ### 4.1 Required shape
 
@@ -144,10 +144,12 @@ alwaysApply: false
 | `rules[].description` | Yes | Cursor `description` |
 | Packaging | Yes | **Either** `alwaysApply: true` **or** `globs: […]` (attach-only uses `globs: []` and `alwaysApply: false`) |
 
-### 4.2 Illustrative example (not committed in DHI-523)
+### 4.2 Example (live map)
+
+See committed [`adapters/cursor/rule-map.yaml`](../../adapters/cursor/rule-map.yaml). Excerpt:
 
 ```yaml
-# Illustrative — created by DHI-524, not by DHI-523
+# Excerpt — full map: adapters/cursor/rule-map.yaml
 version: 1
 rules:
   - id: eversis-agent-core
@@ -304,7 +306,7 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | `placeholder` | Spec + sample config only; wizard must not claim a full adapter |
 | `deferred` | Explicitly out of current adapter MVP |
 
-Until DHI-524/526 land, Cursor/Claude generators are **not** `shipped` in this repo — only this **mapping contract** is.
+Until Claude (DHI-526) lands, that generator is **not** `shipped` here. **Cursor** packaging for mapped rules is available via `adapters/cursor/` (DHI-524); BA Docs rules may still be temporary symlinks, and skills/prompts remain outside this adapter MVP.
 
 ---
 
@@ -313,7 +315,7 @@ Until DHI-524/526 land, Cursor/Claude generators are **not** `shipped` in this r
 | Story | Responsibility |
 |-------|----------------|
 | **DHI-523 (this)** | Mapping specification (this file) + pointer from `.ai/README.md` |
-| **DHI-524** | Cursor generator, `adapters/cursor/`, real `rule-map.yaml`, replace symlinks |
+| **DHI-524** | Cursor generator, `adapters/cursor/`, live `rule-map.yaml`, replace framework symlinks (**done** in this repo for mapped rules) |
 | **DHI-526** | Claude `CLAUDE.md` generator |
 | **DHI-525** | OpenCode placeholder materialization from §6 |
 | **DHI-527** | Sync / generation CLI over existing adapters |

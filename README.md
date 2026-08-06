@@ -2,7 +2,7 @@
 
 Vendor-neutral multi-agent framework core (SSOT under `.ai/`). Adapters, installer, and MCP consume this repository; they do not own the canonical content.
 
-**Status:** Pre-distribution MVP (`v0.0.1`). Core rules, skills, and prompts are present. Adapters, self-contained bootstrap, and installer are not shipped yet.
+**Status:** Pre-distribution MVP (`v0.0.1`). Core rules, skills, and prompts are present. Cursor adapter generator is under `adapters/cursor/`. Self-contained bootstrap and installer are not shipped yet.
 
 **Related channel:** [Cursor Collections](https://github.com/PiotrNie-Eversis/cursor-collections) remains a separate Cursor distribution. It does **not** share SemVer with Agent Collections.
 

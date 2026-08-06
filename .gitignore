@@ -4,8 +4,9 @@
 .cursor/prompts/
 .cursor/commands/
 .cursor/skills/
-.cursor/rules/eversis-*.mdc
-!.cursor/rules/eversis-project-stack.mdc
+# Temporary BA Docs role rules (symlink bootstrap until core BA rules exist)
+.cursor/rules/eversis-ba-docs-*.mdc
+# Generated framework rules + consumer project-stack are tracked (DHI-524)
 # cursor-collections local [end]
 
 # Agent specs / research / plan — local only (MVP; DHI-521)
