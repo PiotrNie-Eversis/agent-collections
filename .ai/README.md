@@ -34,6 +34,8 @@ Content fill schedule:
 
 **Canonical specification:** [`docs/architecture/adapter-mapping.md`](../docs/architecture/adapter-mapping.md) (DHI-523) — field maps for Cursor / Claude Code / OpenCode placeholder, emit matrix, and adapter `rule-map.yaml` contracts. Prefer that document over this summary when implementing or extending adapters (DHI-524+). Cursor: [`adapters/cursor/`](../adapters/cursor/). Claude Code: [`adapters/claude/`](../adapters/claude/) → root `CLAUDE.md`.
 
+**Isolation strategy (DHI-528):** [`docs/architecture/isolation-strategy.md`](../docs/architecture/isolation-strategy.md) — cross-tool packaging visibility and area/path profiles (`frontend-scope` / `backend-scope` / `fullstack`). Ignore file materialization → DHI-529; monorepo path globs → DHI-530.
+
 **OpenCode placeholder (DHI-525):** materialized under [`adapters/opencode/`](../adapters/opencode/) (plus root `opencode.jsonc`). Maturity remains **`placeholder`** — not a full / shipped OpenCode adapter.
 
 | Core asset | Path under `.ai/` | Later consumer role |
@@ -68,3 +70,4 @@ See `rules/orchestration/agent-core.md` for the production lifecycle and gate ru
 - Domain rules extraction: `docs/specs/dhi-519/`
 - Skills & prompts port: `docs/specs/dhi-520/` (manifest: `port-manifest.md`)
 - Adapter mapping (canonical): `docs/architecture/adapter-mapping.md` (DHI-523)
+- Isolation strategy (canonical): `docs/architecture/isolation-strategy.md` (DHI-528)

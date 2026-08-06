@@ -278,7 +278,7 @@ Hand-maintained placeholder (DHI-525) — committed as **`opencode.jsonc`** (JSO
 Optional later fields (document as **TBD / deferred**, do not invent proprietary keys):
 
 - Agent mode / permission blocks in `opencode.json` (see OpenCode agents docs) — **out of MVP placeholder** unless DHI-525 expands
-- Ignore files: `.opencodeignore` → **DHI-528 / DHI-529**
+- Ignore files: `.opencodeignore` → see canonical [isolation strategy](./isolation-strategy.md) (DHI-528); materialization → **DHI-529**
 
 ### 6.2 `AGENTS.md`
 
@@ -308,7 +308,7 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | `placeholder` | Spec + sample config only; wizard must not claim a full adapter |
 | `deferred` | Explicitly out of current adapter MVP |
 
-**Cursor** packaging for mapped rules is available via `adapters/cursor/` (DHI-524). **Claude Code** packaging is available via `adapters/claude/` (DHI-526) — generates root `CLAUDE.md`. BA Docs rules may still be temporary Cursor symlinks; skills/prompts remain outside adapter MVP emit. Ignore / monorepo isolation remains DHI-528–530.
+**Cursor** packaging for mapped rules is available via `adapters/cursor/` (DHI-524). **Claude Code** packaging is available via `adapters/claude/` (DHI-526) — generates root `CLAUDE.md`. BA Docs rules may still be temporary Cursor symlinks; skills/prompts remain outside adapter MVP emit. Ignore / monorepo isolation: canonical strategy is [`isolation-strategy.md`](./isolation-strategy.md) (DHI-528); file materialization and path globs remain DHI-529–530.
 
 ---
 
@@ -322,7 +322,8 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | **DHI-525** | OpenCode placeholder materialization from §6 (**done** — `adapters/opencode/` + root `opencode.jsonc`) |
 | **DHI-527** | Sync / generation CLI — **done**: `node adapters/sync.mjs` (`--check`, optional `--out`; npm `sync:adapters` / `sync:adapters:check`) |
 | **DHI-535** | MCP skill resolve from `.ai/skills/` |
-| **DHI-528–530** | Ignore files and monorepo isolation |
+| **DHI-528** | Canonical isolation strategy — [`isolation-strategy.md`](./isolation-strategy.md) (**done** in this story’s delivery) |
+| **DHI-529–530** | Ignore triad materialization and monorepo area glob scoping (consume isolation strategy) |
 | **DHI-531–532** | AGENTS.md standard |
 
 **Out of scope here:** creating `adapters/`, generators, live `rule-map.yaml`, slash commands, prompt/skill mirrors, MCP rewrite, installer, ignore files.
