@@ -1,0 +1,119 @@
+# Agent Collections — framework reference
+
+Authoritative short guide for **Agent Collections**: a vendor-neutral multi-agent core (`.ai/`) with adapters, installer, and MCP. Product documentation for consumers is written in **English**.
+
+**Delivery standard:** Ideate → Research → Plan → Implement → Review → Fine.
+
+For onboarding checklists, prefer the docs site pages under `website/docs/getting-started/` (build locally; public hosting is deferred).
+
+---
+
+## Model
+
+```text
+.ai/          SSOT — rules, skills, prompts
+adapters/     Cursor / Claude / OpenCode packaging + sync
+mcp/          eversis-collections-mcp → .ai/skills via AGENT_COLLECTIONS_HOME
+scripts/      setup-agent-collections.sh
+templates/    AGENTS / stack / mcp seeds
+```
+
+| Concept | Definition |
+|---------|------------|
+| **Core** | Canonical Markdown under `.ai/` |
+| **Adapter** | Tool packaging that consumes core (does not own SSOT text) |
+| **Consumer** | Application repo that installs via local / submodule / copy |
+
+Related product **Cursor Collections** is a separate Cursor distribution channel. Dual-channel **code** is allowed; **documentation channels stay fully separate** (no shared docs portal).
+
+---
+
+## Table of contents
+
+1. [Install and env](#install-and-env)
+2. [Agents and prompts](#agents-and-prompts)
+3. [Skills (MCP)](#skills-mcp)
+4. [Isolation and areas](#isolation-and-areas)
+5. [Versioning and upgrade](#versioning-and-upgrade)
+6. [Architecture docs](#architecture-docs)
+7. [Getting started on the docs site](#getting-started-on-the-docs-site)
+
+---
+
+## Install and env
+
+```bash
+export AGENT_COLLECTIONS_HOME=/path/to/agent-collections
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+  --build-mcp --non-interactive \
+  --agents=cursor,claude \
+  --mcp-servers=eversis-collections \
+  --profile=fullstack
+```
+
+- Env for skills MCP: **`AGENT_COLLECTIONS_HOME`** (not `CURSOR_COLLECTIONS_HOME`).
+- Selection: `.agent-collections/install-selection.json` — see `docs/architecture/install-selection.md`.
+
+---
+
+## Agents and prompts
+
+| Phase | Primary prompt id |
+|-------|-------------------|
+| Ideate | `eversis-analyze-materials` |
+| Implement | `eversis-implement` |
+| Review | `eversis-review` |
+| Review (UI) | `eversis-review-ui` |
+
+Load prompts by stable id under `.ai/prompts/`. Optional Cursor `@` attach when surfaced. Slash `/eversis-*` commands are **not** MVP.
+
+Entry map: root [`AGENTS.md`](../AGENTS.md).
+
+---
+
+## Skills (MCP)
+
+Skills live under `.ai/skills/eversis-*/`. Prefer MCP server **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`). Respect the consumer **project stack** skills policy (Always / Load when / Do not load).
+
+MVP does **not** ship a full `.cursor/skills` mirror.
+
+---
+
+## Isolation and areas
+
+- Cross-tool ignore triad + area profiles: `docs/architecture/isolation-strategy.md`.
+- Abstract layout: `apps/web`, `apps/api`, `packages/*`. Consumer folder names (e.g. portal/cms-class trees) map via **consumer overlay**, not framework profile hardcoding.
+- WNF-03: ≥30% context reduction vs unscoped using the §7.2 proxy, or a justified estimate.
+
+---
+
+## Versioning and upgrade
+
+SemVer tags on this repository cover core + adapters + installer + MCP together. Breaking releases must include a **Migration** subsection in [`CHANGELOG.md`](../CHANGELOG.md). Upgrade modes: local sync, submodule bump, installer `--upgrade` (see root README).
+
+---
+
+## Architecture docs
+
+| Doc | Topic |
+|-----|--------|
+| `docs/architecture/adapter-mapping.md` | Cursor / Claude / OpenCode emit matrix |
+| `docs/architecture/isolation-strategy.md` | Ignore + area + WNF-03 |
+| `docs/architecture/install-selection.md` | Selection schema |
+| `docs/architecture/agents-md-standard.md` | AGENTS.md convention |
+| `docs/architecture/requirements-traceability.md` | WF/WNF → docs |
+
+---
+
+## Getting started on the docs site
+
+| Page | Path |
+|------|------|
+| Start here | `website/docs/getting-started/start-here.md` |
+| Prerequisites | `website/docs/getting-started/prerequisites.md` |
+| Installation | `website/docs/getting-started/installation.md` |
+| MCP setup | `website/docs/getting-started/mcp-setup.md` |
+| Quick wins | `website/docs/getting-started/quick-wins.md` |
+| Migration | `website/docs/getting-started/migration-from-cursor-collections.md` |
+
+Build: `cd website && npm install && npm run build`. Public hosting is **deferred** (out-of-band).

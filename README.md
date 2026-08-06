@@ -1,10 +1,36 @@
 # Agent Collections
 
-Vendor-neutral multi-agent framework core (SSOT under `.ai/`). Adapters, installer, and MCP consume this repository; they do not own the canonical content.
+Vendor-neutral **multi-agent** product engineering framework. Canonical content lives under **`.ai/`**. Adapters, installer, and MCP consume this repository; they do not own the SSOT.
 
-**Status:** Self-contained distribution MVP (`v0.0.1`). Fresh clone works without a sibling `cursor-collections` checkout.
+**Status:** Self-contained distribution MVP (`v0.0.1`). Fresh clone works without a sibling Cursor Collections checkout.
 
-**Related channel:** [Cursor Collections](https://github.com/PiotrNie-Eversis/cursor-collections) remains a separate Cursor distribution. It does **not** share SemVer with Agent Collections.
+**Related channel:** [Cursor Collections](https://github.com/PiotrNie-Eversis/cursor-collections) remains a separate Cursor distribution. It does **not** share SemVer with Agent Collections. Documentation channels are **fully independent** (no shared docs portal).
+
+## Vision (core + adapters)
+
+```text
+.ai/          SSOT — rules, skills, prompts
+adapters/     Cursor · Claude Code · OpenCode (placeholder) + sync + profiles
+mcp/          eversis-collections-mcp → skills from .ai/skills
+scripts/      setup-agent-collections.sh (local / submodule / copy)
+```
+
+Delivery standard: **Ideate → Research → Plan → Implement → Review → Fine**.
+
+## Getting started
+
+| Guide | Path |
+|-------|------|
+| **Start here** (first successful install) | [`website/docs/getting-started/start-here.md`](./website/docs/getting-started/start-here.md) |
+| Prerequisites | [`website/docs/getting-started/prerequisites.md`](./website/docs/getting-started/prerequisites.md) |
+| Installation | [`website/docs/getting-started/installation.md`](./website/docs/getting-started/installation.md) |
+| MCP setup | [`website/docs/getting-started/mcp-setup.md`](./website/docs/getting-started/mcp-setup.md) |
+| Quick wins | [`website/docs/getting-started/quick-wins.md`](./website/docs/getting-started/quick-wins.md) |
+| **Migration from Cursor Collections** | [`website/docs/getting-started/migration-from-cursor-collections.md`](./website/docs/getting-started/migration-from-cursor-collections.md) |
+| Framework reference | [`documentation/agent-collection.md`](./documentation/agent-collection.md) |
+| WF / WNF traceability | [`docs/architecture/requirements-traceability.md`](./docs/architecture/requirements-traceability.md) |
+
+**Docs site:** source under `website/` (Docusaurus). Build locally with `cd website && npm install && npm run build`. **Public hosting is deferred** (out-of-band) — there is no production docs URL in this MVP.
 
 ## Quick start (developers)
 
@@ -49,7 +75,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 | Mode | Flag | Notes |
 |------|------|-------|
 | **Local** | (default) | Framework stays outside the consumer repo; set `AGENT_COLLECTIONS_HOME` |
-| **Submodule** | `--vendor submodule` | **EOG / team default** (epik Q2) |
+| **Submodule** | `--vendor submodule` | **EOG / team default** |
 | **Copy** | `--vendor copy` | Vendors tree under `vendor/agent-collections/` |
 
 Other useful flags: `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`.
@@ -65,6 +91,8 @@ bash scripts/setup-agent-collections.sh --upgrade --sync --non-interactive
 ```
 
 Reuses agents / MCP / profile / vendor / link from selection. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths (stack rule, `docs/context|plans|specs`, local `AGENTS.md`, secrets) are not overwritten without opt-in.
+
+Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`): see the [migration guide](./website/docs/getting-started/migration-from-cursor-collections.md).
 
 ## Versioning
 
@@ -123,8 +151,10 @@ adapters/             # cursor, claude, opencode + sync.mjs + profiles/
 mcp/                  # eversis-collections-mcp (skills from .ai/skills)
 scripts/              # setup-agent-collections.sh
 templates/            # AGENTS, stack, mcp.json seeds
+documentation/        # Framework reference (agent-collection.md)
+website/              # Docusaurus docs site (local build; hosting deferred)
 AGENTS.md             # Reference agent entry map
-docs/architecture/    # Mapping, isolation, AGENTS standard, selection
+docs/architecture/    # Mapping, isolation, AGENTS standard, selection, WF/WNF
 ```
 
 ## Getting started (maintainers)
@@ -134,3 +164,4 @@ docs/architecture/    # Mapping, isolation, AGENTS standard, selection
 3. Run `npm run sync:adapters` after changing `.ai/rules` or `adapters/*/rule-map.yaml`.
 4. Run `npm run mcp:test` after MCP changes.
 5. Run `bash scripts/setup-agent-collections.test.sh` after installer changes.
+6. Run `npm run website:build` (or `cd website && npm run build`) after docs site changes.

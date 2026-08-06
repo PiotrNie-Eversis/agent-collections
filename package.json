@@ -9,6 +9,8 @@
     "mcp:build": "npm --prefix mcp/eversis-collections-mcp run build",
     "mcp:test": "npm --prefix mcp/eversis-collections-mcp test",
     "mcp:install": "npm --prefix mcp/eversis-collections-mcp install",
-    "installer:smoke": "bash scripts/setup-agent-collections.test.sh"
+    "installer:smoke": "bash scripts/setup-agent-collections.test.sh",
+    "website:install": "npm --prefix website install",
+    "website:build": "npm --prefix website run build"
   }
 }
