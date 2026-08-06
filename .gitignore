@@ -11,3 +11,12 @@ docs/specs/dhi-*/
 mcp/eversis-collections-mcp/node_modules/
 mcp/eversis-collections-mcp/dist/
 scripts/lib/setup-agent-collections/node_modules/
+
+# Docs site (Docusaurus)
+website/node_modules/
+website/build/
+website/.docusaurus/
+
+# IDEs
+.vscode/
+.idea/
