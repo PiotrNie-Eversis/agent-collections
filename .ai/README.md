@@ -34,9 +34,11 @@ Content fill schedule:
 
 **Canonical specification:** [`docs/architecture/adapter-mapping.md`](../docs/architecture/adapter-mapping.md) (DHI-523) — field maps for Cursor / Claude Code / OpenCode placeholder, emit matrix, and the Cursor `rule-map.yaml` contract. Prefer that document over this summary when implementing adapters (DHI-524+).
 
+**OpenCode placeholder (DHI-525):** materialized under [`adapters/opencode/`](../adapters/opencode/) (plus root `opencode.jsonc`). Maturity remains **`placeholder`** — not a full / shipped OpenCode adapter.
+
 | Core asset | Path under `.ai/` | Later consumer role |
 |------------|-------------------|---------------------|
-| Domain & orchestration **rules** | `rules/<domain>/*.md` | Cursor → `.cursor/rules/*.mdc` via rule-map; Claude → `CLAUDE.md` sections; OpenCode → `instructions` globs (placeholder) |
+| Domain & orchestration **rules** | `rules/<domain>/*.md` | Cursor → `.cursor/rules/*.mdc` via rule-map; Claude → `CLAUDE.md` sections; OpenCode → `instructions` globs ([`adapters/opencode/`](../adapters/opencode/) placeholder) |
 | **Skills** | `skills/eversis-<topic>/` (45 packages — DHI-520) | MCP after **DHI-535** — not emitted by Cursor/Claude adapters in MVP |
 | **Prompts** | `prompts/public/`, `prompts/internal/` | Stable ids; not mirrored by Cursor adapter in MVP |
 | **Orchestration contracts** | `rules/orchestration/` plus this README | Lifecycle, gates, Fine/QA, SDD — not only IDE packaging |

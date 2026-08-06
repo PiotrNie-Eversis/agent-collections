@@ -245,6 +245,8 @@ rules:
 
 **Maturity:** `placeholder` — richer sketch aligned to public OpenCode docs; **no** full generator required in this wave.
 
+**Materialized (DHI-525):** live stub at [`adapters/opencode/`](../../adapters/opencode/) (`opencode.jsonc` + README) and an identical root `opencode.jsonc`. Field contract below is unchanged — evolve OpenCode packaging in the adapter layer only; do not rewrite `.ai/rules`.
+
 **References:**
 
 - Rules / instructions: [https://opencode.ai/docs/rules](https://opencode.ai/docs/rules)
@@ -252,7 +254,7 @@ rules:
 
 ### 6.1 Primary config sketch
 
-Generated or hand-maintained placeholder target (DHI-525):
+Hand-maintained placeholder (DHI-525) — committed as **`opencode.jsonc`** (JSONC comments allowed):
 
 ```json
 {
@@ -292,7 +294,7 @@ Do not block DHI-525 on the AGENTS epic; record the dual surface in the emit not
 ```text
 adapter: opencode
 maturity: placeholder
-emits: opencode.json (instructions → .ai/rules globs); optional AGENTS.md pointer
+emits: opencode.jsonc (instructions → .ai/rules globs); optional AGENTS.md pointer
 does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent profiles
 ```
 
@@ -317,7 +319,7 @@ Until Claude (DHI-526) lands, that generator is **not** `shipped` here. **Cursor
 | **DHI-523 (this)** | Mapping specification (this file) + pointer from `.ai/README.md` |
 | **DHI-524** | Cursor generator, `adapters/cursor/`, live `rule-map.yaml`, replace framework symlinks (**done** in this repo for mapped rules) |
 | **DHI-526** | Claude `CLAUDE.md` generator |
-| **DHI-525** | OpenCode placeholder materialization from §6 |
+| **DHI-525** | OpenCode placeholder materialization from §6 (**done** — `adapters/opencode/` + root `opencode.jsonc`) |
 | **DHI-527** | Sync / generation CLI over existing adapters |
 | **DHI-535** | MCP skill resolve from `.ai/skills/` |
 | **DHI-528–530** | Ignore files and monorepo isolation |
@@ -332,5 +334,5 @@ Until Claude (DHI-526) lands, that generator is **not** `shipped` here. **Cursor
 - [ ] Every mapped Cursor rule has `description` and exactly one packaging mode
 - [ ] No packaging YAML written into `.ai/rules/*.md`
 - [ ] Claude output is a single `CLAUDE.md` with one H2 per mapped rule
-- [ ] OpenCode placeholder uses `$schema` + `instructions` and status `placeholder`
+- [x] OpenCode placeholder uses `$schema` + `instructions` and status `placeholder` (materialized: `adapters/opencode/`, DHI-525)
 - [ ] Emit matrix respected (no silent full `.cursor` tree mirror in MVP)

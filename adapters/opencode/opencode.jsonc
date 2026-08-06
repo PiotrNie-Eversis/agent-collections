@@ -1,0 +1,14 @@
+// PLACEHOLDER (DHI-525) — maturity: placeholder; NOT a shipped adapter.
+// Core SSOT remains .ai/ — do not rewrite core when OpenCode format evolves; update this adapter layer only.
+// Canonical copy: adapters/opencode/opencode.jsonc — keep root opencode.jsonc identical (hand sync).
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    ".ai/rules/orchestration/*.md",
+    ".ai/rules/frontend/*.md",
+    ".ai/rules/backend/*.md",
+    ".ai/rules/architecture/*.md",
+    ".ai/rules/devops/*.md",
+    ".ai/rules/shared-types/*.md"
+  ]
+}

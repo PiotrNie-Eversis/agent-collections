@@ -27,6 +27,7 @@ Placeholder pre-distribution version. Self-contained bootstrap and installer are
 - **Mandatory spec-driven development (Delivery Standard)** — `.ai/rules/orchestration/spec-driven-development.md` (+ pointer from `agent-core`); documented in README / AGENTS / `docs/specs/README.md`; Jira story template block in `eversis-jira-task-formatting` (stable prompt ids + optional Cursor attach note)
 - **Adapter mapping specification** — canonical architecture/mapping doc at `docs/architecture/adapter-mapping.md` (Cursor / Claude / OpenCode field maps, emit matrix, `rule-map` contract); pointer from `.ai/README.md` (DHI-523)
 - **Cursor adapter (DHI-524)** — `adapters/cursor/` with `rule-map.yaml` and zero-deps `generate.mjs` (`node adapters/cursor/generate.mjs`, optional `--out`); generates framework `.cursor/rules/*.mdc` from `.ai/rules` (replaces symlink bootstrap for mapped rules; BA Docs symlinks and consumer `eversis-project-stack.mdc` left untouched)
+- **OpenCode adapter placeholder (DHI-525)** — `adapters/opencode/` + root `opencode.jsonc` (`$schema` + `instructions` globs → `.ai/rules`); maturity `placeholder` only (not a shipped adapter); minimal Cursor exclusion in `.cursorignore` (full ignore triad → DHI-529)
 
 ### Migration
 
