@@ -4,6 +4,15 @@ Generates a single repository-root `CLAUDE.md` from Agent Collections core (`.ai
 
 ## Run (from repository root)
 
+Prefer regenerating **all** shipped adapters after core / map changes:
+
+```bash
+node adapters/sync.mjs
+# or: npm run sync:adapters
+```
+
+Claude only:
+
 ```bash
 node adapters/claude/generate.mjs
 ```

@@ -1,0 +1,10 @@
+{
+  "name": "agent-collections",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Agent Collections — vendor-neutral multi-agent framework core",
+  "scripts": {
+    "sync:adapters": "node adapters/sync.mjs",
+    "sync:adapters:check": "node adapters/sync.mjs --check"
+  }
+}

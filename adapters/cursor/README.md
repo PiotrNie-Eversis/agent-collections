@@ -4,6 +4,15 @@ Generates `.cursor/rules/*.mdc` from Agent Collections core (`.ai/rules`) using 
 
 ## Run (from repository root)
 
+Prefer regenerating **all** shipped adapters after core / map changes:
+
+```bash
+node adapters/sync.mjs
+# or: npm run sync:adapters
+```
+
+Cursor only:
+
 ```bash
 node adapters/cursor/generate.mjs
 ```

@@ -320,7 +320,7 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | **DHI-524** | Cursor generator, `adapters/cursor/`, live `rule-map.yaml`, replace framework symlinks (**done** in this repo for mapped rules) |
 | **DHI-526** | Claude `CLAUDE.md` generator (`adapters/claude/`) — **done** in this repo |
 | **DHI-525** | OpenCode placeholder materialization from §6 (**done** — `adapters/opencode/` + root `opencode.jsonc`) |
-| **DHI-527** | Sync / generation CLI over existing adapters |
+| **DHI-527** | Sync / generation CLI — **done**: `node adapters/sync.mjs` (`--check`, optional `--out`; npm `sync:adapters` / `sync:adapters:check`) |
 | **DHI-535** | MCP skill resolve from `.ai/skills/` |
 | **DHI-528–530** | Ignore files and monorepo isolation |
 | **DHI-531–532** | AGENTS.md standard |

@@ -77,10 +77,18 @@ Copy-ready **Delivery Standard** text for Jira stories lives in the SDD rule and
 
 ```text
 .ai/                 # SSOT — rules, skills, prompts
+adapters/            # Tool packaging (cursor, claude, opencode) + sync.mjs
 AGENTS.md            # Short agent entry map for this repo
 README.md            # This file — versioning, upgrade, Delivery Standard
 CHANGELOG.md         # Release history and migration notes
 docs/specs/README.md # Specs convention (dhi-* local-only in this repo)
+```
+
+After changing `.ai/rules` or adapter `rule-map.yaml` files, refresh generated surfaces:
+
+```bash
+node adapters/sync.mjs
+# drift check: node adapters/sync.mjs --check
 ```
 
 See [`.ai/README.md`](./.ai/README.md) for the core mapping contract.
