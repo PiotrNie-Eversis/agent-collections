@@ -32,13 +32,13 @@ Content fill schedule:
 
 ## Mapping contract
 
-**Canonical specification:** [`docs/architecture/adapter-mapping.md`](../docs/architecture/adapter-mapping.md) (DHI-523) — field maps for Cursor / Claude Code / OpenCode placeholder, emit matrix, and the Cursor `rule-map.yaml` contract. Prefer that document over this summary when implementing adapters (DHI-524+).
+**Canonical specification:** [`docs/architecture/adapter-mapping.md`](../docs/architecture/adapter-mapping.md) (DHI-523) — field maps for Cursor / Claude Code / OpenCode placeholder, emit matrix, and adapter `rule-map.yaml` contracts. Prefer that document over this summary when implementing or extending adapters (DHI-524+). Cursor: [`adapters/cursor/`](../adapters/cursor/). Claude Code: [`adapters/claude/`](../adapters/claude/) → root `CLAUDE.md`.
 
 **OpenCode placeholder (DHI-525):** materialized under [`adapters/opencode/`](../adapters/opencode/) (plus root `opencode.jsonc`). Maturity remains **`placeholder`** — not a full / shipped OpenCode adapter.
 
 | Core asset | Path under `.ai/` | Later consumer role |
 |------------|-------------------|---------------------|
-| Domain & orchestration **rules** | `rules/<domain>/*.md` | Cursor → `.cursor/rules/*.mdc` via rule-map; Claude → `CLAUDE.md` sections; OpenCode → `instructions` globs ([`adapters/opencode/`](../adapters/opencode/) placeholder) |
+| Domain & orchestration **rules** | `rules/<domain>/*.md` | Cursor → `.cursor/rules/*.mdc` via [`adapters/cursor/`](../adapters/cursor/); Claude → root `CLAUDE.md` via [`adapters/claude/`](../adapters/claude/); OpenCode → `instructions` globs ([`adapters/opencode/`](../adapters/opencode/) placeholder) |
 | **Skills** | `skills/eversis-<topic>/` (45 packages — DHI-520) | MCP after **DHI-535** — not emitted by Cursor/Claude adapters in MVP |
 | **Prompts** | `prompts/public/`, `prompts/internal/` | Stable ids; not mirrored by Cursor adapter in MVP |
 | **Orchestration contracts** | `rules/orchestration/` plus this README | Lifecycle, gates, Fine/QA, SDD — not only IDE packaging |

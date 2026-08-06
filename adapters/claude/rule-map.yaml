@@ -1,0 +1,19 @@
+# Claude Code adapter rule map (DHI-526)
+# Packaging metadata lives here — not in .ai/rules/*.md
+# id/source parity with adapters/cursor/rule-map.yaml (no Cursor packaging fields)
+version: 1
+rules:
+  - id: eversis-agent-core
+    source: .ai/rules/orchestration/agent-core.md
+  - id: eversis-testing-and-terminal
+    source: .ai/rules/orchestration/testing-and-terminal.md
+  - id: eversis-accessibility
+    source: .ai/rules/frontend/accessibility.md
+  - id: eversis-engineering-manager
+    source: .ai/rules/orchestration/engineering-manager.md
+  - id: eversis-code-reviewer
+    source: .ai/rules/architecture/code-reviewer.md
+  - id: eversis-fine-handoff
+    source: .ai/rules/orchestration/fine-handoff.md
+  - id: eversis-spec-driven-development
+    source: .ai/rules/orchestration/spec-driven-development.md

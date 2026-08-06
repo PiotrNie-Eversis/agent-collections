@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.1] — 2026-08-05
 
-Placeholder pre-distribution version. Self-contained bootstrap and installer are not included yet. Cursor rules adapter generator is present under `adapters/cursor/`.
+Placeholder pre-distribution version. Self-contained bootstrap and installer are not included yet. Cursor rules adapter generator is present under `adapters/cursor/`; Claude Code adapter under `adapters/claude/` (root `CLAUDE.md`); OpenCode placeholder under `adapters/opencode/`.
 
 ### Added
 
@@ -28,6 +28,7 @@ Placeholder pre-distribution version. Self-contained bootstrap and installer are
 - **Adapter mapping specification** — canonical architecture/mapping doc at `docs/architecture/adapter-mapping.md` (Cursor / Claude / OpenCode field maps, emit matrix, `rule-map` contract); pointer from `.ai/README.md` (DHI-523)
 - **Cursor adapter (DHI-524)** — `adapters/cursor/` with `rule-map.yaml` and zero-deps `generate.mjs` (`node adapters/cursor/generate.mjs`, optional `--out`); generates framework `.cursor/rules/*.mdc` from `.ai/rules` (replaces symlink bootstrap for mapped rules; BA Docs symlinks and consumer `eversis-project-stack.mdc` left untouched)
 - **OpenCode adapter placeholder (DHI-525)** — `adapters/opencode/` + root `opencode.jsonc` (`$schema` + `instructions` globs → `.ai/rules`); maturity `placeholder` only (not a shipped adapter); minimal Cursor exclusion in `.cursorignore` (full ignore triad → DHI-529)
+- **Claude Code adapter (DHI-526)** — `adapters/claude/` with `rule-map.yaml` and zero-deps `generate.mjs` (`node adapters/claude/generate.mjs`, optional `--out`); generates root `CLAUDE.md` (H2 per mapped rule, full inline; id/source parity with Cursor map); ignore / monorepo isolation deferred to DHI-528–530
 
 ### Migration
 

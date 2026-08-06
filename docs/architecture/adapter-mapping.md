@@ -41,7 +41,7 @@ adapters (future)
 | Adapter | Rules | Prompts | Skills | Commands / other | Maturity |
 |---------|-------|---------|--------|------------------|----------|
 | **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** (MVP) | **No** emit — resolve via MCP after DHI-535 | **No** slash commands in MVP (Cursor-specific / later) | Generator: **DHI-524** (`adapters/cursor/`) |
-| **Claude Code** | One root **`CLAUDE.md`** (H2 section per mapped rule) | **No** | **No** emit — MCP / `AGENTS.md` | Instructional “load prompt id …” inside `CLAUDE.md` only — **not** `.cursor/commands` | Generator: DHI-526 |
+| **Claude Code** | One root **`CLAUDE.md`** (H2 section per mapped rule) | **No** | **No** emit — MCP / `AGENTS.md` | Instructional “load prompt id …” inside `CLAUDE.md` only — **not** `.cursor/commands` | Generator: **DHI-526** (`adapters/claude/`) — **shipped** |
 | **OpenCode** | Point at core (or generated) paths via `opencode.json` `instructions` | Deferred | Deferred | Config placeholder; optional `AGENTS.md` | **placeholder** (DHI-525) |
 
 Skills and prompts remain under `.ai/`. Adapters **must not** claim they ship a full multi-copy of skills/prompts in MVP.
@@ -308,7 +308,7 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | `placeholder` | Spec + sample config only; wizard must not claim a full adapter |
 | `deferred` | Explicitly out of current adapter MVP |
 
-Until Claude (DHI-526) lands, that generator is **not** `shipped` here. **Cursor** packaging for mapped rules is available via `adapters/cursor/` (DHI-524); BA Docs rules may still be temporary symlinks, and skills/prompts remain outside this adapter MVP.
+**Cursor** packaging for mapped rules is available via `adapters/cursor/` (DHI-524). **Claude Code** packaging is available via `adapters/claude/` (DHI-526) — generates root `CLAUDE.md`. BA Docs rules may still be temporary Cursor symlinks; skills/prompts remain outside adapter MVP emit. Ignore / monorepo isolation remains DHI-528–530.
 
 ---
 
@@ -318,7 +318,7 @@ Until Claude (DHI-526) lands, that generator is **not** `shipped` here. **Cursor
 |-------|----------------|
 | **DHI-523 (this)** | Mapping specification (this file) + pointer from `.ai/README.md` |
 | **DHI-524** | Cursor generator, `adapters/cursor/`, live `rule-map.yaml`, replace framework symlinks (**done** in this repo for mapped rules) |
-| **DHI-526** | Claude `CLAUDE.md` generator |
+| **DHI-526** | Claude `CLAUDE.md` generator (`adapters/claude/`) — **done** in this repo |
 | **DHI-525** | OpenCode placeholder materialization from §6 (**done** — `adapters/opencode/` + root `opencode.jsonc`) |
 | **DHI-527** | Sync / generation CLI over existing adapters |
 | **DHI-535** | MCP skill resolve from `.ai/skills/` |
@@ -333,6 +333,6 @@ Until Claude (DHI-526) lands, that generator is **not** `shipped` here. **Cursor
 
 - [ ] Every mapped Cursor rule has `description` and exactly one packaging mode
 - [ ] No packaging YAML written into `.ai/rules/*.md`
-- [ ] Claude output is a single `CLAUDE.md` with one H2 per mapped rule
+- [x] Claude output is a single `CLAUDE.md` with one H2 per mapped rule (`adapters/claude/`, DHI-526)
 - [x] OpenCode placeholder uses `$schema` + `instructions` and status `placeholder` (materialized: `adapters/opencode/`, DHI-525)
 - [ ] Emit matrix respected (no silent full `.cursor` tree mirror in MVP)
