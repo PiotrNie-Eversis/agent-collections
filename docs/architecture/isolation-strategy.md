@@ -169,14 +169,23 @@ Reduction must **cut noise**, not erase project orientation. Keep a small, dense
 
 ### 8.1 DHI-529 — Synchronized ignore files
 
-Deliver `.cursorignore`, `.claudeignore`, and `.opencodeignore` (or installer templates) that:
+**Status:** Materialized in this repository’s **root** as `.cursorignore`, `.claudeignore`, and `.opencodeignore` (DHI-529). Hand-maintained triad — same path **classes**, tool-idiomatic syntax. No generator / no `adapters/sync.mjs` involvement.
 
-- Encode §4 cross-tool packaging excludes
-- Encode secrets/build excludes
-- Align with §6 heavy-infra defaults where ignore files are the right mechanism
-- Stay synchronized across the triad (same path **classes**, tool-idiomatic syntax)
-- Do **not** overwrite consumer-owned ignore content without opt-in
+**Scope of the framework-repo triad:** §4 cross-tool packaging + secrets/build only. **Heavy-infra** (§6) and abstract `apps/**` area excludes are **not** in the root triad (consumer / DHI-530). Align §6 defaults in consumer profiles or later templates when ignore is the right mechanism.
 
+**Installer contract (5.2 / Q5):** Framework classes are merge-friendly (labeled sections). A future installer **merges missing** framework entries into consumer ignore files and **must not wipe** consumer-owned content without explicit opt-in (same rule as project-owned stack files).
+
+#### Required class checklist (sync across the triad)
+
+| Class | `.cursorignore` | `.claudeignore` | `.opencodeignore` |
+|-------|-----------------|-----------------|-------------------|
+| Secrets / build (`node_modules/`, `dist/`, `build/`, `.env*`, keys, …) | Exclude | Exclude | Exclude |
+| `.cursor/` | *(own — do not exclude)* | Exclude | Exclude |
+| `CLAUDE.md` | Exclude | *(own — do not exclude)* | Exclude |
+| `opencode.json` / `opencode.jsonc`, `adapters/opencode/` | Exclude | Exclude | *(own — do not exclude)* |
+| Heavy-infra / `apps/**` area paths | **Absent** in framework root | **Absent** | **Absent** |
+
+Implementer check: after edits, confirm the three files still encode the same classes (not necessarily identical line text).
 ### 8.2 DHI-530 — Monorepo area glob scoping
 
 Deliver profile-driven path scoping that:
@@ -201,7 +210,7 @@ Deliver profile-driven path scoping that:
 | Item | Status |
 |------|--------|
 | This document (`isolation-strategy.md`) | **DHI-528** deliverable |
-| Root ignore triad materialization | **DHI-529** |
+| Root ignore triad materialization | **DHI-529** — **done** (root triad + §8.1 checklist) |
 | Live monorepo path globs / profile wiring | **DHI-530** |
 | Changing `adapters/*/rule-map.yaml` for path globs in this story | **Out of scope** |
 | Installer / wizard | **5.x** |
@@ -211,7 +220,7 @@ Deliver profile-driven path scoping that:
 
 ## 10. Checklist for implementers (3.2–3.3)
 
-- [ ] Ignore triad encodes cross-tool packaging classes from §4
+- [x] Ignore triad encodes cross-tool packaging classes from §4
 - [ ] Area profiles match §5 ids and abstract path classes
 - [ ] Tool choice is not hard-coded to Frontend/Backend teams
 - [ ] Heavy infra defaults follow §6 unless consumer opt-in

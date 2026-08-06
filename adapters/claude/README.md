@@ -47,7 +47,8 @@ Re-run after core or map changes. **Do not hand-edit** the generated `CLAUDE.md`
 | BA Docs rules | Not in Cursor MVP map — same exclusion here |
 | Consumer `eversis-project-stack` | **Consumer-owned** — never overwrite without opt-in |
 | `.claude/rules/`, native Claude skills/commands | Deferred (strict single `CLAUDE.md` per DHI-523 / DHI-526 Q1=A) |
-| `.claudeignore` / monorepo isolation | **Deferred** to DHI-528–530 (Work Stream 3) |
+| Monorepo area / path globs | **Deferred** to DHI-530 (Work Stream 3) |
+| `.claudeignore` | **Shipped** at repo root (DHI-529 ignore triad; see [`isolation-strategy.md`](../../docs/architecture/isolation-strategy.md) §8.1) |
 
 ## Requirements
 

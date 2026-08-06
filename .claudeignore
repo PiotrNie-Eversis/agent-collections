@@ -1,0 +1,25 @@
+# .claudeignore — patterns excluded from Claude Code's file indexing.
+# Agent Collections ignore triad (DHI-529). Same path *classes* as
+# .cursorignore / .opencodeignore; see docs/architecture/isolation-strategy.md §4 / §8.1.
+# Future installer (5.x) should merge missing framework classes — never wipe consumer entries without opt-in.
+
+# --- Agent Collections: secrets / build ---
+node_modules/
+dist/
+build/
+.next/
+coverage/
+.env
+.env.*
+.env.local
+*.secret
+*.pem
+*.key
+
+# --- Agent Collections: other-tool packaging ---
+# Cursor (own packaging for Cursor — exclude from Claude)
+.cursor/
+# OpenCode placeholder (DHI-525)
+adapters/opencode/
+opencode.json
+opencode.jsonc
