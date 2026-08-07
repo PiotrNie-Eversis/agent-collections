@@ -38,7 +38,7 @@ Build this site locally (`cd website && npm run build`). **Public hosting is def
 
 ### Skills and prompts (MVP)
 
-Prefer MCP **`eversis-collections`** and stable prompt ids under `.ai/prompts/`. This MVP does **not** ship a full `.cursor/skills` or `.cursor/prompts` mirror, and does **not** generate slash-commands.
+Prefer MCP **`eversis-collections`** and stable prompt ids under `.ai/prompts/`. This MVP does **not** ship a full `.cursor/skills` or `.cursor/prompts` mirror. Cursor may generate thin `/eversis-*` shims under `.cursor/commands/` via the adapter (DHI-598).
 
 ## Multi-agent and isolation
 

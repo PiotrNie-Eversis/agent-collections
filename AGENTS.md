@@ -67,7 +67,7 @@ Ideate → Research → Plan → Implement → Review → Fine
 
 - This repository is the **framework** product (not a consumer app). Stack policy: [`.cursor/rules/eversis-project-stack.mdc`](./.cursor/rules/eversis-project-stack.mdc).
 - Quality commands: `npm run sync:adapters`, `npm run sync:adapters:check`, `npm run mcp:build`, `npm run mcp:test`, installer smoke `bash scripts/setup-agent-collections.test.sh`.
-- Skills UX: MCP + `.ai/` load-by-id / `@` attach. Full `.cursor/skills|prompts|commands` mirror and slash-commands are **not** MVP (Q1).
+- Skills UX: MCP + `.ai/` load-by-id / `@` attach. Cursor also emits thin `/eversis-*` shims under `.cursor/commands/` (DHI-598); full `.cursor/skills|prompts` mirror is **not** shipped.
 - BA Docs skills: **Do not load** in this framework repo unless a plan explicitly requires them.
 
 ---
@@ -76,9 +76,10 @@ Ideate → Research → Plan → Implement → Review → Fine
 
 Optional. Ignored by non-Cursor tools.
 
-On the **Cursor** channel, Implement can be started by attaching the prompt by stable id / file stem:
+On the **Cursor** channel, Implement can be started by stable id, `@` attach, or slash command:
 
-- `@eversis-implement` — attach the prompt (when surfaced under `.ai/prompts` or a generated Cursor prompt path)
-- Primary entry remains prompt id **`eversis-implement`**
+- Primary entry remains prompt id **`eversis-implement`** under `.ai/prompts/public/`
+- `@eversis-implement` — attach when the file is surfaced in the picker (prefer `.ai/prompts/…` over docs-site copies)
+- `/eversis-implement` — project command from generated `.cursor/commands/eversis-implement.md` (after `npm run sync:adapters`)
 
-Slash-commands under `.cursor/commands/` are **not** generated in MVP; do not assume `/eversis-*` works until a thin command generator ships.
+Slash files are thin HYBRID shims (SSOT pointer + Executable section). They are **not** used by Claude Code.

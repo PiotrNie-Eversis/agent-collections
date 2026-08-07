@@ -59,7 +59,7 @@ Selection file `.agent-collections/install-selection.json` is **consumer install
 | Core rules packaging | Generated `.cursor/rules/*.mdc` | Root `CLAUDE.md` (mapped rules) |
 | Skills | MCP `eversis-collections` → `.ai/skills` (no full `.cursor/skills` mirror) | Same MCP / read `.ai/skills`; instructional load via `AGENTS.md` |
 | Prompts | Stable id / optional `@` attach | Load by id (instructional) |
-| Slash commands | **Not** MVP | N/A |
+| Slash commands | Thin `.cursor/commands/` from `.ai/prompts` (DHI-598) | Prefer `/eversis-*` after sync; Claude Code uses prompt ids / `CLAUDE.md` |
 | Ignore triad | `.cursorignore` | `.claudeignore` |
 | Area profiles | Path scope via installer profile | Same path profiles (tool-agnostic) |
 | OpenCode | Placeholder only | — |

@@ -74,7 +74,7 @@ Interactive runs prompt for agents × MCP × domain profile. Re-runs are idempot
 
 - **Skills** resolve from **`.ai/skills/`** via MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or by reading `SKILL.md` directly.
 - **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced.
-- This MVP does **not** ship a full mirror under `.cursor/skills` or `.cursor/prompts`, and does **not** generate slash-commands under `.cursor/commands/`.
+- This MVP does **not** ship a full mirror under `.cursor/skills` or `.cursor/prompts`. The Cursor adapter **does** generate thin slash shims under `.cursor/commands/` from `.ai/prompts` (after `npm run sync:adapters`).
 
 ## 5. Upgrade
 

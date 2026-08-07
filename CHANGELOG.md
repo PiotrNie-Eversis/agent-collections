@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **DHI-598** — Cursor adapter emits thin slash commands under `.cursor/commands/eversis-*.md` from `.ai/prompts/{public,internal}/` (HYBRID: SSOT pointer + optional Executable section); deny list `adapters/cursor/command-deny.yaml`; included in `sync:adapters:check`
 - **Wave D — docs + validation (DHI-515 / 541, 539, 540, 542)**
   - Getting-started guides under `website/docs/getting-started/` (CC-analog stems) + migration from Cursor Collections
   - Framework reference `documentation/agent-collection.md` and WF/WNF `docs/architecture/requirements-traceability.md`
@@ -31,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **DHI-598** — Docs updated: adapter-mapping emit matrix, Cursor adapter README, README / AGENTS Channel notes for `/eversis-*`
 - **DHI-541** — Root README rewritten for human-first documentation UX (progressive disclosure: hero → workflows with human gates → quick start → install/upgrade facts), aligned with cursor-collections README pattern while keeping Agent Collections facts (`AGENT_COLLECTIONS_HOME`, adapters, MVP limits)
 - README links getting-started + migration; documents deferred docs hosting
 - README quick start is self-contained; upgrade CLI path implemented via installer

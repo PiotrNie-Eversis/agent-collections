@@ -19,8 +19,8 @@ This document is the **single source of truth** for how Agent Collections **core
         │
         ▼  mapping (this spec) + rule-map / generators (DHI-524+)
 
-adapters (future)
-  cursor/   → .cursor/rules/*.mdc
+adapters
+  cursor/   → .cursor/rules/*.mdc + thin .cursor/commands/eversis-*.md (DHI-598)
   claude/   → CLAUDE.md
   opencode/ → opencode.json (+ optional AGENTS pointers)
 ```
@@ -40,11 +40,11 @@ adapters (future)
 
 | Adapter | Rules | Prompts | Skills | Commands / other | Maturity |
 |---------|-------|---------|--------|------------------|----------|
-| **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** (MVP) | **No** emit — resolve via MCP after DHI-535 | **No** slash commands in MVP (Cursor-specific / later) | Generator: **DHI-524** (`adapters/cursor/`) |
-| **Claude Code** | One root **`CLAUDE.md`** (H2 section per mapped rule) | **No** | **No** emit — MCP / `AGENTS.md` | Instructional “load prompt id …” inside `CLAUDE.md` only — **not** `.cursor/commands` | Generator: **DHI-526** (`adapters/claude/`) — **shipped** |
+| **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** full mirror | **No** emit — resolve via MCP after DHI-535 | **Thin** `.cursor/commands/eversis-*.md` from `.ai/prompts` (HYBRID pointer + Executable; DHI-598) — not a full prompt copy | Generator: **DHI-524** + **DHI-598** (`adapters/cursor/`) |
+| **Claude Code** | One root **`CLAUDE.md`** (H2 section per mapped rule) | **No** | **No** emit — MCP / `AGENTS.md` | Instructional “load prompt id …” inside `CLAUDE.md` only — **not** `.cursor/commands`; native Claude slash emit deferred | Generator: **DHI-526** (`adapters/claude/`) — **shipped** |
 | **OpenCode** | Point at core (or generated) paths via `opencode.json` `instructions` | Deferred | Deferred | Config placeholder; optional `AGENTS.md` | **placeholder** (DHI-525) |
 
-Skills and prompts remain under `.ai/`. Adapters **must not** claim they ship a full multi-copy of skills/prompts in MVP.
+Skills and prompts remain under `.ai/` as SSOT. Cursor slash files are **thin packaging** only (stable id + path + optional Executable section). Adapters **must not** claim they ship a full multi-copy of skills/prompts.
 
 ---
 
@@ -328,7 +328,7 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | **DHI-531** | AGENTS.md standard + template — [`agents-md-standard.md`](./agents-md-standard.md) |
 | **DHI-532** | Reference `AGENTS.md` fill for this repository |
 
-**Out of scope here:** creating `adapters/`, generators, live `rule-map.yaml`, slash commands, prompt/skill mirrors, MCP rewrite, installer, ignore files.
+**Out of scope for the original DHI-523 mapping-only delivery:** creating live generators, installer, ignore files. Cursor thin slash emit is specified in the emit matrix (DHI-598); full prompt/skill mirrors remain out of adapter scope.
 
 ---
 

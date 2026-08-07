@@ -116,7 +116,7 @@ Use `./prompt.template.md` for section ordering. Write **`.ai/prompts/public/eve
 
 In repos with **`website/`** and **`sync-prompts`**, write markdown `href` values in the **source** form (see **Dual-context markdown links** below). Sync rewrites them for Docusaurus automatically — do not hand-edit the gitignored copy under `website/docs/prompts/`.
 
-For **primary user-facing public prompts**, consider also creating a Cursor-adapter **`.cursor/commands/eversis-<name>.md`** sibling (not core SSOT) with the same stem. The command file **must not** duplicate the **Executable prompt** body — it should instruct the agent to **load** the canonical `.ai/prompts/public/eversis-<name>.md` in full (via stable id load / file read / MCP) before acting, optionally name the attach-on-demand **`.mdc`** rule, and call out framework-wide contracts where needed (see existing **`eversis-implement.md`** for research/plan artifacts and **Fine → QA draft**). This gives users a `/eversis-<name>` entry in the Cursor `/` dropdown as an alternative Cursor UX to loading by prompt id. Keep all procedural steps exclusively in `.ai/prompts/public/` to avoid drift.
+For Cursor `/eversis-<name>` entries, **do not hand-maintain** `.cursor/commands/` siblings. After adding or editing a prompt under `.ai/prompts/`, run **`npm run sync:adapters`** (or `node adapters/cursor/generate.mjs`). The Cursor adapter (DHI-598) emits thin **HYBRID** shims: SSOT pointer + optional embedded `## Executable prompt…` section. Prefer excluding an id via `adapters/cursor/command-deny.yaml` over deleting generated files by hand. Keep workflow authorship in `.ai/prompts/` — regenerate commands after Executable edits.
 
 ## Dual-context markdown links
 
@@ -168,7 +168,7 @@ The link checker skips `http:`, `https:`, `mailto:`, `#` anchors, and glob/place
 - [ ] No long-term role definition duplicated (belongs in `.ai/rules/`; adapters may package `.mdc`)
 - [ ] No stack-wide policy duplicated (belongs in `AGENTS.md` / stack rule)
 - [ ] Workflow steps are clear; internal prompts linked by **canonical** paths (see Dual-context markdown links)
-- [ ] If a `.cursor/commands/` sibling was created: verify it delegates to the canonical prompt (mandatory load of canonical `.ai/prompts/` file) and does **not** paste duplicate workflow steps from the public file
+- [ ] If slash UX is expected: run `npm run sync:adapters` (or Cursor generate) so `.cursor/commands/eversis-<name>.md` exists; verify it points at the `.ai/prompts/` SSOT (HYBRID shim)
 - [ ] **Monorepo with `website/`:** markdown links follow source canonical form (no `../../agents/`, no slug-only `./implement` in source)
 - [ ] **Monorepo with `website/`:** run from repo root:
   ```bash
