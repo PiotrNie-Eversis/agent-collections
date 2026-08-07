@@ -32,6 +32,7 @@ Delegates to **`eversis-orchestrating-implementation`**, which owns:
 - **Quick vs Full flow** selection (Figma/UI always forces Full)
 - Research → plan → plan validation → implementation → review gates
 - Per-task todos, routing table, and UI verification gate
+- **Continuity:** same-session `eversis-review` → **Fine** + QA draft (unless opt-out)
 - **Fine** + mandatory QA comment draft via `eversis-fine-handoff`
 
 Load **`eversis-orchestrating-implementation`** for the full workflow (docs: `website/docs/skills/orchestrating-implementation.md`).
@@ -60,6 +61,8 @@ Start implementation delivery for a feature based on a task description, Jira it
 **Artifacts:** Create `*.research.md`, `*.plan.md`, and `*.plan-review.md` only when a gap exists — not on every run. Existing files in `docs/specs/<issue-or-task-kebab>/` may satisfy readiness.
 
 **Workflow:** Start at Step 0 in `eversis-orchestrating-implementation` and follow that skill through Step 5 (Fine + `eversis-fine-handoff` in the same response). Do not duplicate orchestration steps in this prompt.
+
+**Continuity (default):** After implementation and quality checks, run `eversis-review` in the **same session**, then on PASS declare **Fine** and the QA draft in the **same response**. Do **not** end the turn waiting for the human to attach `/eversis-review`. Opt-out only if the user said **`pause before review`** or **`review later`**. Standalone `/eversis-review` remains for review-only or re-review chats.
 
 ### Entry signals (automatic — no extra keywords required)
 

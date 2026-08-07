@@ -160,6 +160,15 @@ Use Quick Flow only if Step 1 passed every Quick criterion and the user selected
    - After confirmation, route fixes back to Software Engineer, run affected validation again, and re-run review when the fix is material.
 5. **Abort Quick Flow if hidden complexity appears** — If ambiguity, cross-domain work, plan gaps, or any Figma/UI-verification need appears during execution, stop Quick Flow, rewrite the execution plan, and restart in Full Flow.
 
+### Continuity (default) — code review → Fine
+
+After implementation and validation checks (Quick or Full):
+
+1. **Default:** Run code review in the **same session** (`eversis-review`). Do **not** set Next gate to “awaiting human to attach `/eversis-review`” and do **not** end the turn solely to wait for that attach.
+2. On review **PASS** (no required changes), proceed immediately to Step 5 (**Fine** + QA draft in the **same response**).
+3. **Opt-out** — only if the user explicitly said **`pause before review`** or **`review later`**: stop after implementation/validation and wait for the human before running code review / Fine.
+4. Standalone `/eversis-review` (or attach) remains valid for review-only chats and re-review; it is not required to close a normal Implement thread.
+
 ## Full Flow
 
 ### Planning readiness
@@ -223,11 +232,12 @@ Process tasks in plan order. Consult the todo list before each task and update t
    - Use [`eversis-implement-ui.md`](../../../.ai/prompts/internal/eversis-implement-ui.md) as the workflow reference for the verify-fix loop.
    - Mark each item **PASSED** or **ESCALATED**. Never batch multiple UI verification items into one review step.
 7. **Enforce the UI verification gate** — Do not start code review until every `[REUSE]` UI verification item has been individually passed or escalated with explicit user approval.
-8. **Run code review after the UI gate clears** — Delegate to Code Reviewer with `eversis-review.md` only after the UI verification gate passes or is explicitly escalated per item.
+8. **Run code review after the UI gate clears** — Delegate to Code Reviewer with `eversis-review.md` only after the UI verification gate passes or is explicitly escalated per item. Apply **Continuity (default)** above — do not wait for a separate human `/eversis-review` attach unless opt-out.
 9. **Confirm before changing a reviewed solution** — If code review finds issues, ask for confirmation before changing the reviewed solution.
 10. **Route review fixes back through the correct implementer** — After confirmation, delegate fixes through the routing table, run affected checks, and re-run review when needed.
 11. **Treat direct implementation as a workflow violation** — If the orchestrator starts writing product code directly, stop and return to delegated execution.
 12. **Record solution changes in the plan Changelog** — When the approved solution changes during implementation, document it in the plan file's Changelog with timestamps after confirmation.
+13. **Proceed to Fine on PASS** — When review passes, execute Step 5 in the same turn (unless Continuity opt-out).
 
 ### Step 5 - Declare Fine and produce QA comment draft (Cursor-only)
 

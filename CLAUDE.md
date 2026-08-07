@@ -35,6 +35,7 @@ Work moves through these stages:
 - When a **research** document is required, a human must approve it before planning starts.
 - When an **implementation plan** is required, a human must approve it before broad changes start.
 - Agent output is a **draft** until the human confirms the relevant gate.
+- **Review** after Implement is **not** a human approval gate (see Continuity in `eversis-orchestrating-implementation`). Standalone `/eversis-review` remains available when the human wants a separate review pass.
 - Declaring work **Fine** includes a QA comment **draft** for human review; posting that comment to a ticket tracker needs **explicit** human approval (never automatic).
 
 ## Orchestration (Implement)
@@ -44,8 +45,8 @@ When acting as Engineering Manager or running the **Implement** prompt (`eversis
 1. **Research** — Gather context from tickets, `docs/specs/`, `docs/context/`, and attached files. Produce a **research artifact** (`*.research.md`). Run the **adequacy checklist** (orchestration skill `eversis-orchestrating-implementation`) before `Research: SKIP` when a file already exists. When readiness shows **CREATE** or **DELTA**, the research file MUST be written or updated in the **same session** before ending the turn. **Stop** for human approval before planning.
 2. **Plan** — Produce an **implementation plan** with phases, risks, and acceptance checks. Run the **adequacy checklist** before `Plan: SKIP` when `*.plan.md` exists. When readiness shows **REFRESH** or **CREATE**, update or write the plan in the **same session** before broad code changes. **Stop** for human approval before execution.
 3. **Implement** — Make focused edits; run the repo's lint/test/typecheck commands after substantive changes (see `testing-and-terminal.md` in this folder).
-4. **Review** — Offer or request the **Review** prompt (`eversis-review`) with PASS / BLOCKER / SUGGESTION structure.
-5. **QA draft** — When declaring **Fine**, produce the QA comment draft in the same turn per `fine-handoff.md` (and skill `eversis-fine-handoff` when available). Ticket publication requires explicit human approval (copy-paste or issue tracker MCP — never automatic).
+4. **Review** — In the **same session**, load and execute the **Review** prompt (`eversis-review`) with PASS / BLOCKER / SUGGESTION structure. Do **not** end the turn solely to wait for the human to attach `/eversis-review`, unless the user opted out with **`pause before review`** or **`review later`**.
+5. **Fine + QA draft** — On review PASS (or after blockers are fixed per the orchestration skill), declare **Fine** and produce the QA comment draft **in the same turn** per `fine-handoff.md` (and skill `eversis-fine-handoff` when available). Ticket publication requires explicit human approval (copy-paste or issue tracker MCP — never automatic).
 
 ## Skills discovery
 
@@ -150,6 +151,8 @@ Optional fifth line: `- **Reason:** …`
 - Public prompts: `eversis-review-ui`, `eversis-review`.
 
 Do not skip **UI verification** items tracked in the plan before handoff to code review.
+
+**Continuity:** After code + checks, run `eversis-review` in-session then Fine on PASS — see orchestration skill **Continuity (default)**. Do not wait for a separate human `/eversis-review` attach unless the user said `pause before review` or `review later`.
 
 ## QA Handoff Policy
 
@@ -269,7 +272,7 @@ Ideate
   → Research   → human gate (approve research before plan)
   → Plan       → human gate (approve plan before broad code)
 Implement      → focused changes + quality commands
-Review         → independent check (PASS / BLOCKER / SUGGESTION)
+Review         → independent check (PASS / BLOCKER / SUGGESTION) — same session as Implement by default
 Fine           → QA comment draft same turn; publish only with explicit human OK
 ```
 
@@ -279,9 +282,18 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 
 ## Human gates
 
+| Stage | Human approval gate? |
+|-------|----------------------|
+| Research | **Yes** — approve before plan |
+| Plan | **Yes** — approve before broad code |
+| Implement | No (after plan approval / Proceeding) |
+| Review (code) | **No** — runs inside the Implement session by default (Continuity); not a separate human attach gate |
+| Fine (QA draft) | Draft is automatic with Fine; **publish to Jira** needs explicit human OK |
+
 - Required **research** (`*.research.md`) must be human-approved before planning starts.
 - Required **plan** (`*.plan.md`) must be human-approved before broad implementation.
 - Agent outputs are **drafts** until the relevant gate is confirmed.
+- **Review** is a Delivery Standard **stage**, not a human “approve before Fine” gate. Canonical Continuity + opt-out (`pause before review` / `review later`) live in skill `eversis-orchestrating-implementation`.
 - **Fine** produces a QA comment **draft** in the same turn (`fine-handoff.md` / skill `eversis-fine-handoff`). Posting to a ticket tracker needs **explicit** human approval — never automatic.
 
 ## Spec folder and artifacts
@@ -311,8 +323,8 @@ This story follows full spec-driven development (mandatory under Agent Collectio
 * Research: <issue-kebab>.research.md — required before plan
 * Plan: <issue-kebab>.plan.md — required before implementation
 * Implement: load eversis-implement (approved plan attached)
-* Review: load eversis-review before Done
-* Fine: QA comment draft per eversis-fine-handoff
+* Review: runs inside the Implement session by default (eversis-review); standalone /eversis-review is optional
+* Fine: QA comment draft per eversis-fine-handoff (same turn as Fine); publish to tracker only with explicit human OK
 
 Do not start implementation without approved research and plan artifacts.
 

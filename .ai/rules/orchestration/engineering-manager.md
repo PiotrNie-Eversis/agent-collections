@@ -37,6 +37,8 @@ Optional fifth line: `- **Reason:** …`
 
 Do not skip **UI verification** items tracked in the plan before handoff to code review.
 
+**Continuity:** After code + checks, run `eversis-review` in-session then Fine on PASS — see orchestration skill **Continuity (default)**. Do not wait for a separate human `/eversis-review` attach unless the user said `pause before review` or `review later`.
+
 ## QA Handoff Policy
 
 - When you reach **Fine**, **always** produce the QA comment draft **in the same turn** per **`fine-handoff.md`** / skill `eversis-fine-handoff` (orchestration skill Step 5).

@@ -23,6 +23,8 @@ Start implementation delivery for a feature based on a task description, Jira it
 
 **Workflow:** Start at Step 0 in `eversis-orchestrating-implementation` and follow that skill through Step 5 (Fine + `eversis-fine-handoff` in the same response). Do not duplicate orchestration steps in this prompt.
 
+**Continuity (default):** After implementation and quality checks, run `eversis-review` in the **same session**, then on PASS declare **Fine** and the QA draft in the **same response**. Do **not** end the turn waiting for the human to attach `/eversis-review`. Opt-out only if the user said **`pause before review`** or **`review later`**. Standalone `/eversis-review` remains for review-only or re-review chats.
+
 ### Entry signals (automatic — no extra keywords required)
 
 Before research, planning, or code, inspect `docs/specs/<issue>/` (or paths attached with `@`):

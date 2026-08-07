@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **DHI-515 Continuity** — Implement sessions auto-run `eversis-review` then Fine + QA draft in-session (no wait for human `/eversis-review`); opt-out: `pause before review` / `review later`; SDD gate table + agent-core / orchestration skill / Channel notes aligned
 - **Installer Next steps** — agent-aware (Cursor stack `.mdc` vs Claude `AGENTS.md`); vendor submodule/copy marked done + teammate `git submodule update --init --recursive`; local mode clarifies no in-repo `.ai/`
 - **MCP wizard** — interactive MCP server selection no longer requires `--build-mcp` (`--build-mcp` = force rebuild only; missing `dist` still builds)
 - **Installer docs** — `.agent-collections/` purpose, `--collections-home` one-liners, Claude vs Cursor stack customisation (`install-selection.md`, getting-started, Claude adapter README, root README)

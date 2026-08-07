@@ -81,5 +81,7 @@ On the **Cursor** channel, Implement can be started by stable id, `@` attach, or
 - Primary entry remains prompt id **`eversis-implement`** under `.ai/prompts/public/`
 - `@eversis-implement` — attach when the file is surfaced in the picker (prefer `.ai/prompts/…` over docs-site copies)
 - `/eversis-implement` — project command from generated `.cursor/commands/eversis-implement.md` (after `npm run sync:adapters`)
+- **Continuity:** a normal `/eversis-implement` thread runs **Review then Fine** in-session after code (no separate human `/eversis-review` required to close Delivery Standard). Opt-out: say `pause before review` or `review later`.
+- `/eversis-review` — **standalone** code review (or re-review); optional when you want a review-only chat
 
 Slash files are thin HYBRID shims (SSOT pointer + Executable section). They are **not** used by Claude Code.

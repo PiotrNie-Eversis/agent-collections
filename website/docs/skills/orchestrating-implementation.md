@@ -78,9 +78,11 @@ You do **not** need to type “Research” in the prompt — the agent inspects 
 | --- | --- | --- |
 | **When** | Narrow scope, ≤3 files, no ambiguity, no Figma/UI, planning readiness met | Cross-domain, ambiguous, missing/inadequate research/plan, >3 files, or any Figma/UI |
 | **Skips** | Full research/plan/plan-review when criteria met and artifacts exist | Nothing — runs research → plan → plan validation → execution when gaps exist |
-| **Ends with** | Validation → `@eversis-review` → Fine + fine-handoff | Per-task execution → UI gate → review → Fine + fine-handoff |
+| **Ends with** | Validation → **same-session** `eversis-review` → Fine + fine-handoff | Per-task execution → UI gate → **same-session** review → Fine + fine-handoff |
 
 **Hard rule:** Any Figma or `[REUSE]` UI verification task **forces Full Flow**.
+
+**Continuity (default):** Do not end the Implement turn waiting for the human to attach `/eversis-review`. Run review in-session; on PASS declare Fine + QA draft in the same response. Opt-out phrases: `pause before review` / `review later`. Standalone `/eversis-review` remains for review-only chats. Normative detail: `.ai/skills/eversis-orchestrating-implementation/SKILL.md`.
 
 The Engineering Manager recommends a flow in chat; the user may override.
 

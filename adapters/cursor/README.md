@@ -55,6 +55,8 @@ Source of packaging metadata: [`rule-map.yaml`](./rule-map.yaml). Mapping contra
 
 Stable prompt id under `.ai/prompts/` remains SSOT. Claude Code does **not** consume `.cursor/commands/` (separate channel; native Claude slash emit deferred).
 
+**Continuity:** `/eversis-implement` embeds same-session Review → Fine; `/eversis-review` is optional standalone (see `AGENTS.md` Channel notes).
+
 ## Exceptions (not generated)
 
 | Path | Reason |
