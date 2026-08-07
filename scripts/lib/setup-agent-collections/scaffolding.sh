@@ -18,7 +18,8 @@ scaffold_project() {
 This project uses Agent Collections (`.ai/` SSOT via `AGENT_COLLECTIONS_HOME` / vendor).
 
 - Enable MCP server **eversis-collections**.
-- Customise **eversis-project-stack** for this repo.
+- Cursor: customise **`.cursor/rules/eversis-project-stack.mdc`**.
+- Claude Code: customise **`AGENTS.md`** (do not hand-edit generated `CLAUDE.md`).
 - Delivery Standard: Research → Plan → Implement → Review → Fine under `docs/specs/<issue-kebab>/`.
 AGENTS_EOF
     fi

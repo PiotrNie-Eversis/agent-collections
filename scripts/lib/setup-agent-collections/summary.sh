@@ -6,8 +6,13 @@ print_summary() {
   [[ -n "${VENDOR_MODE:-}" ]] && mode="vendor (${VENDOR_MODE})"
 
   local effective_link="${EFFECTIVE_LINK_MODE:-${ARG_LINK_MODE:-auto}}"
-  local mcp_file="${TARGET_DIR}/.cursor/mcp.json"
   local configured="${MCP_CONFIGURED_SERVERS:-eversis-collections}"
+  local agents_csv="${SELECTED_AGENTS:-cursor}"
+  local step=1
+  local is_local=true
+  if [[ -n "${VENDOR_MODE:-}" ]] && [[ "${VENDOR_MODE}" != "local" ]]; then
+    is_local=false
+  fi
 
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -16,7 +21,7 @@ print_summary() {
   echo ""
   echo "  Mode:          ${mode}"
   echo "  Link mode:     ${effective_link}"
-  echo "  Agents:        ${SELECTED_AGENTS:-cursor}"
+  echo "  Agents:        ${agents_csv}"
   echo "  Profile:       ${DOMAIN_PROFILE:-fullstack}"
   echo "  Area scope:    ${AREA_PROFILE_ID:-n/a}"
   echo "  MCP servers:   ${configured}"
@@ -24,16 +29,49 @@ print_summary() {
   echo "  Target:        ${TARGET_DIR}"
   echo "  Selection:     ${TARGET_DIR}/.agent-collections/install-selection.json"
   echo ""
-  if echo ",${SELECTED_AGENTS:-}," | grep -q ',opencode,'; then
+  if echo ",${agents_csv}," | grep -q ',opencode,'; then
     echo "  ${_YELLOW}OpenCode:${_RESET} placeholder-only — not a full adapter."
     echo ""
   fi
+
   echo "${_BOLD}Next steps:${_RESET}"
   echo ""
-  echo "  1. Customise .cursor/rules/eversis-project-stack.mdc"
-  echo "  2. Export AGENT_COLLECTIONS_HOME=\"${COLLECTIONS_HOME}\" (local mode)"
-  echo "  3. Enable MCP in Cursor / restart; skills load from .ai/skills via eversis-collections"
-  echo "  4. Review AGENTS.md (never auto-overwritten)"
+
+  if echo ",${agents_csv}," | grep -q ',cursor,'; then
+    echo "  ${step}. Customise .cursor/rules/eversis-project-stack.mdc (Cursor stack / skills policy)"
+    step=$((step + 1))
+  fi
+
+  if echo ",${agents_csv}," | grep -q ',claude,'; then
+    echo "  ${step}. Customise AGENTS.md (stack / areas / skills policy — Claude + shared map)"
+    echo "     Do not hand-edit generated CLAUDE.md; it is overwritten on adapter sync."
+    step=$((step + 1))
+  fi
+
+  if [[ "$is_local" == "true" ]]; then
+    echo "  ${step}. Export AGENT_COLLECTIONS_HOME=\"${COLLECTIONS_HOME}\" (required in local mode)"
+    step=$((step + 1))
+    echo "  ${step}. Enable MCP eversis-collections / restart the IDE"
+    echo "     Skills resolve from \$AGENT_COLLECTIONS_HOME/.ai/skills (not an in-repo .ai/ tree)"
+    step=$((step + 1))
+  else
+    echo "  ${step}. (Done) Framework is at vendor/agent-collections (mode: ${VENDOR_MODE}) — no further install action"
+    step=$((step + 1))
+    if [[ "${VENDOR_MODE}" == "submodule" ]]; then
+      echo "  ${step}. Teammates after clone: git submodule update --init --recursive"
+      step=$((step + 1))
+    fi
+    echo "  ${step}. Enable MCP eversis-collections / restart the IDE"
+    echo "     Skills resolve from vendor/agent-collections/.ai/skills (or \$AGENT_COLLECTIONS_HOME if set)"
+    step=$((step + 1))
+  fi
+
+  # Always remind AGENTS exists when cursor-only (Claude step already covers customise)
+  if ! echo ",${agents_csv}," | grep -q ',claude,'; then
+    echo "  ${step}. Review AGENTS.md (never auto-overwritten on re-run)"
+    step=$((step + 1))
+  fi
+
   echo ""
   echo "Deselection: re-run with a smaller --mcp-servers / --agents list to refresh managed"
   echo "entries, or manually edit .cursor/mcp.json. See README recovery notes."

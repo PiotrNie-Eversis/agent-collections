@@ -1,20 +1,23 @@
 # DHI-542 — EOG pilot evidence pack
 
-**Date:** 2026-08-06  
-**Consumer path surveyed:** `/Users/piotrniemirski/Documents/Projects/eog` (read-only survey + proxy measurement)  
-**Framework:** Agent Collections at local checkout (Wave D implement session)
+**Date:** 2026-08-06 (survey) · **Updated:** 2026-08-07 (live install + Phase A/B implement)  
+**Consumer surveyed:** EOG monorepo (local clone)  
+**Framework:** Agent Collections via `AGENT_COLLECTIONS_HOME` (**local** vendor mode for Q5)
 
-## Scope delivered in this repository
+## Scope delivered
 
 | Item | Status |
 |------|--------|
 | Consumer overlay documentation (`portal`/`cms` → abstract classes) | **Done** — [README.md](./README.md) |
 | WNF-03 §7.2 file-count proxy (U vs S) | **Done** — numbers below (≥30%) |
-| Collision checklist (template + known baseline from survey) | **Done** — below |
+| Collision checklist (template + known baseline from survey) | **Done** — below (update after Q5 sessions) |
 | Upgrade runbook | **Done** — [upgrade-runbook.md](./upgrade-runbook.md) |
-| Migration guide refresh pointer | **Done** — see getting-started migration (EOG section) |
-| Live installer run + submodule pin inside EOG | **Residual** — out-of-repo; blocked from this workspace session (see Residual) |
-| ≥5 business days or ≥3+3 FE/BE agent sessions | **Residual** — requires human-led pilot window (Q5) |
+| Migration guide refresh pointer | **Done** — getting-started migration (EOG section) |
+| Live installer run inside EOG | **Done (local)** — branch `agent-collections`; cursor+claude; fullstack; MCP on `AGENT_COLLECTIONS_HOME` |
+| Consumer **2a** heavy-infra ignore overlay | **Reverted (2026-08-07)** — `charts/` + handbooks are active apps; `# eog-pilot-overlay` removed; area-scope no longer excludes `charts/**` |
+| EOG `AGENTS.md` + `eversis-project-stack.mdc` customization | **Done** (pilot implement 2026-08-07) |
+| Submodule pin to SemVer tag | **Deferred** — after Q5 (research Q1) |
+| ≥5 business days or ≥3+3 FE/BE agent sessions | **Scheduled** — start **2026-08-10**, owner **Piotr Niemirski** |
 
 ## WNF-03 proxy measurement (Q6)
 
@@ -31,36 +34,38 @@
 
 **Verdict:** Both areas meet the **≥30%** WNF-03 target under this proxy. Heavy infra trees (nginx sidecars, charts, databases, handbooks, load-test, …) dominate the unscoped remainder — aligning with §6 defaults.
 
-**Caveats:** Proxy is file count, not IDE token telemetry. Own-tool vs other-tool packaging deltas are small relative to infra volume; still apply the ignore triad when both Cursor and Claude are installed.
+**Caveats:** Proxy is file count, not IDE token telemetry. EOG treats `charts/` and handbook trees as **product apps**, not heavy infra — do not exclude them from Cursor indexing.
 
 ## Collision checklist (Q5)
 
-Use during the human pilot window (≥5 business days **or** ≥3 Cursor FE + ≥3 Claude BE sessions):
+Use during the human pilot window (≥5 business days **or** ≥3 Cursor FE + ≥3 Claude BE sessions).  
+**Window:** starts **2026-08-10** · **Owner:** Piotr Niemirski
 
-| Check | Pass criteria | Survey baseline (2026-08-06) |
-|-------|---------------|------------------------------|
-| MCP skills env | `eversis-collections` uses `AGENT_COLLECTIONS_HOME` only | **Fail until cutover** — EOG still references `CURSOR_COLLECTIONS_HOME` in `.cursor/mcp.json` |
-| Other-tool packaging | Claude does not index `.cursor/**`; Cursor does not index `CLAUDE.md` as primary dump | Not verified in live session — verify after dual-agent install |
-| Area leak | FE session does not pull large `cms/**` trees by default | Overlay documented; live session residual |
-| Infra noise | Heavy infra not in default indexed set | Supported by proxy (U≫S) |
-| Dual installer conflict | No parallel `setup-cursor-local.sh` + Agent Collections skills path | Residual until cutover |
+| Check | Pass criteria | Status (2026-08-07) |
+|-------|---------------|---------------------|
+| MCP skills env | `eversis-collections` uses `AGENT_COLLECTIONS_HOME` only | **Pass (config)** — live `mcp.json` cut over; confirm Cursor env + `eversis_skills_list` in-session |
+| Other-tool packaging | Claude does not index `.cursor/**`; Cursor does not treat `CLAUDE.md` as primary dump | Dual-agent installed; **verify in Q5 sessions** |
+| Area leak | FE session does not pull large unrelated trees by default | Soft session discipline; **no** hard product-app excludes |
+| Infra noise | True sidecars (nginx/DB) optional | **No blanket product exclude** — charts/handbooks must stay visible |
+| Dual installer conflict | No parallel `setup-cursor-local.sh` + Agent Collections skills path | Deprecation note in EOG `AGENTS.md` / README — **verify no dual use in Q5** |
 
-**Incidents:** none recorded in this implement session (no live dual-agent sessions executed here).
+**Incidents:** none recorded yet (Q5 not started).
 
-## Residual out-of-repo steps (honest)
+## Residual steps
 
-1. On an EOG **pilot branch**, add `agent-collections` as submodule (or local `AGENT_COLLECTIONS_HOME`) pinned to a SemVer tag.
-2. Run `setup-agent-collections.sh --agents=cursor,claude --profile=fullstack --build-mcp` (team: `--vendor submodule`).
-3. Replace `CURSOR_COLLECTIONS_HOME` → `AGENT_COLLECTIONS_HOME` in MCP; keep other EOG MCP servers.
-4. Apply consumer ignore overlay for `portal`/`cms` vs heavy infra (do not edit framework profiles).
-5. Execute Q5 session quota; fill collision checklist results into this file.
-6. Feed any new findings into [findings-backlog.md](./findings-backlog.md) and the migration guide.
+1. ~~Live installer + MCP env cutover~~ — done (local).  
+2. ~~Consumer ignore overlay~~ — **reverted**; keep product apps (`charts/`, handbooks) indexable.  
+3. ~~Customize AGENTS + project-stack~~ — done.  
+4. **Q5 sessions** from 2026-08-10 — fill checklist outcomes above.  
+5. **Submodule + SemVer pin** after Q5 (team-ready).  
+6. Optional: delete residual LF-named (`\n`) directory in EOG if still present (F7).  
+7. Feed new findings into [findings-backlog.md](./findings-backlog.md).
 
 ## D8–D11 mapping
 
 | AC | Evidence |
 |----|----------|
-| D8 | Overlay + checklist ready; live dual-agent period = residual |
+| D8 | Overlay + checklist; live dual-agent period = Q5 from 2026-08-10 |
 | D9 | [upgrade-runbook.md](./upgrade-runbook.md) |
 | D10 | Proxy ≥30% both areas (table above) |
-| D11 | This folder + migration guide EOG section + findings backlog draft |
+| D11 | This folder + migration guide EOG section + findings backlog |

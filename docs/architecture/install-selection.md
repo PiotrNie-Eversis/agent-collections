@@ -1,10 +1,14 @@
-# Install selection schema
+## Purpose
 
-Consumer install record written by `scripts/setup-agent-collections.sh` to:
+`.agent-collections/` is the **consumer install record directory** created by `scripts/setup-agent-collections.sh`. It is intentional (not leftover from Cursor Collections). Upgrade / sync **reads** this directory so re-runs can reuse agents, MCP servers, profile, and vendor mode without re-prompting.
+
+Primary file:
 
 ```text
 .agent-collections/install-selection.json
 ```
+
+Related helper files may also appear (for example `domain-profile.txt`, `area-profile.txt`). They are small install hints — not the framework SSOT (SSOT remains under `AGENT_COLLECTIONS_HOME/.ai/` or `vendor/agent-collections/.ai/`).
 
 ## Schema (Q3)
 

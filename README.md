@@ -164,12 +164,14 @@ First successful install checklist: [Start here](./website/docs/getting-started/
 ## Install into a consumer project
 
 ```bash
+# Prefer export first, or pass --collections-home (avoids `/scripts/...` when env is unset)
 export AGENT_COLLECTIONS_HOME=/path/to/agent-collections
 bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
-  --build-mcp --non-interactive \
+  --non-interactive \
   --agents=cursor \
   --mcp-servers=eversis-collections \
   --profile=fullstack
+# Optional: --build-mcp to force MCP package rebuild (also builds when dist is missing)
 ```
 
 ### Vendor modes
@@ -177,15 +179,16 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 | Mode | Flag | Notes |
 |------|------|-------|
 | **Local** | (default) | Framework stays outside the consumer repo; set `AGENT_COLLECTIONS_HOME` |
-| **Submodule** | `--vendor submodule` | **EOG / team default** |
+| **Submodule** | `--vendor submodule` | **EOG / team default** — teammates: `git submodule update --init --recursive` |
 | **Copy** | `--vendor copy` | Vendors tree under `vendor/agent-collections/` |
 
-Useful flags: `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`.
+Useful flags: `--collections-home`, `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`, `--build-mcp` (force MCP rebuild).
 
-Interactive wizard prompts for agents × MCP × domain profile. Re-runs are idempotent; partial failures list completed vs failed steps with recovery hints.
+Interactive wizard (TTY) prompts for agents × domain profile × MCP servers — **no `--build-mcp` required** for the MCP checklist. Re-runs are idempotent; partial failures list completed vs failed steps with recovery hints.
 
-Selection is recorded at `.agent-collections/install-selection.json` (schema: [`docs/architecture/install-selection.md`](./docs/architecture/install-selection.md)).
+Selection is recorded at `.agent-collections/install-selection.json` (schema: [`docs/architecture/install-selection.md`](./docs/architecture/install-selection.md)) — required for `--upgrade`.
 
+**Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `AGENTS.md` (do not hand-edit generated `CLAUDE.md`).
 Full install guide (including Windows): [Installation](./website/docs/getting-started/installation.md).
 
 Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`): [Migration guide](./website/docs/getting-started/migration-from-cursor-collections.md).

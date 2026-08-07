@@ -39,8 +39,8 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 
 4. **MCP env cutover** — replace `CURSOR_COLLECTIONS_HOME` with **`AGENT_COLLECTIONS_HOME`** in MCP config for `eversis-collections`. Keep other MCP servers (Atlassian, Figma, …) unless you intentionally drop them.
 5. **Stop dual skills paths** — do not point the same skills server at both frameworks. Remove or ignore obsolete Cursor Collections symlinks for skills/prompts if the installer replaced them.
-6. **Verify** — `.agent-collections/install-selection.json` present; `eversis_skills_list` works; Cursor rules and/or `CLAUDE.md` present as selected; first Implement session succeeds.
-7. **Document** — update consumer runbooks; deprecate `setup-cursor-local.sh` for this repo when cutover is accepted.
+6. **Verify** — `.agent-collections/install-selection.json` present; `eversis_skills_list` works; Cursor rules and/or `CLAUDE.md` present as selected; first Implement session succeeds. For submodule installs, teammates need `git submodule update --init --recursive`.
+7. **Document** — update consumer runbooks; Cursor stack in `eversis-project-stack.mdc`, Claude stack in `AGENTS.md`; deprecate `setup-cursor-local.sh` for this repo when cutover is accepted.
 
 ## Ownership model (local / core / generated)
 
@@ -90,7 +90,7 @@ Typical enterprise cutover from `setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HO
 5. Measure WNF-03 with the §7.2 proxy (file count or approx tokens) for scoped vs unscoped — target ≥30% reduction or record a justified estimate + improvement plan.
 6. Feed findings back into this guide and optional `docs/context/` notes — **without** linking to a Cursor Collections docs portal.
 
-**Pilot snapshot (2026-08-06):** In-repo notes and a file-count proxy for an EOG-class layout are under [`docs/context/eog/`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/context/eog/README.md). Measured proxy reductions for frontend≈portal and backend≈cms were **above 30%** vs full monorepo unscoped file count. Live submodule install and the Q5 dual-agent session window remain **consumer-repo residual** steps (see that folder’s evidence pack).
+**Pilot snapshot (2026-08-07):** In-repo notes and a file-count proxy for an EOG-class layout are under [`docs/context/eog/`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/context/eog/README.md). Measured proxy reductions for frontend≈portal and backend≈cms were **above 30%** vs full monorepo unscoped file count. Live **local** installer + MCP `AGENT_COLLECTIONS_HOME` cutover and consumer **2a** infra overlay are recorded in the evidence pack; **Q5 dual-agent sessions** start **2026-08-10**; submodule SemVer pin remains a post-Q5 residual.
 
 Pilot measurement templates and residual out-of-repo steps: see `docs/context/eog/` in this repository.
 

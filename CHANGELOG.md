@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Installer UX (DHI-515 umbrella)** — Interactive agents checkbox + domain-profile select (`agents-prompt.mjs`, `profile-prompt.mjs`); shared inquirer deps helper
 - **DHI-598** — Cursor adapter emits thin slash commands under `.cursor/commands/eversis-*.md` from `.ai/prompts/{public,internal}/` (HYBRID: SSOT pointer + optional Executable section); deny list `adapters/cursor/command-deny.yaml`; included in `sync:adapters:check`
 - **DHI-598 follow-up** — Slash command files put `prompt_description` as the first paragraph for Cursor `/` menu summary; GENERATED marker moved to end of file
 - **Wave D — docs + validation (DHI-515 / 541, 539, 540, 542)**
@@ -33,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Installer Next steps** — agent-aware (Cursor stack `.mdc` vs Claude `AGENTS.md`); vendor submodule/copy marked done + teammate `git submodule update --init --recursive`; local mode clarifies no in-repo `.ai/`
+- **MCP wizard** — interactive MCP server selection no longer requires `--build-mcp` (`--build-mcp` = force rebuild only; missing `dist` still builds)
+- **Installer docs** — `.agent-collections/` purpose, `--collections-home` one-liners, Claude vs Cursor stack customisation (`install-selection.md`, getting-started, Claude adapter README, root README)
 - **DHI-598** — Docs updated: adapter-mapping emit matrix, Cursor adapter README, README / AGENTS Channel notes for `/eversis-*`
 - **DHI-541** — Root README rewritten for human-first documentation UX (progressive disclosure: hero → workflows with human gates → quick start → install/upgrade facts), aligned with cursor-collections README pattern while keeping Agent Collections facts (`AGENT_COLLECTIONS_HOME`, adapters, MVP limits)
 - README links getting-started + migration; documents deferred docs hosting

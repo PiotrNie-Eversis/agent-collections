@@ -21,6 +21,15 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
   --profile=fullstack
 ```
 
-EOG / team default vendor mode: **`--vendor submodule`**.
+Or without relying on env expansion:
 
-See root [README.md](../README.md) for modes, upgrade (`--upgrade`), and selection schema.
+```bash
+bash /path/to/agent-collections/scripts/setup-agent-collections.sh \
+  --collections-home /path/to/agent-collections \
+  --non-interactive --agents=cursor --mcp-servers=eversis-collections \
+  --profile=fullstack
+```
+
+EOG / team default vendor mode: **`--vendor submodule`**. After clone, teammates run `git submodule update --init --recursive`.
+
+See root [README.md](../README.md) for modes, upgrade (`--upgrade`), and selection schema (`.agent-collections/`).

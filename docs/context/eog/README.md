@@ -18,6 +18,7 @@ Local notes for the **EOG** monorepo pilot ([DHI-542](https://eversis.atlassian.
 - Prefer **`--vendor submodule`** pinned to an `agent-collections` SemVer tag.
 - Solo trials may use **local** mode with `AGENT_COLLECTIONS_HOME` pointing at a checkout.
 - MCP skills server must use **`AGENT_COLLECTIONS_HOME`** (replace `CURSOR_COLLECTIONS_HOME`).
+- **Path policy:** committed docs here must not embed machine-local absolute paths — use repo names, in-repo relative paths, or `$AGENT_COLLECTIONS_HOME` / `${env:AGENT_COLLECTIONS_HOME}`.
 
 ## Documents in this folder
 

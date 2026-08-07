@@ -4,13 +4,13 @@ Short orientation map for AI agents working in this repository: where areas live
 
 ## Framework
 
-- **Core SSOT:** `.ai/` — rules, skills, prompts (see `.ai/README.md`)
-- **Adapters:** `adapters/` — tool packaging (Cursor, Claude Code, OpenCode placeholder); refresh with `node adapters/sync.mjs`
-- **Orchestration:** start with `.ai/rules/orchestration/agent-core.md` and **`spec-driven-development.md`**; load `engineering-manager` for Implement
-- **Prompts:** load by stable id under `.ai/prompts/` (e.g. `eversis-implement`, `eversis-review`)
-- **Skills:** MCP server **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`) when enabled; otherwise read `.ai/skills/*/SKILL.md`
-- **AGENTS standard:** `docs/architecture/agents-md-standard.md`
-- **Versioning / upgrade:** root `README.md` and `CHANGELOG.md`
+This consumer project uses **Agent Collections**.
+
+- **Local mode:** Core SSOT is `$AGENT_COLLECTIONS_HOME/.ai/` (not copied into this repo). Enable MCP **`eversis-collections`**.
+- **Submodule / copy mode:** SSOT may live under `vendor/agent-collections/.ai/` — still prefer MCP for skills.
+- **Prompts:** load by stable id (e.g. `eversis-implement`) under the framework `.ai/prompts/` tree.
+- **Orchestration:** `.ai/rules/orchestration/agent-core.md` + **`spec-driven-development.md`** (via framework home).
+- **Path policy:** do not commit machine-local absolute paths; use `$AGENT_COLLECTIONS_HOME` or relative in-repo paths.
 
 ## Project deliverables
 
@@ -60,12 +60,14 @@ Ideate → Research → Plan → Implement → Review → Fine
 - Spec folder: `docs/specs/<issue-kebab>/`
 - Research: `<issue-kebab>.research.md` (approve before plan)
 - Plan: `<issue-kebab>.plan.md` (approve before implement)
-- Canonical rule: `.ai/rules/orchestration/spec-driven-development.md`
+- Canonical rule: `$AGENT_COLLECTIONS_HOME/.ai/rules/orchestration/spec-driven-development.md` (or under `vendor/agent-collections/` when vendored)
 
 ## Project specifics
 
 <!-- Replace this section with project-specific agent instructions. -->
-<!-- Stack commands and lint/test invocations belong in the consumer project-stack rule, not here. -->
+<!-- Cursor: stack commands / lint targets belong in `.cursor/rules/eversis-project-stack.mdc`. -->
+<!-- Claude Code: put stack, areas, and skills policy here in AGENTS.md (Claude does not load Cursor .mdc rules). -->
+<!-- Do not hand-edit generated CLAUDE.md. -->
 
 ---
 

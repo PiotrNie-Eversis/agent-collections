@@ -22,7 +22,7 @@ Transform the Cursor-centric **Cursor Collections** framework into a vendor-agno
 - Standardized agnostic `AGENTS.md` as monorepo context map and role matrix
 - Distribution model: self-contained repo, bash/CLI install bootstrap, modular profiles (Frontend-only, Backend-only, Fullstack Monorepo)
 - **Interactive install wizard:** choose AI agent adapter(s) (Cursor / Claude Code / OpenCode placeholder / multi) **and** MCP server set for the target project
-- Migration documentation and pilot validation in the **EOG** enterprise monorepo (`/Users/piotrniemirski/Documents/Projects/eog`)
+- Migration documentation and pilot validation in the **EOG** enterprise monorepo
 - Porting framework MCP server and install scripts from `cursor-collections` where they remain part of the deliverable standard
 - **Docusaurus documentation site** migration from `cursor-collections` to `agent-collections`, with full rebrand from Cursor Collections to Agent Collections
 - **Mandatory delivery standard:** every story under DHI-515 is executed using **full spec-driven development** (research → plan → implement → review, with human gates and `docs/specs/<issue-kebab>/` artifacts)
@@ -83,7 +83,7 @@ All implementation work under epic **DHI-515** follows the Eversis **spec-driven
 | # | Question | Decision |
 |---|----------|----------|
 | Q1 | Docusaurus site location and branding | **Migrate** the Docusaurus site to `agent-collections`; rebrand all references from Cursor Collections → Agent Collections |
-| Q2 | Phase 3 pilot monorepo | **EOG** — `/Users/piotrniemirski/Documents/Projects/eog` (Earth Observation Gateway; frontend `portal/`, backend `cms/`, existing Cursor Collections install via `scripts/setup-cursor-local.sh`) |
+| Q2 | Phase 3 pilot monorepo | **EOG** (Earth Observation Gateway; frontend `portal/`, backend `cms/`, existing Cursor Collections install via `scripts/setup-cursor-local.sh`) |
 | Q3 | `cursor-collections` post-migration role | **Remain a separate Cursor-specific distribution channel** (code/install) — not deprecated; coexists with `agent-collections` as the multi-agent SSOT |
 | Q4 | Delivery standard for all DHI-515 work | **Full spec-driven development mandatory** — every story requires `docs/specs/<issue-kebab>/` with `*.research.md` and `*.plan.md`, human gates, `@eversis-implement`, `@eversis-review`, Fine handoff; Jira descriptions must include Delivery Standard section |
 | Q5 | Bash install wizard scope | Installer must let the user choose **AI agent adapter(s)** for the project **and** **MCP servers** (extend legacy `--mcp-servers` / interactive MCP prompt; add agent selection axis) |

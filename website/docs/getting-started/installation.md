@@ -58,7 +58,7 @@ Selection is written to **`.agent-collections/install-selection.json`**. Schema:
 
 | Flag | Purpose |
 |------|---------|
-| `--build-mcp` | Install + build `mcp/eversis-collections-mcp` |
+| `--build-mcp` | Force rebuild of `mcp/eversis-collections-mcp` (also builds when `dist` is missing). Does **not** gate the interactive MCP server checklist. |
 | `--agents` | `cursor`, `claude`, `opencode` (opencode = placeholder) |
 | `--mcp-servers` | Comma-separated ids; without it + `--non-interactive` → `eversis-collections` only |
 | `--profile` | `frontend` \| `backend` \| `fullstack` |
@@ -67,8 +67,26 @@ Selection is written to **`.agent-collections/install-selection.json`**. Schema:
 | `--upgrade` | Reuse selection (fail-safe if missing/corrupt) |
 | `--non-interactive` | No prompts — defaults + flags |
 | `--target DIR` | Consumer path when not running from that repo |
+| `--collections-home DIR` | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion) |
 
-Interactive runs prompt for agents × MCP × domain profile. Re-runs are idempotent; partial failures list completed vs failed steps.
+Interactive runs (TTY, without `--non-interactive`) prompt for agents × domain profile × MCP servers. `--build-mcp` is optional on interactive installs. Re-runs are idempotent; partial failures list completed vs failed steps.
+
+### After submodule install (teammates)
+
+When the consumer uses `--vendor submodule`, teammates clone the app repo then:
+
+```bash
+git submodule update --init --recursive
+```
+
+Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains at `.agent-collections/install-selection.json` (see [install-selection.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/install-selection.md)).
+
+### Customising stack (Cursor vs Claude)
+
+| Channel | Customise |
+|---------|-----------|
+| Cursor | `.cursor/rules/eversis-project-stack.mdc` |
+| Claude Code | `AGENTS.md` (do not hand-edit generated `CLAUDE.md`) |
 
 ## 4. Skills and prompts (MVP)
 

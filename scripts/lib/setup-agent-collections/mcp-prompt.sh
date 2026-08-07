@@ -44,16 +44,6 @@ _run_mcp_toggle_prompt() {
   export MCP_SELECTED_IDS MCP_CONFIGURED_SERVERS="$MCP_SELECTED_IDS"
 }
 
-_ensure_mcp_prompt_deps() {
-  local deps_marker="${LIB_DIR}/node_modules/@inquirer/prompts/package.json"
-  [[ -f "$deps_marker" ]] && return 0
-  require_cmd npm "Install Node.js/npm from https://nodejs.org"
-  log_info "Installing MCP prompt UI dependencies (one-time) …"
-  (cd "$LIB_DIR" && npm install --omit=dev --no-audit --no-fund --silent) \
-    || return 1
-  return 0
-}
-
 _run_checkbox_mcp_prompt() {
   local selected_csv="" exit_code=0
 
@@ -85,7 +75,6 @@ _run_interactive_mcp_prompt() {
 }
 
 _resolve_mcp_selection() {
-  local mcp_file="${TARGET_DIR}/.cursor/mcp.json"
   local default_minimal="eversis-collections"
 
   if [[ -n "${MCP_SELECTED_IDS:-}" ]]; then
@@ -107,20 +96,10 @@ _resolve_mcp_selection() {
     return 0
   fi
 
-  if [[ "${ARG_BUILD_MCP:-false}" == "true" ]] && _is_interactive_terminal; then
+  # Interactive MCP wizard whenever TTY — do not gate on --build-mcp
+  # (--build-mcp only forces MCP package rebuild in build-mcp.sh).
+  if _is_interactive_terminal; then
     _run_interactive_mcp_prompt
-    return 0
-  fi
-
-  if [[ -f "$mcp_file" ]]; then
-    MCP_SELECTED_IDS="$default_minimal"
-    export MCP_SELECTED_IDS MCP_CONFIGURED_SERVERS="$MCP_SELECTED_IDS"
-    return 0
-  fi
-
-  if [[ "${ARG_BUILD_MCP:-false}" != "true" ]]; then
-    MCP_SELECTED_IDS="$default_minimal"
-    export MCP_SELECTED_IDS MCP_CONFIGURED_SERVERS="$MCP_SELECTED_IDS"
     return 0
   fi
 

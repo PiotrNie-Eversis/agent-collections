@@ -20,6 +20,16 @@ resolve_collections_home() {
       COLLECTIONS_HOME="$(default_collections_home)"
     fi
   fi
+
+  # Guard empty / root-like paths (e.g. one-liner with unset AGENT_COLLECTIONS_HOME
+  # expanding to `/scripts/...` never reaches us — but empty CLI/env still can).
+  if [[ -z "${COLLECTIONS_HOME:-}" ]] || [[ "${COLLECTIONS_HOME}" == "/" ]]; then
+    die "AGENT_COLLECTIONS_HOME is empty or invalid.
+  Pass --collections-home /path/to/agent-collections
+  or: export AGENT_COLLECTIONS_HOME=/path/to/agent-collections
+  then: bash \"\$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh\" …"
+  fi
+
   export COLLECTIONS_HOME
 }
 
@@ -37,7 +47,8 @@ ensure_framework_checkout() {
       log_warn "Directory exists but has no .ai/skills — proceeding anyway (--force)."
       return 0
     fi
-    die "Directory '${home}' exists but does not contain .ai/skills. Pass --collections-home or set AGENT_COLLECTIONS_HOME."
+    die "Directory '${home}' exists but does not contain .ai/skills.
+  Pass --collections-home /path/to/agent-collections or set AGENT_COLLECTIONS_HOME to a valid checkout."
   fi
 
   require_cmd git "Install Git from https://git-scm.com"

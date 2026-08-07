@@ -80,3 +80,19 @@ require_cmd() {
     fi
   fi
 }
+
+_ensure_inquirer_prompt_deps() {
+  # Shared by agents + MCP checkbox prompts (LIB_DIR set by setup entrypoint).
+  local deps_marker="${LIB_DIR}/node_modules/@inquirer/prompts/package.json"
+  [[ -f "$deps_marker" ]] && return 0
+  require_cmd npm "Install Node.js/npm from https://nodejs.org"
+  log_info "Installing installer prompt UI dependencies (one-time) …"
+  (cd "$LIB_DIR" && npm install --omit=dev --no-audit --no-fund --silent) \
+    || return 1
+  return 0
+}
+
+# Back-compat alias used by older MCP prompt call sites.
+_ensure_mcp_prompt_deps() {
+  _ensure_inquirer_prompt_deps
+}

@@ -5,10 +5,13 @@
 #   bash scripts/setup-agent-collections.sh [OPTIONS]
 #
 # Options:
-#   --build-mcp               Build the MCP server (npm install + npm run build).
-#                             Auto-triggered when dist/index.js is missing.
+#   --build-mcp               Force rebuild of the MCP server (npm install + build).
+#                             Without this flag, build still runs when dist/index.js
+#                             is missing. Does not control the interactive MCP wizard.
 #   --collections-home DIR    Path to agent-collections checkout.
 #                             Overrides AGENT_COLLECTIONS_HOME env var and OS default.
+#                             Prefer this (or a prior export) over bare
+#                             $AGENT_COLLECTIONS_HOME/scripts/... when env may be unset.
 #   --target DIR              Target project directory.
 #                             Default: interactive (git root vs cwd) or git root.
 #   --vendor submodule|copy   Vendor the framework into this repository.
@@ -34,13 +37,19 @@
 #   AGENT_COLLECTIONS_REPO_URL  Git URL to clone from (default: upstream GitHub repo).
 #
 # Examples:
-#   bash scripts/setup-agent-collections.sh --build-mcp --non-interactive \
-#     --agents=cursor --mcp-servers=eversis-collections --profile=fullstack
+#   bash /path/to/agent-collections/scripts/setup-agent-collections.sh \
+#     --collections-home /path/to/agent-collections \
+#     --non-interactive --agents=cursor --mcp-servers=eversis-collections \
+#     --profile=fullstack
 #
-#   AGENT_COLLECTIONS_HOME=~/src/agent-collections \
-#     bash scripts/setup-agent-collections.sh --vendor submodule --build-mcp
+#   export AGENT_COLLECTIONS_HOME=~/src/agent-collections
+#   bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+#     --vendor submodule
 #
-#   bash scripts/setup-agent-collections.sh --upgrade --sync
+#   bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --upgrade --sync
+#
+# Interactive installs prompt for agents, domain profile, and MCP servers on a TTY
+# (no --build-mcp required for the MCP checklist).
 
 set -euo pipefail
 

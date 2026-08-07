@@ -50,6 +50,12 @@ Re-run after core or map changes. **Do not hand-edit** the generated `CLAUDE.md`
 | Monorepo area / path globs | **Deferred** to DHI-530 (Work Stream 3) |
 | `.claudeignore` | **Shipped** at repo root (DHI-529 ignore triad; see [`isolation-strategy.md`](../../docs/architecture/isolation-strategy.md) §8.1) |
 
+## Consumer project notes
+
+- **Do not hand-edit** the generated `CLAUDE.md` — it is overwritten on the next `sync:adapters` / Claude generate run.
+- Claude Code does **not** load Cursor `.cursor/rules/*.mdc`. Put consumer stack, area map, and skills policy in **`AGENTS.md`** (shared orientation map). Cursor teams still customise `eversis-project-stack.mdc` for Cursor-only stack commands.
+- Skills resolve via MCP **`eversis-collections`** (or by reading `.ai/skills/*/SKILL.md` from the framework home / vendor path).
+
 ## Requirements
 
 - Node.js 18+ (stdlib only; no npm install)

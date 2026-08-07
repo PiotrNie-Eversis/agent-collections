@@ -1,6 +1,57 @@
 #!/usr/bin/env bash
 # lib/setup-agent-collections/profile.sh — domain profile axis (manifest-driven).
 
+readonly PROFILE_PROMPT_MJS="${LIB_DIR}/profile-prompt.mjs"
+
+_is_interactive_profile_terminal() {
+  [[ -t 1 ]]
+}
+
+_run_select_profile_prompt() {
+  local selected="" exit_code=0
+
+  selected="$(node "$PROFILE_PROMPT_MJS")" || exit_code=$?
+  if [[ "$exit_code" -eq 130 ]]; then
+    die "Setup cancelled."
+  fi
+  if [[ "$exit_code" -ne 0 ]] || [[ -z "$selected" ]]; then
+    return 1
+  fi
+
+  DOMAIN_PROFILE="${selected//$'\n'/}"
+  _validate_profile "$DOMAIN_PROFILE"
+  export DOMAIN_PROFILE
+  return 0
+}
+
+_run_numbered_profile_prompt() {
+  echo ""
+  echo "${_BOLD}Select domain profile:${_RESET}"
+  echo "  1) frontend  — FE-oriented rules/skills"
+  echo "  2) backend   — BE-oriented rules/skills"
+  echo "  3) fullstack — full set + monorepo area scoping defaults"
+  echo ""
+  local choice=""
+  read -r -p "Enter choice [3]: " choice
+  case "${choice:-3}" in
+    1) DOMAIN_PROFILE="frontend" ;;
+    2) DOMAIN_PROFILE="backend" ;;
+    *) DOMAIN_PROFILE="fullstack" ;;
+  esac
+  export DOMAIN_PROFILE
+}
+
+_run_interactive_profile_prompt() {
+  require_cmd node "Install Node.js ≥ 18 from https://nodejs.org"
+
+  if _ensure_inquirer_prompt_deps && _run_select_profile_prompt; then
+    return 0
+  fi
+
+  log_info "Select UI unavailable — using numbered menu."
+  _run_numbered_profile_prompt
+}
+
 resolve_domain_profile() {
   if [[ -n "${DOMAIN_PROFILE:-}" ]]; then
     _validate_profile "$DOMAIN_PROFILE"
@@ -22,20 +73,14 @@ resolve_domain_profile() {
     return 0
   fi
 
-  echo ""
-  echo "${_BOLD}Select domain profile:${_RESET}"
-  echo "  1) frontend  — FE-oriented rules/skills"
-  echo "  2) backend   — BE-oriented rules/skills"
-  echo "  3) fullstack — full set + monorepo area scoping defaults"
-  echo ""
-  local choice=""
-  read -r -p "Enter choice [3]: " choice
-  case "${choice:-3}" in
-    1) DOMAIN_PROFILE="frontend" ;;
-    2) DOMAIN_PROFILE="backend" ;;
-    *) DOMAIN_PROFILE="fullstack" ;;
-  esac
-  export DOMAIN_PROFILE
+  if _is_interactive_profile_terminal; then
+    _run_interactive_profile_prompt
+  else
+    DOMAIN_PROFILE="fullstack"
+    export DOMAIN_PROFILE
+    log_warn "Non-interactive terminal — defaulting profile to fullstack."
+    log_info "Pass --profile=frontend|backend|fullstack for non-interactive selection."
+  fi
 }
 
 _validate_profile() {
