@@ -377,11 +377,43 @@ function extractExecutableSection(body) {
   return section.replace(/\s+$/, "");
 }
 
+/**
+ * Read prompt YAML frontmatter keys used for slash-menu summary text.
+ * @returns {{ prompt_description?: string, title?: string }}
+ */
+function extractPromptMeta(body) {
+  const meta = {};
+  if (!body.startsWith("---")) return meta;
+  const end = body.indexOf("\n---", 3);
+  if (end === -1) return meta;
+  const fm = body.slice(3, end);
+  for (const rawLine of fm.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    if (key !== "prompt_description" && key !== "title") continue;
+    meta[key] = String(parseScalar(line.slice(idx + 1)));
+  }
+  return meta;
+}
+
+/**
+ * Cursor slash UI often shows the first plain paragraph after the title as the
+ * command summary — do not put GENERATED HTML comments there.
+ */
 function buildCommandContent(prompt, sourceBody) {
+  const meta = extractPromptMeta(sourceBody);
+  const summary =
+    (meta.prompt_description && String(meta.prompt_description).trim()) ||
+    (meta.title && String(meta.title).trim()) ||
+    `Run Agent Collections prompt ${prompt.id}`;
+
   const lines = [
     `# ${prompt.id}`,
     "",
-    GENERATED_MARKER,
+    summary,
     "",
     `**Stable id:** \`${prompt.id}\`  `,
     `**Audience:** ${prompt.audience}  `,
@@ -402,6 +434,7 @@ function buildCommandContent(prompt, sourceBody) {
     );
   }
 
+  lines.push(GENERATED_MARKER, "");
   return lines.join("\n");
 }
 

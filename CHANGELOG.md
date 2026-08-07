@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **DHI-598** — Cursor adapter emits thin slash commands under `.cursor/commands/eversis-*.md` from `.ai/prompts/{public,internal}/` (HYBRID: SSOT pointer + optional Executable section); deny list `adapters/cursor/command-deny.yaml`; included in `sync:adapters:check`
+- **DHI-598 follow-up** — Slash command files put `prompt_description` as the first paragraph for Cursor `/` menu summary; GENERATED marker moved to end of file
 - **Wave D — docs + validation (DHI-515 / 541, 539, 540, 542)**
   - Getting-started guides under `website/docs/getting-started/` (CC-analog stems) + migration from Cursor Collections
   - Framework reference `documentation/agent-collection.md` and WF/WNF `docs/architecture/requirements-traceability.md`

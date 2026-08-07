@@ -48,7 +48,7 @@ Source of packaging metadata: [`rule-map.yaml`](./rule-map.yaml). Mapping contra
 |------|--------|
 | Discovery | All `eversis-*.md` under `.ai/prompts/public/` and `.ai/prompts/internal/` |
 | Output | `.cursor/commands/<id>.md` |
-| Shape (HYBRID) | Pointer to SSOT path + embed `## Executable prompt…` when present |
+| Shape (HYBRID) | First plain paragraph = `prompt_description` (slash menu summary); SSOT pointer; embed `## Executable prompt…` when present; GENERATED marker at **end** of file |
 | Deny list | [`command-deny.yaml`](./command-deny.yaml) — ids listed there are not emitted |
 | Orphans | Generated `eversis-*.md` under `.cursor/commands/` not in inventory are removed on sync |
 | Drift check | Included in `npm run sync:adapters:check` |
