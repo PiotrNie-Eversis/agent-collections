@@ -14,6 +14,7 @@ import {
   type Section,
 } from "./chapters.js";
 import { loadDocx, saveDocx } from "./docx-io.js";
+import { validateDocxFile } from "./validate.js";
 
 const GRAPHICS_PLACEHOLDER =
   ">>> FOR BA REVIEW: CHECK AND UPDATE DIAGRAM ACCORDING TO RELEASE <<<";
@@ -390,7 +391,44 @@ export function registerDocxTools(server: McpServer): void {
     }
   );
 
-  // ── MCP-8: backup_docx ───────────────────────────────────────────────────
+  // ── MCP-8: validate_docx ─────────────────────────────────────────────────
+
+  server.registerTool(
+    "validate_docx",
+    {
+      description:
+        "OOXML health check for a .docx (Word-compatibility gate). " +
+        "Fails closed on ElementTree-style ns0: document.xml rewrites that unzip -t still accepts. " +
+        "Call after every mutating docx edit; do not treat unzip -t alone as sufficient.",
+      inputSchema: {
+        docx_path: z.string(),
+      },
+    },
+    async ({ docx_path }) => {
+      try {
+        const result = await validateDocxFile(docx_path);
+        return textResult(JSON.stringify(result, null, 2));
+      } catch (e) {
+        return textResult(
+          JSON.stringify(
+            {
+              status: "FAIL",
+              path: path.resolve(docx_path),
+              entry_count: 0,
+              document_xml_bytes: 0,
+              reasons: [String(e)],
+              warnings: [],
+              head_preview: "",
+            },
+            null,
+            2
+          )
+        );
+      }
+    }
+  );
+
+  // ── MCP-9: backup_docx ───────────────────────────────────────────────────
 
   server.registerTool(
     "backup_docx",

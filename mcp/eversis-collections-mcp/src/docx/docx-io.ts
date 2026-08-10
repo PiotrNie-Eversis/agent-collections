@@ -4,6 +4,7 @@ import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import type { Document as XmlDocument, Element as XmlElement } from "@xmldom/xmldom";
 import JSZip from "jszip";
 import { getBody, listBodyParagraphs, buildStyleMap } from "./chapters.js";
+import { assertWordCompatibleDocumentXml } from "./validate.js";
 
 export interface LoadedDocx {
   abs: string;
@@ -71,6 +72,7 @@ export async function saveDocx(loaded: LoadedDocx): Promise<void> {
   const root = doc.documentElement;
   if (!root) throw new Error("No document root");
   const out = ser.serializeToString(root);
+  assertWordCompatibleDocumentXml(out);
   const decl = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
   zip.file("word/document.xml", `${decl}\n${out}`);
   const buf = await zip.generateAsync({ type: "nodebuffer" });

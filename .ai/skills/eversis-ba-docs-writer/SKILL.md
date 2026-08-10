@@ -70,8 +70,13 @@ Note the returned `content_type`:
 Call read_chapter(docx_path, chapter_id).
 Confirm the new content is present in the returned text.
 If not present → stop, report the discrepancy, do not continue to next section.
+
+Call validate_docx(docx_path).
+If status = "FAIL" → stop immediately. Report reasons. Restore from the Step 0 backup (or last known-good backup). Do NOT continue editing a FAIL package.
+If status = "PASS" → continue (warnings may be logged; they are not a hard fail).
 ```
 
+`unzip -t` alone is **not** sufficient. Packages with ElementTree-style `ns0:document` rewrite can pass zip CRC checks and still be rejected by Microsoft Word.
 ### Step 3 — Graphics flag handling
 
 For sections annotated `[WYMAGA_AKTUALIZACJI_GRAFIKI]`:
@@ -88,10 +93,10 @@ After processing all sections, output:
 Sections updated:   N
 Sections skipped (TABLE-CONTAINS — manual):  N
 Sections flagged for graphics:  N
+Final validate_docx: PASS | FAIL
 
 Reminder: Visually verify tables, numbering, and diagrams in MS Word before uploading to SharePoint.
 ```
-
 List any section that was skipped with a brief reason so the BA knows what requires manual attention.
 
 ## Decision table (quick reference)
@@ -110,6 +115,17 @@ MIXED              → update_table_cell        (treat as TABLE-CONTAINS)
 - `update_chapter` **destroys** all existing paragraph content in the section body (paragraphs, inline images). It does NOT remove tables (`w:tbl`), but it orphans them. Never call `update_chapter` without checking `content_type` first.
 - **FORBIDDEN:** Calling `update_chapter` or `append_chapter` on a `TABLE-CONTAINS` section without explicit human approval in the same session.
 - Always call `read_chapter` after every edit to verify content was written correctly.
+- Always call `validate_docx` after every mutating edit (`update_chapter`, `append_chapter`, `update_table_cell`). Fail closed on `status: "FAIL"`.
+- **FORBIDDEN:** Rewriting whole `word/document.xml` via Python `xml.etree.ElementTree` / `ET.tostring`, `lxml.tostring`, or rebuilding the `.docx` zip around a re-serialized tree. That produces `ns0:document` packages Word reports as damaged. Prefer MCP mutate tools only. If a one-off surgical byte/run replace is unavoidable, preserve existing zip entry compression and never re-serialize the full XML tree.
+- Avoid literal `</…>` closing tags inside `update_chapter` string payloads when possible (known zip/XML corruption risk); prefer prose instructions to close tags in Source mode, or a strategy proven safe with `validate_docx`.
+- Do not treat `unzip -t` or macOS `textutil` as a Word-compatibility gate.
 - Do not commit secrets or credentials. `upload_to_sharepoint` may be unimplemented — document limitations instead of faking success.
 - Do not proceed past Step 0 if `backup_docx` fails — the risk of data loss without a backup is unacceptable.
 - Do not run `eversis-ba-docs-planner` yourself — the plan must already be approved before Writer starts.
+
+## Recovery (when validate_docx FAIL)
+
+1. Stop editing.
+2. Restore the Step 0 `backup_docx` copy (or last backup whose `validate_docx` was PASS / whose `word/document.xml` starts with `<w:document`).
+3. Re-apply only missing deltas via MCP tools.
+4. Run `validate_docx` again before declaring the Writer session complete.

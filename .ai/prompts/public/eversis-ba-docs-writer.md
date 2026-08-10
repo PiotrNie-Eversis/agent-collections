@@ -45,13 +45,16 @@ Attach the **approved** plan. Optionally load role rule `eversis-ba-docs-writer`
       - `IMAGE-CONTAINS`   → `append_chapter` + `requires_graphics_review: true`; do NOT remove existing image paragraphs
       - `MIXED`            → treat as `TABLE-CONTAINS`
    c. After each edit → call `read_chapter(docx_path, chapter_id)` to verify new content is present
+   d. After each mutating edit → call `validate_docx(docx_path)`. If `status` is `FAIL`, **stop**, restore from the Step 2 backup, and report — do not continue. `unzip -t` alone is not a Word-compatibility gate (`ns0:document` rewrites can still look zip-healthy).
 
 4. **Graphics flag** — Sections annotated `[WYMAGA_AKTUALIZACJI_GRAFIKI]`: insert placeholder, flag for human. Remind the human that diagrams require a manual update in Word.
 
 5. **Finish** — Output session summary:
    - Sections updated / skipped (TABLE-CONTAINS — manual) / flagged for graphics
+   - Confirm final `validate_docx` is `PASS`
    - Remind human: "Visually verify tables, numbering, and diagrams in MS Word before uploading to SharePoint."
 
+**Do not** rewrite whole `word/document.xml` with Python `ElementTree` / `ET.tostring` (produces Word-damaged `ns0:document` packages). Prefer MCP tools only.
 </workflow>
 
 ## Related
