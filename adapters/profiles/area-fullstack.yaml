@@ -7,5 +7,4 @@ include:
   - docs/**
   - scripts/**
 exclude:
-  - charts/**
   - "**/node_modules/**"

@@ -9,5 +9,4 @@ include:
   - scripts/**
 exclude:
   - apps/api/**
-  - charts/**
   - "**/node_modules/**"

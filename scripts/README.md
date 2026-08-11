@@ -32,4 +32,4 @@ bash /path/to/agent-collections/scripts/setup-agent-collections.sh \
 
 EOG / team default vendor mode: **`--vendor submodule`**. After clone, teammates run `git submodule update --init --recursive`.
 
-See root [README.md](../README.md) for modes, upgrade (`--upgrade`), and selection schema (`.agent-collections/`).
+See root [README.md](../README.md) for modes, upgrade (`--upgrade`), selection schema (`.agent-collections/`), and **deselection / recovery** (MCP prune, Claude surface cleanup, slash-command orphans).

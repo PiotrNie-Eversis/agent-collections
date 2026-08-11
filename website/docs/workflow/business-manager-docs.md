@@ -60,12 +60,12 @@ The `.docx` engine automatically handles two common issues with non-English Word
 
 ## Prompts vs Role Rules
 
-Following **Agent Collections** monorepo convention, we separate:
+Following **Agent Collections** convention, we separate:
 
-- **Public prompt** — **`.cursor/prompts/public/eversis-*.md`**: **executable workflow** content (Docusaurus frontmatter + SOP steps). In Cursor, **`@` + file stem** (e.g. **`@eversis-ba-docs-planner`**) usually resolves **this prompt**.
-- **Role rule** — **`.cursor/rules/eversis-*.mdc`**: **who the agent is**, boundaries, MCP tool behavior; attached on demand (**`@`** to the `.mdc` file or picker selection), often with `alwaysApply: false`.
+- **Public prompt** — **`.ai/prompts/public/eversis-*.md`**: **executable workflow** content (SSOT; optional Docusaurus copies under `website/docs/prompts/`). In Cursor, use **`/eversis-ba-docs-planner`** or load-by-id / **`@`** when the SSOT or generated slash shim is surfaced.
+- **Role rule** — **`.cursor/rules/eversis-*.mdc`** when emitted by the adapter: **who the agent is**, boundaries, MCP tool behavior; attach on demand. **BA Docs `.mdc` rules are not shipped in MVP** — prompts + skills + slash commands carry the workflow.
 
-In practice for this workflow **both artifacts are normative**: the prompt starts the track; the rule reinforces the role and framework consistency. If **`@`** does not pull both into one session, **explicitly attach** the second file (full path under `.cursor/…`), as in [AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md).
+In practice for this workflow the **prompt + skills** are normative; attach **`/eversis-ba-docs-planner`** then **`/eversis-ba-docs-writer`**. See [AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md) for channel notes.
 
 ## Documentation channels (Word vs Repo)
 
@@ -84,8 +84,8 @@ The workflow relies on two specialized agents communicating through a shared art
 
 ### 1. Planner — Lead Analyst (BA Docs / Word)
 
-- **Prompt (workflow):** **`.cursor/prompts/public/eversis-ba-docs-planner.md`** — attach **`@eversis-ba-docs-planner`**
-- **Role rule:** **`.cursor/rules/eversis-ba-docs-planner.mdc`**
+- **Prompt (workflow):** **`.ai/prompts/public/eversis-ba-docs-planner.md`** — **`/eversis-ba-docs-planner`** or load-by-id
+- **Role rule:** optional **`.cursor/rules/eversis-ba-docs-planner.mdc`** — **not shipped in MVP** (prompt + skills sufficient)
 - **Responsibility:** Understand the Release scope, verify Confluence guidelines, and map changes to the appropriate document sections.
 - **Input:** Jira Release ID + Confluence page title with update rules + `summary.md` (or path to `.docx` to generate a map first).
 - **Output:** **`docs-update-plan.md`**
@@ -99,8 +99,8 @@ The workflow relies on two specialized agents communicating through a shared art
 
 ### 2. Writer — Technical Writer (BA Docs / Word)
 
-- **Prompt (workflow):** **`.cursor/prompts/public/eversis-ba-docs-writer.md`** — attach **`@eversis-ba-docs-writer`**
-- **Role rule:** **`.cursor/rules/eversis-ba-docs-writer.mdc`**
+- **Prompt (workflow):** **`.ai/prompts/public/eversis-ba-docs-writer.md`** — **`/eversis-ba-docs-writer`** or load-by-id
+- **Role rule:** optional **`.cursor/rules/eversis-ba-docs-writer.mdc`** — **not shipped in MVP**
 - **Responsibility:** Physical content update in the `.docx` file using **`eversis-collections` MCP** `.docx` tools.
 - **Input:** Approved **`docs-update-plan.md`**
 - **Output:** Modified document ready for verification.
@@ -137,16 +137,16 @@ The workflow relies on two specialized agents communicating through a shared art
 
 ### Example commands
 
-**Planner** (attach **`@eversis-ba-docs-planner`**; optionally **`.cursor/rules/eversis-ba-docs-planner.mdc`**):
+**Planner** (`/eversis-ba-docs-planner` or load-by-id):
 
 ```text
-@eversis-ba-docs-planner Prepare a <your product> documentation update plan for Release 2.4.5. Project rules are on the Confluence page "<your product> Documentation Definitions & Updating Rules".
+/eversis-ba-docs-planner Prepare a <your product> documentation update plan for Release 2.4.5. Project rules are on the Confluence page "<your product> Documentation Definitions & Updating Rules".
 ```
 
-**Writer** (attach **`@eversis-ba-docs-writer`**; optionally **`.cursor/rules/eversis-ba-docs-writer.mdc`**):
+**Writer** (`/eversis-ba-docs-writer` or load-by-id):
 
 ```text
-@eversis-ba-docs-writer Implement changes to the relevant documents according to the plan in docs-update-plan.md
+/eversis-ba-docs-writer Implement changes to the relevant documents according to the plan in docs-update-plan.md
 ```
 
 ## Workflow Diagram

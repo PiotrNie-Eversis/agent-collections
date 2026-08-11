@@ -74,7 +74,9 @@ print_summary() {
 
   echo ""
   echo "Deselection: re-run with a smaller --mcp-servers / --agents list to refresh managed"
-  echo "entries, or manually edit .cursor/mcp.json. See README recovery notes."
+  echo "entries. MCP catalog servers are pruned automatically; adapter sync removes orphan"
+  echo "generated slash commands. When Claude is omitted, framework-generated CLAUDE.md and"
+  echo ".claudeignore are removed if present. See README upgrade / recovery notes."
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""

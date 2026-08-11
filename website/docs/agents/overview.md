@@ -7,11 +7,11 @@ title: Agents Overview
 
 **Twelve specialized roles** plus **three internal workers** mirror a full product-engineering team across **Ideate → Implement → Review**.
 
-In **Cursor**, those roles are expressed as **rules** (`.cursor/rules/eversis-*.mdc`), **prompts** (bodies in **`.cursor/prompts/public/`** and **`.cursor/prompts/internal/`** as `eversis-*.md`), and **skill packages** (`SKILL.md` under `.cursor/skills/`, used via the **`eversis-collections` MCP** and `eversis_skills_*` tools plus **`eversis_skill_run_script`** where allowlisted; optional `eversis-` names if you fork). **Attach** prompts in Chat or Agent by typing **`@`** and the **file stem** (e.g. **`@eversis-implement`**, **`@eversis-research`**). Use a full path under **`.cursor/prompts/...`** only if the file picker does not disambiguate.
+In **Cursor**, roles map to **rules** (`.cursor/rules/eversis-*.mdc`), **prompts** (SSOT under **`.ai/prompts/{public,internal}/`** as `eversis-*.md`), and **skill packages** (`.ai/skills/eversis-*/`, loaded via **`eversis-collections` MCP** — `eversis_skills_*`, optional **`eversis_skill_run_script`**). **Entry:** stable prompt ids, optional **`/eversis-*`** slash shims (generated under `.cursor/commands/` by the Cursor adapter), or **`@`** attach when your IDE surfaces SSOT or generated command files.
 
 The canonical packaging and mappings are documented in the [Framework reference](../framework) (same as **`documentation/agent-collection.md`** in the repository). Entry points for this repository are **`AGENTS.md`** (root) and the always-on rule **`.cursor/rules/eversis-agent-core.mdc`**.
 
-**Starter rule packs in this repo:** `eversis-agent-core.mdc` (always apply), `eversis-engineering-manager.mdc` (attach with **`@eversis-implement`**), and `eversis-code-reviewer.mdc` (attach with **`@eversis-review`**). Other roles use the **canonical template** filenames in the table below (`eversis-role-<role>.mdc`); add those files when you split behavior out of the core packs — they are **not** all shipped in agent-collections (delegated prompts + skills carry most role behavior).
+**Starter rule packs in this repo:** `eversis-agent-core.mdc` (always apply), `eversis-engineering-manager.mdc` (attach with **`/eversis-implement`** or load-by-id), and `eversis-code-reviewer.mdc` (attach with **`/eversis-review`**). Other roles use the **canonical template** filenames in the table below (`eversis-role-<role>.mdc`); add those files when you split behavior out of the core packs — they are **not** all shipped in agent-collections (delegated prompts + skills carry most role behavior).
 
 ## How roles work
 
@@ -20,7 +20,7 @@ Each role defines:
 - **Purpose** — What it optimizes for and what it refuses to do.
 - **Packaging** — Which rule file and prompts implement it in Cursor.
 - **Tools** — MCP servers, terminal, and Cursor Agent capabilities you enable in **Cursor Settings → MCP**.
-- **Skills** — Reusable procedures in **`.cursor/skills/`**; load content through **`eversis-collections` MCP** (`eversis_skills_get`, **`eversis_skill_run_script`** for allowlisted automation, etc.). (`eversis-*` naming when you add your own copies.)
+- **Skills** — Reusable procedures in **`.ai/skills/`**; load content through **`eversis-collections` MCP** (`eversis_skills_get`, **`eversis_skill_run_script`** for allowlisted automation, etc.).
 - **Handoffs** — Which prompt or approval gate comes next (human gates after research and plan per **`eversis-agent-core.mdc`**), not ad-hoc mode switches.
 
 ## Agent Handoff Diagram

@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **DHI-515 close-out** — Q6 hygiene: retarget `.ai/` deep-links from `cursor-collections` to Agent Collections paths; `docs/context/agent-collections/delivery-index.md` traceability (CQ2 waiver); installer Claude deselect prune for generated `CLAUDE.md` / `.claudeignore`; area profiles drop generic `charts/**` exclude (consumer overlay for true infra); targeted website SSOT wording (`.ai/prompts`, slash commands)
 - **Installer UX (DHI-515 umbrella)** — Interactive agents checkbox + domain-profile select (`agents-prompt.mjs`, `profile-prompt.mjs`); shared inquirer deps helper
 - **DHI-598** — Cursor adapter emits thin slash commands under `.cursor/commands/eversis-*.md` from `.ai/prompts/{public,internal}/` (HYBRID: SSOT pointer + optional Executable section); deny list `adapters/cursor/command-deny.yaml`; included in `sync:adapters:check`
 - **DHI-598 follow-up** — Slash command files put `prompt_description` as the first paragraph for Cursor `/` menu summary; GENERATED marker moved to end of file

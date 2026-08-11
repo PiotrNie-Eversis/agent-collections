@@ -9,6 +9,8 @@
 | Primary Source of Truth | Jira |
 | Notes | Full backlog under epic DHI-515 (children are Tasks, converted from Story 2026-07-31); spec-driven delivery mandatory; docs of agent-collections and cursor-collections fully separated |
 
+**Delivery traceability:** see [`delivery-index.md`](./delivery-index.md) for Jira key → wave → paths on `main` (CQ2 waiver for missing per-story folders 530, 532–540).
+
 ## Current Epics
 
 | Jira Key | Title | Priority | Status | Latest Session |

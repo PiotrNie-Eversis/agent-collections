@@ -339,6 +339,19 @@ When moving from framework version **N** to **N+1**:
 | Local ignore / MCP fragments outside documented merge | Consumer environment choices |
 | `.agent-collections/install-selection.json` | Install record (upgrade reads; does not wipe) |
 
+### Deselection and recovery
+
+Re-run the installer with a **smaller** `--agents` or `--mcp-servers` list (or change selections in the interactive wizard):
+
+| What changed | Behavior |
+|--------------|----------|
+| **MCP servers** | Framework-managed entries in `.cursor/mcp.json` are **removed** when deselected (consumer-added servers outside the catalog are kept). |
+| **Slash commands** | `npm run sync:adapters` / installer adapter sync **removes orphan** generated `eversis-*.md` under `.cursor/commands/`. |
+| **Claude omitted** | Framework-generated **`CLAUDE.md`** and triad **`.claudeignore`** are removed when Claude is not in `--agents` (project-edited files are left in place). |
+| **Cursor rules** | Regenerated for the remaining agents; **`eversis-project-stack.mdc`** is never overwritten without opt-in. |
+
+If install fails partway, fix the reported step and re-run with the same flags (idempotent).
+
 ---
 
 ## Delivery standard (spec-driven development)

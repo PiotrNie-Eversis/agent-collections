@@ -61,10 +61,9 @@ Stable prompt id under `.ai/prompts/` remains SSOT. Claude Code does **not** con
 
 | Path | Reason |
 |------|--------|
-| `.cursor/rules/eversis-ba-docs-planner.mdc` | **Temporary symlink** to `cursor-collections` until BA core rules exist (DHI-519 deferred / DHI-524 Q3=B) |
-| `.cursor/rules/eversis-ba-docs-writer.mdc` | Same as planner |
 | `.cursor/rules/eversis-project-stack.mdc` | **Consumer-owned** — never overwrite without opt-in (DHI-521 / README) |
 | `.cursor/skills/`, `.cursor/prompts/` | Outside Cursor emit (no full skill/prompt mirror) |
+| BA Docs role rules (`eversis-ba-docs-*.mdc`) | **Not emitted in MVP** — use `.ai/prompts` + MCP skills + `/eversis-ba-docs-*` slash shims (CQ3 close-out) |
 
 ## Requirements
 

@@ -113,8 +113,8 @@ Profiles describe **path scope**, not tool assignment.
 
 | Profile | Example include globs | Example exclude globs |
 |---------|----------------------|------------------------|
-| `frontend-scope` | `apps/web/**`, `packages/ui/**`, `packages/shared-types/**`, `docs/**`, `scripts/**` | `apps/api/**`, `charts/**`, `**/node_modules/**` |
-| `backend-scope` | `apps/api/**`, `packages/shared-types/**`, `docs/**`, `scripts/**` | `apps/web/**`, `charts/**`, `**/node_modules/**` |
+| `frontend-scope` | `apps/web/**`, `packages/ui/**`, `packages/shared-types/**`, `docs/**`, `scripts/**` | `apps/api/**`, `**/node_modules/**` |
+| `backend-scope` | `apps/api/**`, `packages/shared-types/**`, `docs/**`, `scripts/**` | `apps/web/**`, `**/node_modules/**` |
 
 ---
 
@@ -123,7 +123,9 @@ Profiles describe **path scope**, not tool assignment.
 | Class | Examples | Default for application agents |
 |-------|----------|--------------------------------|
 | **Light shared** | `docs/**`, `scripts/**`, narrow `packages/**` (types, small shared libs) | **Include** with the active area profile (cheap orientation / contracts) |
-| **Heavy infra** | `charts/**`, DB data volumes, nginx/HAProxy/mail/load-test stacks, large binary dumps | **Exclude** from default application agent indexes |
+| **Heavy infra** | Helm/K8s chart trees, DB data volumes, nginx/HAProxy/mail/load-test stacks, large binary dumps | **Exclude** via **consumer overlay** when those paths are true sidecars — not product apps |
+
+The abstract name `charts/**` is **not** in default area profile excludes: some consumers mount application code under a directory literally named `charts/`. Use a consumer ignore overlay for genuine infra trees (see `docs/context/eog/` pilot notes).
 
 Consumers may loosen heavy-infra excludes for dedicated DevOps sessions; the **default** protects the WNF-03 reduction target.
 

@@ -74,7 +74,7 @@ Answer these questions before writing anything:
 
 **Step 2: Choose the target role and rules**
 
-- Read **`.ai/rules/`** and [website/docs/agents/](https://github.com/PiotrNie-Eversis/cursor-collections/tree/main/website/docs/agents) to pick the **conceptual** role (Business Analyst, Engineering Manager, …).
+- Read **`.ai/rules/`** and [website/docs/agents/](../../../website/docs/agents/) to pick the **conceptual** role (Business Analyst, Engineering Manager, …).
 - In the prompt body, tell the user which **`eversis-*.mdc`** files to @-attach. Model choice is a **user setting in Cursor**, not frontmatter in these Markdown prompts.
 
 **Step 3: Determine tool requirements**
