@@ -413,7 +413,7 @@ docs/architecture/    # Mapping, isolation, AGENTS standard, selection, WF/WNF
 | [MCP package README](./mcp/eversis-collections-mcp/README.md) | Skills + Word tools reference |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Notable changes |
 
-**Docs site:** source under `website/`. Build locally with `npm run website:build` (or `cd website && npm install && npm run build`). Hosted at [agent-collections.vercel.app](https://agent-collections.vercel.app) (`vercel.json`). The `/changelog` page is generated from root [`CHANGELOG.md`](./CHANGELOG.md) — edit the root file only, then run `npm run website:changelog:sync` (or rely on `prebuild`). Drift check: `npm run website:changelog:check`.
+**Docs site:** source under `website/`. Build locally with `npm run website:build` (or `cd website && npm install && npm run build`). Hosted at [agent-collections.vercel.app](https://agent-collections.vercel.app). Vercel **Root Directory** must be `website` (dashboard); root [`vercel.json`](./vercel.json) uses paths relative to that folder (`npm run build` → `build/`). The `/changelog` page is generated from root [`CHANGELOG.md`](./CHANGELOG.md) — edit the root file only, then run `npm run website:changelog:sync` (or rely on `prebuild`). Drift check: `npm run website:changelog:check`.
 
 ---
 
