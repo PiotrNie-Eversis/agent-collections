@@ -49,8 +49,13 @@ function denyPatternsFromClaudeignore(path) {
     }
 
     const isDir = line.endsWith('/');
-    const body = isDir ? line.slice(0, -1) : line;
-    const anchored = body.includes('/');
+    // A leading "/" is gitignore's own root-anchor marker (e.g. "/dist/")
+    // — strip it before checking for an *internal* "/", otherwise it both
+    // double-counts as anchoring evidence and survives into the glob as a
+    // literal ".//dist/**" (a malformed double slash that may not match).
+    const bodyWithLeadingSlash = isDir ? line.slice(0, -1) : line;
+    const body = bodyWithLeadingSlash.replace(/^\//, '');
+    const anchored = body.includes('/') || bodyWithLeadingSlash.startsWith('/');
 
     let glob;
     if (anchored) {

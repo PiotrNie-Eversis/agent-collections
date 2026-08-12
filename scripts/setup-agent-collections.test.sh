@@ -89,6 +89,19 @@ cmp -s "$SKILL_SRC" "$SKILL_DST" \
 grep -qF 'user-invocable: false' "$SKILL_DST" \
   || { echo "FAIL: .claude/skills/.../SKILL.md lost user-invocable: false"; exit 1; }
 
+# .claude/CLAUDE.md (Phase G) — seeded once, and its @AGENTS.md import must
+# be resolvable: Claude Code resolves @-imports relative to the importing
+# file's own directory, not the working directory, so from inside .claude/
+# the import must be @../AGENTS.md, not a bare @AGENTS.md (which would
+# resolve to a nonexistent .claude/AGENTS.md).
+CLAUDE_PROJECT_MD="${TARGET_CLAUDE}/.claude/CLAUDE.md"
+[[ -f "$CLAUDE_PROJECT_MD" ]] || { echo "FAIL: missing .claude/CLAUDE.md"; exit 1; }
+grep -qF '@../AGENTS.md' "$CLAUDE_PROJECT_MD" \
+  || { echo "FAIL: .claude/CLAUDE.md import is not @../AGENTS.md (would not resolve from .claude/)"; exit 1; }
+IMPORT_REL="$(head -1 "$CLAUDE_PROJECT_MD" | sed 's/^@//')"
+[[ -f "$(dirname "$CLAUDE_PROJECT_MD")/${IMPORT_REL}" ]] \
+  || { echo "FAIL: .claude/CLAUDE.md's @-import (resolved relative to its own directory, per Claude Code docs) does not point at a real file"; exit 1; }
+
 # Deselecting Claude on re-run must prune ALL framework-generated .claude/*
 # artifacts (commands, rules, skills, CLAUDE.md, .claudeignore) — not just
 # the ones whose own generator happens to run again. Regression coverage

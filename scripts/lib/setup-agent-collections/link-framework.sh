@@ -140,9 +140,11 @@ _link_claude_skills() {
   mkdir -p "$skills_dst_root"
 
   local src name dst count=0
+  local keep_names=""
   for src in "$skills_src_root"/eversis-*; do
     [[ -d "$src" ]] || continue
     name="$(basename "$src")"
+    keep_names="${keep_names},${name},"
     dst="${skills_dst_root}/${name}"
     rm -rf "$dst"
     if [[ "${EFFECTIVE_LINK_MODE:-symlink}" == "symlink" ]]; then
@@ -153,6 +155,24 @@ _link_claude_skills() {
     count=$((count + 1))
   done
   log_ok "Linked ${count} skill package(s) into .claude/skills/ (mode: ${EFFECTIVE_LINK_MODE:-symlink})."
+
+  # A skill package renamed or removed upstream (in .ai/skills/) would
+  # otherwise survive forever in .claude/skills/ — the loop above only adds
+  # entries for what exists in the source today, it never removes what no
+  # longer does. Prune destination entries with no matching source name.
+  local existing removed=0
+  for existing in "$skills_dst_root"/eversis-*; do
+    [[ -e "$existing" ]] || continue
+    name="$(basename "$existing")"
+    case "$keep_names" in
+      *",${name},"*) continue ;;
+    esac
+    rm -rf "$existing"
+    removed=$((removed + 1))
+  done
+  if [[ "$removed" -gt 0 ]]; then
+    log_ok "Removed ${removed} stale skill package(s) from .claude/skills/ (no longer in .ai/skills/)."
+  fi
 }
 
 _run_adapter_sync() {

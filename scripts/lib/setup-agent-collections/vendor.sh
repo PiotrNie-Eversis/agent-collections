@@ -96,6 +96,21 @@ setup_vendor_copy() {
     cp "${COLLECTIONS_HOME}/package.json" "${vendor_dir}/package.json"
   fi
 
+  # The ignore triad are single files, not directories, so the src_dirs loop
+  # above never touches them — but merge-ignore-triad.mjs resolves its
+  # framework pattern source as `${COLLECTIONS_HOME}/.claudeignore` etc.,
+  # and COLLECTIONS_HOME gets repointed to this vendor dir right after this
+  # function returns. Without copying these, a --vendor=copy install merges
+  # zero framework classes into the consumer's ignore files — for
+  # .claudeignore specifically, that means permissions.deny in
+  # .claude/settings.json ends up with no secrets/build patterns at all.
+  local ignore_file
+  for ignore_file in .cursorignore .claudeignore .opencodeignore; do
+    if [[ -f "${COLLECTIONS_HOME}/${ignore_file}" ]]; then
+      cp "${COLLECTIONS_HOME}/${ignore_file}" "${vendor_dir}/${ignore_file}"
+    fi
+  done
+
   COLLECTIONS_HOME="$vendor_dir"
   export COLLECTIONS_HOME
   log_ok "Vendor copy ready at ${vendor_dir}"

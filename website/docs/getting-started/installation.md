@@ -86,13 +86,13 @@ Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains
 | Channel | Customise |
 |---------|-----------|
 | Cursor | `.cursor/rules/eversis-project-stack.mdc` |
-| Claude Code | `AGENTS.md` (do not hand-edit generated `CLAUDE.md`) |
+| Claude Code | `.claude/CLAUDE.md` (seeded once, never overwritten — do not hand-edit generated `CLAUDE.md`; Claude Code does not auto-read `AGENTS.md`) |
 
 ## 4. Skills and prompts (MVP)
 
-- **Skills** resolve from **`.ai/skills/`** via MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or by reading `SKILL.md` directly.
+- **Skills** resolve from **`.ai/skills/`** via MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), by reading `SKILL.md` directly, or — for Claude Code only — **natively** via `.claude/skills/eversis-*/` (linked/copied by the installer, no MCP required).
 - **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced.
-- This MVP does **not** ship a full mirror under `.cursor/skills` or `.cursor/prompts`. The Cursor adapter **does** generate thin slash shims under `.cursor/commands/` from `.ai/prompts` (after `npm run sync:adapters`).
+- This MVP does **not** ship a full mirror under `.cursor/skills` or `.cursor/prompts` — Cursor's skills stay MCP-only. Both adapters **do** generate thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`).
 
 ## 5. Upgrade
 

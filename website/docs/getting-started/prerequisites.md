@@ -11,8 +11,8 @@ Agent Collections is **multi-agent**:
 
 | Tool | Role in MVP |
 |------|-------------|
-| **[Cursor](https://cursor.com/)** | Full adapter: generated `.cursor/rules/*.mdc`, MCP skills, attachable prompts |
-| **Claude Code** | Shipped adapter: root `CLAUDE.md` from core rules; skills via MCP / `AGENTS.md` |
+| **[Cursor](https://cursor.com/)** | Full adapter: generated `.cursor/rules/*.mdc`, `.cursor/commands/*.md`, MCP skills |
+| **Claude Code** | Full adapter: `CLAUDE.md` + `.claude/rules/*.md` from core rules, native `.claude/commands/*.md`, native `.claude/skills/`; project notes in `.claude/CLAUDE.md` |
 | **OpenCode** | Placeholder only — not a full shipped adapter |
 
 Use at least one supported tool. Teams often run **Cursor for frontend** and **Claude Code for backend** in the same monorepo with isolation (see [isolation strategy](../isolation)).

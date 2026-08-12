@@ -40,7 +40,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 4. **MCP env cutover** — replace `CURSOR_COLLECTIONS_HOME` with **`AGENT_COLLECTIONS_HOME`** in MCP config for `eversis-collections`. Keep other MCP servers (Atlassian, Figma, …) unless you intentionally drop them.
 5. **Stop dual skills paths** — do not point the same skills server at both frameworks. Remove or ignore obsolete Cursor Collections symlinks for skills/prompts if the installer replaced them.
 6. **Verify** — `.agent-collections/install-selection.json` present; `eversis_skills_list` works; Cursor rules and/or `CLAUDE.md` present as selected; first Implement session succeeds. For submodule installs, teammates need `git submodule update --init --recursive`.
-7. **Document** — update consumer runbooks; Cursor stack in `eversis-project-stack.mdc`, Claude stack in `AGENTS.md`; deprecate `setup-cursor-local.sh` for this repo when cutover is accepted.
+7. **Document** — update consumer runbooks; Cursor stack in `eversis-project-stack.mdc`, Claude stack in `.claude/CLAUDE.md` (seeded once, never overwritten — Claude Code does not auto-read `AGENTS.md`); deprecate `setup-cursor-local.sh` for this repo when cutover is accepted.
 
 ## Ownership model (local / core / generated)
 
@@ -48,19 +48,20 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 |-------|------|----------|------------------|
 | **Local (consumer)** | Project policy and product context | Stack rule, `docs/context|plans|specs`, local `AGENTS.md`, secrets, custom ignore overlays | **Never** overwritten without opt-in |
 | **Core (framework SSOT)** | Vendor-neutral content | `.ai/rules`, `.ai/skills`, `.ai/prompts` | Updated by pulling/tagging `agent-collections` |
-| **Generated (adapters)** | Tool packaging from core | `.cursor/rules/eversis-*.mdc`, root `CLAUDE.md` | Regenerated via `sync:adapters` / installer `--sync` — do not hand-edit as SSOT |
+| **Generated (adapters)** | Tool packaging from core | `.cursor/rules/eversis-*.mdc`, `.cursor/commands/*.md`, root `CLAUDE.md`, `.claude/rules/*.md`, `.claude/commands/*.md` | Regenerated via `sync:adapters` / installer `--sync` — do not hand-edit as SSOT |
 
 Selection file `.agent-collections/install-selection.json` is **consumer install metadata** (read by `--upgrade`; not wiped casually).
 
 ## Capability matrix (Cursor vs Claude MVP)
 
-| Capability | Cursor | Claude Code (MVP) |
+| Capability | Cursor | Claude Code |
 |------------|--------|-------------------|
-| Core rules packaging | Generated `.cursor/rules/*.mdc` | Root `CLAUDE.md` (mapped rules) |
-| Skills | MCP `eversis-collections` → `.ai/skills` (no full `.cursor/skills` mirror) | Same MCP / read `.ai/skills`; instructional load via `AGENTS.md` |
-| Prompts | Stable id / optional `@` attach | Load by id (instructional) |
-| Slash commands | Thin `.cursor/commands/` from `.ai/prompts` (DHI-598) | Prefer `/eversis-*` after sync; Claude Code uses prompt ids / `CLAUDE.md` |
-| Ignore triad | `.cursorignore` | `.claudeignore` |
+| Core rules packaging | Generated `.cursor/rules/*.mdc` | Root `CLAUDE.md` (mapped rules) + `.claude/rules/*.md` (glob-scoped rules, `paths:` frontmatter) |
+| Skills | MCP `eversis-collections` → `.ai/skills` (no full `.cursor/skills` mirror) | **Native** `.claude/skills/eversis-*/` (linked by the installer, no MCP required) — Claude Code has a fuller skills story here than Cursor |
+| Prompts | Stable id / optional `@` attach | Load by id; project notes belong in `.claude/CLAUDE.md`, not `AGENTS.md` (Claude Code does not auto-read it) |
+| Slash commands | Thin `.cursor/commands/` from `.ai/prompts` (DHI-598) | Thin `.claude/commands/` from `.ai/prompts` — same generator contract, `/eversis-*` after sync |
+| Ignore triad | `.cursorignore` | `.claudeignore` — class source only; Claude Code enforces via `.claude/settings.json` `permissions.deny` (not `.claudeignore` directly) |
+| Settings / permissions | N/A | `.claude/settings.json` — `permissions.deny` generated from `.claudeignore` classes, `enabledMcpjsonServers` from MCP selection |
 | Area profiles | Path scope via installer profile | Same path profiles (tool-agnostic) |
 | OpenCode | Placeholder only | — |
 

@@ -1,15 +1,7 @@
 {
-  "enabledMcpjsonServers": ["eversis-collections"],
+  "enabledMcpjsonServers": [],
   "permissions": {
-    "deny": [
-      "Read(./**/.cursor/**)",
-      "Read(./**/node_modules/**)",
-      "Read(./.env)",
-      "Read(./.env.*)",
-      "Read(./**/*.pem)",
-      "Read(./**/*.key)",
-      "Read(./**/*.secret)"
-    ],
+    "deny": [],
     "allow": ["Bash(git status)", "Bash(git diff *)", "Bash(git log *)"]
   }
 }

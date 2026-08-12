@@ -107,5 +107,23 @@ else
   _fail "final .claude/settings.json is valid JSON"
 fi
 
+# Case 5: leading-slash (root-anchored) .claudeignore patterns must not
+# produce a malformed "./" + "/x" double-slash glob.
+cat > "${TARGET_DIR}/.claudeignore" <<'EOF'
+/dist/
+/secrets.env
+EOF
+merge_claude_settings
+if grep -qF 'Read(./dist/**)' "$DENY_JSON" && grep -qF 'Read(./secrets.env)' "$DENY_JSON"; then
+  _pass "leading-slash .claudeignore patterns produce single-slash globs"
+else
+  _fail "leading-slash .claudeignore patterns produce single-slash globs"
+fi
+if grep -qF './/' "$DENY_JSON"; then
+  _fail "no double-slash glob in permissions.deny"
+else
+  _pass "no double-slash glob in permissions.deny"
+fi
+
 echo ""
 echo "  ✅  All ${PASS} claude-settings-merge unit tests passed."

@@ -76,8 +76,13 @@ _seed_claude_project_md() {
 
   mkdir -p "$(dirname "$claude_md_dst")"
   if [[ -f "$agents_dst" ]]; then
+    # Claude Code resolves @-imports relative to the FILE containing the
+    # import, not the working directory (confirmed against code.claude.com/
+    # docs/en/memory) — .claude/CLAUDE.md lives one level below the repo
+    # root where AGENTS.md lives, so the import must be @../AGENTS.md, not
+    # the bare @AGENTS.md that would resolve to a nonexistent .claude/AGENTS.md.
     {
-      echo "@AGENTS.md"
+      echo "@../AGENTS.md"
       echo ""
       cat "$template"
     } > "$claude_md_dst"

@@ -48,8 +48,8 @@ Empirical pilot notes live under `docs/context/eog/` when present.
 
 | Tool | Packaging | Skills |
 |------|-----------|--------|
-| Cursor | `.cursor/rules/*.mdc` | MCP → `.ai/skills` |
-| Claude Code | `CLAUDE.md` | MCP / read `.ai/skills` |
+| Cursor | `.cursor/rules/*.mdc`, `.cursor/commands/*.md` | MCP → `.ai/skills` |
+| Claude Code | `CLAUDE.md`, `.claude/rules/*.md`, `.claude/commands/*.md` | Native `.claude/skills/` (linked by installer) or MCP |
 | OpenCode | Placeholder config | Deferred |
 
 See also [adapter mapping](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/adapter-mapping.md) and [Migration](./getting-started/migration-from-cursor-collections).

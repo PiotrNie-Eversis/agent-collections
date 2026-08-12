@@ -24,7 +24,7 @@ cd "$AGENT_COLLECTIONS_HOME"
 npm run mcp:install && npm run mcp:build
 ```
 
-3. Point MCP at the built entry (installer merges this into `.cursor/mcp.json`):
+3. Point MCP at the built entry (the installer merges this into `.cursor/mcp.json` for Cursor and `.mcp.json` for Claude Code, translating syntax per host):
 
 ```json
 "eversis-collections": {
@@ -73,7 +73,7 @@ Allowed ids match the installer MCP allowlist (see `scripts/setup-agent-collecti
 
 ## Claude Code note
 
-Claude MVP uses **`CLAUDE.md`** plus skills via MCP / reading `.ai/skills` — not a full Cursor MCP parity matrix. Prefer documenting which MCP servers your team enables in the consumer stack rule.
+Claude Code has MCP config parity with Cursor: the installer writes a root **`.mcp.json`** with the same servers, using Claude-native syntax (`${VAR}` / `${VAR:-default}`, no `${env:...}`). Skills additionally resolve **natively** via `.claude/skills/` (linked by the installer), not only through MCP. Document which MCP servers your team enables in `.claude/CLAUDE.md`.
 
 ## Next
 
