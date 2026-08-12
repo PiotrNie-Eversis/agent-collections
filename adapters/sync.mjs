@@ -20,6 +20,11 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CURSOR_GENERATE = path.join(__dirname, "cursor", "generate.mjs");
 const CLAUDE_GENERATE = path.join(__dirname, "claude", "generate.mjs");
+const CLAUDE_COMMANDS_GENERATE = path.join(
+  __dirname,
+  "claude",
+  "generate-commands.mjs",
+);
 const CURSOR_MAP = path.join(__dirname, "cursor", "rule-map.yaml");
 const CLAUDE_MAP = path.join(__dirname, "claude", "rule-map.yaml");
 
@@ -50,6 +55,7 @@ function findRepoRoot(startDir) {
 function parseArgs(argv) {
   let outRoot = null;
   let check = false;
+  let frameworkPrefix = "";
   /** @type {Set<string>|null} */
   let agents = null;
   for (let i = 0; i < argv.length; i++) {
@@ -60,6 +66,15 @@ function parseArgs(argv) {
         fail("--out requires a directory path");
       }
       outRoot = path.resolve(next);
+      i++;
+      continue;
+    }
+    if (arg === "--framework-prefix") {
+      const next = argv[i + 1];
+      if (!next || next.startsWith("-")) {
+        fail("--framework-prefix requires a value");
+      }
+      frameworkPrefix = next;
       i++;
       continue;
     }
@@ -89,12 +104,16 @@ function parseArgs(argv) {
     if (arg === "--help" || arg === "-h") {
       console.log(
         "Usage: node adapters/sync.mjs [--check] [--out <dir>] [--agents cursor,claude,opencode]\n" +
+          "                              [--framework-prefix <path>]\n" +
           "  Default: regenerate Cursor (.mdc) then Claude (CLAUDE.md) from core.\n" +
           "  --check: compare fresh generation to disk; exit 0 if no drift (also checks\n" +
           "           Cursor↔Claude id/source map parity). Does not write in-place.\n" +
           "  --out: pass through to generators (write or compare under <dir>).\n" +
           "  --agents: only run selected adapters (default: cursor,claude).\n" +
           "            opencode is placeholder-only (copies opencode.jsonc when present).\n" +
+          "  --framework-prefix: pass through to the Claude generator only — prepends\n" +
+          "            <path> to .ai/... references in CLAUDE.md's How-to section for\n" +
+          "            vendored consumer installs (empty = self-host, unprefixed).\n" +
           "\n" +
           "npm: npm run sync:adapters | npm run sync:adapters:check",
       );
@@ -102,7 +121,7 @@ function parseArgs(argv) {
     }
     fail(`unknown argument: ${arg}`);
   }
-  return { outRoot, check, agents };
+  return { outRoot, check, agents, frameworkPrefix };
 }
 
 function stripQuotes(value) {
@@ -253,7 +272,7 @@ function assertIdSourceParity(cursorMap, claudeMap) {
   fail(`Cursor↔Claude id/source parity failed — ${parts.join(" | ")}`);
 }
 
-function runGenerator(scriptPath, outRoot, label) {
+function runGenerator(scriptPath, outRoot, label, extraArgs = []) {
   if (!fs.existsSync(scriptPath)) {
     fail(`${label} generator not found: ${scriptPath}`);
   }
@@ -261,6 +280,7 @@ function runGenerator(scriptPath, outRoot, label) {
   if (outRoot) {
     args.push("--out", outRoot);
   }
+  args.push(...extraArgs);
   const result = spawnSync(process.execPath, args, {
     cwd: process.cwd(),
     encoding: "utf8",
@@ -305,7 +325,7 @@ function resolveCompareRoot(repoRoot, outRoot) {
   return outRoot || repoRoot;
 }
 
-function runCheck(repoRoot, outRoot) {
+function runCheck(repoRoot, outRoot, frameworkPrefix) {
   const cursorMap = loadRuleMap(CURSOR_MAP, "Cursor");
   const claudeMap = loadRuleMap(CLAUDE_MAP, "Claude");
   assertIdSourceParity(cursorMap, claudeMap);
@@ -319,7 +339,16 @@ function runCheck(repoRoot, outRoot) {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "agent-collections-sync-"));
   try {
     runGenerator(CURSOR_GENERATE, tmp, "Cursor");
-    runGenerator(CLAUDE_GENERATE, tmp, "Claude");
+    const claudeExtraArgs = frameworkPrefix
+      ? ["--framework-prefix", frameworkPrefix]
+      : [];
+    runGenerator(CLAUDE_GENERATE, tmp, "Claude", claudeExtraArgs);
+    runGenerator(
+      CLAUDE_COMMANDS_GENERATE,
+      tmp,
+      "Claude commands",
+      claudeExtraArgs,
+    );
 
     const compareRoot = resolveCompareRoot(repoRoot, outRoot);
     const drifts = [];
@@ -377,6 +406,92 @@ function runCheck(repoRoot, outRoot) {
     }
 
     {
+      const expectedCommandsDir = path.join(tmp, ".claude", "commands");
+      const actualCommandsDir = path.join(compareRoot, ".claude", "commands");
+      const expectedNames = new Set();
+
+      if (fs.existsSync(expectedCommandsDir)) {
+        for (const name of fs.readdirSync(expectedCommandsDir).sort()) {
+          if (!/^eversis-.*\.md$/.test(name)) continue;
+          expectedNames.add(name);
+          const expected = path.join(expectedCommandsDir, name);
+          const actual = path.join(actualCommandsDir, name);
+          const err = compareFiles(
+            expected,
+            actual,
+            `claude-command:${name.replace(/\.md$/, "")}`,
+          );
+          if (err) drifts.push(err);
+        }
+      }
+
+      if (fs.existsSync(actualCommandsDir)) {
+        for (const name of fs.readdirSync(actualCommandsDir).sort()) {
+          if (!/^eversis-.*\.md$/.test(name)) continue;
+          if (expectedNames.has(name)) continue;
+          const actual = path.join(actualCommandsDir, name);
+          let text = "";
+          try {
+            text = fs.readFileSync(actual, "utf8");
+          } catch {
+            continue;
+          }
+          if (
+            !text.includes(
+              "GENERATED by adapters/claude/generate-commands.mjs",
+            )
+          ) {
+            continue;
+          }
+          drifts.push(
+            `claude-command:${name.replace(/\.md$/, "")}: unexpected generated file on disk: ${actual}`,
+          );
+        }
+      }
+    }
+
+    {
+      const expectedRulesDir = path.join(tmp, ".claude", "rules");
+      const actualRulesDir = path.join(compareRoot, ".claude", "rules");
+      const expectedNames = new Set();
+
+      if (fs.existsSync(expectedRulesDir)) {
+        for (const name of fs.readdirSync(expectedRulesDir).sort()) {
+          if (!/^eversis-.*\.md$/.test(name)) continue;
+          expectedNames.add(name);
+          const expected = path.join(expectedRulesDir, name);
+          const actual = path.join(actualRulesDir, name);
+          const err = compareFiles(
+            expected,
+            actual,
+            `claude-rule:${name.replace(/\.md$/, "")}`,
+          );
+          if (err) drifts.push(err);
+        }
+      }
+
+      if (fs.existsSync(actualRulesDir)) {
+        for (const name of fs.readdirSync(actualRulesDir).sort()) {
+          if (!/^eversis-.*\.md$/.test(name)) continue;
+          if (expectedNames.has(name)) continue;
+          const actual = path.join(actualRulesDir, name);
+          let text = "";
+          try {
+            text = fs.readFileSync(actual, "utf8");
+          } catch {
+            continue;
+          }
+          if (!text.includes("GENERATED by adapters/claude/generate.mjs")) {
+            continue;
+          }
+          drifts.push(
+            `claude-rule:${name.replace(/\.md$/, "")}: unexpected generated file on disk: ${actual}`,
+          );
+        }
+      }
+    }
+
+    {
       const expected = path.join(tmp, "CLAUDE.md");
       const actual = path.join(compareRoot, "CLAUDE.md");
       const err = compareFiles(expected, actual, "CLAUDE.md");
@@ -417,7 +532,7 @@ function runOpenCodePlaceholder(repoRoot, outRoot) {
   );
 }
 
-function runWrite(repoRoot, outRoot, agents) {
+function runWrite(repoRoot, outRoot, agents, frameworkPrefix) {
   const selected = agents ?? new Set(["cursor", "claude"]);
   if (selected.has("cursor")) {
     console.log("adapter sync: regenerating Cursor…");
@@ -425,7 +540,16 @@ function runWrite(repoRoot, outRoot, agents) {
   }
   if (selected.has("claude")) {
     console.log("adapter sync: regenerating Claude…");
-    runGenerator(CLAUDE_GENERATE, outRoot, "Claude");
+    const claudeExtraArgs = frameworkPrefix
+      ? ["--framework-prefix", frameworkPrefix]
+      : [];
+    runGenerator(CLAUDE_GENERATE, outRoot, "Claude", claudeExtraArgs);
+    runGenerator(
+      CLAUDE_COMMANDS_GENERATE,
+      outRoot,
+      "Claude commands",
+      claudeExtraArgs,
+    );
   }
   if (selected.has("opencode")) {
     runOpenCodePlaceholder(repoRoot, outRoot);
@@ -434,13 +558,15 @@ function runWrite(repoRoot, outRoot, agents) {
 }
 
 function main() {
-  const { outRoot, check, agents } = parseArgs(process.argv.slice(2));
+  const { outRoot, check, agents, frameworkPrefix } = parseArgs(
+    process.argv.slice(2),
+  );
   const repoRoot = findRepoRoot(process.cwd());
 
   if (check) {
-    runCheck(repoRoot, outRoot);
+    runCheck(repoRoot, outRoot, frameworkPrefix);
   } else {
-    runWrite(repoRoot, outRoot, agents);
+    runWrite(repoRoot, outRoot, agents, frameworkPrefix);
   }
 }
 

@@ -66,7 +66,7 @@ Ideate → Research → Plan → Implement → Review → Fine
 
 <!-- Replace this section with project-specific agent instructions. -->
 <!-- Cursor: stack commands / lint targets belong in `.cursor/rules/eversis-project-stack.mdc`. -->
-<!-- Claude Code: put stack, areas, and skills policy here in AGENTS.md (Claude does not load Cursor .mdc rules). -->
+<!-- Claude Code: put stack, areas, and skills policy in `.claude/CLAUDE.md` — Claude Code does not auto-read this AGENTS.md file unless `.claude/CLAUDE.md` imports it with `@AGENTS.md` (seeded automatically when both files are scaffolded together). -->
 <!-- Do not hand-edit generated CLAUDE.md. -->
 
 ---

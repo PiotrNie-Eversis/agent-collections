@@ -4,6 +4,7 @@
  */
 import fs from 'node:fs';
 
+const host = process.env.MCP_HOST || 'cursor';
 const targetDir = process.env.MCP_TARGET_DIR?.replace(/\\/g, '/');
 const distIndex = process.env.MCP_DIST_INDEX?.replace(/\\/g, '/');
 const collections = process.env.MCP_COLLECTIONS_HOME?.replace(/\\/g, '/');
@@ -60,7 +61,20 @@ if (picked['eversis-collections']) {
   const distSuffix = 'mcp/eversis-collections-mcp/dist/index.js';
   let cmdPath;
   let envBlock;
-  if (useRelative) {
+  if (host === 'claude') {
+    // Claude Code only expands ${VAR} / ${VAR:-default} — no ${env:X} — and
+    // GUI-launched hosts don't reliably inherit shell profile exports, so
+    // AGENT_COLLECTIONS_HOME is always set explicitly on this entry's own
+    // env block rather than assumed from the ambient process environment.
+    if (useRelative) {
+      const root = '${CLAUDE_PROJECT_DIR:-.}/vendor/agent-collections';
+      cmdPath = `${root}/${distSuffix}`;
+      envBlock = { AGENT_COLLECTIONS_HOME: root };
+    } else {
+      cmdPath = `\${AGENT_COLLECTIONS_HOME}/${distSuffix}`;
+      envBlock = { AGENT_COLLECTIONS_HOME: collections };
+    }
+  } else if (useRelative) {
     cmdPath = `\${workspaceFolder}/vendor/agent-collections/${distSuffix}`;
     envBlock = {};
   } else {
@@ -73,6 +87,34 @@ if (picked['eversis-collections']) {
     type: 'stdio',
     ...(Object.keys(envBlock).length ? { env: envBlock } : {}),
   };
+}
+
+if (host === 'claude') {
+  // Claude Code MVP syntax: ${env:X} isn't recognised (only ${X} / ${X:-d}),
+  // and ${workspaceFolder} is a VS Code/Cursor-only variable — rewrite any
+  // template-sourced server (context7, figma, aws/gcp entries, …) that still
+  // uses either form. eversis-collections above is already Claude-native and
+  // passes through unchanged.
+  const rewriteClaudeSyntax = (value) => {
+    if (typeof value === 'string') {
+      return value
+        .replace(/\$\{env:([^}]+)\}/g, '${$1}')
+        .replace(/\$\{workspaceFolder\}/g, '${CLAUDE_PROJECT_DIR:-.}');
+    }
+    if (Array.isArray(value)) {
+      return value.map(rewriteClaudeSyntax);
+    }
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value).map(([k, v]) => [k, rewriteClaudeSyntax(v)]),
+      );
+    }
+    return value;
+  };
+  for (const [id, cfg] of Object.entries(picked)) {
+    if (id === 'eversis-collections') continue;
+    picked[id] = rewriteClaudeSyntax(cfg);
+  }
 }
 
 const existingServers = existing.mcpServers ?? {};
@@ -104,5 +146,10 @@ const result = {
   mcpServers: mergedServers,
   inputs: cleanedTop.inputs ?? template.inputs ?? [],
 };
+if (host === 'claude') {
+  // Claude Code's .mcp.json ignores "inputs" (a VS Code/Cursor-only key) —
+  // drop it even if it survived from a pre-existing hand-edited file.
+  delete result.inputs;
+}
 
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

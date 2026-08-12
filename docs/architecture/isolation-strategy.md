@@ -106,7 +106,7 @@ Profiles describe **path scope**, not tool assignment.
 **Notes for DHI-530 / install profiles:**
 
 - Cursor may express area scope via additional `globs` / ignore patterns; today’s adapter `rule-map.yaml` often uses **file-type** globs (`**/*.tsx`) — monorepo **path** globs are a separate concern owned by this strategy + DHI-530.
-- Claude Code MVP is a single root `CLAUDE.md`; path isolation leans on `.claudeignore` + session guidance until richer native scoping exists.
+- Claude Code enforces path exclusion via `permissions.deny` in `.claude/settings.json` — **not** `.claudeignore` itself, which Claude Code never reads (confirmed unsupported: [anthropics/claude-code#579](https://github.com/anthropics/claude-code/issues/579), [#4160](https://github.com/anthropics/claude-code/issues/4160)). The installer generates `permissions.deny` from `.claudeignore`'s path classes (`scripts/lib/setup-agent-collections/claude-settings-merge.sh`) so the triad stays the single source of truth for classes (§8.1) while the actually-enforced mechanism is host-native. File-type glob scoping (the `globs:` equivalent) uses `.claude/rules/*.md` with a `paths:` frontmatter key, generated for any rule that carries non-empty `globs` in the Cursor map.
 - OpenCode placeholder uses `instructions` for `.ai/rules`; application tree scoping still follows ignore + consumer profile.
 
 ### 5.1 Worked example (abstract paths)
@@ -176,6 +176,8 @@ Reduction must **cut noise**, not erase project orientation. Keep a small, dense
 **Scope of the framework-repo triad:** §4 cross-tool packaging + secrets/build only. **Heavy-infra** (§6) and abstract `apps/**` area excludes are **not** in the root triad (consumer / DHI-530). Align §6 defaults in consumer profiles or later templates when ignore is the right mechanism.
 
 **Installer contract (5.2 / Q5):** Framework classes are merge-friendly (labeled sections). A future installer **merges missing** framework entries into consumer ignore files and **must not wipe** consumer-owned content without explicit opt-in (same rule as project-owned stack files).
+
+**Claude Code enforcement caveat:** `.claudeignore` is **not** read by Claude Code — it is not a supported ignore file for that tool (tracked upstream: [#579](https://github.com/anthropics/claude-code/issues/579), [#4160](https://github.com/anthropics/claude-code/issues/4160), [#29455](https://github.com/anthropics/claude-code/issues/29455)). For Claude Code, `.claudeignore` now serves as the **class source of truth only** — the installer's `merge_claude_settings` reads it and regenerates `permissions.deny` in `.claude/settings.json` on every run (see `scripts/lib/setup-agent-collections/claude-settings-merge.sh` / `.mjs`), which is the mechanism Claude Code actually enforces (a hard tool-use denial, not a context-loading filter).
 
 #### Required class checklist (sync across the triad)
 

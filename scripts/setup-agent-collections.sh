@@ -160,6 +160,8 @@ source "${LIB_DIR}/mcp-merge.sh"
 source "${LIB_DIR}/gitignore.sh"
 # shellcheck source=lib/setup-agent-collections/ignore-triad.sh
 source "${LIB_DIR}/ignore-triad.sh"
+# shellcheck source=lib/setup-agent-collections/claude-settings-merge.sh
+source "${LIB_DIR}/claude-settings-merge.sh"
 # shellcheck source=lib/setup-agent-collections/scaffolding.sh
 source "${LIB_DIR}/scaffolding.sh"
 # shellcheck source=lib/setup-agent-collections/selection.sh
@@ -226,6 +228,9 @@ record_ok "mcp-merge"
 manage_gitignore
 merge_ignore_triad || true
 record_ok "ignore"
+
+merge_claude_settings || { record_fail "claude-settings"; _print_partial_fail; exit 1; }
+record_ok "claude-settings"
 
 scaffold_project
 record_ok "scaffold"
