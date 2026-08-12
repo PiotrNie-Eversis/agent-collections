@@ -14,7 +14,7 @@ Maintained by [Eversis](https://eversis.com).
 
 - **Business analysts / product** — turn workshop materials into structured backlog items with review before anything is pushed to Jira.
 - **Engineers / tech leads** — research, plan, and implement in small steps with acceptance checks and a structured code review.
-- **Anyone new to the project** — this README is the map; deeper playbooks live under `website/docs/` (build locally — public hosting is deferred).
+- **Anyone new to the project** — this README is the map; deeper playbooks live under `website/docs/` (also published at [agent-collections.vercel.app](https://agent-collections.vercel.app)).
 
 You do **not** need to know the folder layout to start. Start with a workflow below, then install when you are ready.
 
@@ -312,7 +312,7 @@ Some servers need **API keys or OAuth** — follow each provider’s docs. After
 | First placeholder | **`v0.0.1`** |
 | Release unit | One git tag covers core (`.ai/`), adapters, installer, and MCP **together** — not a separate npm package for `.ai/` in MVP |
 | Pinning | Consumers pin via **git tag**, **submodule ref**, or installer `--collections-home` |
-| Changelog | Root [`CHANGELOG.md`](./CHANGELOG.md) — Keep a Changelog + SemVer |
+| Changelog | Root [`CHANGELOG.md`](./CHANGELOG.md) — Keep a Changelog + SemVer; docs site `/changelog` is **generated** from this file (`node scripts/sync-changelog.mjs`) |
 
 Breaking releases **must** include a **Migration** subsection in `CHANGELOG.md` with concrete consumer steps.
 
@@ -379,7 +379,7 @@ mcp/                  # eversis-collections-mcp (skills from .ai/skills)
 scripts/              # setup-agent-collections.sh
 templates/            # AGENTS, stack, mcp.json seeds
 documentation/        # Framework reference (agent-collection.md)
-website/              # Docusaurus docs site (local build; hosting deferred)
+website/              # Docusaurus docs site (Vercel: agent-collections.vercel.app)
 AGENTS.md             # Reference agent entry map
 docs/architecture/    # Mapping, isolation, AGENTS standard, selection, WF/WNF
 ```
@@ -413,7 +413,7 @@ docs/architecture/    # Mapping, isolation, AGENTS standard, selection, WF/WNF
 | [MCP package README](./mcp/eversis-collections-mcp/README.md) | Skills + Word tools reference |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Notable changes |
 
-**Docs site:** source under `website/`. Build locally with `cd website && npm install && npm run build`. **Public hosting is deferred** — there is no production docs URL in this MVP.
+**Docs site:** source under `website/`. Build locally with `npm run website:build` (or `cd website && npm install && npm run build`). Hosted at [agent-collections.vercel.app](https://agent-collections.vercel.app) (`vercel.json`). The `/changelog` page is generated from root [`CHANGELOG.md`](./CHANGELOG.md) — edit the root file only, then run `npm run website:changelog:sync` (or rely on `prebuild`). Drift check: `npm run website:changelog:check`.
 
 ---
 

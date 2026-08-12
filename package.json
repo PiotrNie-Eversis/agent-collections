@@ -11,6 +11,8 @@
     "mcp:install": "npm --prefix mcp/eversis-collections-mcp install",
     "installer:smoke": "bash scripts/setup-agent-collections.test.sh",
     "website:install": "npm --prefix website install",
-    "website:build": "npm --prefix website run build"
+    "website:build": "npm --prefix website run build",
+    "website:changelog:sync": "node scripts/sync-changelog.mjs",
+    "website:changelog:check": "node scripts/sync-changelog.mjs --check"
   }
 }

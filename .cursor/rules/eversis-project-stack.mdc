@@ -27,6 +27,8 @@ npm run sync:adapters:check
 npm run mcp:build
 npm run mcp:test
 bash scripts/setup-agent-collections.test.sh
+npm run website:build
+npm run website:changelog:check
 ```
 
 ## Conventions
