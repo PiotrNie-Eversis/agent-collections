@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Installer submodule skew (`--framework-prefix`)** — `--upgrade --sync` no longer passes new `adapters/sync.mjs` flags into an older vendor pin (`unknown argument: --framework-prefix`). A clean submodule is aligned to the launching installer SHA; a dirty pin or missing SHA fails with recovery git commands (never `checkout --force`)
 - **Vercel docs deploy** — `vercel.json` install/build paths are relative to the dashboard Root Directory `website` (no nested `cd website`); matches prior agent-collections.vercel.app config
 
 ### Added

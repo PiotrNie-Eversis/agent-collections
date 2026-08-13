@@ -210,6 +210,9 @@ link_framework_files() {
   mkdir -p "${TARGET_DIR}/.cursor/rules"
 
   # Q1: do NOT mirror .cursor/skills|prompts|commands — skills via MCP + .ai/
+  # Align a clean submodule pin to INSTALLER_FRAMEWORK_HOME when vendored
+  # sync.mjs would reject flags this launched installer will pass.
+  align_vendor_sync_cli_or_die
   _run_adapter_sync
   _prune_deselected_agents
   _seed_stack_rule

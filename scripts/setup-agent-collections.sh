@@ -152,6 +152,8 @@ source "${LIB_DIR}/agents.sh"
 source "${LIB_DIR}/profile.sh"
 # shellcheck source=lib/setup-agent-collections/link-framework.sh
 source "${LIB_DIR}/link-framework.sh"
+# shellcheck source=lib/setup-agent-collections/vendor-sync-skew.sh
+source "${LIB_DIR}/vendor-sync-skew.sh"
 # shellcheck source=lib/setup-agent-collections/mcp-prompt.sh
 source "${LIB_DIR}/mcp-prompt.sh"
 # shellcheck source=lib/setup-agent-collections/mcp-merge.sh
@@ -189,6 +191,8 @@ fi
 
 resolve_collections_home
 ensure_framework_checkout
+INSTALLER_FRAMEWORK_HOME="$(cd "${COLLECTIONS_HOME}" && pwd)"
+export INSTALLER_FRAMEWORK_HOME
 resolve_target_dir
 
 _script_repo_root="$(cd "${SCRIPT_DIR}/.." && pwd)"

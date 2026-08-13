@@ -103,13 +103,15 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 
 Reuses agents / MCP / profile / vendor / link from selection. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths (stack rule, `docs/context|plans|specs`, local `AGENTS.md`, secrets) are not overwritten without opt-in.
 
+`--upgrade --sync` against a **vendor submodule** aligns a **clean** pin to the launching installer SHA when vendored `adapters/sync.mjs` would reject flags the installer will pass (for example `--framework-prefix`). A **dirty** vendor worktree, or a SHA missing after `git fetch`, **fails** with paths, SHAs, the flag name, and recovery `git fetch` / `git checkout` commands — it never `checkout --force`. Copy and local modes are unchanged.
+
 ### Keeping consumers aligned
 
 | Install mode | After framework update |
 |--------------|------------------------|
 | Local + symlink | Pull/tag checkout → rebuild MCP → re-run setup |
 | Local + copy | Pull + re-run with `--sync` |
-| Vendor submodule | Update submodule to tag → `--upgrade --sync` |
+| Vendor submodule | `--upgrade --sync` aligns a **clean** pin to the launching SHA; dirty pin or missing SHA fails with recovery git commands |
 | Vendor copy | Re-run with `--vendor copy --build-mcp` |
 
 ## First successful install (sample project)

@@ -30,6 +30,6 @@ bash /path/to/agent-collections/scripts/setup-agent-collections.sh \
   --profile=fullstack
 ```
 
-EOG / team default vendor mode: **`--vendor submodule`**. After clone, teammates run `git submodule update --init --recursive`.
+EOG / team default vendor mode: **`--vendor submodule`**. After clone, teammates run `git submodule update --init --recursive`. `--upgrade --sync` aligns a **clean** vendor submodule to the launching installer SHA (or fails with recovery git commands if the pin is dirty).
 
 See root [README.md](../README.md) for modes, upgrade (`--upgrade`), selection schema (`.agent-collections/`), and **deselection / recovery** (MCP prune, Claude surface cleanup, slash-command orphans).
