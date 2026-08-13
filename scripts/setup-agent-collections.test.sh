@@ -54,6 +54,7 @@ TARGET_CLAUDE="${TMP}/consumer-claude"
 mkdir -p "$TARGET_CLAUDE"
 (cd "$TARGET_CLAUDE" && git init -q)
 
+CLAUDE_INSTALL_LOG="${TMP}/consumer-claude-install.log"
 bash "${ROOT}/scripts/setup-agent-collections.sh" \
   --collections-home "$ROOT" \
   --target "$TARGET_CLAUDE" \
@@ -62,7 +63,21 @@ bash "${ROOT}/scripts/setup-agent-collections.sh" \
   --agents=claude \
   --mcp-servers=eversis-collections \
   --profile=frontend \
-  --link-mode=copy
+  --link-mode=copy \
+  | tee "$CLAUDE_INSTALL_LOG"
+
+# F12 regression: printed "Next steps" must point Claude customisation at
+# .claude/CLAUDE.md, never AGENTS.md, and Deselection must mention the
+# Phase C/D pruned surfaces (.claude/commands|rules|skills), not just
+# CLAUDE.md/.claudeignore.
+grep -qF 'Customise AGENTS.md' "$CLAUDE_INSTALL_LOG" \
+  && { echo "FAIL: Next steps still tells Claude users to customise AGENTS.md (F12)"; exit 1; }
+grep -qF 'Customise .claude/CLAUDE.md' "$CLAUDE_INSTALL_LOG" \
+  || { echo "FAIL: Next steps missing 'Customise .claude/CLAUDE.md' line"; exit 1; }
+grep -qF 'Review AGENTS.md' "$CLAUDE_INSTALL_LOG" \
+  || { echo "FAIL: Next steps missing the AGENTS.md reminder for --agents=claude"; exit 1; }
+grep -qF '.claude/skills/' "$CLAUDE_INSTALL_LOG" \
+  || { echo "FAIL: Deselection paragraph doesn't mention .claude/skills/ pruning"; exit 1; }
 
 [[ -f "${TARGET_CLAUDE}/.mcp.json" ]] || { echo "FAIL: missing .mcp.json for --agents=claude"; exit 1; }
 [[ -f "${TARGET_CLAUDE}/.cursor/mcp.json" ]] && { echo "FAIL: .cursor/mcp.json should not exist for --agents=claude"; exit 1; }

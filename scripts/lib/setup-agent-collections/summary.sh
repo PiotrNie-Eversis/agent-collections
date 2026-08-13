@@ -43,7 +43,7 @@ print_summary() {
   fi
 
   if echo ",${agents_csv}," | grep -q ',claude,'; then
-    echo "  ${step}. Customise AGENTS.md (stack / areas / skills policy — Claude + shared map)"
+    echo "  ${step}. Customise .claude/CLAUDE.md (Claude stack / skills policy)"
     echo "     Do not hand-edit generated CLAUDE.md; it is overwritten on adapter sync."
     step=$((step + 1))
   fi
@@ -66,17 +66,18 @@ print_summary() {
     step=$((step + 1))
   fi
 
-  # Always remind AGENTS exists when cursor-only (Claude step already covers customise)
-  if ! echo ",${agents_csv}," | grep -q ',claude,'; then
-    echo "  ${step}. Review AGENTS.md (never auto-overwritten on re-run)"
-    step=$((step + 1))
-  fi
+  # AGENTS.md is the shared orientation map (both Cursor and Claude read it —
+  # Claude only via the @../AGENTS.md import seeded into .claude/CLAUDE.md),
+  # so this reminder always applies, not just when Claude is deselected.
+  echo "  ${step}. Review AGENTS.md — shared orientation map (never auto-overwritten on re-run)"
+  step=$((step + 1))
 
   echo ""
   echo "Deselection: re-run with a smaller --mcp-servers / --agents list to refresh managed"
   echo "entries. MCP catalog servers are pruned automatically; adapter sync removes orphan"
-  echo "generated slash commands. When Claude is omitted, framework-generated CLAUDE.md and"
-  echo ".claudeignore are removed if present. See README upgrade / recovery notes."
+  echo "generated slash commands and scoped rules. When Claude is omitted, framework-generated"
+  echo "CLAUDE.md, .claudeignore, .claude/commands/, .claude/rules/, and .claude/skills/ are"
+  echo "removed if present. See README upgrade / recovery notes."
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
