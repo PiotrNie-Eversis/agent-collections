@@ -39,7 +39,7 @@ When working with the framework in **any** repository, agent/project deliverable
 | `docs/plans/` | Legacy/flat plans if used; prefer `docs/specs/<issue>/` for Implement workflow plans |
 | `docs/specs/` | SDD research / plan / plan-review artifacts (`docs/specs/<issue-kebab>/`) |
 
-**Framework repository note:** folders such as `docs/specs/dhi-*/` may be **gitignored** (local-only story work on the framework itself). They are not the published product surface. Committed standards and templates live elsewhere (this file, `templates/`).
+**Framework repository note:** all `docs/specs/*/` subfolders are **gitignored** (local-only story work on the framework itself), regardless of naming. They are not the published product surface. Committed standards and templates live elsewhere (this file, `templates/`).
 
 ## Role matrix
 

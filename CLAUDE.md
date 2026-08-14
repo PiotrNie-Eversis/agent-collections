@@ -294,7 +294,7 @@ Do **not** start implementation without approved research and plan artifacts whe
 
 ### This framework repository vs consumers
 
-- In **`agent-collections`**, story folders matching `docs/specs/dhi-*/` are **gitignored** (local agent artifacts; MVP committed docs are README / CHANGELOG / `.ai/`).
+- In **`agent-collections`**, all `docs/specs/*/` story folders are **gitignored**, regardless of ticket prefix or naming (local agent artifacts; MVP committed docs are README / CHANGELOG / `.ai/`).
 - **Consumer projects** choose whether to commit or ignore their own `docs/specs/` — the folder convention stays the same either way.
 
 ## Delivery Standard (copy into Jira / story descriptions)

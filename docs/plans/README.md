@@ -10,6 +10,6 @@ Use `docs/plans/` only for legacy or ad-hoc flat plans when the team chooses not
 
 ## Framework repository
 
-In **this** monorepo, story work under `docs/specs/dhi-*/` is often **local-only** (gitignored). Keep this README committed so the **docs triad** (`docs/context/`, `docs/plans/`, `docs/specs/`) matches cursor-collections scaffolding expectations.
+In **this** monorepo, all story work under `docs/specs/*/` is **local-only** (gitignored), regardless of ticket prefix. Keep this README committed so the **docs triad** (`docs/context/`, `docs/plans/`, `docs/specs/`) matches cursor-collections scaffolding expectations.
 
 **Consumer projects** may add and commit their own `docs/plans/` layout as needed.
