@@ -130,6 +130,13 @@ Optional fifth line: `- **Reason:** …`
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.
 
+**Self-check before treating a mid-thread gate as cleared:**
+
+1. Does the user's message **directly respond to the specific gate** that was declared (not a different, earlier question)?
+2. If proposing a flow or gate change (e.g., Quick Flow instead of a previously-declared Full-Flow gate), did I **stop** instead of also acting on it in this same turn?
+
+See orchestration skill **Gate-closing rule** for the full rule.
+
 ## Key delegates
 
 - Internal prompts (by stable name): `eversis-research`, `eversis-plan`, `eversis-review-plan`, `eversis-implement-ui`, and other `eversis-implement-*` per the routing table in the orchestration skill.

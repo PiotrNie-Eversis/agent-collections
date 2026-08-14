@@ -97,6 +97,14 @@ Before creating artifacts, delegating, or writing product code, inspect `docs/sp
 - Optional fifth line after the block: `- **Reason:** …` (one line: why this Flow / Research decision).
 - Do **not** substitute a narrative summary or A/B/C option menu for the block.
 
+#### Gate-closing rule (hard)
+
+A declared `Next gate` closes only when the user's next message **directly responds to that specific gate** — not merely because the user replied to something else in the thread (e.g., locking research Gap Analysis answers closes the *research* gate, not a later Plan or Quick Flow gate).
+
+- If recommending Quick Flow as a substitute for an already-declared Full-Flow gate — or any other flow/gate reclassification mid-thread — **state the proposal and stop**. Do not perform any implementation action, file edit, or delegation in that same turn.
+- Treat only an explicit answer to that proposal in the user's **next** turn as the acceptance signal — not silence, not an unrelated reply, not the absence of objection.
+- Applies to every declared gate in a thread (Plan, code, Quick Flow acceptance, review→Fine), not only the readiness block in the first response.
+
 #### Adequacy checklist
 
 Run **before** setting `Research: SKIP` or `Plan: SKIP` when a `*.research.md` or `*.plan.md` already exists (bugfix, QA comment, retest, or attached `@` artifact).
@@ -149,7 +157,7 @@ Write the full ordered agent + prompt call sequence before the first delegation.
 
 ## Quick Flow
 
-Use Quick Flow only if Step 1 passed every Quick criterion and the user selected or accepted it.
+Use Quick Flow only if Step 1 passed every Quick criterion and the user selected or accepted it (see **Gate-closing rule** above — acceptance must be explicit, in response to a direct proposal, never inferred).
 
 1. **Delegate implementation** — Delegate to **Software Engineer** via [`eversis-implement-common-task.md`](../../../.ai/prompts/internal/eversis-implement-common-task.md).
 2. **Run validation checks** — After implementation, run the appropriate checks for the affected area (see `eversis-project-stack.mdc` / `eversis-testing-and-terminal.mdc`).
