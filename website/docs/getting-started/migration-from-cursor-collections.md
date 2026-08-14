@@ -59,7 +59,7 @@ Selection file `.agent-collections/install-selection.json` is **consumer install
 | Core rules packaging | Generated `.cursor/rules/*.mdc` | Root `CLAUDE.md` (mapped rules) + `.claude/rules/*.md` (glob-scoped rules, `paths:` frontmatter) |
 | Skills | MCP `eversis-collections` → `.ai/skills` (no full `.cursor/skills` mirror) | **Native** `.claude/skills/eversis-*/` (linked by the installer, no MCP required) — Claude Code has a fuller skills story here than Cursor |
 | Prompts | Stable id / optional `@` attach | Load by id; project notes belong in `.claude/CLAUDE.md`, not `AGENTS.md` (Claude Code does not auto-read it) |
-| Slash commands | Thin `.cursor/commands/` from `.ai/prompts` (DHI-598) | Thin `.claude/commands/` from `.ai/prompts` — same generator contract, `/eversis-*` after sync |
+| Slash commands | Thin `.cursor/commands/` from `.ai/prompts` (TASK-598) | Thin `.claude/commands/` from `.ai/prompts` — same generator contract, `/eversis-*` after sync |
 | Ignore triad | `.cursorignore` | `.claudeignore` — class source only; Claude Code enforces via `.claude/settings.json` `permissions.deny` (not `.claudeignore` directly) |
 | Settings / permissions | N/A | `.claude/settings.json` — `permissions.deny` generated from `.claudeignore` classes, `enabledMcpjsonServers` from MCP selection |
 | Area profiles | Path scope via installer profile | Same path profiles (tool-agnostic) |

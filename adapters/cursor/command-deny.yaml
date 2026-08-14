@@ -1,4 +1,4 @@
-# Cursor slash-command deny list (DHI-598).
+# Cursor slash-command deny list (TASK-598).
 # Ids listed here are not emitted under .cursor/commands/.
 # Stable prompt ids remain under .ai/prompts/ regardless of this list.
 version: 1

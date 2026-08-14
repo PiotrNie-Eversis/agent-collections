@@ -82,7 +82,7 @@ h2. Requirements
 
 h2. Delivery Standard
 
-This story follows full spec-driven development (mandatory under Agent Collections / epic DHI-515 when applicable).
+This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
 
 * Spec folder: docs/specs/<issue-kebab>/
 * Research: <issue-kebab>.research.md — required before plan

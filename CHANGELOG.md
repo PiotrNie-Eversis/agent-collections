@@ -17,37 +17,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Installer submodule skew (`--framework-prefix`)** — `--upgrade --sync` no longer passes new `adapters/sync.mjs` flags into an older vendor pin (`unknown argument: --framework-prefix`). A clean submodule is aligned to the launching installer SHA; a dirty pin or missing SHA fails with recovery git commands (never `checkout --force`)
 - **Vercel docs deploy** — `vercel.json` install/build paths are relative to the dashboard Root Directory `website` (no nested `cd website`); matches prior agent-collections.vercel.app config
-- **`docs/specs/` gitignore scope** — `.gitignore` only excluded `docs/specs/dhi-*/`, so local research/plan folders from non-DHI work (ad-hoc analysis, framework self-improvement) were not ignored and could be committed by mistake. Broadened to `docs/specs/*/` (all subfolders local-only, regardless of ticket prefix); untracked three already-committed leaked folders (`cursor-collection-migration/`, `pilot-feedback-framework-deltas/`, `website-changelog-sync/`) going forward — kept on disk, not purged from history
+- **`docs/specs/` gitignore scope** — `.gitignore` only excluded `docs/specs/task-*/`, so local research/plan folders from non-TASK work (ad-hoc analysis, framework self-improvement) were not ignored and could be committed by mistake. Broadened to `docs/specs/*/` (all subfolders local-only, regardless of ticket prefix); untracked three already-committed leaked folders (`cursor-collection-migration/`, `pilot-feedback-framework-deltas/`, `website-changelog-sync/`) going forward — kept on disk, not purged from history
 
 ### Added
 
 - **Docs changelog sync** — Root `CHANGELOG.md` is the single editable SSOT (SemVer + prior history); `website/src/pages/changelog.md` is generated via `scripts/sync-changelog.mjs` (`prestart`/`prebuild`); `--check` drift gate; `vercel.json` for docs deploy
-- **DHI-515 close-out** — Q6 hygiene: retarget `.ai/` deep-links from `cursor-collections` to Agent Collections paths; `docs/context/agent-collections/delivery-index.md` traceability (CQ2 waiver); installer Claude deselect prune for generated `CLAUDE.md` / `.claudeignore`; area profiles drop generic `charts/**` exclude (consumer overlay for true infra); targeted website SSOT wording (`.ai/prompts`, slash commands)
-- **Installer UX (DHI-515 umbrella)** — Interactive agents checkbox + domain-profile select (`agents-prompt.mjs`, `profile-prompt.mjs`); shared inquirer deps helper
-- **DHI-598** — Cursor adapter emits thin slash commands under `.cursor/commands/eversis-*.md` from `.ai/prompts/{public,internal}/` (HYBRID: SSOT pointer + optional Executable section); deny list `adapters/cursor/command-deny.yaml`; included in `sync:adapters:check`
-- **DHI-598 follow-up** — Slash command files put `prompt_description` as the first paragraph for Cursor `/` menu summary; GENERATED marker moved to end of file
-- **Wave D — docs + validation (DHI-515 / 541, 539, 540, 542)**
+- **TASK-515 close-out** — Q6 hygiene: retarget `.ai/` deep-links from `cursor-collections` to Agent Collections paths; `docs/context/agent-collections/delivery-index.md` traceability (CQ2 waiver); installer Claude deselect prune for generated `CLAUDE.md` / `.claudeignore`; area profiles drop generic `charts/**` exclude (consumer overlay for true infra); targeted website SSOT wording (`.ai/prompts`, slash commands)
+- **Installer UX (TASK-515 umbrella)** — Interactive agents checkbox + domain-profile select (`agents-prompt.mjs`, `profile-prompt.mjs`); shared inquirer deps helper
+- **TASK-598** — Cursor adapter emits thin slash commands under `.cursor/commands/eversis-*.md` from `.ai/prompts/{public,internal}/` (HYBRID: SSOT pointer + optional Executable section); deny list `adapters/cursor/command-deny.yaml`; included in `sync:adapters:check`
+- **TASK-598 follow-up** — Slash command files put `prompt_description` as the first paragraph for Cursor `/` menu summary; GENERATED marker moved to end of file
+- **Wave D — docs + validation (TASK-515 / 541, 539, 540, 542)**
   - Getting-started guides under `website/docs/getting-started/` (CC-analog stems) + migration from Cursor Collections
   - Framework reference `documentation/agent-collection.md` and WF/WNF `docs/architecture/requirements-traceability.md`
   - Docusaurus site under `website/` (rebrand Agent Collections; Vercel at agent-collections.vercel.app; changelog generated from root SSOT)
   - EOG pilot context / WNF-03 measurement notes under `docs/context/eog/`
-- **Wave C — self-contained distribution (DHI-515 / 533–538, 530, 532; 521 verify)**
+- **Wave C — self-contained distribution (TASK-515 / 533–538, 530, 532; 521 verify)**
   - Bootstrap without sibling `cursor-collections` symlinks (skills/prompts/commands + BA Docs rule links removed; Q1: no full `.cursor` skills mirror)
   - MCP package `mcp/eversis-collections-mcp/` resolving `.ai/skills` via `AGENT_COLLECTIONS_HOME` (Q2; no `CURSOR_COLLECTIONS_HOME` in default template)
   - Installer `scripts/setup-agent-collections.sh` (local / submodule / copy) with selection `.agent-collections/install-selection.json` (Q3)
-  - Domain profiles `adapters/profiles/{frontend,backend,fullstack}.yaml` (Q4) + area profiles `area-*-scope.yaml` / `area-fullstack.yaml` (DHI-530)
-  - Wizard axes `--agents` / `--mcp-servers` / `--profile` + `--non-interactive`; upgrade `--upgrade` with fail-safe (DHI-537 / S-01…S-04)
-  - Reference `AGENTS.md` filled (DHI-532); install selection schema doc
+  - Domain profiles `adapters/profiles/{frontend,backend,fullstack}.yaml` (Q4) + area profiles `area-*-scope.yaml` / `area-fullstack.yaml` (TASK-530)
+  - Wizard axes `--agents` / `--mcp-servers` / `--profile` + `--non-interactive`; upgrade `--upgrade` with fail-safe (TASK-537 / S-01…S-04)
+  - Reference `AGENTS.md` filled (TASK-532); install selection schema doc
   - Root scripts: `mcp:build`, `mcp:test`, `installer:smoke`
 
 ### Changed
 
-- **DHI-515 Continuity** — Implement sessions auto-run `eversis-review` then Fine + QA draft in-session (no wait for human `/eversis-review`); opt-out: `pause before review` / `review later`; SDD gate table + agent-core / orchestration skill / Channel notes aligned
+- **TASK-515 Continuity** — Implement sessions auto-run `eversis-review` then Fine + QA draft in-session (no wait for human `/eversis-review`); opt-out: `pause before review` / `review later`; SDD gate table + agent-core / orchestration skill / Channel notes aligned
 - **Installer Next steps** — agent-aware (Cursor stack `.mdc` vs Claude `AGENTS.md`); vendor submodule/copy marked done + teammate `git submodule update --init --recursive`; local mode clarifies no in-repo `.ai/`
 - **MCP wizard** — interactive MCP server selection no longer requires `--build-mcp` (`--build-mcp` = force rebuild only; missing `dist` still builds)
 - **Installer docs** — `.agent-collections/` purpose, `--collections-home` one-liners, Claude vs Cursor stack customisation (`install-selection.md`, getting-started, Claude adapter README, root README)
-- **DHI-598** — Docs updated: adapter-mapping emit matrix, Cursor adapter README, README / AGENTS Channel notes for `/eversis-*`
-- **DHI-541** — Root README rewritten for human-first documentation UX (progressive disclosure: hero → workflows with human gates → quick start → install/upgrade facts), aligned with cursor-collections README pattern while keeping Agent Collections facts (`AGENT_COLLECTIONS_HOME`, adapters, MVP limits)
+- **TASK-598** — Docs updated: adapter-mapping emit matrix, Cursor adapter README, README / AGENTS Channel notes for `/eversis-*`
+- **TASK-541** — Root README rewritten for human-first documentation UX (progressive disclosure: hero → workflows with human gates → quick start → install/upgrade facts), aligned with cursor-collections README pattern while keeping Agent Collections facts (`AGENT_COLLECTIONS_HOME`, adapters, MVP limits)
 - README links getting-started + migration; documents deferred docs hosting
 - README quick start is self-contained; upgrade CLI path implemented via installer
 - Adapter sync accepts `--agents cursor,claude,opencode` (OpenCode remains placeholder)
@@ -64,15 +64,15 @@ Placeholder pre-distribution version. Self-contained bootstrap and installer are
   - Domain rules under `.ai/rules/{frontend,backend,devops,architecture,shared-types}/`
   - Skill packages (45) under `.ai/skills/` and prompts (16 public + 12 internal) under `.ai/prompts/`
 - **Versioning and upgrade contract** — documented in root `README.md` (local sync, submodule bump, CLI upgrade forward-ref; project-owned opt-in rules)
-- **Local-only story specs** — `docs/specs/dhi-*/` gitignored for MVP (research/plan stay on disk, not published with the framework tree)
+- **Local-only story specs** — `docs/specs/task-*/` gitignored for MVP (research/plan stay on disk, not published with the framework tree)
 - **Mandatory spec-driven development (Delivery Standard)** — `.ai/rules/orchestration/spec-driven-development.md` (+ pointer from `agent-core`); documented in README / AGENTS / `docs/specs/README.md`; Jira story template block in `eversis-jira-task-formatting` (stable prompt ids + optional Cursor attach note)
-- **Adapter mapping specification** — canonical architecture/mapping doc at `docs/architecture/adapter-mapping.md` (Cursor / Claude / OpenCode field maps, emit matrix, `rule-map` contract); pointer from `.ai/README.md` (DHI-523)
-- **Isolation strategy (DHI-528)** — canonical cross-tool ignore and area-scoping strategy at `docs/architecture/isolation-strategy.md` (packaging matrix, area profiles, WNF-03 estimation + orientation-without-noise); pointer from `adapter-mapping.md` / `.ai/README.md`; path globs remain DHI-530
-- **Synchronized ignore triad (DHI-529)** — root `.cursorignore`, `.claudeignore`, and `.opencodeignore` with shared secrets/build + cross-tool packaging classes (§4); checklist in `isolation-strategy.md` §8.1; no heavy-infra/`apps/**` in framework root; `adapters/sync.mjs` unchanged; future installer merges missing classes without wipe (opt-in)
-- **Cursor adapter (DHI-524)** — `adapters/cursor/` with `rule-map.yaml` and zero-deps `generate.mjs` (`node adapters/cursor/generate.mjs`, optional `--out`); generates framework `.cursor/rules/*.mdc` from `.ai/rules` (replaces symlink bootstrap for mapped rules; BA Docs symlinks and consumer `eversis-project-stack.mdc` left untouched)
-- **OpenCode adapter placeholder (DHI-525)** — `adapters/opencode/` + root `opencode.jsonc` (`$schema` + `instructions` globs → `.ai/rules`); maturity `placeholder` only (not a shipped adapter); minimal Cursor exclusion in `.cursorignore` (full ignore triad → DHI-529)
-- **Claude Code adapter (DHI-526)** — `adapters/claude/` with `rule-map.yaml` and zero-deps `generate.mjs` (`node adapters/claude/generate.mjs`, optional `--out`); generates root `CLAUDE.md` (H2 per mapped rule, full inline; id/source parity with Cursor map); ignore / monorepo isolation deferred to DHI-528–530
-- **Adapter sync CLI (DHI-527)** — `adapters/sync.mjs` (+ `package.json` scripts `sync:adapters` / `sync:adapters:check`) regenerates Cursor then Claude deterministically; `--check` validates no drift and Cursor↔Claude id/source map parity; does not touch project-owned stack / BA Doc symlinks; OpenCode out of sync MVP
+- **Adapter mapping specification** — canonical architecture/mapping doc at `docs/architecture/adapter-mapping.md` (Cursor / Claude / OpenCode field maps, emit matrix, `rule-map` contract); pointer from `.ai/README.md` (TASK-523)
+- **Isolation strategy (TASK-528)** — canonical cross-tool ignore and area-scoping strategy at `docs/architecture/isolation-strategy.md` (packaging matrix, area profiles, WNF-03 estimation + orientation-without-noise); pointer from `adapter-mapping.md` / `.ai/README.md`; path globs remain TASK-530
+- **Synchronized ignore triad (TASK-529)** — root `.cursorignore`, `.claudeignore`, and `.opencodeignore` with shared secrets/build + cross-tool packaging classes (§4); checklist in `isolation-strategy.md` §8.1; no heavy-infra/`apps/**` in framework root; `adapters/sync.mjs` unchanged; future installer merges missing classes without wipe (opt-in)
+- **Cursor adapter (TASK-524)** — `adapters/cursor/` with `rule-map.yaml` and zero-deps `generate.mjs` (`node adapters/cursor/generate.mjs`, optional `--out`); generates framework `.cursor/rules/*.mdc` from `.ai/rules` (replaces symlink bootstrap for mapped rules; BA Docs symlinks and consumer `eversis-project-stack.mdc` left untouched)
+- **OpenCode adapter placeholder (TASK-525)** — `adapters/opencode/` + root `opencode.jsonc` (`$schema` + `instructions` globs → `.ai/rules`); maturity `placeholder` only (not a shipped adapter); minimal Cursor exclusion in `.cursorignore` (full ignore triad → TASK-529)
+- **Claude Code adapter (TASK-526)** — `adapters/claude/` with `rule-map.yaml` and zero-deps `generate.mjs` (`node adapters/claude/generate.mjs`, optional `--out`); generates root `CLAUDE.md` (H2 per mapped rule, full inline; id/source parity with Cursor map); ignore / monorepo isolation deferred to TASK-528–530
+- **Adapter sync CLI (TASK-527)** — `adapters/sync.mjs` (+ `package.json` scripts `sync:adapters` / `sync:adapters:check`) regenerates Cursor then Claude deterministically; `--check` validates no drift and Cursor↔Claude id/source map parity; does not touch project-owned stack / BA Doc symlinks; OpenCode out of sync MVP
 
 ### Migration
 

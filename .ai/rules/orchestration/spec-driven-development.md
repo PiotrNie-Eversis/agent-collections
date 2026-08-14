@@ -37,7 +37,7 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 
 | Item | Convention |
 |------|------------|
-| Folder | `docs/specs/<issue-kebab>/` (e.g. `docs/specs/dhi-522/`) |
+| Folder | `docs/specs/<issue-kebab>/` (e.g. `docs/specs/task-522/`) |
 | Research | `<issue-kebab>.research.md` — before plan when Full / SDD applies |
 | Plan | `<issue-kebab>.plan.md` — before implementation when Full / SDD applies |
 | Optional | `*.plan-review.md`, manifests, inventory notes as the story requires |
@@ -54,7 +54,7 @@ Do **not** start implementation without approved research and plan artifacts whe
 ```text
 ## Delivery Standard
 
-This story follows full spec-driven development (mandatory under Agent Collections / epic DHI-515 when applicable).
+This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
 
 * Spec folder: docs/specs/<issue-kebab>/
 * Research: <issue-kebab>.research.md — required before plan

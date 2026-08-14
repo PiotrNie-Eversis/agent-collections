@@ -6,9 +6,9 @@ Content fill schedule:
 
 | Area | Story |
 |------|-------|
-| Orchestration rules (full) | DHI-518 (**done** — see `rules/orchestration/`) + DHI-522 SDD (`spec-driven-development.md`) |
-| Domain rules | DHI-519 (**done** — see `rules/{frontend,backend,devops,architecture,shared-types}/`) |
-| Skills and prompts bodies | DHI-520 (**done** — see `skills/`, `prompts/`; manifest `docs/specs/dhi-520/port-manifest.md`; MCP resolveRoot → DHI-535) |
+| Orchestration rules (full) | TASK-518 (**done** — see `rules/orchestration/`) + TASK-522 SDD (`spec-driven-development.md`) |
+| Domain rules | TASK-519 (**done** — see `rules/{frontend,backend,devops,architecture,shared-types}/`) |
+| Skills and prompts bodies | TASK-520 (**done** — see `skills/`, `prompts/`; manifest `docs/specs/task-520/port-manifest.md`; MCP resolveRoot → TASK-535) |
 
 ## Layout
 
@@ -32,27 +32,27 @@ Content fill schedule:
 
 ## Mapping contract
 
-**Canonical specification:** [`docs/architecture/adapter-mapping.md`](../docs/architecture/adapter-mapping.md) (DHI-523) — field maps for Cursor / Claude Code / OpenCode placeholder, emit matrix, and adapter `rule-map.yaml` contracts. Prefer that document over this summary when implementing or extending adapters (DHI-524+). Cursor: [`adapters/cursor/`](../adapters/cursor/). Claude Code: [`adapters/claude/`](../adapters/claude/) → root `CLAUDE.md`.
+**Canonical specification:** [`docs/architecture/adapter-mapping.md`](../docs/architecture/adapter-mapping.md) (TASK-523) — field maps for Cursor / Claude Code / OpenCode placeholder, emit matrix, and adapter `rule-map.yaml` contracts. Prefer that document over this summary when implementing or extending adapters (TASK-524+). Cursor: [`adapters/cursor/`](../adapters/cursor/). Claude Code: [`adapters/claude/`](../adapters/claude/) → root `CLAUDE.md`.
 
-**Isolation strategy (DHI-528):** [`docs/architecture/isolation-strategy.md`](../docs/architecture/isolation-strategy.md) — cross-tool packaging visibility and area/path profiles (`frontend-scope` / `backend-scope` / `fullstack`). Ignore triad materialized at repo root (**DHI-529**); monorepo path globs → DHI-530.
+**Isolation strategy (TASK-528):** [`docs/architecture/isolation-strategy.md`](../docs/architecture/isolation-strategy.md) — cross-tool packaging visibility and area/path profiles (`frontend-scope` / `backend-scope` / `fullstack`). Ignore triad materialized at repo root (**TASK-529**); monorepo path globs → TASK-530.
 
-**AGENTS.md standard (DHI-531):** [`docs/architecture/agents-md-standard.md`](../docs/architecture/agents-md-standard.md) — agnostic orientation map (sections, role matrix, docs triad `docs/{context,plans,specs}`, install contract). Copyable seed: [`templates/AGENTS.template.md`](../templates/AGENTS.template.md). Full reference fill for this repo → **DHI-532**.
+**AGENTS.md standard (TASK-531):** [`docs/architecture/agents-md-standard.md`](../docs/architecture/agents-md-standard.md) — agnostic orientation map (sections, role matrix, docs triad `docs/{context,plans,specs}`, install contract). Copyable seed: [`templates/AGENTS.template.md`](../templates/AGENTS.template.md). Full reference fill for this repo → **TASK-532**.
 
-**OpenCode placeholder (DHI-525):** materialized under [`adapters/opencode/`](../adapters/opencode/) (plus root `opencode.jsonc`). Maturity remains **`placeholder`** — not a full / shipped OpenCode adapter.
+**OpenCode placeholder (TASK-525):** materialized under [`adapters/opencode/`](../adapters/opencode/) (plus root `opencode.jsonc`). Maturity remains **`placeholder`** — not a full / shipped OpenCode adapter.
 
 | Core asset | Path under `.ai/` | Later consumer role |
 |------------|-------------------|---------------------|
 | Domain & orchestration **rules** | `rules/<domain>/*.md` | Cursor → `.cursor/rules/*.mdc` via [`adapters/cursor/`](../adapters/cursor/); Claude → root `CLAUDE.md` via [`adapters/claude/`](../adapters/claude/); OpenCode → `instructions` globs ([`adapters/opencode/`](../adapters/opencode/) placeholder) |
-| **Skills** | `skills/eversis-<topic>/` (45 packages — DHI-520) | MCP after **DHI-535** — not emitted by Cursor/Claude adapters in MVP |
+| **Skills** | `skills/eversis-<topic>/` (45 packages — TASK-520) | MCP after **TASK-535** — not emitted by Cursor/Claude adapters in MVP |
 | **Prompts** | `prompts/public/`, `prompts/internal/` | Stable ids; not mirrored by Cursor adapter in MVP |
 | **Orchestration contracts** | `rules/orchestration/` plus this README | Lifecycle, gates, Fine/QA, SDD — not only IDE packaging |
 
 ### What does **not** live in `.ai/`
 
 - Cursor **commands** (thin slash shims) — adapter / Cursor channel
-- IDE front matter (`globs`, `alwaysApply`) and **rule-map** — adapter packaging (see mapping spec; file lands in DHI-524)
+- IDE front matter (`globs`, `alwaysApply`) and **rule-map** — adapter packaging (see mapping spec; file lands in TASK-524)
 - Consumer **project stack** customization — stays project-owned
-- Framework **docs site** / rebrand — DHI-540
+- Framework **docs site** / rebrand — TASK-540
 
 ## Rule format
 
@@ -62,14 +62,14 @@ Core rules use **plain Markdown** (`.md`):
 - No Claude-only `CLAUDE.md` conventions inside rule files
 - Prefer tool-agnostic wording (“load the Implement prompt”, “resolve skills via MCP”)
 
-See `rules/orchestration/agent-core.md` for the production lifecycle and gate rules (DHI-518).
+See `rules/orchestration/agent-core.md` for the production lifecycle and gate rules (TASK-518).
 
 ## Related specs
 
-- Inventory: `docs/specs/dhi-516/asset-inventory.md`
-- Structure story: `docs/specs/dhi-517/`
-- Orchestration extraction: `docs/specs/dhi-518/`
-- Domain rules extraction: `docs/specs/dhi-519/`
-- Skills & prompts port: `docs/specs/dhi-520/` (manifest: `port-manifest.md`)
-- Adapter mapping (canonical): `docs/architecture/adapter-mapping.md` (DHI-523)
-- Isolation strategy (canonical): `docs/architecture/isolation-strategy.md` (DHI-528)
+- Inventory: `docs/specs/task-516/asset-inventory.md`
+- Structure story: `docs/specs/task-517/`
+- Orchestration extraction: `docs/specs/task-518/`
+- Domain rules extraction: `docs/specs/task-519/`
+- Skills & prompts port: `docs/specs/task-520/` (manifest: `port-manifest.md`)
+- Adapter mapping (canonical): `docs/architecture/adapter-mapping.md` (TASK-523)
+- Isolation strategy (canonical): `docs/architecture/isolation-strategy.md` (TASK-528)

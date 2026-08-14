@@ -29,7 +29,7 @@ Prefer loading this skill via the **`eversis-collections` MCP** (`eversis_skills
 
 - Only call `addCommentToJiraIssue` (Atlassian MCP) when the human **explicitly** approves posting (e.g. "post this", "add to ticket PROJ-123", "looks good, send it").
 - Use the **approved or human-edited** body as `commentBody` — never the unreviewed draft.
-- Required args: `issueIdOrKey` (e.g. `DHI-396`), `commentBody` (markdown), `cloudId` (from `getAccessibleAtlassianResources` or the ticket URL the human provides — do not invent).
+- Required args: `issueIdOrKey` (e.g. `TASK-396`), `commentBody` (markdown), `cloudId` (from `getAccessibleAtlassianResources` or the ticket URL the human provides — do not invent).
 - Set `contentFormat: "markdown"` when the server supports it.
 - If the issue key is ambiguous, confirm with the human before posting.
 
@@ -87,7 +87,7 @@ Keep all technical depth in **Automation & Technical Notes** only.
 After the human approves or rewrites the draft, they may either:
 
 - **Copy-paste** into the Jira issue directly, or
-- **Instruct the agent** to post via Atlassian MCP: "Post the comment above to DHI-396 on eversis.atlassian.net."
+- **Instruct the agent** to post via Atlassian MCP: "Post the comment above to TASK-396 on eversis.atlassian.net."
 
 The agent then calls `addCommentToJiraIssue` with the **approved** body. It never posts automatically or in the same turn as the draft.
 

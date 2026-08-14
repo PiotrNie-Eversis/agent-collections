@@ -34,21 +34,21 @@ OpenCode loads:
 1. **`instructions`** from `opencode.jsonc` (globs under `.ai/rules/<domain>/*.md` — may include domain `README.md` files; refine when a shipped adapter exists)
 2. Root **`AGENTS.md`** when present (combined with instructions per OpenCode docs)
 
-This story does **not** edit root `AGENTS.md` (standardization → DHI-531 / DHI-532).
+This story does **not** edit root `AGENTS.md` (standardization → TASK-531 / TASK-532).
 
 ## Isolation / ignore checklist (Story 3.2)
 
-Minimal Cursor exclusion is already in root `.cursorignore` (`adapters/opencode/`, `opencode.jsonc`). Full synchronized triad is **DHI-529**:
+Minimal Cursor exclusion is already in root `.cursorignore` (`adapters/opencode/`, `opencode.jsonc`). Full synchronized triad is **TASK-529**:
 
 | Path / pattern | Cursor | Claude | OpenCode |
 |----------------|--------|--------|----------|
-| `adapters/opencode/` | exclude (done in DHI-525) | exclude | (n/a — own adapter) |
-| `opencode.jsonc` | exclude (done in DHI-525) | exclude | load as config |
-| Future `.opencodeignore` | — | — | DHI-529 |
+| `adapters/opencode/` | exclude (done in TASK-525) | exclude | (n/a — own adapter) |
+| `opencode.jsonc` | exclude (done in TASK-525) | exclude | load as config |
+| Future `.opencodeignore` | — | — | TASK-529 |
 
 ## Out of scope here
 
-- Generator / sync CLI (DHI-527)
-- Claude `CLAUDE.md` (DHI-526)
-- Full `.claudeignore` / `.opencodeignore` triad (DHI-528–529)
+- Generator / sync CLI (TASK-527)
+- Claude `CLAUDE.md` (TASK-526)
+- Full `.claudeignore` / `.opencodeignore` triad (TASK-528–529)
 - Agent profiles / permissions keys beyond `$schema` + `instructions`

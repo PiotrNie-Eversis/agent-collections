@@ -4,7 +4,7 @@ Tool-specific packaging that **consumes** Agent Collections core (`.ai/`). Gener
 
 Mapping contract: [`docs/architecture/adapter-mapping.md`](../docs/architecture/adapter-mapping.md).
 
-## Sync all shipped adapters (DHI-527)
+## Sync all shipped adapters (TASK-527)
 
 From the repository root, regenerate **Cursor** then **Claude** outputs from core:
 

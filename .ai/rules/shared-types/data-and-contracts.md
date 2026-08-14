@@ -1,6 +1,6 @@
 # Data and contracts (seed)
 
-> **Seed** from skill `eversis-sql-and-database-understanding` (guiding principles), framed for **shared types and data contracts**. Full SQL/ORM cookbooks arrive in **DHI-520**.
+> **Seed** from skill `eversis-sql-and-database-understanding` (guiding principles), framed for **shared types and data contracts**. Full SQL/ORM cookbooks arrive in **TASK-520**.
 
 ## Principles
 

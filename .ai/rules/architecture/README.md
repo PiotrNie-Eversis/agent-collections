@@ -9,8 +9,8 @@ Cross-cutting architecture and quality standards.
 
 **Orchestration hard limits / testing:** [`../orchestration/agent-core.md`](../orchestration/agent-core.md), [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md).
 
-**Deferred:** BA Docs planner/writer rules (optional later / with DHI-520 skills).
+**Deferred:** BA Docs planner/writer rules (optional later / with TASK-520 skills).
 
 **Consumer project stack** stays project-owned — not stored in `.ai/`.
 
-**Full architecture / code-reviewing skill bodies:** **DHI-520**.
+**Full architecture / code-reviewing skill bodies:** **TASK-520**.

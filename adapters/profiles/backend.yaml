@@ -1,4 +1,4 @@
-# Domain profile: backend (DHI-536)
+# Domain profile: backend (TASK-536)
 id: backend
 description: Backend-oriented domain content (shared-types + orchestration + backend + devops subset)
 domains:

@@ -1,4 +1,4 @@
-# Area profile: backend-scope (isolation-strategy §5 / DHI-530)
+# Area profile: backend-scope (isolation-strategy §5 / TASK-530)
 id: backend-scope
 include:
   - apps/api/**

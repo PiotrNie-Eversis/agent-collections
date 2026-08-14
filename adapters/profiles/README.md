@@ -1,4 +1,4 @@
-# Domain + area profiles for Agent Collections installer (DHI-536 / DHI-530)
+# Domain + area profiles for Agent Collections installer (TASK-536 / TASK-530)
 
 | File | Role |
 |------|------|

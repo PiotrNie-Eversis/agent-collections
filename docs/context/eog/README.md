@@ -1,6 +1,6 @@
 # EOG consumer context (Agent Collections pilot)
 
-Local notes for the **EOG** monorepo pilot ([DHI-542](https://eversis.atlassian.net/browse/DHI-542)). Consumer-specific; not framework SSOT.
+Local notes for the **EOG** monorepo pilot ([TASK-542](https://eversis.atlassian.net/browse/TASK-542)). Consumer-specific; not framework SSOT.
 
 ## Area overlay (Q7)
 

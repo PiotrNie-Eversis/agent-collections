@@ -1,4 +1,4 @@
-# Claude Code adapter rule map (DHI-526)
+# Claude Code adapter rule map (TASK-526)
 # Packaging metadata lives here — not in .ai/rules/*.md
 # id/source parity with adapters/cursor/rule-map.yaml (no Cursor packaging fields)
 version: 1

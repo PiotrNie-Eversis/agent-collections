@@ -22,7 +22,7 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 |------|------|
 | [`docs/context/`](./docs/context/) | Internal knowledge, task baselines |
 | [`docs/plans/`](./docs/plans/) | Optional flat plans; prefer specs for Implement |
-| [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<issue-kebab>/`; `dhi-*` local-only / gitignored in this repo) |
+| [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<issue-kebab>/`; `task-*` local-only / gitignored in this repo) |
 
 ## Monorepo / Areas
 
@@ -67,7 +67,7 @@ Ideate → Research → Plan → Implement → Review → Fine
 
 - This repository is the **framework** product (not a consumer app). Stack policy: [`.cursor/rules/eversis-project-stack.mdc`](./.cursor/rules/eversis-project-stack.mdc).
 - Quality commands: `npm run sync:adapters`, `npm run sync:adapters:check`, `npm run mcp:build`, `npm run mcp:test`, installer smoke `bash scripts/setup-agent-collections.test.sh`, `npm run website:build`, `npm run website:changelog:check`.
-- Skills UX: MCP + `.ai/` load-by-id / `@` attach. Cursor also emits thin `/eversis-*` shims under `.cursor/commands/` (DHI-598); full `.cursor/skills|prompts` mirror is **not** shipped.
+- Skills UX: MCP + `.ai/` load-by-id / `@` attach. Cursor also emits thin `/eversis-*` shims under `.cursor/commands/` (TASK-598); full `.cursor/skills|prompts` mirror is **not** shipped.
 - BA Docs skills: **Do not load** in this framework repo unless a plan explicitly requires them.
 
 ---

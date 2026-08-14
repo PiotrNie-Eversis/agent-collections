@@ -32,7 +32,7 @@ Re-run after core or map changes. **Do not hand-edit** the generated `CLAUDE.md`
 
 ## Generated commands
 
-`adapters/claude/generate-commands.mjs` discovers `.ai/prompts/{public,internal}/eversis-*.md` and writes one thin pointer file per prompt to `.claude/commands/<id>.md` — same discovery, deny-list (`command-deny.yaml`), and marker-gated orphan-cleanup contract as Cursor's `.cursor/commands/` (DHI-598), so `/eversis-implement` etc. work the same way in both tools. Frontmatter is `description` + `argument-hint` (Claude has no `globs`/`alwaysApply`); the GENERATED marker sits at the end of the file, not the top, so it never leaks into the slash-menu preview text.
+`adapters/claude/generate-commands.mjs` discovers `.ai/prompts/{public,internal}/eversis-*.md` and writes one thin pointer file per prompt to `.claude/commands/<id>.md` — same discovery, deny-list (`command-deny.yaml`), and marker-gated orphan-cleanup contract as Cursor's `.cursor/commands/` (TASK-598), so `/eversis-implement` etc. work the same way in both tools. Frontmatter is `description` + `argument-hint` (Claude has no `globs`/`alwaysApply`); the GENERATED marker sits at the end of the file, not the top, so it never leaks into the slash-menu preview text.
 
 ## Generated skills
 
@@ -60,10 +60,10 @@ Re-run after core or map changes. **Do not hand-edit** the generated `CLAUDE.md`
 | BA Docs rules | Not in Cursor MVP map — same exclusion here |
 | Consumer `eversis-project-stack.mdc` (Cursor) | **Consumer-owned** — never overwrite without opt-in |
 | Consumer `.claude/CLAUDE.md` | **Consumer-owned** — seeded once by the installer, never regenerated (see Consumer project notes) |
-| Monorepo area / path globs | **Deferred** to DHI-530 (Work Stream 3) |
-| `.claudeignore` | **Shipped** at repo root (DHI-529 ignore triad), but **not enforced by Claude Code** — it is a class source only; the installer regenerates `permissions.deny` in `.claude/settings.json` from it on every run (see [`isolation-strategy.md`](../../docs/architecture/isolation-strategy.md) §8.1) |
+| Monorepo area / path globs | **Deferred** to TASK-530 (Work Stream 3) |
+| `.claudeignore` | **Shipped** at repo root (TASK-529 ignore triad), but **not enforced by Claude Code** — it is a class source only; the installer regenerates `permissions.deny` in `.claude/settings.json` from it on every run (see [`isolation-strategy.md`](../../docs/architecture/isolation-strategy.md) §8.1) |
 
-`.claude/rules/*.md` (glob-scoped rules) and native `.claude/commands/` / `.claude/skills/` are **no longer deferred** — see "Generated rule ids", "Generated commands", and "Generated skills" above. They were deferred at DHI-523 / DHI-526 (Q1=A) time; that decision was revisited and shipped alongside this framework's claude-code-setup work.
+`.claude/rules/*.md` (glob-scoped rules) and native `.claude/commands/` / `.claude/skills/` are **no longer deferred** — see "Generated rule ids", "Generated commands", and "Generated skills" above. They were deferred at TASK-523 / TASK-526 (Q1=A) time; that decision was revisited and shipped alongside this framework's claude-code-setup work.
 
 ## Consumer project notes
 

@@ -8,4 +8,4 @@ Neutral guidance for shared contracts, DTOs, and data boundaries across packages
 
 **Testing discipline:** [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md).
 
-**Full database/SQL skill body:** **DHI-520**.
+**Full database/SQL skill body:** **TASK-520**.

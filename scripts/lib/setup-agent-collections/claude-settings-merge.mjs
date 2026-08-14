@@ -6,7 +6,7 @@
  *  - First run (no existing file): seed the whole file from
  *    templates/claude-settings.json.
  *  - Every run: fully regenerate `permissions.deny` (from .claudeignore path
- *    classes — the single source of truth for path classes, DHI-529) and
+ *    classes — the single source of truth for path classes, TASK-529) and
  *    `enabledMcpjsonServers` (from the current MCP selection). Every other
  *    key in an existing file — including `permissions.allow` and anything a
  *    consumer added by hand — is left untouched.

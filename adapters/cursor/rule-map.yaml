@@ -1,4 +1,4 @@
-# Cursor adapter rule map (DHI-524)
+# Cursor adapter rule map (TASK-524)
 # Packaging metadata lives here — not in .ai/rules/*.md
 version: 1
 rules:

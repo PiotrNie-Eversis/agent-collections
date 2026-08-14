@@ -1,4 +1,4 @@
-# Area profile: frontend-scope (isolation-strategy §5 / DHI-530)
+# Area profile: frontend-scope (isolation-strategy §5 / TASK-530)
 # Abstract layout only — apps/web, apps/api (no client names).
 id: frontend-scope
 include:

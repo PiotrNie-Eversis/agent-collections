@@ -1,8 +1,8 @@
 # Adapter architecture and mapping specification
 
 **Status:** Canonical (committed)  
-**Story:** [DHI-523](https://eversis.atlassian.net/browse/DHI-523) (Work Stream 2 / Story 2.1)  
-**Audience:** Implementers of Cursor (DHI-524), Claude Code (DHI-526), OpenCode placeholder (DHI-525), and sync tooling (DHI-527)
+**Story:** [TASK-523](https://eversis.atlassian.net/browse/TASK-523) (Work Stream 2 / Story 2.1)  
+**Audience:** Implementers of Cursor (TASK-524), Claude Code (TASK-526), OpenCode placeholder (TASK-525), and sync tooling (TASK-527)
 
 This document is the **single source of truth** for how Agent Collections **core** (`.ai/`) transforms into each tool’s native packaging. Core rule bodies stay vendor-neutral Markdown; packaging metadata and generated outputs live in the **adapter** layer (created in follow-on stories — **not** in this document’s delivery).
 
@@ -17,10 +17,10 @@ This document is the **single source of truth** for how Agent Collections **core
   prompts/{public,internal}
 
         │
-        ▼  mapping (this spec) + rule-map / generators (DHI-524+)
+        ▼  mapping (this spec) + rule-map / generators (TASK-524+)
 
 adapters
-  cursor/   → .cursor/rules/*.mdc + thin .cursor/commands/eversis-*.md (DHI-598)
+  cursor/   → .cursor/rules/*.mdc + thin .cursor/commands/eversis-*.md (TASK-598)
   claude/   → CLAUDE.md
   opencode/ → opencode.json (+ optional AGENTS pointers)
 ```
@@ -40,9 +40,9 @@ adapters
 
 | Adapter | Rules | Prompts | Skills | Commands / other | Maturity |
 |---------|-------|---------|--------|------------------|----------|
-| **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** full mirror | **No** emit — resolve via MCP after DHI-535 | **Thin** `.cursor/commands/eversis-*.md` from `.ai/prompts` (HYBRID pointer + Executable; DHI-598) — not a full prompt copy | Generator: **DHI-524** + **DHI-598** (`adapters/cursor/`) |
-| **Claude Code** | Root **`CLAUDE.md`** (H2 section per non-glob-scoped mapped rule) + `.claude/rules/*.md` (`paths:` frontmatter for glob-scoped rules) | **No** full mirror | **Native** `.claude/skills/eversis-*/` — linked/copied by the **installer** (not the generator) from `.ai/skills/`, one dir per skill package | **Thin** `.claude/commands/eversis-*.md` from `.ai/prompts` (same HYBRID pointer + Executable shape as Cursor's DHI-598 commands; `description` + `argument-hint` frontmatter, marker at file end) — closes the claude-code-setup research's F1 | Generator: **DHI-526** (`adapters/claude/generate.mjs` + `generate-commands.mjs`); skills linking + `.claude/CLAUDE.md`/`.claude/settings.json` seeding: installer (`scripts/lib/setup-agent-collections/`) — **shipped** |
-| **OpenCode** | Point at core (or generated) paths via `opencode.json` `instructions` | Deferred | Deferred | Config placeholder; optional `AGENTS.md` | **placeholder** (DHI-525) |
+| **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** full mirror | **No** emit — resolve via MCP after TASK-535 | **Thin** `.cursor/commands/eversis-*.md` from `.ai/prompts` (HYBRID pointer + Executable; TASK-598) — not a full prompt copy | Generator: **TASK-524** + **TASK-598** (`adapters/cursor/`) |
+| **Claude Code** | Root **`CLAUDE.md`** (H2 section per non-glob-scoped mapped rule) + `.claude/rules/*.md` (`paths:` frontmatter for glob-scoped rules) | **No** full mirror | **Native** `.claude/skills/eversis-*/` — linked/copied by the **installer** (not the generator) from `.ai/skills/`, one dir per skill package | **Thin** `.claude/commands/eversis-*.md` from `.ai/prompts` (same HYBRID pointer + Executable shape as Cursor's TASK-598 commands; `description` + `argument-hint` frontmatter, marker at file end) — closes the claude-code-setup research's F1 | Generator: **TASK-526** (`adapters/claude/generate.mjs` + `generate-commands.mjs`); skills linking + `.claude/CLAUDE.md`/`.claude/settings.json` seeding: installer (`scripts/lib/setup-agent-collections/`) — **shipped** |
+| **OpenCode** | Point at core (or generated) paths via `opencode.json` `instructions` | Deferred | Deferred | Config placeholder; optional `AGENTS.md` | **placeholder** (TASK-525) |
 
 Skills and prompts remain under `.ai/` as SSOT. Cursor slash files are **thin packaging** only (stable id + path + optional Executable section). Adapters **must not** claim they ship a full multi-copy of skills/prompts.
 
@@ -129,8 +129,8 @@ alwaysApply: false
 
 ## 4. Cursor `rule-map.yaml` contract
 
-**File (DHI-524):** [`adapters/cursor/rule-map.yaml`](../../adapters/cursor/rule-map.yaml)  
-**Generator (DHI-524):** [`adapters/cursor/generate.mjs`](../../adapters/cursor/generate.mjs) — run from repo root: `node adapters/cursor/generate.mjs` (optional `--out <dir>`).
+**File (TASK-524):** [`adapters/cursor/rule-map.yaml`](../../adapters/cursor/rule-map.yaml)  
+**Generator (TASK-524):** [`adapters/cursor/generate.mjs`](../../adapters/cursor/generate.mjs) — run from repo root: `node adapters/cursor/generate.mjs` (optional `--out <dir>`).
 
 ### 4.1 Required shape
 
@@ -175,7 +175,7 @@ rules:
     alwaysApply: false
 ```
 
-### 4.3 Generator expectations (DHI-524)
+### 4.3 Generator expectations (TASK-524)
 
 1. Read `rule-map.yaml`.
 2. For each entry, write `output` with front matter from the map + body from `source`.
@@ -190,9 +190,9 @@ rules:
 
 | Field | Meaning in this framework | Mapping |
 |-------|---------------------------|---------|
-| `scope` | Which core rules are inlined into `CLAUDE.md` | One **H2 section per mapped core rule file that has no non-empty `globs` in the Cursor map** (unambiguous for DHI-526). A rule with non-empty Cursor `globs` (e.g. `eversis-accessibility`) is routed to `.claude/rules/<id>.md` instead — see the `paths` row below. Install profiles may later subset domains; the generator still uses section-per-rule for included ids. |
+| `scope` | Which core rules are inlined into `CLAUDE.md` | One **H2 section per mapped core rule file that has no non-empty `globs` in the Cursor map** (unambiguous for TASK-526). A rule with non-empty Cursor `globs` (e.g. `eversis-accessibility`) is routed to `.claude/rules/<id>.md` instead — see the `paths` row below. Install profiles may later subset domains; the generator still uses section-per-rule for included ids. |
 | `paths` | Glob-scoped rules (Cursor `globs:` equivalent) | `.claude/rules/<id>.md` with a `paths:` frontmatter array, copied 1:1 from the same id's `globs:` in `adapters/cursor/rule-map.yaml` (the Cursor map is the single source of truth for which rules are glob-scoped — the Claude map itself stays free of packaging fields). No longer deferred. |
-| `commands` | How the agent is told to run framework entrypoints | Two surfaces: (1) **instructional** lines inside `CLAUDE.md`'s How-to section (e.g. "load prompt id `eversis-implement`"), and (2) **native** `.claude/commands/eversis-*.md` files — one per `.ai/prompts/{public,internal}/eversis-*.md`, same discovery/deny-list/orphan-cleanup contract as Cursor's `.cursor/commands/`. No longer deferred (was deferred at DHI-526 time; shipped alongside this framework's claude-code-setup work). |
+| `commands` | How the agent is told to run framework entrypoints | Two surfaces: (1) **instructional** lines inside `CLAUDE.md`'s How-to section (e.g. "load prompt id `eversis-implement`"), and (2) **native** `.claude/commands/eversis-*.md` files — one per `.ai/prompts/{public,internal}/eversis-*.md`, same discovery/deny-list/orphan-cleanup contract as Cursor's `.cursor/commands/`. No longer deferred (was deferred at TASK-526 time; shipped alongside this framework's claude-code-setup work). |
 | `.claude/CLAUDE.md` | Consumer-owned project surface | **Not generated.** Seeded once (copy-if-absent) by the installer's `scaffold_project` from `templates/claude-CLAUDE.template.md`, importing `@AGENTS.md` when that file exists. Never regenerated or overwritten — the Claude Code equivalent of Cursor's `eversis-project-stack.mdc`. Closes the AGENTS.md↔Claude Code gap: Claude Code does not auto-read root `AGENTS.md`. |
 
 ### 5.2 Output structure
@@ -244,7 +244,7 @@ rules:
 
 **Maturity:** `placeholder` — richer sketch aligned to public OpenCode docs; **no** full generator required in this wave.
 
-**Materialized (DHI-525):** live stub at [`adapters/opencode/`](../../adapters/opencode/) (`opencode.jsonc` + README) and an identical root `opencode.jsonc`. Field contract below is unchanged — evolve OpenCode packaging in the adapter layer only; do not rewrite `.ai/rules`.
+**Materialized (TASK-525):** live stub at [`adapters/opencode/`](../../adapters/opencode/) (`opencode.jsonc` + README) and an identical root `opencode.jsonc`. Field contract below is unchanged — evolve OpenCode packaging in the adapter layer only; do not rewrite `.ai/rules`.
 
 **References:**
 
@@ -253,7 +253,7 @@ rules:
 
 ### 6.1 Primary config sketch
 
-Hand-maintained placeholder (DHI-525) — committed as **`opencode.jsonc`** (JSONC comments allowed):
+Hand-maintained placeholder (TASK-525) — committed as **`opencode.jsonc`** (JSONC comments allowed):
 
 ```json
 {
@@ -276,17 +276,17 @@ Hand-maintained placeholder (DHI-525) — committed as **`opencode.jsonc`** (JSO
 
 Optional later fields (document as **TBD / deferred**, do not invent proprietary keys):
 
-- Agent mode / permission blocks in `opencode.json` (see OpenCode agents docs) — **out of MVP placeholder** unless DHI-525 expands
-- Ignore files: `.opencodeignore` → see canonical [isolation strategy](./isolation-strategy.md) (DHI-528); triad materialized at repo root (**DHI-529**)
+- Agent mode / permission blocks in `opencode.json` (see OpenCode agents docs) — **out of MVP placeholder** unless TASK-525 expands
+- Ignore files: `.opencodeignore` → see canonical [isolation strategy](./isolation-strategy.md) (TASK-528); triad materialized at repo root (**TASK-529**)
 
 ### 6.2 `AGENTS.md`
 
-OpenCode also supports project `AGENTS.md` as an instructions surface. Framework-wide `AGENTS.md` standardization: canonical standard **[`agents-md-standard.md`](./agents-md-standard.md)** (**DHI-531**); reference fill for this repo **DHI-532**. This placeholder may:
+OpenCode also supports project `AGENTS.md` as an instructions surface. Framework-wide `AGENTS.md` standardization: canonical standard **[`agents-md-standard.md`](./agents-md-standard.md)** (**TASK-531**); reference fill for this repo **TASK-532**. This placeholder may:
 
 - Point OpenCode users at root `AGENTS.md`, and/or
 - Use `instructions` globs only
 
-Do not block DHI-525 on the AGENTS epic; record the dual surface in the emit notes.
+Do not block TASK-525 on the AGENTS epic; record the dual surface in the emit notes.
 
 ### 6.3 Placeholder status block (for install wizard / docs)
 
@@ -307,7 +307,7 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | `placeholder` | Spec + sample config only; wizard must not claim a full adapter |
 | `deferred` | Explicitly out of current adapter MVP |
 
-**Cursor** packaging for mapped rules is available via `adapters/cursor/` (DHI-524). **Claude Code** packaging is available via `adapters/claude/` (DHI-526) — generates root `CLAUDE.md`, `.claude/rules/*.md`, and `.claude/commands/*.md`; the installer additionally links `.claude/skills/` and seeds `.claude/CLAUDE.md` / `.claude/settings.json` (claude-code-setup work, see §2 emit matrix). BA Docs rules may still be temporary Cursor symlinks; full skill/prompt mirrors remain outside adapter MVP emit. Ignore / monorepo isolation: canonical strategy is [`isolation-strategy.md`](./isolation-strategy.md) (DHI-528); ignore triad materialized at repo root (**DHI-529**, and for Claude Code enforced via `.claude/settings.json` `permissions.deny`); monorepo path globs remain **DHI-530**.
+**Cursor** packaging for mapped rules is available via `adapters/cursor/` (TASK-524). **Claude Code** packaging is available via `adapters/claude/` (TASK-526) — generates root `CLAUDE.md`, `.claude/rules/*.md`, and `.claude/commands/*.md`; the installer additionally links `.claude/skills/` and seeds `.claude/CLAUDE.md` / `.claude/settings.json` (claude-code-setup work, see §2 emit matrix). BA Docs rules may still be temporary Cursor symlinks; full skill/prompt mirrors remain outside adapter MVP emit. Ignore / monorepo isolation: canonical strategy is [`isolation-strategy.md`](./isolation-strategy.md) (TASK-528); ignore triad materialized at repo root (**TASK-529**, and for Claude Code enforced via `.claude/settings.json` `permissions.deny`); monorepo path globs remain **TASK-530**.
 
 ---
 
@@ -315,19 +315,19 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 
 | Story | Responsibility |
 |-------|----------------|
-| **DHI-523 (this)** | Mapping specification (this file) + pointer from `.ai/README.md` |
-| **DHI-524** | Cursor generator, `adapters/cursor/`, live `rule-map.yaml`, replace framework symlinks (**done** in this repo for mapped rules) |
-| **DHI-526** | Claude `CLAUDE.md` generator (`adapters/claude/`) — **done** in this repo |
-| **DHI-525** | OpenCode placeholder materialization from §6 (**done** — `adapters/opencode/` + root `opencode.jsonc`) |
-| **DHI-527** | Sync / generation CLI — **done**: `node adapters/sync.mjs` (`--check`, optional `--out`; npm `sync:adapters` / `sync:adapters:check`) |
-| **DHI-535** | MCP skill resolve from `.ai/skills/` |
-| **DHI-528** | Canonical isolation strategy — [`isolation-strategy.md`](./isolation-strategy.md) (**done** in this story’s delivery) |
-| **DHI-529** | Ignore triad materialization (root `.cursorignore` / `.claudeignore` / `.opencodeignore`) — **done** |
-| **DHI-530** | Monorepo area glob scoping (consume isolation strategy) |
-| **DHI-531** | AGENTS.md standard + template — [`agents-md-standard.md`](./agents-md-standard.md) |
-| **DHI-532** | Reference `AGENTS.md` fill for this repository |
+| **TASK-523 (this)** | Mapping specification (this file) + pointer from `.ai/README.md` |
+| **TASK-524** | Cursor generator, `adapters/cursor/`, live `rule-map.yaml`, replace framework symlinks (**done** in this repo for mapped rules) |
+| **TASK-526** | Claude `CLAUDE.md` generator (`adapters/claude/`) — **done** in this repo |
+| **TASK-525** | OpenCode placeholder materialization from §6 (**done** — `adapters/opencode/` + root `opencode.jsonc`) |
+| **TASK-527** | Sync / generation CLI — **done**: `node adapters/sync.mjs` (`--check`, optional `--out`; npm `sync:adapters` / `sync:adapters:check`) |
+| **TASK-535** | MCP skill resolve from `.ai/skills/` |
+| **TASK-528** | Canonical isolation strategy — [`isolation-strategy.md`](./isolation-strategy.md) (**done** in this story’s delivery) |
+| **TASK-529** | Ignore triad materialization (root `.cursorignore` / `.claudeignore` / `.opencodeignore`) — **done** |
+| **TASK-530** | Monorepo area glob scoping (consume isolation strategy) |
+| **TASK-531** | AGENTS.md standard + template — [`agents-md-standard.md`](./agents-md-standard.md) |
+| **TASK-532** | Reference `AGENTS.md` fill for this repository |
 
-**Out of scope for the original DHI-523 mapping-only delivery:** creating live generators, installer, ignore files. Cursor thin slash emit is specified in the emit matrix (DHI-598); full prompt/skill mirrors remain out of adapter scope.
+**Out of scope for the original TASK-523 mapping-only delivery:** creating live generators, installer, ignore files. Cursor thin slash emit is specified in the emit matrix (TASK-598); full prompt/skill mirrors remain out of adapter scope.
 
 ---
 
@@ -335,6 +335,6 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 
 - [ ] Every mapped Cursor rule has `description` and exactly one packaging mode
 - [ ] No packaging YAML written into `.ai/rules/*.md`
-- [x] Claude output is a single `CLAUDE.md` with one H2 per mapped rule (`adapters/claude/`, DHI-526)
-- [x] OpenCode placeholder uses `$schema` + `instructions` and status `placeholder` (materialized: `adapters/opencode/`, DHI-525)
+- [x] Claude output is a single `CLAUDE.md` with one H2 per mapped rule (`adapters/claude/`, TASK-526)
+- [x] OpenCode placeholder uses `$schema` + `instructions` and status `placeholder` (materialized: `adapters/opencode/`, TASK-525)
 - [ ] Emit matrix respected (no silent full `.cursor` tree mirror in MVP)

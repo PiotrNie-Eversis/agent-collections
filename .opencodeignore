@@ -1,5 +1,5 @@
 # .opencodeignore — patterns excluded from OpenCode's file indexing (placeholder maturity).
-# Agent Collections ignore triad (DHI-529). Same path *classes* as
+# Agent Collections ignore triad (TASK-529). Same path *classes* as
 # .cursorignore / .claudeignore; see docs/architecture/isolation-strategy.md §4 / §8.1.
 # Future installer (5.x) should merge missing framework classes — never wipe consumer entries without opt-in.
 

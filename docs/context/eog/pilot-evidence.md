@@ -1,4 +1,4 @@
-# DHI-542 — EOG pilot evidence pack
+# TASK-542 — EOG pilot evidence pack
 
 **Date:** 2026-08-06 (survey) · **Updated:** 2026-08-07 (live install + Phase A/B implement)  
 **Consumer surveyed:** EOG monorepo (local clone)  

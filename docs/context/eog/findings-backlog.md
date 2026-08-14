@@ -20,7 +20,7 @@ Draft notes only. **Do not** auto-create Jira issues without explicit human requ
 
 1. EOG: pin Agent Collections as submodule (SemVer) after Q5.  
 2. ~~EOG: materialize consumer ignore overlay for heavy infra~~ — **cancelled** (misclassified product apps).  
-3. EOG: complete Q5 dual-agent pilot window and attach session outcomes to DHI-542.  
-4. Agent Collections: optional generic heavy-infra excludes in framework area manifests (**6b**) — not DHI-542; must not treat client product trees as infra.  
+3. EOG: complete Q5 dual-agent pilot window and attach session outcomes to TASK-542.  
+4. Agent Collections: optional generic heavy-infra excludes in framework area manifests (**6b**) — not TASK-542; must not treat client product trees as infra.  
 5. Agent Collections: formalize installer interactive agents/profile UX (checkbox/select) + CHANGELOG if not already shipped.
 6. Agent Collections: consider removing `charts/**` from default `area-fullstack.yaml` exclude (generic name collides with consumer apps named `charts`).

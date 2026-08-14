@@ -1,4 +1,4 @@
-# Area profile: fullstack (isolation-strategy §5 / DHI-530)
+# Area profile: fullstack (isolation-strategy §5 / TASK-530)
 id: fullstack
 include:
   - apps/web/**

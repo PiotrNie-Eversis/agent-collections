@@ -1,6 +1,6 @@
 # Architecture design (seed)
 
-> **Seed** from skill `eversis-architecture-designing` (process outline). Full design playbooks arrive in **DHI-520**.
+> **Seed** from skill `eversis-architecture-designing` (process outline). Full design playbooks arrive in **TASK-520**.
 
 ## Process
 

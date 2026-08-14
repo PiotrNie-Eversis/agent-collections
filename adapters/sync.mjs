@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Adapter sync CLI (DHI-527).
+ * Adapter sync CLI (TASK-527).
  * Orchestrates Cursor + Claude generators from core. Zero npm dependencies.
  *
  * Usage (repo root):

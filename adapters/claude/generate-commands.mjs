@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Claude Code slash-command generator (port of adapters/cursor/generate.mjs's
- * DHI-598 command emit, closing F1 from
+ * TASK-598 command emit, closing F1 from
  * docs/specs/claude-code-setup/claude-code-setup.research.md).
  *
  * Discovers .ai/prompts/{public,internal}/eversis-*.md and writes thin

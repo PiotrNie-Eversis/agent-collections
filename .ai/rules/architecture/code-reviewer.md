@@ -5,7 +5,7 @@ Use when running the **Review** prompt (`eversis-review`).
 - Apply orchestration **`testing-and-terminal.md`** for quality commands and evidence.
 - Check against specs under `docs/specs/`, the implementation plan, and `docs/context/` as referenced in the task.
 - Output structured **PASS** / **BLOCKER** / **SUGGESTION** findings.
-- Full review methodology lives in skill **`eversis-code-reviewing`** (package body under `.ai/skills/` after DHI-520; until then resolve via MCP or adapter path).
+- Full review methodology lives in skill **`eversis-code-reviewing`** (package body under `.ai/skills/` after TASK-520; until then resolve via MCP or adapter path).
 
 ## Hard limits (BLOCKER)
 

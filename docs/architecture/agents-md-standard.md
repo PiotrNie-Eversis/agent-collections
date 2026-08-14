@@ -1,8 +1,8 @@
 # AGENTS.md standard
 
-Normative standard for the root **`AGENTS.md`** orientation file in Agent Collections (DHI-531 / BRD WF-04).
+Normative standard for the root **`AGENTS.md`** orientation file in Agent Collections (TASK-531 / BRD WF-04).
 
-**Related:** copyable consumer template [`templates/AGENTS.template.md`](../../templates/AGENTS.template.md). Reference fill for this repository is **DHI-532** (out of scope here). Isolation orientation role: [`isolation-strategy.md`](./isolation-strategy.md) §7.3. OpenCode dual surface note: [`adapter-mapping.md`](./adapter-mapping.md) §6.2.
+**Related:** copyable consumer template [`templates/AGENTS.template.md`](../../templates/AGENTS.template.md). Reference fill for this repository is **TASK-532** (out of scope here). Isolation orientation role: [`isolation-strategy.md`](./isolation-strategy.md) §7.3. OpenCode dual surface note: [`adapter-mapping.md`](./adapter-mapping.md) §6.2.
 
 ## Purpose
 
@@ -91,7 +91,7 @@ Other tools ignore this appendix.
 
 ## Install contract (AC #3)
 
-For future installer / bootstrap (Work Stream 5; **not implemented in DHI-531**):
+For future installer / bootstrap (Work Stream 5; **not implemented in TASK-531**):
 
 | Rule | Detail |
 |------|--------|
@@ -103,12 +103,12 @@ For future installer / bootstrap (Work Stream 5; **not implemented in DHI-531**)
 
 Verification of this story’s AC #3 is by **documented contract + template file**, not by running an installer CLI.
 
-## Boundary with DHI-532
+## Boundary with TASK-532
 
 | Story | Delivers |
 |-------|----------|
-| **DHI-531** (this) | Standard + template + root `AGENTS.md` **restructured** to template shape with placeholders / short pointers |
-| **DHI-532** | Complete **reference** `AGENTS.md` for `agent-collections` (filled areas, maintainer roles, install entry points) |
+| **TASK-531** (this) | Standard + template + root `AGENTS.md` **restructured** to template shape with placeholders / short pointers |
+| **TASK-532** | Complete **reference** `AGENTS.md` for `agent-collections` (filled areas, maintainer roles, install entry points) |
 
 ## Out of scope here
 

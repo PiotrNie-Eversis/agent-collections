@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Non-interactive smoke test for setup-agent-collections.sh (DHI-534 / 538).
+# Non-interactive smoke test for setup-agent-collections.sh (TASK-534 / 538).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

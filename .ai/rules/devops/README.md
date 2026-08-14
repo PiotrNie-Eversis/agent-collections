@@ -8,4 +8,4 @@ Neutral guidance for CI/CD, infrastructure, and operations discipline.
 
 **Testing discipline:** [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md).
 
-**Full devops skill bodies:** **DHI-520**.
+**Full devops skill bodies:** **TASK-520**.

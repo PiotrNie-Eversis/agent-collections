@@ -9,7 +9,7 @@ For maintainers of the **EOG** monorepo. Does not deep-link to any Cursor Collec
 
 ## Steps
 
-1. **Branch** — create a rollback-friendly pilot branch (e.g. `dhi-542-agent-collections-pilot`).
+1. **Branch** — create a rollback-friendly pilot branch (e.g. `task-542-agent-collections-pilot`).
 2. **Pin framework** — prefer Git submodule `vendor/agent-collections` at a SemVer tag of Agent Collections. Solo: export `AGENT_COLLECTIONS_HOME` to a local checkout.
 3. **Install**
 

@@ -6,7 +6,7 @@ When implementation is declared **Fine**, produce a clear, human-friendly QA sum
 
 This contract covers **Implement handoff only** (one ticket comment draft). For full test planning or regression, use the QA workflow prompt/skill (`eversis-qa-workflow`) — do not expand this draft into a full test plan.
 
-The detailed skill package is **`eversis-fine-handoff`** (body lands under `.ai/skills/` in DHI-520). Until then, follow this contract and load the skill via MCP or adapter-resolved path when available.
+The detailed skill package is **`eversis-fine-handoff`** (body lands under `.ai/skills/` in TASK-520). Until then, follow this contract and load the skill via MCP or adapter-resolved path when available.
 
 ## When to run
 

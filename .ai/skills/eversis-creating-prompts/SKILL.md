@@ -116,7 +116,7 @@ Use `./prompt.template.md` for section ordering. Write **`.ai/prompts/public/eve
 
 In repos with **`website/`** and **`sync-prompts`**, write markdown `href` values in the **source** form (see **Dual-context markdown links** below). Sync rewrites them for Docusaurus automatically — do not hand-edit the gitignored copy under `website/docs/prompts/`.
 
-For Cursor `/eversis-<name>` entries, **do not hand-maintain** `.cursor/commands/` siblings. After adding or editing a prompt under `.ai/prompts/`, run **`npm run sync:adapters`** (or `node adapters/cursor/generate.mjs`). The Cursor adapter (DHI-598) emits thin **HYBRID** shims: SSOT pointer + optional embedded `## Executable prompt…` section. Prefer excluding an id via `adapters/cursor/command-deny.yaml` over deleting generated files by hand. Keep workflow authorship in `.ai/prompts/` — regenerate commands after Executable edits.
+For Cursor `/eversis-<name>` entries, **do not hand-maintain** `.cursor/commands/` siblings. After adding or editing a prompt under `.ai/prompts/`, run **`npm run sync:adapters`** (or `node adapters/cursor/generate.mjs`). The Cursor adapter (TASK-598) emits thin **HYBRID** shims: SSOT pointer + optional embedded `## Executable prompt…` section. Prefer excluding an id via `adapters/cursor/command-deny.yaml` over deleting generated files by hand. Keep workflow authorship in `.ai/prompts/` — regenerate commands after Executable edits.
 
 ## Dual-context markdown links
 

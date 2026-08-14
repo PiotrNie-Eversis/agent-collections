@@ -40,10 +40,10 @@ Copy the approved text from the draft and paste it into the Jira issue's **Add c
 
 If you have the Atlassian MCP configured in your workspace, you can ask the agent to post after you have approved the text:
 
-> Post the comment above to DHI-396 on eversis.atlassian.net.
+> Post the comment above to TASK-396 on eversis.atlassian.net.
 
 The agent then calls `addCommentToJiraIssue` with:
-- `issueIdOrKey` — the ticket key you specify (e.g. `DHI-396`)
+- `issueIdOrKey` — the ticket key you specify (e.g. `TASK-396`)
 - `commentBody` — the **approved** text, verbatim
 - `cloudId` — resolved from `getAccessibleAtlassianResources` or derived from the site URL you provide (the agent will not invent this)
 - `contentFormat: "markdown"` when supported

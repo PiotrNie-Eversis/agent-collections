@@ -1,4 +1,4 @@
-# Domain profile: fullstack (DHI-536)
+# Domain profile: fullstack (TASK-536)
 id: fullstack
 description: Full domain set + default monorepo area scoping (fullstack)
 domains:

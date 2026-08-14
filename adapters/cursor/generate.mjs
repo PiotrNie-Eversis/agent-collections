@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Cursor adapter generator (DHI-524 rules + DHI-598 slash commands).
+ * Cursor adapter generator (TASK-524 rules + TASK-598 slash commands).
  * - Reads adapters/cursor/rule-map.yaml → .cursor/rules/*.mdc from .ai/rules
  * - Discovers .ai/prompts/{public,internal}/eversis-*.md → thin HYBRID
  *   shims under .cursor/commands/ (pointer + optional Executable section)

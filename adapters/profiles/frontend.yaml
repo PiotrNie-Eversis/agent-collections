@@ -1,4 +1,4 @@
-# Domain profile: frontend (DHI-536)
+# Domain profile: frontend (TASK-536)
 # Maps to domain rule folders + skill allowlist. Consumed by installer — not hardcoded in bash.
 id: frontend
 description: Frontend-oriented domain content (shared-types + orchestration + frontend)

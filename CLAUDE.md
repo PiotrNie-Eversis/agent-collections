@@ -9,7 +9,7 @@
 - Resolve skills via MCP (`eversis_skills_get` / `eversis_skills_list`) when available; otherwise read `.ai/skills/<id>/SKILL.md`.
 - Do **not** expect `.cursor/commands` or Cursor `@` attachment as the only entry — those are Cursor-channel packaging.
 - Prefer backend / system-layer trees for CLI work; do **not** load Cursor-specific packaging (`.cursor/rules/*.mdc`, slash commands) for standards — this file is the Claude Code instruction surface.
-- Full ignore-file / monorepo path isolation (`.claudeignore`, `claudeMdExcludes`) is **deferred** to DHI-528–530; until then, stay in the relevant package tree and avoid unrelated frontend/tool config when possible.
+- Full ignore-file / monorepo path isolation (`.claudeignore`, `claudeMdExcludes`) is **deferred** to TASK-528–530; until then, stay in the relevant package tree and avoid unrelated frontend/tool config when possible.
 
 ## eversis-agent-core
 
@@ -104,7 +104,7 @@ Use when running the **Implement** prompt (`eversis-implement`) or acting as the
 
 ## Canonical workflow
 
-Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` after DHI-520 / adapter resolution). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
+Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` after TASK-520 / adapter resolution). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
 
 ## Human gates
 
@@ -154,7 +154,7 @@ Use when running the **Review** prompt (`eversis-review`).
 - Apply orchestration **`testing-and-terminal.md`** for quality commands and evidence.
 - Check against specs under `docs/specs/`, the implementation plan, and `docs/context/` as referenced in the task.
 - Output structured **PASS** / **BLOCKER** / **SUGGESTION** findings.
-- Full review methodology lives in skill **`eversis-code-reviewing`** (package body under `.ai/skills/` after DHI-520; until then resolve via MCP or adapter path).
+- Full review methodology lives in skill **`eversis-code-reviewing`** (package body under `.ai/skills/` after TASK-520; until then resolve via MCP or adapter path).
 
 ## Hard limits (BLOCKER)
 
@@ -176,7 +176,7 @@ When implementation is declared **Fine**, produce a clear, human-friendly QA sum
 
 This contract covers **Implement handoff only** (one ticket comment draft). For full test planning or regression, use the QA workflow prompt/skill (`eversis-qa-workflow`) — do not expand this draft into a full test plan.
 
-The detailed skill package is **`eversis-fine-handoff`** (body lands under `.ai/skills/` in DHI-520). Until then, follow this contract and load the skill via MCP or adapter-resolved path when available.
+The detailed skill package is **`eversis-fine-handoff`** (body lands under `.ai/skills/` in TASK-520). Until then, follow this contract and load the skill via MCP or adapter-resolved path when available.
 
 ## When to run
 
@@ -285,7 +285,7 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 
 | Item | Convention |
 |------|------------|
-| Folder | `docs/specs/<issue-kebab>/` (e.g. `docs/specs/dhi-522/`) |
+| Folder | `docs/specs/<issue-kebab>/` (e.g. `docs/specs/task-522/`) |
 | Research | `<issue-kebab>.research.md` — before plan when Full / SDD applies |
 | Plan | `<issue-kebab>.plan.md` — before implementation when Full / SDD applies |
 | Optional | `*.plan-review.md`, manifests, inventory notes as the story requires |
@@ -302,7 +302,7 @@ Do **not** start implementation without approved research and plan artifacts whe
 ```text
 ## Delivery Standard
 
-This story follows full spec-driven development (mandatory under Agent Collections / epic DHI-515 when applicable).
+This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
 
 * Spec folder: docs/specs/<issue-kebab>/
 * Research: <issue-kebab>.research.md — required before plan
