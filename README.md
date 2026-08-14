@@ -179,7 +179,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 | Mode | Flag | Notes |
 |------|------|-------|
 | **Local** | (default) | Framework stays outside the consumer repo; set `AGENT_COLLECTIONS_HOME` |
-| **Submodule** | `--vendor submodule` | **EOG / team default** — teammates: `git submodule update --init --recursive` |
+| **Submodule** | `--vendor submodule` | **TASK / team default** — teammates: `git submodule update --init --recursive` |
 | **Copy** | `--vendor copy` | Vendors tree under `vendor/agent-collections/` |
 
 Useful flags: `--collections-home`, `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`, `--build-mcp` (force MCP rebuild).

@@ -125,7 +125,7 @@ Profiles describe **path scope**, not tool assignment.
 | **Light shared** | `docs/**`, `scripts/**`, narrow `packages/**` (types, small shared libs) | **Include** with the active area profile (cheap orientation / contracts) |
 | **Heavy infra** | Helm/K8s chart trees, DB data volumes, nginx/HAProxy/mail/load-test stacks, large binary dumps | **Exclude** via **consumer overlay** when those paths are true sidecars — not product apps |
 
-The abstract name `charts/**` is **not** in default area profile excludes: some consumers mount application code under a directory literally named `charts/`. Use a consumer ignore overlay for genuine infra trees (see `docs/context/eog/` pilot notes).
+The abstract name `charts/**` is **not** in default area profile excludes: some consumers mount application code under a directory literally named `charts/`. This was confirmed empirically during a consumer pilot — `charts/` and handbook trees there turned out to be product apps, not infra sidecars — so use a consumer ignore overlay for genuine infra trees instead of a blanket framework exclude.
 
 Consumers may loosen heavy-infra excludes for dedicated DevOps sessions; the **default** protects the WNF-03 reduction target.
 

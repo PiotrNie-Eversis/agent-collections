@@ -18,7 +18,7 @@ Stay on Cursor Collections if your org only needs Cursor-only packaging and has 
 ## Prerequisites
 
 1. Pin a **SemVer tag** of `agent-collections` (or a known commit) for the pilot.
-2. Prefer **vendor submodule** for team repos (EOG default); local path is fine for individual developers.
+2. Prefer **vendor submodule** for team repos (recommended team default); local path is fine for individual developers.
 3. Inventory consumer customizations: project stack rule, `AGENTS.md`, `docs/context/`, MCP servers beyond collections, ignore overlays.
 4. Note current env: `CURSOR_COLLECTIONS_HOME` and any `setup-cursor-local.sh` automation.
 
@@ -80,7 +80,7 @@ Framework area profiles use **abstract** paths (`apps/web/**`, `apps/api/**`). C
 
 Rollback does **not** require deleting the Agent Collections clone on disk.
 
-## EOG-oriented upgrade runbook (legacy → Agent Collections)
+## Enterprise-oriented upgrade runbook (legacy → Agent Collections)
 
 Typical enterprise cutover from `setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`:
 
@@ -91,9 +91,9 @@ Typical enterprise cutover from `setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HO
 5. Measure WNF-03 with the §7.2 proxy (file count or approx tokens) for scoped vs unscoped — target ≥30% reduction or record a justified estimate + improvement plan.
 6. Feed findings back into this guide and optional `docs/context/` notes — **without** linking to a Cursor Collections docs portal.
 
-**Pilot snapshot (2026-08-07):** In-repo notes and a file-count proxy for an EOG-class layout are under [`docs/context/eog/`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/context/eog/README.md). Measured proxy reductions for frontend≈portal and backend≈cms were **above 30%** vs full monorepo unscoped file count. Live **local** installer + MCP `AGENT_COLLECTIONS_HOME` cutover and consumer **2a** infra overlay are recorded in the evidence pack; **Q5 dual-agent sessions** start **2026-08-10**; submodule SemVer pin remains a post-Q5 residual.
+**Pilot snapshot (2026-08-07):** A file-count proxy for a portal/cms-class monorepo layout measured frontend≈portal and backend≈cms proxy reductions **above 30%** vs full monorepo unscoped file count. Live **local** installer + MCP `AGENT_COLLECTIONS_HOME` cutover and consumer **2a** infra overlay were recorded in the pilot's evidence pack; **Q5 dual-agent sessions** start **2026-08-10**; submodule SemVer pin remains a post-Q5 residual.
 
-Pilot measurement templates and residual out-of-repo steps: see `docs/context/eog/` in this repository.
+Pilot measurement templates and evidence are kept locally by the consumer team, not published in this repository.
 
 ## Anti-patterns
 

@@ -12,6 +12,6 @@ By default this folder is committed like any other project doc. Projects install
 
 ## Framework repository (`agent-collections`)
 
-This repo does not apply `--gitignore-agent-artifacts` to itself — `docs/context/*/` subfolders here (e.g. `agent-collections/`) are committed as reference material, unlike a consumer project that opts into the local-only pattern.
+This repo applies the same local-only pattern to itself that `--gitignore-agent-artifacts` gives consumer projects — `docs/context/*/` subfolders here (e.g. `agent-collections/`, `eog/`) are gitignored; only this `README.md` stays tracked. Same treatment already applied to `docs/specs/*/` (see `CHANGELOG.md`).
 
 **Consumer projects** may commit `docs/context/` by default, or opt in to gitignoring `docs/context/*/` subfolders with `--gitignore-agent-artifacts`.

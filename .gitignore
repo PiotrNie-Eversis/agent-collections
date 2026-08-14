@@ -7,6 +7,9 @@
 # Agent specs / research / plan — local only (MVP)
 docs/specs/*/
 
+# Agent context subfolders — local only (README stays tracked)
+docs/context/*/
+
 # MCP package
 mcp/eversis-collections-mcp/node_modules/
 mcp/eversis-collections-mcp/dist/
