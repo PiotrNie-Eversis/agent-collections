@@ -1,4 +1,4 @@
-# Plans (`docs/plans/`)
+# plans
 
 Optional location for **flat implementation plans** as `*.md` files (scope, rationale, steps, risks).
 

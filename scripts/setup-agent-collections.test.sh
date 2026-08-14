@@ -45,6 +45,8 @@ grep -q 'AGENT_COLLECTIONS_HOME' "${TARGET}/.cursor/mcp.json" \
 [[ -f "${TARGET}/AGENTS.md" ]] || { echo "FAIL: missing AGENTS.md"; exit 1; }
 [[ -f "${TARGET}/.agent-collections/area-profile.txt" ]] || { echo "FAIL: missing area profile"; exit 1; }
 grep -q 'frontend-scope' "${TARGET}/.agent-collections/area-profile.txt"
+[[ -f "${TARGET}/docs/context/README.md" ]] || { echo "FAIL: missing docs/context/README.md"; exit 1; }
+[[ -f "${TARGET}/docs/plans/README.md" ]] || { echo "FAIL: missing docs/plans/README.md"; exit 1; }
 
 # --agents=claude, vendored (--vendor=copy) — exercises Phases A/B/D of the
 # claude-code-setup plan: .mcp.json (not .cursor/mcp.json), and CLAUDE.md

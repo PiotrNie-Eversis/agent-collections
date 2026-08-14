@@ -28,8 +28,8 @@ AGENTS_EOF
     log_info "AGENTS.md already exists — not overwritten (project-owned)."
   fi
 
-  if [[ ! -d "$specs_dir" ]]; then
-    mkdir -p "$specs_dir"
+  mkdir -p "$specs_dir"
+  if [[ ! -f "$specs_readme" ]]; then
     cat > "$specs_readme" <<'README_EOF'
 # specs
 
@@ -43,14 +43,44 @@ docs/specs/my-feature/
   my-feature.plan.md
 ```
 README_EOF
-    log_ok "Created docs/specs/ directory."
+    log_ok "Created docs/specs/README.md."
   fi
 
-  for d in docs/context docs/plans; do
-    if [[ ! -d "${target}/${d}" ]]; then
-      mkdir -p "${target}/${d}"
-    fi
-  done
+  local context_dir="${target}/docs/context"
+  local context_readme="${context_dir}/README.md"
+  mkdir -p "$context_dir"
+  if [[ ! -f "$context_readme" ]]; then
+    cat > "$context_readme" <<'README_EOF'
+# context
+
+Internal knowledge for this project: architecture notes, ADRs, wiki sync exports, onboarding. Use clear filenames under `docs/context/<project>/`.
+
+**Task baseline (workshop continuity):** `docs/context/<project>/task-baseline.md` — optional epic/story index refreshed after a successful Jira push from prompt `eversis-analyze-materials`.
+
+Referenced by research/plan steps. Attach it by path in your tool (e.g. Cursor `@docs/context/<project>/`).
+
+Part of the project deliverables triad with [`docs/plans/`](../plans/) and [`docs/specs/`](../specs/).
+
+By default this folder is committed like any other project doc. Projects installed with `--gitignore-agent-artifacts` gitignore `docs/context/*/` subfolders instead (local baselines/exports stay off git); only this `README.md` stays tracked in that mode.
+README_EOF
+    log_ok "Created docs/context/README.md."
+  fi
+
+  local plans_dir="${target}/docs/plans"
+  local plans_readme="${plans_dir}/README.md"
+  mkdir -p "$plans_dir"
+  if [[ ! -f "$plans_readme" ]]; then
+    cat > "$plans_readme" <<'README_EOF'
+# plans
+
+Optional location for **flat implementation plans** as `*.md` files (scope, rationale, steps, risks).
+
+Prefer the Implement workflow under `docs/specs/<issue-kebab>/*.plan.md` (with `*.research.md` / `*.plan-review.md`) — see [`docs/specs/README.md`](../specs/README.md).
+
+Use `docs/plans/` only for legacy or ad-hoc flat plans when the team chooses not to use a specs folder.
+README_EOF
+    log_ok "Created docs/plans/README.md."
+  fi
 
   _seed_claude_project_md "$target" "$agents_dst"
 }
