@@ -1,8 +1,8 @@
 # Cross-tool ignore and scoping strategy
 
 **Status:** Canonical (committed)  
-**Story:** [TASK-528](https://eversis.atlassian.net/browse/TASK-528) (Work Stream 3 / Story 3.1)  
-**Audience:** Implementers of synchronized ignore files (TASK-529), monorepo area globs (TASK-530), install profiles (5.x), and later WNF-03 validation (TASK-542)
+**Story:** Work Stream 3 / Story 3.1  
+**Audience:** Implementers of synchronized ignore files, monorepo area globs, install profiles (5.x), and later WNF-03 validation
 
 This document is the **single source of truth** for how Agent Collections isolates AI context in multi-tool, multi-area monorepos. It defines **what each tool indexes or excludes**, how **area profiles** map to path globs, and how to target **context reduction without losing project orientation**.
 
@@ -18,8 +18,8 @@ Isolation has **two independent axes**:
 
 | Axis | Meaning | Follow-on |
 |------|---------|-----------|
-| **Cross-tool packaging** | When more than one agent is installed, each tool must not index the others’ packaging surfaces | [TASK-529](https://eversis.atlassian.net/browse/TASK-529) ignore triad |
-| **Area / path scoping** | Sessions can narrow to `frontend-scope`, `backend-scope`, or `fullstack` via path profiles — **independent of which tool(s) the user chose** | [TASK-530](https://eversis.atlassian.net/browse/TASK-530) (+ install profiles 5.3) |
+| **Cross-tool packaging** | When more than one agent is installed, each tool must not index the others’ packaging surfaces | Ignore triad — see §8.1 below |
+| **Area / path scoping** | Sessions can narrow to `frontend-scope`, `backend-scope`, or `fullstack` via path profiles — **independent of which tool(s) the user chose** | Monorepo area glob scoping — see §8.2 below (+ install profiles 5.3) |
 
 ```text
 Monorepo (abstract reference layout)
@@ -68,7 +68,7 @@ Consumers rename folders freely. Map local names onto the abstract classes above
 
 ## 4. Cross-tool packaging matrix
 
-When a tool is **installed**, it indexes its **own** packaging and must **exclude** packaging owned by other tools (and always exclude secrets/build). Exact ignore syntax lands in TASK-529; classes below are the contract.
+When a tool is **installed**, it indexes its **own** packaging and must **exclude** packaging owned by other tools (and always exclude secrets/build). Exact ignore syntax lands in the ignore triad (§8.1); classes below are the contract.
 
 | Path class | Cursor | Claude Code | OpenCode (placeholder) |
 |------------|--------|-------------|------------------------|
@@ -103,9 +103,9 @@ Profiles describe **path scope**, not tool assignment.
 | `backend-scope` | `apps/api/**`, narrow shared `packages/**` needed by the API, light shared | `apps/web/**`, heavy infra, other-tool packaging |
 | `fullstack` | `apps/web/**` + `apps/api/**` + light shared + relevant `packages/**` | heavy infra (unless the consumer explicitly relaxes), other-tool packaging |
 
-**Notes for TASK-530 / install profiles:**
+**Notes for monorepo area glob scoping / install profiles:**
 
-- Cursor may express area scope via additional `globs` / ignore patterns; today’s adapter `rule-map.yaml` often uses **file-type** globs (`**/*.tsx`) — monorepo **path** globs are a separate concern owned by this strategy + TASK-530.
+- Cursor may express area scope via additional `globs` / ignore patterns; today’s adapter `rule-map.yaml` often uses **file-type** globs (`**/*.tsx`) — monorepo **path** globs are a separate concern owned by this strategy + monorepo area glob scoping (§8.2).
 - Claude Code enforces path exclusion via `permissions.deny` in `.claude/settings.json` — **not** `.claudeignore` itself, which Claude Code never reads (confirmed unsupported: [anthropics/claude-code#579](https://github.com/anthropics/claude-code/issues/579), [#4160](https://github.com/anthropics/claude-code/issues/4160)). The installer generates `permissions.deny` from `.claudeignore`'s path classes (`scripts/lib/setup-agent-collections/claude-settings-merge.sh`) so the triad stays the single source of truth for classes (§8.1) while the actually-enforced mechanism is host-native. File-type glob scoping (the `globs:` equivalent) uses `.claude/rules/*.md` with a `paths:` frontmatter key, generated for any rule that carries non-empty `globs` in the Cursor map.
 - OpenCode placeholder uses `instructions` for `.ai/rules`; application tree scoping still follows ignore + consumer profile.
 
@@ -141,14 +141,14 @@ AI tools load repository material into a limited context window. Unscoped loadin
 
 ### 7.2 Estimation method (this story)
 
-Until empirical validation (TASK-542):
+Until empirical validation (see §8.3):
 
 1. Define **unscoped set** \(U\): application + packages + docs + scripts + infra trees typically visible without isolation (exclude only secrets/build/`node_modules` if already ignored).
 2. Define **scoped set** \(S\): paths allowed by the active area profile + light shared + own-tool packaging − other-tool packaging − heavy infra.
 3. Proxy reduction ≈ \(1 - |S|/|U|\) using file count, tree size, or approximate token weight of text files — document which proxy was used.
 4. Design ignore patterns and profile globs so typical `frontend-scope` / `backend-scope` land in the **30–50%** band on the abstract layout. Adjust class membership (especially heavy infra) if estimates fall short.
 
-**Empirical proof** on a live consumer install is **TASK-542**, not this document.
+**Empirical proof** on a live consumer install is tracked separately (§8.3), not this document.
 
 ### 7.3 Orientation without noise
 
@@ -156,7 +156,7 @@ Reduction must **cut noise**, not erase project orientation. Keep a small, dense
 
 | Layer | Role | Token posture |
 |-------|------|----------------|
-| **`AGENTS.md`** (TASK-531 / TASK-532) | Monorepo map, roles, framework entry points | Small, high value |
+| **`AGENTS.md`** | Monorepo map, roles, framework entry points | Small, high value |
 | **Always-on / orchestration rules** | How to work (gates, quality, handoff) | Bounded instruction set |
 | **Active area tree** | Code relevant to the task | Where most useful tokens go |
 | **Light shared** | Docs, scripts, narrow packages | Cheap shared orientation |
@@ -169,11 +169,11 @@ Reduction must **cut noise**, not erase project orientation. Keep a small, dense
 
 ## 8. Contracts for follow-on stories
 
-### 8.1 TASK-529 — Synchronized ignore files
+### 8.1 Synchronized ignore files
 
-**Status:** Materialized in this repository’s **root** as `.cursorignore`, `.claudeignore`, and `.opencodeignore` (TASK-529). Hand-maintained triad — same path **classes**, tool-idiomatic syntax. No generator / no `adapters/sync.mjs` involvement.
+**Status:** Materialized in this repository’s **root** as `.cursorignore`, `.claudeignore`, and `.opencodeignore`. Hand-maintained triad — same path **classes**, tool-idiomatic syntax. No generator / no `adapters/sync.mjs` involvement.
 
-**Scope of the framework-repo triad:** §4 cross-tool packaging + secrets/build only. **Heavy-infra** (§6) and abstract `apps/**` area excludes are **not** in the root triad (consumer / TASK-530). Align §6 defaults in consumer profiles or later templates when ignore is the right mechanism.
+**Scope of the framework-repo triad:** §4 cross-tool packaging + secrets/build only. **Heavy-infra** (§6) and abstract `apps/**` area excludes are **not** in the root triad (consumer follow-up — see §8.2). Align §6 defaults in consumer profiles or later templates when ignore is the right mechanism.
 
 **Installer contract (5.2 / Q5):** Framework classes are merge-friendly (labeled sections). A future installer **merges missing** framework entries into consumer ignore files and **must not wipe** consumer-owned content without explicit opt-in (same rule as project-owned stack files).
 
@@ -190,7 +190,7 @@ Reduction must **cut noise**, not erase project orientation. Keep a small, dense
 | Heavy-infra / `apps/**` area paths | **Absent** in framework root | **Absent** | **Absent** |
 
 Implementer check: after edits, confirm the three files still encode the same classes (not necessarily identical line text).
-### 8.2 TASK-530 — Monorepo area glob scoping
+### 8.2 Monorepo area glob scoping
 
 Deliver profile-driven path scoping that:
 
@@ -201,12 +201,12 @@ Deliver profile-driven path scoping that:
 
 ### 8.3 Related (not this story)
 
-| Story | Role |
+| Item | Role |
 |-------|------|
-| **TASK-531** | `AGENTS.md` standard + template — [`agents-md-standard.md`](./agents-md-standard.md) |
-| **TASK-532** | Reference `AGENTS.md` fill for this repository (orientation layer body) |
-| **TASK-542** | Empirical WNF-03 validation on a consumer install; migration notes as needed |
-| **TASK-523** | Adapter emit mapping — see [`adapter-mapping.md`](./adapter-mapping.md); ignore deferred here |
+| **AGENTS.md standard** | `AGENTS.md` standard + template — [`agents-md-standard.md`](./agents-md-standard.md) |
+| **AGENTS.md reference fill** | Reference `AGENTS.md` fill for this repository (orientation layer body) |
+| **Empirical WNF-03 validation** | On a consumer install; migration notes as needed |
+| **Adapter mapping** | Adapter emit mapping — see [`adapter-mapping.md`](./adapter-mapping.md); ignore deferred here |
 
 ---
 
@@ -214,9 +214,9 @@ Deliver profile-driven path scoping that:
 
 | Item | Status |
 |------|--------|
-| This document (`isolation-strategy.md`) | **TASK-528** deliverable |
-| Root ignore triad materialization | **TASK-529** — **done** (root triad + §8.1 checklist) |
-| Live monorepo path globs / profile wiring | **TASK-530** |
+| This document (`isolation-strategy.md`) | Canonical isolation strategy specification |
+| Root ignore triad materialization | **done** (root triad + §8.1 checklist) |
+| Live monorepo path globs / profile wiring | Follow-up (§8.2) |
 | Changing `adapters/*/rule-map.yaml` for path globs in this story | **Out of scope** |
 | Installer / wizard | **5.x** |
 | Embedding internal project names in framework docs | **Forbidden** (§2) |
