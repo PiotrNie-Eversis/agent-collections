@@ -36,6 +36,7 @@
       "Bash(yarn test *)",
       "Bash(yarn tsc *)",
       "Bash(yarn jest *)",
+      "Bash(yarn lint *)",
       "Bash(bun run *)",
       "Bash(bun test *)",
       "Bash(npx *)",
