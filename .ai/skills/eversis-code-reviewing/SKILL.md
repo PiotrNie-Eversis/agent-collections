@@ -1,6 +1,6 @@
 ---
 name: eversis-code-reviewing
-description: Perform code review. Quality analysis. Acceptance criteria verification. Best practices review.
+description: Performs the Agent Collections Review stage — verifies implemented code against the task's `*.research.md`/`*.plan.md`, acceptance criteria, and the three STRICT FORBIDDEN constraints (scope, documentation comments, dependencies), then runs the project's unit/integration/e2e tests. Use when reviewing code inside an Agent Collections Implement/Review session (via the `eversis-review` prompt) or when spec/plan-driven verification against acceptance criteria is needed. Do NOT use for a quick ad-hoc diff review, `--fix` auto-remediation, or inline PR comments outside this workflow — use the general-purpose `code-review` skill for that instead.
 ---
 
 # Code review
