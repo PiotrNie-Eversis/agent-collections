@@ -1,6 +1,6 @@
 ---
 name: eversis-creating-skills
-description: "Create new Cursor Agent Skills (SKILL.md) under .ai/skills/eversis-*. Provides naming (gerund), description, body structure, progressive disclosure, templates, validation. For Agent Collections."
+description: "Create new Agent Skills (SKILL.md) under .ai/skills/eversis-*. Provides naming (gerund), description, body structure, progressive disclosure, templates, validation. For Agent Collections."
 user-invokable: false
 ---
 
@@ -8,7 +8,7 @@ user-invokable: false
 
 Creates well-structured **skill packages** (`SKILL.md`) for **Agent Collections** (and compatible hosts / adapters). Skills live under **`.ai/skills/eversis-<gerund>/SKILL.md`** in this monorepo. Enforce naming, structure, and progressive disclosure per the same conventions as the broader Agent Skills ecosystem.
 
-**Consumption in this framework:** the canonical way to **list, read, and validate** these packages in Cursor Agent is the **`eversis-collections` MCP** server under **`mcp/eversis-collections-mcp/`** (build with `npm install && npm run build`, then enable it via `.cursor/mcp.json`). Use **`eversis_skills_*` tools** — do not register the `.ai/skills/` folder under Cursor’s **Agent Skills** settings; that path is not part of the supported workflow here.
+**Consumption in this framework:** skills are consumed through the current host's native mechanism (e.g. Claude Code discovers `.ai/skills/eversis-*` natively via symlinked `.claude/skills/`, no MCP involved), or through the **`eversis-collections` MCP** server under **`mcp/eversis-collections-mcp/`** (build with `npm install && npm run build`, then enable it via `.cursor/mcp.json`) and its **`eversis_skills_*` tools** — which channel applies depends on the adapter in use.
 
 When a skill needs **deterministic automation** (e.g. validation, code generation), add a script under that skill’s `scripts/` and register a **narrow** allowlist entry in [`mcp/eversis-collections-mcp/`](../../../mcp/eversis-collections-mcp/) (exposed as **`eversis_skill_run_script`**) so the agent invokes execution instead of re-deriving steps from text. This skill’s example is script key **`eversis-creating-skills-skill-md-stats`** (JSON line counts and frontmatter flag for this folder’s `SKILL.md`). Run **`eversis_skills_validate`** in CI (see repository workflow **`eversis_skills_validate`**) or `npm run validate` in the MCP package.
 

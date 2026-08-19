@@ -53,5 +53,3 @@ You are helping the user add a **new role** to their agent setup (core under `.a
 3. Propose a **single-purpose** `.mdc` file; avoid duplicating `eversis-agent-core.mdc`.
 4. After authoring, self-review: globs correct, `description` accurate, no conflicting always-on rules.
 5. If the user’s message is incomplete, ask clarifying questions before writing files.
-
-<!-- Cursor Collections -->

@@ -11,7 +11,7 @@ prompt_description: "Create or extend project instructions for Cursor: AGENTS.md
 **Role:** [Cursor customization orchestrator](../../../website/docs/agents/cursor-customization-orchestrator.md)  
 **File:** `.ai/prompts/public/eversis-create-custom-instructions.md`
 
-Helps the user encode **project-wide instructions** for **Cursor**: primarily **[AGENTS.md](../../../AGENTS.md)** and **`.cursor/rules/*.mdc`**. Optional: scoped **`RULE.md`** in subfolders (Cursor-supported patterns). **Do not** target GitHub Copilot `copilot-instructions.md` — this repository is Cursor-only.
+Helps the user encode **project-wide instructions** for Agent Collections: primarily **[AGENTS.md](../../../AGENTS.md)** and **`.ai/rules/`** (the Cursor adapter may additionally emit **`.cursor/rules/*.mdc`**). Optional: scoped **`RULE.md`** in subfolders. **Do not** target GitHub Copilot `copilot-instructions.md` — this framework has no Copilot channel.
 
 ## Usage
 
@@ -46,5 +46,3 @@ Updated **`AGENTS.md`** and/or **`.cursor/rules/eversis-*.mdc`** (and optional `
 2. Prefer **one** always-on core rule plus stack-specific `eversis-project-stack.mdc` — avoid ten overlapping always-apply files.
 3. Instructions must be **actionable** for the model (clear imperatives, paths to tests, “never do X” where needed).
 4. Never instruct the user to add `.github/prompts` or Copilot — those are not part of this framework.
-
-<!-- Cursor Collections -->

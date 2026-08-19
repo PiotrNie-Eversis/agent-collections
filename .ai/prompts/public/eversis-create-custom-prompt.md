@@ -44,5 +44,3 @@ A new **`.ai/prompts/public/eversis-*.md`** (or **`internal/eversis-*.md`**) fil
 2. Use **`.ai/prompts/public/eversis-implement.md`** (or another prompt) as a structural reference for sections and “Executable prompt” blocks.
 3. For routing in narrative text, refer to **conceptual roles** and **`.ai/rules/`** — not to deleted Copilot agent IDs.
 4. Add the new file to the docs sidebar if this monorepo publishes the site (`sidebars.ts`).
-
-<!-- Cursor Collections -->
