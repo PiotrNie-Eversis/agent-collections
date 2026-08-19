@@ -23,3 +23,6 @@ website/.docusaurus/
 # IDEs
 .vscode/
 .idea/
+
+# macOS
+.DS_Store
