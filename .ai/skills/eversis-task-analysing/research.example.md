@@ -53,3 +53,11 @@ All missing information and gaps in task description, together with provided ans
 ### Question 2
 #### <question>
 <answer>
+
+## Human gates
+
+Numbered list of every human-approval gate this task passes through, in order. Strike through a gate once closed, and quote the user's literal closing phrase — do not paraphrase — as evidence:
+
+1. Approve research
+2. Approve plan (once written)
+3. Implement → Review → Fine

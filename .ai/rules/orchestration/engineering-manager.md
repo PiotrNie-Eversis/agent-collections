@@ -32,8 +32,9 @@ Optional fifth line: `- **Reason:** …`
 
 **Self-check before treating a mid-thread gate as cleared:**
 
-1. Does the user's message **directly respond to the specific gate** that was declared (not a different, earlier question)?
-2. If proposing a flow or gate change (e.g., Quick Flow instead of a previously-declared Full-Flow gate), did I **stop** instead of also acting on it in this same turn?
+1. Does the user's message **directly respond to the specific gate** that was declared (not a different, earlier question, and not a message sent before that gate existed)?
+2. If I just declared **any** `Next gate` in this turn — not only a flow/gate change proposal — did I **stop** there, instead of also acting on it (implementing, delegating, or otherwise progressing) in this same turn?
+3. If the answer to #1 isn't a clean yes **and the reply is plausibly an uncertain approval attempt**, did I **ask an explicit clarifying question** instead of proceeding on a plausible reading? (Not needed when the reply is clearly something else — a question, a requested change, a clarification — just handle it directly and leave the gate open.)
 
 See orchestration skill **Gate-closing rule** for the full rule.
 

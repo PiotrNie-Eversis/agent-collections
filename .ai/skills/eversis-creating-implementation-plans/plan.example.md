@@ -213,6 +213,14 @@ Potential improvements identified during planning that are not part of the curre
 
 - <improvement description>
 
+## Human gates
+
+Numbered list of every human-approval gate this task passes through, in order. Strike through a gate once closed, and quote the user's literal closing phrase — do not paraphrase — as evidence:
+
+1. ~~Approve research~~ — done (`<exact quote>`)
+2. Approve this plan
+3. Implement → Review → Fine
+
 ## Changelog
 
 | Date   | Change Description   |

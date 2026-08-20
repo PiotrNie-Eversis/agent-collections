@@ -101,9 +101,9 @@ Before creating artifacts, delegating, or writing product code, inspect `docs/sp
 
 A declared `Next gate` closes only when the user's next message **directly responds to that specific gate** — not merely because the user replied to something else in the thread (e.g., locking research Gap Analysis answers closes the *research* gate, not a later Plan or Quick Flow gate).
 
-- If recommending Quick Flow as a substitute for an already-declared Full-Flow gate — or any other flow/gate reclassification mid-thread — **state the proposal and stop**. Do not perform any implementation action, file edit, or delegation in that same turn.
-- Treat only an explicit answer to that proposal in the user's **next** turn as the acceptance signal — not silence, not an unrelated reply, not the absence of objection.
-- Applies to every declared gate in a thread (Plan, code, Quick Flow acceptance, review→Fine), not only the readiness block in the first response.
+- **Once a `Next gate` is declared, stop — every time, not only for Quick Flow reclassification.** Do not perform any implementation action, file edit, delegation, or further workflow progression in that same turn or response, regardless of what user message initiated this turn — including a message that correctly triggered writing the very artifact the new gate now covers (e.g., an instruction to write a plan is not retroactive approval to implement it once written). Applies to every declared gate in a thread (Plan, code, Quick Flow acceptance, review→Fine), not only the readiness block in the first response.
+- Treat only an explicit answer to the declared gate, arriving in the user's **next** turn *after* that gate was declared, as the acceptance signal — not silence, not an unrelated reply, not a message sent before the gate existed, not the absence of objection.
+- **When the self-check's answer isn't a clean yes, ask before proceeding — but only for a plausible-but-uncertain approval attempt, not for every non-approval message.** If the user's reply could plausibly be read as approval but isn't unambiguous, do not infer approval from that plausible reading — ask the user an explicit clarifying question (the current environment's interactive-question mechanism where one is available, or a plain clarifying chat message otherwise) before treating the gate as closed. This does **not** apply to replies that are clearly something else — an answered question, a requested change to the plan/research, a clarification, or ordinary discussion. Handle those directly (answer, edit, discuss) and leave the gate open for a later, genuine closing reply — do not additionally ask "are you approving?" when it's already obvious the reply wasn't an approval attempt at all.
 
 #### Adequacy checklist
 
@@ -173,7 +173,7 @@ Use Quick Flow only if Step 1 passed every Quick criterion and the user selected
 After implementation and validation checks (Quick or Full):
 
 1. **Default:** Run code review in the **same session** (`eversis-review`). Do **not** set Next gate to “awaiting human to attach `/eversis-review`” and do **not** end the turn solely to wait for that attach.
-2. On review **PASS** (no required changes), proceed immediately to Step 5 (**Fine** + QA draft in the **same response**).
+2. On review **PASS** — defined as zero open BLOCKER findings **and** every visible Definition-of-Done and Acceptance-Criteria checkbox verified checked, not an unqualified "looks fine" (see Execution rules and gates below) — proceed immediately to Step 5 (**Fine** + QA draft in the **same response**).
 3. **Opt-out** — only if the user explicitly said **`pause before review`** or **`review later`**: stop after implementation/validation and wait for the human before running code review / Fine.
 4. Standalone `/eversis-review` (or attach) remains valid for review-only chats and re-review; it is not required to close a normal Implement thread.
 
@@ -240,12 +240,15 @@ Process tasks in plan order. Consult the todo list before each task and update t
    - Use [`eversis-implement-ui.md`](../../../.ai/prompts/internal/eversis-implement-ui.md) as the workflow reference for the verify-fix loop.
    - Mark each item **PASSED** or **ESCALATED**. Never batch multiple UI verification items into one review step.
 7. **Enforce the UI verification gate** — Do not start code review until every `[REUSE]` UI verification item has been individually passed or escalated with explicit user approval.
-8. **Run code review after the UI gate clears** — Delegate to Code Reviewer with `eversis-review.md` only after the UI verification gate passes or is explicitly escalated per item. Apply **Continuity (default)** above — do not wait for a separate human `/eversis-review` attach unless opt-out.
+8. **Run code review after the UI gate clears** — Delegate to Code Reviewer with `eversis-review.md` only after the UI verification gate passes or is explicitly escalated per item. Apply **Continuity (default)** above — do not wait for a separate human `/eversis-review` attach unless opt-out. **Code Review must run as a genuinely separate delegated context from whichever context implemented the fix — self-review (the same context that wrote the code also declaring PASS on it) is not verification**, mirroring the UI verification gate's own isolation requirement (`eversis-implement-ui.md:57`, "Mental comparison or code reading is not verification").
 9. **Confirm before changing a reviewed solution** — If code review finds issues, ask for confirmation before changing the reviewed solution.
-10. **Route review fixes back through the correct implementer** — After confirmation, delegate fixes through the routing table, run affected checks, and re-run review when needed.
+10. **Route review fixes back through the correct implementer, then re-run a full review, with hard limits:**
+    - After confirmation, delegate fixes through the routing table and run affected checks.
+    - Re-run the **complete** review (every Definition-of-Done and Acceptance-Criteria item, not only the item that was fixed) before PASS can be declared again — a partial or spot-check re-review does not count.
+    - If the same BLOCKER survives **3** full review passes, stop cycling and escalate to the user instead of continuing silently or declaring PASS anyway — mirroring the plan-review loop's iteration cap (Planning sequence, above).
 11. **Treat direct implementation as a workflow violation** — If the orchestrator starts writing product code directly, stop and return to delegated execution.
 12. **Record solution changes in the plan Changelog** — When the approved solution changes during implementation, document it in the plan file's Changelog with timestamps after confirmation.
-13. **Proceed to Fine on PASS** — When review passes, execute Step 5 in the same turn (unless Continuity opt-out).
+13. **Proceed to Fine on PASS** — When review passes — per the PASS definition in Continuity (default) above — execute Step 5 in the same turn (unless Continuity opt-out).
 
 ### Step 5 - Declare Fine and produce QA comment draft (Cursor-only)
 

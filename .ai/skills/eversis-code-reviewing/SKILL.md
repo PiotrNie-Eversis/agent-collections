@@ -95,6 +95,10 @@ Focus on security. Check for potential OWASP TOP10 issues. Check for potential c
 
 Analyse if the implemented solution is scalable. Focus on areas like being able to scale it horizontally, not having a stateful components, not having code with high computational complexity.
 
+**Verdict: what counts as PASS**
+
+`PASS` is a checkable predicate, not an impression: **zero open BLOCKER findings, and every visible Definition-of-Done and Acceptance-Criteria checkbox in the plan verified checked.** Any open BLOCKER, or any DoD/AC item that can't be verified as met, means the verdict is not PASS — do not report PASS while treating a BLOCKER or an unverified checkbox as a minor exception. `SUGGESTION` findings do not block PASS.
+
 ## Connected Skills
 
 - `eversis-implementation-gap-analysing`
