@@ -25,7 +25,7 @@ Never introduce new patterns unless explicitly requested by the user. Always rep
 
 ## Process
 
-### Step 1: Discover project instructions (Cursor)
+### Step 1: Discover project instructions
 
 Search for project rules and instructions:
 

@@ -33,7 +33,7 @@ Implementation orchestration progress:
 - [ ] Step 2: Write the upfront execution plan
 - [ ] Step 3: Run the selected flow
 - [ ] Step 4: Close validation and review gates
-- [ ] Step 5: Declare Fine and produce QA comment draft (Cursor-only)
+- [ ] Step 5: Declare Fine and produce QA comment draft
 ```
 
 ### Step 0 - Start with todos
@@ -250,7 +250,7 @@ Process tasks in plan order. Consult the todo list before each task and update t
 12. **Record solution changes in the plan Changelog** — When the approved solution changes during implementation, document it in the plan file's Changelog with timestamps after confirmation.
 13. **Proceed to Fine on PASS** — When review passes — per the PASS definition in Continuity (default) above — execute Step 5 in the same turn (unless Continuity opt-out).
 
-### Step 5 - Declare Fine and produce QA comment draft (Cursor-only)
+### Step 5 - Declare Fine and produce QA comment draft
 
 When all validation and review gates pass:
 
@@ -264,7 +264,7 @@ When all validation and review gates pass:
 - `eversis-technical-context-discovering` — when existing Technical Context is sufficient vs when discovery should be delegated
 - `eversis-code-reviewing` — final review gate standards
 - `eversis-ui-verifying` — verification standard behind the per-item UI review gate
-- `eversis-fine-handoff` — mandatory QA comment draft on Fine (Cursor-only)
+- `eversis-fine-handoff` — mandatory QA comment draft on Fine
 - `eversis-writing-repo-documentation` — repository documentation tasks delegated from the plan
 - `eversis-task-analysing` — whether research context is complete before planning
 - `eversis-creating-implementation-plans` — plan structure and planning readiness signals

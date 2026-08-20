@@ -20,15 +20,15 @@ Use the checklist below and track your progress:
 
 ```
 Discovery progress:
-- [ ] Step 1: Check Cursor project instructions and rules
+- [ ] Step 1: Check project instructions and rules
 - [ ] Step 2: Analyze existing codebase patterns
 - [ ] Step 3: Consult external documentation (if needed)
 - [ ] Step 4: Apply the implementation rule
 ```
 
-**Step 1: Check Cursor project instructions and rules**
+**Step 1: Check project instructions and rules**
 
-**ALWAYS check first** for project-level guidance (Cursor):
+**ALWAYS check first** for project-level guidance:
 
 - Read **`AGENTS.md`** at the repository root (if present).
 - List **`.cursor/rules/*.mdc`** and read those with `alwaysApply: true` or globs matching the files you will edit.
