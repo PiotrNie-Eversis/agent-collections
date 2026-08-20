@@ -96,6 +96,14 @@ setup_vendor_copy() {
     cp "${COLLECTIONS_HOME}/package.json" "${vendor_dir}/package.json"
   fi
 
+  # docker-compose.yml is a root-level file (not under any src_dirs entry)
+  # that mcp-merge.mjs's relative-mode -f path always points into this
+  # vendor dir for — without it, a --vendor=copy install's eversis-collections
+  # MCP entry references a compose file that was never copied.
+  if [[ -f "${COLLECTIONS_HOME}/docker-compose.yml" ]]; then
+    cp "${COLLECTIONS_HOME}/docker-compose.yml" "${vendor_dir}/docker-compose.yml"
+  fi
+
   # The ignore triad are single files, not directories, so the src_dirs loop
   # above never touches them — but merge-ignore-triad.mjs resolves its
   # framework pattern source as `${COLLECTIONS_HOME}/.claudeignore` etc.,

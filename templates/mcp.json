@@ -24,14 +24,17 @@
       "type": "stdio"
     },
     "eversis-collections": {
-      "command": "node",
+      "command": "docker",
       "args": [
-        "${env:AGENT_COLLECTIONS_HOME}/mcp/eversis-collections-mcp/dist/index.js"
+        "compose",
+        "-f",
+        "${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml",
+        "run",
+        "--rm",
+        "-T",
+        "eversis-collections"
       ],
-      "type": "stdio",
-      "env": {
-        "AGENT_COLLECTIONS_HOME": "${env:AGENT_COLLECTIONS_HOME}"
-      }
+      "type": "stdio"
     },
     "playwright": {
       "command": "npx",

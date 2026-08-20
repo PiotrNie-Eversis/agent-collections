@@ -99,8 +99,8 @@ All servers are configured in **`.cursor/mcp.json`** at the repository root (Cur
       "args": ["-y", "@google-cloud/storage-mcp"]
     },
     "eversis-collections": {
-      "command": "node",
-      "args": ["mcp/eversis-collections-mcp/dist/index.js"],
+      "command": "docker",
+      "args": ["compose", "-f", "docker-compose.yml", "run", "--rm", "-T", "eversis-collections"],
       "type": "stdio"
     }
   },

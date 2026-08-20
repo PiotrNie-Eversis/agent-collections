@@ -58,34 +58,30 @@ for (const id of selected) {
 }
 
 if (picked['eversis-collections']) {
-  const distSuffix = 'mcp/eversis-collections-mcp/dist/index.js';
+  const composeFile = 'docker-compose.yml';
   let cmdPath;
-  let envBlock;
   if (host === 'claude') {
-    // Claude Code only expands ${VAR} / ${VAR:-default} — no ${env:X} — and
+    // Claude Code only expands ${VAR} / ${VAR:-default} — no ${env:X}. The
+    // compose file itself now hardcodes AGENT_COLLECTIONS_HOME=/repo inside
+    // the container (no env passthrough needed), but the *host-side* -f path
+    // in absolute mode still needs a value for ${AGENT_COLLECTIONS_HOME} —
     // GUI-launched hosts don't reliably inherit shell profile exports, so
-    // AGENT_COLLECTIONS_HOME is always set explicitly on this entry's own
-    // env block rather than assumed from the ambient process environment.
+    // the value already resolved by the installer (`collections`) is baked
+    // in as the `${VAR:-default}` fallback instead of a separate env block.
     if (useRelative) {
-      const root = '${CLAUDE_PROJECT_DIR:-.}/vendor/agent-collections';
-      cmdPath = `${root}/${distSuffix}`;
-      envBlock = { AGENT_COLLECTIONS_HOME: root };
+      cmdPath = `\${CLAUDE_PROJECT_DIR:-.}/vendor/agent-collections/${composeFile}`;
     } else {
-      cmdPath = `\${AGENT_COLLECTIONS_HOME}/${distSuffix}`;
-      envBlock = { AGENT_COLLECTIONS_HOME: collections };
+      cmdPath = `\${AGENT_COLLECTIONS_HOME:-${collections}}/${composeFile}`;
     }
   } else if (useRelative) {
-    cmdPath = `\${workspaceFolder}/vendor/agent-collections/${distSuffix}`;
-    envBlock = {};
+    cmdPath = `\${workspaceFolder}/vendor/agent-collections/${composeFile}`;
   } else {
-    cmdPath = `\${env:AGENT_COLLECTIONS_HOME}/${distSuffix}`;
-    envBlock = { AGENT_COLLECTIONS_HOME: '${env:AGENT_COLLECTIONS_HOME}' };
+    cmdPath = `\${env:AGENT_COLLECTIONS_HOME}/${composeFile}`;
   }
   picked['eversis-collections'] = {
-    command: 'node',
-    args: [cmdPath],
+    command: 'docker',
+    args: ['compose', '-f', cmdPath, 'run', '--rm', '-T', 'eversis-collections'],
     type: 'stdio',
-    ...(Object.keys(envBlock).length ? { env: envBlock } : {}),
   };
 }
 

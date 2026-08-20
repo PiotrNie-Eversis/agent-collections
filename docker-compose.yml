@@ -1,0 +1,14 @@
+# Runs the eversis-collections MCP server (stdio transport). The `.` volume
+# is always relative to this file's own directory, so the same file works
+# unmodified whether this is the framework's own checkout or a consumer
+# project's vendored copy — see mcp/eversis-collections-mcp/Dockerfile.
+services:
+  eversis-collections:
+    build:
+      context: ./mcp/eversis-collections-mcp
+    volumes:
+      - .:/repo
+    environment:
+      AGENT_COLLECTIONS_HOME: /repo
+    stdin_open: true
+    tty: false

@@ -171,7 +171,7 @@ Before editing any `.docx` through MCP:
 ### Workspace (this repository)
 
 ```bash
-cd mcp/eversis-collections-mcp && npm install && npm run build
+docker compose build eversis-collections
 ```
 
 Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restart Cursor.
@@ -179,22 +179,22 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 ```json
 {
   "eversis-collections": {
-    "command": "node",
-    "args": ["mcp/eversis-collections-mcp/dist/index.js"],
+    "command": "docker",
+    "args": ["compose", "-f", "docker-compose.yml", "run", "--rm", "-T", "eversis-collections"],
     "type": "stdio"
   }
 }
 ```
 
-Paths in `args` are relative to the **repository root** that contains `.cursor/mcp.json`.
+The `-f` path is relative to the **repository root** that contains `.cursor/mcp.json`; `docker-compose.yml` bind-mounts that same repository root into the container, so no other path configuration is needed.
 
 ### Consumer project (framework outside workspace)
 
-1. Clone the framework once and set **`AGENT_COLLECTIONS_HOME`** to that checkout (must contain `.cursor/skills`).
+1. Clone the framework once and set **`AGENT_COLLECTIONS_HOME`** to that checkout (must contain `.cursor/skills` and `docker-compose.yml`).
 2. Bootstrap with `setup-agent-collections.sh --build-mcp` — see [Installation §4](../getting-started/installation).
 3. Enable **`eversis-collections`** in Cursor MCP settings and restart.
 
-The setup script writes `${env:AGENT_COLLECTIONS_HOME}/mcp/eversis-collections-mcp/dist/index.js` in your project's `.cursor/mcp.json` (local mode). Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../getting-started/installation).
+The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the bind mount relative to that file's own directory. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../getting-started/installation).
 
 ## Do not register skills as Agent Skills
 
@@ -202,13 +202,13 @@ For this framework, consume skills through **`eversis_skills_*` MCP tools** — 
 
 ## Verify
 
-After restart, open **Agent** and confirm tools such as **`eversis_skills_list`** appear. If tools are missing, rebuild the package and check that **`dist/index.js`** exists.
+After restart, open **Agent** and confirm tools such as **`eversis_skills_list`** appear. If tools are missing, rebuild the image with `docker compose build eversis-collections` and check that it built successfully.
 
 ## Authentication
 
-No OAuth or API keys. The server runs locally via **Node.js** (≥ 18). A **build step is required** before tools are available — unlike `npx`-based third-party MCPs.
+No OAuth or API keys. The server **runs in a Docker container**; Node.js is only needed to develop the package itself (see [`mcp/eversis-collections-mcp/`](https://github.com/PiotrNie-Eversis/agent-collections/tree/main/mcp/eversis-collections-mcp)'s build/test scripts). A **Docker Compose build step is required** before tools are available — unlike `npx`-based third-party MCPs.
 
-Optional: set **`AGENT_COLLECTIONS_HOME`** when walk-up auto-detection cannot find `.cursor/skills` from your workspace.
+Optional: set **`AGENT_COLLECTIONS_HOME`** when walk-up auto-detection cannot find `.cursor/skills` from your workspace — it is used only to locate the right `docker-compose.yml` via `-f`, never passed into the container itself.
 
 ## Official Documentation
 

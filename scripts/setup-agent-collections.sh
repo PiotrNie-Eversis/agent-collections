@@ -5,9 +5,10 @@
 #   bash scripts/setup-agent-collections.sh [OPTIONS]
 #
 # Options:
-#   --build-mcp               Force rebuild of the MCP server (npm install + build).
-#                             Without this flag, build still runs when dist/index.js
-#                             is missing. Does not control the interactive MCP wizard.
+#   --build-mcp               Force rebuild of the MCP server's Docker image
+#                             (docker compose build). Without this flag, build still
+#                             runs when the image doesn't exist yet. Does not control
+#                             the interactive MCP wizard.
 #   --collections-home DIR    Path to agent-collections checkout.
 #                             Overrides AGENT_COLLECTIONS_HOME env var and OS default.
 #                             Prefer this (or a prior export) over bare

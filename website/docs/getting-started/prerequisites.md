@@ -17,13 +17,15 @@ Agent Collections is **multi-agent**:
 
 Use at least one supported tool. Teams often run **Cursor for frontend** and **Claude Code for backend** in the same monorepo with isolation (see [isolation strategy](../isolation)).
 
-## Node.js
+## Docker
 
-**Node.js ≥ 18** is required to build the local **`eversis-collections`** MCP package (`mcp/eversis-collections-mcp/`). From the framework checkout:
+**Docker Engine + Compose v2** are required to **run** the local **`eversis-collections`** MCP server. From the framework checkout:
 
 ```bash
-npm run mcp:install && npm run mcp:build
+docker compose build eversis-collections
 ```
+
+**Node.js ≥ 18** is required only to **develop** the `eversis-collections` MCP package (`mcp/eversis-collections-mcp/`) itself — running `npm run mcp:test` or building outside Docker for debugging. It is not a prerequisite for end users who only run the server.
 
 ## Git
 

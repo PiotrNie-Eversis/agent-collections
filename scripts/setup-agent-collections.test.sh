@@ -85,8 +85,12 @@ grep -qF '.claude/skills/' "$CLAUDE_INSTALL_LOG" \
 [[ -f "${TARGET_CLAUDE}/.cursor/mcp.json" ]] && { echo "FAIL: .cursor/mcp.json should not exist for --agents=claude"; exit 1; }
 grep -qF '${env:' "${TARGET_CLAUDE}/.mcp.json" \
   && { echo "FAIL: .mcp.json still contains \${env:...} (Claude Code can't expand it)"; exit 1; }
-grep -qF '"AGENT_COLLECTIONS_HOME"' "${TARGET_CLAUDE}/.mcp.json" \
-  || { echo "FAIL: .mcp.json missing explicit AGENT_COLLECTIONS_HOME env"; exit 1; }
+grep -qF '"command": "docker"' "${TARGET_CLAUDE}/.mcp.json" \
+  || { echo "FAIL: .mcp.json eversis-collections entry is not docker-based"; exit 1; }
+grep -qF '${CLAUDE_PROJECT_DIR:-.}/vendor/agent-collections/docker-compose.yml' "${TARGET_CLAUDE}/.mcp.json" \
+  || { echo "FAIL: .mcp.json eversis-collections -f path is not the vendored docker-compose.yml"; exit 1; }
+grep -qF 'dist/index.js' "${TARGET_CLAUDE}/.mcp.json" \
+  && { echo "FAIL: .mcp.json still references the pre-Docker dist/index.js entry"; exit 1; }
 grep -qF 'vendor/agent-collections/.ai/prompts/public/' "${TARGET_CLAUDE}/CLAUDE.md" \
   || { echo "FAIL: CLAUDE.md How-to section doesn't point at the vendored .ai/ prefix (F11)"; exit 1; }
 

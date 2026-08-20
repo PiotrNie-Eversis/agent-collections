@@ -21,7 +21,7 @@ log_error()   { echo "${_RED}[agent-setup ERROR]${_RESET} $*" >&2; }
 die()         { log_error "$*"; exit 1; }
 
 _print_partial_fail() {
-  if [[ ${#FAILED_STEPS[@]:-0} -eq 0 ]]; then
+  if [[ ${#FAILED_STEPS[@]} -eq 0 ]]; then
     return 0
   fi
   echo ""

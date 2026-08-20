@@ -17,20 +17,26 @@ Configure **Model Context Protocol (MCP)** servers so Agent can call tools (skil
 export AGENT_COLLECTIONS_HOME=/path/to/agent-collections
 ```
 
-2. Build the local package:
+2. Build the Docker Compose image (requires Docker Engine + Compose v2 — see [Prerequisites](./prerequisites)):
 
 ```bash
 cd "$AGENT_COLLECTIONS_HOME"
-npm run mcp:install && npm run mcp:build
+docker compose build eversis-collections
 ```
 
-3. Point MCP at the built entry (the installer merges this into `.cursor/mcp.json` for Cursor and `.mcp.json` for Claude Code, translating syntax per host):
+3. Point MCP at the Compose-based entry (the installer merges this into `.cursor/mcp.json` for Cursor and `.mcp.json` for Claude Code, translating syntax per host):
 
 ```json
 "eversis-collections": {
-  "command": "node",
+  "command": "docker",
   "args": [
-    "${env:AGENT_COLLECTIONS_HOME}/mcp/eversis-collections-mcp/dist/index.js"
+    "compose",
+    "-f",
+    "${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml",
+    "run",
+    "--rm",
+    "-T",
+    "eversis-collections"
   ]
 }
 ```
@@ -59,7 +65,7 @@ Do not keep both env vars pointing at different frameworks for the same skills s
 
 ### Verify
 
-After restart, open Agent and confirm tools appear (e.g. `eversis_skills_list`). If tools are missing: rebuild MCP, confirm `AGENT_COLLECTIONS_HOME` is visible to the IDE process (launch from a terminal that exports it, or set a system env), and re-run the installer with `--build-mcp`.
+After restart, open Agent and confirm tools appear (e.g. `eversis_skills_list`). If tools are missing: rebuild the Docker image (`docker compose build eversis-collections`), confirm Docker is visible to the IDE process, confirm `AGENT_COLLECTIONS_HOME` resolves to the framework checkout (launch from a terminal that exports it, or set a system env), and re-run the installer with `--build-mcp`.
 
 ## Installer merge
 
@@ -73,7 +79,7 @@ Allowed ids match the installer MCP allowlist (see `scripts/setup-agent-collecti
 
 ## Claude Code note
 
-Claude Code has MCP config parity with Cursor: the installer writes a root **`.mcp.json`** with the same servers, using Claude-native syntax (`${VAR}` / `${VAR:-default}`, no `${env:...}`). Skills additionally resolve **natively** via `.claude/skills/` (linked by the installer), not only through MCP. Document which MCP servers your team enables in `.claude/CLAUDE.md`.
+Claude Code has MCP config parity with Cursor: the installer writes a root **`.mcp.json`** with the same servers, using Claude-native syntax (`${VAR}` / `${VAR:-default}`, no `${env:...}`). The **`eversis-collections`** entry runs `docker compose ... run --rm -T eversis-collections`, not a bare `node` process — Docker is required, Node.js is not. Skills additionally resolve **natively** via `.claude/skills/` (linked by the installer), not only through MCP. Document which MCP servers your team enables in `.claude/CLAUDE.md`.
 
 ## Next
 
