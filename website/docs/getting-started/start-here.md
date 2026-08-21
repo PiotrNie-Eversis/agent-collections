@@ -19,7 +19,7 @@ Follow the checklist below in order. Each step links to the detailed playbook �
 
 Complete these steps on a **sample consumer project** (empty folder or small repo) until install succeeds:
 
-1. **[Prerequisites](./prerequisites)** — Cursor and/or Claude Code, **Node.js ≥ 18**, Git.
+1. **[Prerequisites](./prerequisites)** — Cursor and/or Claude Code, **Docker Engine + Compose v2** (to run the MCP server), **Node.js ≥ 18** (to develop the MCP package), Git.
 2. Clone **agent-collections** and export `AGENT_COLLECTIONS_HOME` (see [Installation](./installation)).
 3. **[Installation](./installation)** — run `setup-agent-collections.sh` with `--build-mcp --non-interactive` (local, submodule, or copy).
 4. Confirm `.agent-collections/install-selection.json` exists in the consumer project.

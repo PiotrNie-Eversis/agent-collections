@@ -9,6 +9,8 @@ title: Installation
 Follow **[Start here](./start-here)** for the full onboarding checklist, including **first successful install**.
 :::
 
+Installing Agent Collections into a project turns on the assistant's built-in tools and skills for that project — things like structured research/plan/review workflows and a local library of reusable prompts. One of those tools, the **`eversis-collections`** skills server, now runs inside a small self-contained app called **Docker** rather than as a plain background process, so Docker needs to be installed and running before you set anything up. The steps below walk through cloning the framework once, then running one script against each project that should use it.
+
 ## 1. Clone the framework
 
 ```bash
@@ -19,7 +21,7 @@ export AGENT_COLLECTIONS_HOME="$(pwd)/agent-collections"
 
 You can use any folder name. Paths in [AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md) and [`documentation/agent-collection.md`](../framework) are relative to the repo root.
 
-Pin consumers to a **SemVer git tag** when you leave local development (see root README versioning).
+**Pin** (lock) consumers to a **SemVer git tag** when you leave local development (see root README versioning).
 
 ## 2. Open the framework (optional for maintainers)
 
@@ -30,6 +32,10 @@ Pin consumers to a **SemVer git tag** when you leave local development (see root
 ## 3. Bootstrap a consumer project
 
 The installer lives in the **agent-collections** repository (`scripts/setup-agent-collections.sh`), not in your app repo. Run it from the consumer project (recommended) or pass `--target`.
+
+:::tip New to Docker?
+[Docker Desktop](https://www.docker.com/products/docker-desktop/) is a free app that runs the small container the `eversis-collections` MCP server lives in — install it once per machine. Before running the command below, open Docker Desktop and confirm it's running (look for the whale icon in your menu bar / system tray). If the command below fails with something like "Cannot connect to the Docker daemon," Docker Desktop isn't running yet — start it and try again.
+:::
 
 ### Non-interactive example (CI / first install)
 
@@ -51,14 +57,14 @@ Selection is written to **`.agent-collections/install-selection.json`**. Schema:
 | Mode | Flag | Notes |
 |------|------|-------|
 | **Local** (default) | (omit `--vendor`) | Framework stays outside the consumer repo; set `AGENT_COLLECTIONS_HOME` |
-| **Submodule** | `--vendor submodule` | **Team / EOG default** — pin a tag in `.gitmodules` |
+| **Submodule** | `--vendor submodule` | **Team / EOG default** — pin (lock) a specific version tag in `.gitmodules` |
 | **Copy** | `--vendor copy` | Tree under `vendor/agent-collections/` |
 
 ### Useful flags
 
 | Flag | Purpose |
 |------|---------|
-| `--build-mcp` | Force rebuild of `mcp/eversis-collections-mcp` (also builds when `dist` is missing). Does **not** gate the interactive MCP server checklist. |
+| `--build-mcp` | Force rebuild of the `eversis-collections` Docker image (also builds when the image doesn't exist yet). Does **not** gate the interactive MCP server checklist. |
 | `--agents` | `cursor`, `claude`, `opencode` (opencode = placeholder) |
 | `--mcp-servers` | Comma-separated ids; without it + `--non-interactive` → `eversis-collections` only |
 | `--profile` | `frontend` \| `backend` \| `fullstack` |
@@ -103,16 +109,36 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 
 Reuses agents / MCP / profile / vendor / link from selection. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths (stack rule, `docs/context|plans|specs`, local `AGENTS.md`, secrets) are not overwritten without opt-in.
 
-`--upgrade --sync` against a **vendor submodule** aligns a **clean** pin to the launching installer SHA when vendored `adapters/sync.mjs` would reject flags the installer will pass (for example `--framework-prefix`). A **dirty** vendor worktree, or a SHA missing after `git fetch`, **fails** with paths, SHAs, the flag name, and recovery `git fetch` / `git checkout` commands — it never `checkout --force`. Copy and local modes are unchanged.
+If your team vendors the framework as a **Git submodule**, `--upgrade --sync` only auto-updates that submodule's pinned version in one narrow case — see [Advanced: keeping a team submodule in sync](#advanced-keeping-a-team-submodule-in-sync) below before assuming an upgrade picked up the latest framework changes.
 
 ### Keeping consumers aligned
 
 | Install mode | After framework update |
 |--------------|------------------------|
-| Local + symlink | Pull/tag checkout → rebuild MCP → re-run setup |
+| Local + symlink | Pull or check out the new version tag → `docker compose build eversis-collections` → re-run setup |
 | Local + copy | Pull + re-run with `--sync` |
-| Vendor submodule | `--upgrade --sync` aligns a **clean** pin to the launching SHA; dirty pin or missing SHA fails with recovery git commands |
+| Vendor submodule | Usually a **manual** pin bump — see [Advanced](#advanced-keeping-a-team-submodule-in-sync) |
 | Vendor copy | Re-run with `--vendor copy --build-mcp` |
+
+## Advanced: keeping a team submodule in sync
+
+:::info Skip this unless your team uses `--vendor submodule`
+This section covers internals of how a Git-submodule-vendored install stays in sync with framework updates. If you installed with the **local** or **copy** vendor mode, you don't need it.
+:::
+
+When the framework is vendored as a submodule, `vendor/agent-collections/` is pinned to one specific commit (its "pin" — the exact version your project is locked to, identified by a **SHA**, a unique ID for that one commit). `--upgrade --sync` does **not** generally bump that pin to the latest framework version. It only auto-aligns the pin in one narrow case: when the vendored `adapters/sync.mjs` would otherwise reject a new CLI flag the installer is about to pass it (for example `--framework-prefix`). In that specific case, a **clean** vendor worktree is checked out to the launching installer's SHA automatically; a **dirty** worktree, or a SHA missing after `git fetch`, **fails** with the paths, SHAs, the flag name, and recovery `git fetch` / `git checkout` commands — it never force-resets anything.
+
+For most other framework updates (like a new file or dependency added to the framework), **you must bump the submodule pin yourself**:
+
+```bash
+cd vendor/agent-collections
+git fetch origin
+git checkout <new-tag-or-commit>
+cd ../..
+git add vendor/agent-collections
+```
+
+Then re-run `--upgrade --sync` (and `--build-mcp` if the MCP server itself changed) to refresh the generated config from the new pin.
 
 ## First successful install (sample project)
 

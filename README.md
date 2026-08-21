@@ -60,7 +60,8 @@ Canonical content lives under **`.ai/`**. Adapters, the installer, and MCP **con
 ## Prerequisites
 
 - **Agent tool:** [Cursor](https://cursor.com/) and/or Claude Code (OpenCode packaging is placeholder only).
-- **Node.js** ≥ 18 — to build the local **`eversis-collections`** MCP package.
+- **Docker Engine + Compose v2** — to **run** the local **`eversis-collections`** MCP server.
+- **Node.js** ≥ 18 — needed only to **develop** the **`eversis-collections`** MCP package itself, not to run it.
 - **Git** — clone and consumer install.
 
 Recommended: capable models (Claude Sonnet or GPT-4 class) for structured rules and prompts.
@@ -137,10 +138,10 @@ You can run any flow with a **Jira ticket ID** or a **free-form task description
 export AGENT_COLLECTIONS_HOME="$(pwd)"
 ```
 
-3. Build MCP (skills discoverability):
+3. Build the MCP Docker image (skills discoverability):
 
 ```bash
-npm run mcp:install && npm run mcp:build
+docker compose build eversis-collections
 ```
 
 4. Refresh adapter surfaces (after changing `.ai/` rules or adapter maps):
@@ -276,10 +277,7 @@ Use when tools should apply **only to one project** (copy or generate workspace 
 ### Build local server: `eversis-collections`
 
 ```bash
-cd mcp/eversis-collections-mcp
-npm install && npm run build
-# or from repo root:
-npm run mcp:install && npm run mcp:build
+docker compose build eversis-collections
 ```
 
 Enable **`eversis-collections`** in Settings → MCP and restart the agent tool.
@@ -391,8 +389,9 @@ docs/architecture/    # Mapping, isolation, AGENTS standard, selection, WF/WNF
 1. Clone this repository; read [`.ai/README.md`](./.ai/README.md) and [`AGENTS.md`](./AGENTS.md).
 2. Run `npm run sync:adapters` after changing `.ai/rules` or `adapters/*/rule-map.yaml`.
 3. Run `npm run mcp:test` after MCP changes.
-4. Run `bash scripts/setup-agent-collections.test.sh` after installer changes.
-5. Run `npm run website:build` (or `cd website && npm run build`) after docs site changes.
+4. Run `docker compose build eversis-collections` after MCP changes — verifies the Docker image the generated MCP entry actually runs still builds (`npm run mcp:test` alone only exercises the Node dev-loop).
+5. Run `bash scripts/setup-agent-collections.test.sh` after installer changes.
+6. Run `npm run website:build` (or `cd website && npm run build`) after docs site changes.
 
 ---
 
