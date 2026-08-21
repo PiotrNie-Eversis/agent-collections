@@ -44,3 +44,5 @@ A new **`.ai/skills/<gerund-name>/`** tree.
 2. New skill folders use **gerund** names (e.g. `reviewing-invoices`) matching the skill’s `name` in frontmatter.
 3. Ensure the **description** field is specific so the agent matches the skill when appropriate.
 4. Do not reference VS Code Copilot — skills are consumed through the current host's native mechanism, or via the **`eversis-collections` MCP** and `eversis_skills_*` tools, depending on the adapter.
+
+<!-- Eversis port; upstream: eversis-create-custom-skill -->

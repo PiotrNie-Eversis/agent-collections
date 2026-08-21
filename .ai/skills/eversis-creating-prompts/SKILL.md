@@ -1,12 +1,12 @@
 ---
 name: eversis-creating-prompts
-description: "Create attachable Cursor prompts: .ai/prompts/public|internal/eversis-*.md (Docusaurus frontmatter + body). Replaces legacy .github/prompts/*.prompt.md. Use when creating or reviewing prompt markdown in this framework."
+description: "Create attachable prompts: .ai/prompts/public|internal/eversis-*.md (Docusaurus frontmatter + body). Replaces legacy .github/prompts/*.prompt.md. Use when creating or reviewing prompt markdown in this framework."
 user-invokable: false
 ---
 
-# Creating prompts (Cursor markdown)
+# Creating prompts (Markdown)
 
-Creates well-structured **attachable prompts** for Cursor Collections: Markdown under **`.ai/prompts/`** with `eversis-` names (synced into `website/docs/prompts/` for Docusaurus in this monorepo). Ensures clear separation between **prompt bodies**, **`.ai/rules/`** role behavior (adapters may add `.cursor/rules/`), and **skills**.
+Creates well-structured **attachable prompts** for **Agent Collections**: Markdown under **`.ai/prompts/`** with `eversis-` names (synced into `website/docs/prompts/` for Docusaurus in this monorepo; loaded by stable id across Cursor and Claude Code). Ensures clear separation between **prompt bodies**, **`.ai/rules/`** role behavior (adapters may add `.cursor/rules/`), and **skills**.
 
 ## Core Design Principles
 
