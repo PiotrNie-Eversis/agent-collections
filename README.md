@@ -34,7 +34,7 @@ Canonical content lives under **`.ai/`**. Adapters, the installer, and MCP **con
 
 - **Rules** — always-on agent core; Engineering Manager for orchestration.
 - **Prompts** — `eversis-implement` (research → plan → code, with human gates).
-- **Skills** — orchestration, architecture, technical context, domain implementation (per project stack policy).
+- **Skills** — orchestration, architecture, technical context, domain implementation (per project stack policy), domain-knowledge promotion/import/audit (`eversis-promote-domain-knowledge`, `eversis-import-confluence-knowledge`, `eversis-audit-domain-knowledge`).
 
 ### Quality — Review & testing
 
@@ -85,7 +85,7 @@ Rules and prompts work best **in order**, with **your review** at each gate.
 
 - Produces research (`*.research.md`) and a phased plan (`*.plan.md`) with acceptance checks when needed.
 - Changes code in small, reviewable steps — scoped to the task.
-- Declares **Fine** when agent work is done and drafts a **QA comment** for your review before anyone posts it to a ticket tracker.
+- Declares **Fine** when agent work is done and drafts a **QA comment** for your review before anyone posts it to a ticket tracker — plus, when the task surfaced durable domain knowledge (a convention, a confirmed business rule), a second, independent draft proposing to save it under `docs/context/`.
 
 | Step | Load / attach | What happens |
 | ---- | ------------- | ------------ |
@@ -183,7 +183,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 | **Submodule** | `--vendor submodule` | **TASK / team default** — teammates: `git submodule update --init --recursive` |
 | **Copy** | `--vendor copy` | Vendors tree under `vendor/agent-collections/` |
 
-Useful flags: `--collections-home`, `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`, `--build-mcp` (force MCP rebuild).
+Useful flags: `--collections-home`, `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`, `--build-mcp` (force MCP rebuild), `--ssot-source URL` / `--ssot-branch NAME` (seed `docs/context/global/` from a shared domain-context repo, best-effort — never blocks install), `--confluence-space-key KEY` (optional, one-time AS-IS import — see `eversis-import-confluence-knowledge`).
 
 Interactive wizard (TTY) prompts for agents × domain profile × MCP servers — **no `--build-mcp` required** for the MCP checklist. Re-runs are idempotent; partial failures list completed vs failed steps with recovery hints.
 
@@ -283,6 +283,7 @@ docker compose build eversis-collections
 Enable **`eversis-collections`** in Settings → MCP and restart the agent tool.
 
 - **Skills** — `eversis_skills_list` / `eversis_skills_get` load `.ai/skills/`
+- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the `${PWD}:/workspace` mount in `docker-compose.yml`, not just `AGENT_COLLECTIONS_HOME`
 - **Word tools** — used by BA docs prompts when that workflow is in scope
 - Tool reference: [`mcp/eversis-collections-mcp/README.md`](./mcp/eversis-collections-mcp/README.md)
 
@@ -329,7 +330,7 @@ When moving from framework version **N** to **N+1**:
 | Path / class | Why |
 |--------------|-----|
 | `eversis-project-stack` (project rule) | Consumer-owned stack and skills policy |
-| `docs/context/` | Project context and task baselines |
+| `docs/context/` | Project context, task baselines, and domain knowledge — `docs/context/<project>/<component>/` (project-owned) plus `docs/context/global/` (subtree-pulled from a shared `domain-context` repo, when configured) |
 | `docs/plans/` | Optional flat plans |
 | `docs/specs/` | Project research / plan artifacts |
 | Local `AGENTS.md` (once created) | Project-specific agent instructions |

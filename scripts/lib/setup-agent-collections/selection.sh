@@ -21,6 +21,10 @@ write_install_selection() {
   local mcp_json
   mcp_json="$(node -e "console.log(JSON.stringify(String(process.argv[1]||'eversis-collections').split(',').map(s=>s.trim()).filter(Boolean)))" "${MCP_SELECTED_IDS:-eversis-collections}")"
 
+  local ssot_repo="${ARG_SSOT_SOURCE:-}"
+  local project_context_path="docs/context/${SSOT_PROJECT_SLUG:-project}/"
+  local global_context_path="docs/context/global/"
+
   node -e "
     const fs = require('fs');
     const sel = {
@@ -31,9 +35,16 @@ write_install_selection() {
       vendorMode: process.argv[5],
       linkMode: process.argv[6],
       recordedAt: new Date().toISOString(),
+      ssot: {
+        externalSsotRepo: process.argv[8] || null,
+        projectContextPath: process.argv[9],
+        globalContextPath: process.argv[10],
+        confluenceSpaceKey: process.argv[11] || null,
+      },
     };
     fs.writeFileSync(process.argv[7], JSON.stringify(sel, null, 2) + '\n');
-  " "$version" "$agents_json" "$mcp_json" "${DOMAIN_PROFILE:-fullstack}" "$vendor_mode" "$link_mode" "$out"
+  " "$version" "$agents_json" "$mcp_json" "${DOMAIN_PROFILE:-fullstack}" "$vendor_mode" "$link_mode" "$out" \
+    "$ssot_repo" "$project_context_path" "$global_context_path" "${ARG_CONFLUENCE_SPACE_KEY:-}"
 
   log_ok "Wrote ${SELECTION_REL}"
   return 0

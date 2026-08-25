@@ -2,12 +2,22 @@
 # is always relative to this file's own directory, so the same file works
 # unmodified whether this is the framework's own checkout or a consumer
 # project's vendored copy — see mcp/eversis-collections-mcp/Dockerfile.
+#
+# Second mount (${PWD}:/workspace): the framework mount (/repo) never contains
+# the CONSUMER project's own files (docs/context/, .agent-collections/) — those
+# live wherever the IDE/agent's working directory is when it launches this
+# command. ${PWD} is substituted by docker compose from the invoking shell's
+# cwd, which the MCP client (Claude Code / Cursor) sets to the consumer
+# project root before spawning stdio servers. eversis_context_* tools
+# (global-domain-context-ssot.research.md, Question 2/6) read/write /workspace,
+# never /repo — see mcp/eversis-collections-mcp/src/context.ts.
 services:
   eversis-collections:
     build:
       context: ./mcp/eversis-collections-mcp
     volumes:
       - .:/repo
+      - ${PWD}:/workspace
     environment:
       AGENT_COLLECTIONS_HOME: /repo
     stdin_open: true

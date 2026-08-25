@@ -31,6 +31,14 @@
 #   --agents LIST             Comma-separated agent adapters: cursor,claude,opencode
 #                             (opencode is placeholder-only).
 #   --profile NAME            Domain profile: frontend | backend | fullstack
+#   --ssot-source URL         GitLab domain-context project to seed docs/context/global/
+#                             from (git subtree add, best-effort — never blocks install).
+#   --ssot-branch NAME        Branch of --ssot-source to seed from. Default: main.
+#   --confluence-space-key KEY
+#                             Optional. Records a Confluence space key for the
+#                             one-time AS-IS import (eversis-import-confluence-knowledge
+#                             skill, run manually afterward — the installer itself never
+#                             calls Confluence). Omitting this never blocks install.
 #   --help                    Show this help and exit.
 #
 # Environment variables:
@@ -70,10 +78,14 @@ ARG_GITIGNORE_AGENT_ARTIFACTS="false"
 ARG_MCP_SERVERS=""
 ARG_AGENTS=""
 ARG_PROFILE=""
+ARG_SSOT_SOURCE=""
+ARG_SSOT_BRANCH="main"
+ARG_CONFLUENCE_SPACE_KEY=""
 
 export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_LINK_MODE \
        ARG_SYNC ARG_UPGRADE ARG_NON_INTERACTIVE ARG_FORCE \
        ARG_GITIGNORE_AGENT_ARTIFACTS ARG_MCP_SERVERS ARG_AGENTS ARG_PROFILE \
+       ARG_SSOT_SOURCE ARG_SSOT_BRANCH ARG_CONFLUENCE_SPACE_KEY \
        SETUP_SCRIPT_DIR="${SCRIPT_DIR}" LIB_DIR="${LIB_DIR}"
 
 while [[ $# -gt 0 ]]; do
@@ -115,6 +127,18 @@ while [[ $# -gt 0 ]]; do
       [[ $# -lt 2 ]] && { echo "ERROR: --profile requires a value" >&2; exit 1; }
       ARG_PROFILE="$2"; shift 2 ;;
     --profile=*) ARG_PROFILE="${1#*=}"; shift ;;
+    --ssot-source)
+      [[ $# -lt 2 ]] && { echo "ERROR: --ssot-source requires a value" >&2; exit 1; }
+      ARG_SSOT_SOURCE="$2"; shift 2 ;;
+    --ssot-source=*) ARG_SSOT_SOURCE="${1#*=}"; shift ;;
+    --ssot-branch)
+      [[ $# -lt 2 ]] && { echo "ERROR: --ssot-branch requires a value" >&2; exit 1; }
+      ARG_SSOT_BRANCH="$2"; shift 2 ;;
+    --ssot-branch=*) ARG_SSOT_BRANCH="${1#*=}"; shift ;;
+    --confluence-space-key)
+      [[ $# -lt 2 ]] && { echo "ERROR: --confluence-space-key requires a value" >&2; exit 1; }
+      ARG_CONFLUENCE_SPACE_KEY="$2"; shift 2 ;;
+    --confluence-space-key=*) ARG_CONFLUENCE_SPACE_KEY="${1#*=}"; shift ;;
     --help|-h)
       awk '/^# setup-agent-collections.sh/,/^[^#]/ { if ($0 ~ /^#/) { sub(/^# ?/, ""); print } }' "$0"
       exit 0 ;;
@@ -167,6 +191,8 @@ source "${LIB_DIR}/ignore-triad.sh"
 source "${LIB_DIR}/claude-settings-merge.sh"
 # shellcheck source=lib/setup-agent-collections/scaffolding.sh
 source "${LIB_DIR}/scaffolding.sh"
+# shellcheck source=lib/setup-agent-collections/ssot.sh
+source "${LIB_DIR}/ssot.sh"
 # shellcheck source=lib/setup-agent-collections/selection.sh
 source "${LIB_DIR}/selection.sh"
 # shellcheck source=lib/setup-agent-collections/upgrade.sh
@@ -239,6 +265,11 @@ record_ok "claude-settings"
 
 scaffold_project
 record_ok "scaffold"
+
+scaffold_ssot_project
+seed_ssot_global
+note_confluence_space_key
+record_ok "ssot"
 
 write_install_selection || { record_fail "selection"; _print_partial_fail; exit 1; }
 record_ok "selection"

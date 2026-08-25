@@ -8,6 +8,7 @@ import { listAllowedSkillScripts, runAllowlistedSkillScript, skillScriptKeysForZ
 import { getSkillFile, listSkills } from "./skills.js";
 import { validateAllSkills } from "./validate.js";
 import { registerDocxTools } from "./docx/tools.js";
+import { getContext, listContext, syncContext } from "./context.js";
 
 function textResult(text: string) {
   return { content: [{ type: "text" as const, text }] };
@@ -141,6 +142,56 @@ export async function runMcpServer(): Promise<void> {
   );
 
   registerDocxTools(server);
+
+  server.registerTool(
+    "eversis_context_list",
+    {
+      description:
+        "List domain-knowledge components from the consumer project's docs/context/ (project-level and global/subtree-pulled), one line each. Does NOT support fuzzy search — read the small INDEX.md list and reason over it, or use eversis_context_get once you know the component name.",
+    },
+    async () => {
+      try {
+        const components = listContext();
+        return textResult(JSON.stringify({ components }, null, 2));
+      } catch (e) {
+        return textResult(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }, null, 2));
+      }
+    }
+  );
+
+  server.registerTool(
+    "eversis_context_get",
+    {
+      description:
+        "Read the domain-knowledge file for ONE component from the consumer project's docs/context/ — project-level overrides global if both exist. Annotates source and (for global entries) staleness vs. the domain-context remote. Updates last_consulted on the file.",
+      inputSchema: {
+        component: z.string().describe("Component folder name, e.g. checkout-flow"),
+      },
+    },
+    async ({ component }) => {
+      try {
+        const entry = getContext(component);
+        return textResult(JSON.stringify(entry, null, 2));
+      } catch (e) {
+        return textResult(JSON.stringify({ error: e instanceof Error ? e.message : String(e) }, null, 2));
+      }
+    }
+  );
+
+  server.registerTool(
+    "eversis_context_sync",
+    {
+      description:
+        "Manually refresh docs/context/global/ from the configured domain-context repo (git subtree pull --squash). Never runs automatically — the developer chooses when to call this.",
+      inputSchema: {
+        branch: z.string().optional().describe('Branch of the domain-context repo. Default: "main"'),
+      },
+    },
+    async ({ branch }) => {
+      const result = syncContext(branch ?? "main");
+      return textResult(JSON.stringify(result, null, 2));
+    }
+  );
 
   const transport = new StdioServerTransport();
   await server.connect(transport);

@@ -33,6 +33,16 @@ The detailed skill package is **`eversis-fine-handoff`** (body lands under `.ai/
 - Use the **approved or human-edited** body — never the unreviewed draft blindly if the human changed it.
 - Confirm the issue key if ambiguous.
 
+## Optional second draft — domain-knowledge promotion
+
+When `eversis-promote-domain-knowledge` (see that skill) determines the task produced a durable, cross-task fact (a convention, a confirmed business rule, a reusable integration pattern — not a one-off implementation detail), add a **second, independent draft** in the same Fine turn, alongside the QA comment draft:
+
+- Begin it with its own header: `**Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing**`
+- Show the proposed file path, the frontmatter, and the content to be written.
+- This draft has its **own** approval — approving or rejecting the QA comment draft has no effect on this one, and vice versa. Only write to `docs/context/<project>/` after this specific draft is explicitly approved.
+- If `eversis-promote-domain-knowledge` finds nothing worth promoting for this task, do not add this draft at all — the QA comment draft alone is a complete, valid Fine turn (this is the common case, not an exception).
+- Publication mechanism once approved: GitLab REST API (Branches → Commits with multiple file actions → Merge Requests), never a local checkout of `domain-context` (see `eversis-promote-domain-knowledge`).
+
 ## Readability rules
 
 QA readers are **not** reading the codebase. They need the change from the outside.
