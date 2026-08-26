@@ -35,7 +35,7 @@ Any Figma involvement or `[REUSE]` UI verification task **disqualifies Quick Flo
 ```
 
 :::note Mandatory QA comment draft after Fine
-When the Engineering Manager declares **Fine**, it **always produces a QA comment draft in the same response** following the **[Fine Handoff](../skills/fine-handoff)** skill (`eversis-fine-handoff`). Review the draft, edit if needed, then paste it into Jira or ask the agent to post it via Atlassian MCP. More context: [Workflow Overview](./overview).
+When the Engineering Manager declares **Fine**, it **always produces a QA comment draft in the same response** following the **[Fine Handoff](../skills/fine-handoff)** skill (`eversis-fine-handoff`). Review the draft, edit if needed, then paste it into Jira or ask the agent to post it via Atlassian MCP. If the task also surfaced durable, cross-task knowledge, a second, independently-approved draft proposes recording it in `docs/context/<project>/` — more context: [Workflow Overview](./overview#status-fine--handoff).
 :::
 
 ## How the Verification Loop Works

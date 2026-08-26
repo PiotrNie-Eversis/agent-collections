@@ -28,6 +28,7 @@ Provides integration with Jira and Confluence for gathering requirements, task c
 | **Context Engineer** | Gathering task requirements from Jira and Confluence, searching for related issues |
 | **E2E Engineer** | Searching for related test requirements and context |
 | **Software Engineer** | Searching for task requirements and related context |
+| **Any agent** (`eversis-import-confluence-knowledge`) | Seeding a `docs/context/<project>/` component from an existing Confluence page, on request — see [Domain Context (SSOT)](../domain-context) |
 
 ## Configuration
 

@@ -41,7 +41,7 @@ The Engineering Manager automatically handles the full development cycle:
 
 - **When:** Only if Implement readiness shows **Research: CREATE** or **DELTA** (no adequate `*.research.md`, or existing research is stale for current scope).
 - **Delegated to:** Context Engineer
-- **What it does:** Gathers all available information about the task from the codebase, Jira, Confluence, Figma, and other sources.
+- **What it does:** Gathers all available information about the task from the codebase, Jira, Confluence, Figma, `docs/context/` (durable domain knowledge — see [Domain Context (SSOT)](../domain-context)), and other sources.
 - **What it produces:** A `.research.md` file with task summary, assumptions, open questions, and suggested next steps. **DELTA** updates the existing file (Changelog + new section) in the same session.
 - **Your action:** Review the generated research document. Verify accuracy. The Engineering Manager asks for confirmation before proceeding.
 
@@ -72,7 +72,7 @@ If `.research.md` and `.plan.md` exist **and pass the adequacy checklist** for t
 :::
 
 :::note Mandatory QA comment draft after Fine
-When the Engineering Manager declares **Fine**, it **always produces a QA comment draft in the same response** following the **[Fine Handoff](../skills/fine-handoff)** skill (`eversis-fine-handoff`). Review the draft, edit if needed, then paste it into Jira or ask the agent to post it via Atlassian MCP. See [Workflow Overview](./overview) for how **Fine** fits the lifecycle.
+When the Engineering Manager declares **Fine**, it **always produces a QA comment draft in the same response** following the **[Fine Handoff](../skills/fine-handoff)** skill (`eversis-fine-handoff`). Review the draft, edit if needed, then paste it into Jira or ask the agent to post it via Atlassian MCP. If the task also surfaced a durable, cross-task fact, Fine adds a second, independently-approved draft proposing to record it in `docs/context/<project>/` — see [Workflow Overview](./overview#status-fine--handoff) for the full process and both approval gates.
 :::
 
 ### 2. Review

@@ -27,7 +27,7 @@ Build this site locally (`cd website && npm run build`). **Public hosting is def
 | **Core SSOT** | `.ai/rules`, `.ai/skills`, `.ai/prompts` | Canonical content |
 | **Adapters** | `adapters/cursor`, `adapters/claude`, `adapters/opencode` | Tool packaging + `sync.mjs` |
 | **Installer** | `scripts/setup-agent-collections.sh` | Local / submodule / copy into consumers |
-| **MCP** | `mcp/eversis-collections-mcp` | Skills tools via `AGENT_COLLECTIONS_HOME` |
+| **MCP** | `mcp/eversis-collections-mcp` | Skills tools via `AGENT_COLLECTIONS_HOME`, plus **domain context** tools (`eversis_context_*`, see [Domain Context (SSOT)](./domain-context)) via a second, independent volume |
 
 ### Lifecycle
 

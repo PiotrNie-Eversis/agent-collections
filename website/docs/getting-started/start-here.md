@@ -22,7 +22,7 @@ Complete these steps on a **sample consumer project** (empty folder or small rep
 1. **[Prerequisites](./prerequisites)** — Cursor and/or Claude Code, **Docker Engine + Compose v2** (to run the MCP server), **Node.js ≥ 18** (to develop the MCP package), Git.
 2. Clone **agent-collections** and export `AGENT_COLLECTIONS_HOME` (see [Installation](./installation)).
 3. **[Installation](./installation)** — run `setup-agent-collections.sh` with `--build-mcp --non-interactive` (local, submodule, or copy).
-4. Confirm `.agent-collections/install-selection.json` exists in the consumer project.
+4. Confirm `.agent-collections/install-selection.json` exists in the consumer project. Also confirm `docs/context/<project>/INDEX.md` — created on every install, see [Domain Context (SSOT)](../domain-context).
 5. **[MCP setup](./mcp-setup)** — enable **`eversis-collections`** with `AGENT_COLLECTIONS_HOME` (not `CURSOR_COLLECTIONS_HOME`).
 6. Open the consumer project in your agent tool and attach **`@eversis-implement`** (or load prompt id `eversis-implement`) with a short task — or read `.ai/skills/*/SKILL.md` via MCP.
 7. **Done** when: installer exited 0, MCP skills list works (or skills readable from `.ai/skills/`), and a first Implement readiness block appears in chat.

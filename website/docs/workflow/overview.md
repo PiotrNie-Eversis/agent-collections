@@ -64,7 +64,32 @@ At Step 0 the EM recommends **Quick** or **Full** (you may override). See [Orche
 
 When Implement is complete, the Engineering Manager declares **Fine** and **must** output a **QA comment draft in the same response** (not a separate turn). Normative procedure: [`.cursor/skills/eversis-fine-handoff/SKILL.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/skills/eversis-fine-handoff/SKILL.md) or MCP `eversis_skills_get` for `eversis-fine-handoff`. Onboarding overview: [Fine Handoff](../skills/fine-handoff).
 
-The draft is labeled **`Draft QA comment — review before posting to Jira`**. Post to Jira only after you approve (copy-paste or explicit Atlassian MCP instruction).
+The draft is labeled **`QA comment — review before posting to Jira`**. Post to Jira only after you approve (copy-paste or explicit Atlassian MCP instruction).
+
+### Domain-knowledge promotion
+
+So that a durable fact learned during one task (a confirmed business rule, a reusable integration pattern — not a one-off implementation detail) survives beyond that single task and beyond a single repo, Fine can also produce a **second, independent draft**: a proposal to write that fact into `docs/context/<project>/` (the project's own **domain knowledge** store — durable notes about the codebase and business rules, separate from per-task history). Most tasks do **not** produce this kind of finding — it appears only when the task actually surfaces one.
+
+This second draft is labeled **`Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing`** and has its **own** approval: accepting or rejecting the QA comment draft has no effect on it, and vice versa. Once approved, it publishes via the GitLab REST API directly to the `domain-context` repository — never a local checkout.
+
+```mermaid
+flowchart TD
+    review["Review\n(PASS)"] --> fine["Fine\n(work marked ready for QA)"]
+    fine --> qa["QA comment draft\n(always — every task)"]
+    qa --> gate1{"Human approves\nQA draft?"}
+    gate1 -->|"yes"| jira["Post comment\nto Jira"]
+
+    fine --> check{"Also: durable, cross-task\nknowledge found?\n(e.g. confirmed business rule,\nreusable pattern)"}
+    check -->|"No — most tasks"| nosecond["No second draft —\nQA comment draft above\nstill applies as normal"]
+    check -->|"Yes"| promo["+ Domain-knowledge promotion draft\n(independent, second draft)"]
+    promo --> gate2{"Human approves\npromotion draft?\n(separate decision)"}
+    gate2 -->|"yes"| gitlab["GitLab REST API commit\nto domain-context repo"]
+
+    style qa fill:#FFF9C4
+    style promo fill:#BBDEFB
+    style jira fill:#C8E6C9
+    style gitlab fill:#C8E6C9
+```
 
 ## Workflow diagram
 

@@ -21,7 +21,7 @@ The Code Reviewer agent performs structured code reviews against the implementat
 
 ## Review Process
 
-1. Read coding guidelines from **`.cursor/rules/`** (especially `eversis-project-stack.mdc`), **`AGENTS.md`**, and `docs/context/` / `docs/specs/` when present.
+1. Read coding guidelines from **`.cursor/rules/`** (especially `eversis-project-stack.mdc`), **`AGENTS.md`**, and `docs/specs/` when present. For `docs/context/` (see [Domain Context (SSOT)](../domain-context)), follow the same budget-aware procedure as Research — `INDEX.md` first, then only the one matched component file, never the whole directory.
 2. Understand project coding standards and best practices.
 3. Load relevant **Eversis** skills for the review domain.
 4. Run all necessary checks and tests (tests, lint, typecheck as appropriate; see `eversis-testing-and-terminal.mdc`).

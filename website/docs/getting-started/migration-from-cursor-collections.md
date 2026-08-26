@@ -46,9 +46,10 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 
 | Layer | Owns | Examples | Upgrade behavior |
 |-------|------|----------|------------------|
-| **Local (consumer)** | Project policy and product context | Stack rule, `docs/context|plans|specs`, local `AGENTS.md`, secrets, custom ignore overlays | **Never** overwritten without opt-in |
+| **Local (consumer)** | Project policy and product context | Stack rule, `docs/context|plans|specs`, local `AGENTS.md`, secrets, custom ignore overlays | **Never** overwritten without opt-in — `docs/context/PROJECT/INDEX.md` is the one exception, actively scaffolded by the installer |
 | **Core (framework SSOT)** | Vendor-neutral content | `.ai/rules`, `.ai/skills`, `.ai/prompts` | Updated by pulling/tagging `agent-collections` |
 | **Generated (adapters)** | Tool packaging from core | `.cursor/rules/eversis-*.mdc`, `.cursor/commands/*.md`, root `CLAUDE.md`, `.claude/rules/*.md`, `.claude/commands/*.md` | Regenerated via `sync:adapters` / installer `--sync` — do not hand-edit as SSOT |
+| **Shared (domain-context)** | Cross-repo domain knowledge, not owned by this consumer or by `agent-collections` | `docs/context/global/` (see [Domain Context (SSOT)](../domain-context)) | Refreshed via `eversis_context_sync` — a `git subtree pull` from a separate `domain-context` GitLab project, distinct from both Local and Core |
 
 Selection file `.agent-collections/install-selection.json` is **consumer install metadata** (read by `--upgrade`; not wiped casually).
 
@@ -63,6 +64,7 @@ Selection file `.agent-collections/install-selection.json` is **consumer install
 | Ignore triad | `.cursorignore` | `.claudeignore` — class source only; Claude Code enforces via `.claude/settings.json` `permissions.deny` (not `.claudeignore` directly) |
 | Settings / permissions | N/A | `.claude/settings.json` — `permissions.deny` generated from `.claudeignore` classes, `enabledMcpjsonServers` from MCP selection |
 | Area profiles | Path scope via installer profile | Same path profiles (tool-agnostic) |
+| Domain context | MCP `eversis-collections` → `eversis_context_get`/`list`/`sync` | Same MCP tools (tool-agnostic — identical mechanism for both) |
 | OpenCode | Placeholder only | — |
 
 Full mapping: [`docs/architecture/adapter-mapping.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/adapter-mapping.md).

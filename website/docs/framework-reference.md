@@ -24,7 +24,8 @@ This site builds locally (`npm run build` in `website/`). **Public hosting is de
 ```text
 .ai/          SSOT — rules, skills, prompts
 adapters/     Cursor / Claude / OpenCode packaging + sync
-mcp/          eversis-collections-mcp → .ai/skills via AGENT_COLLECTIONS_HOME
+mcp/          eversis-collections-mcp → .ai/skills via AGENT_COLLECTIONS_HOME,
+              + domain context (docs/context/) via a second, independent volume
 scripts/      setup-agent-collections.sh
 templates/    AGENTS / stack / mcp seeds
 ```
@@ -66,9 +67,11 @@ Load prompts by stable id under `.ai/prompts/`. Optional Cursor `@` attach when 
 
 ## Skills (MCP)
 
-Skills live under `.ai/skills/eversis-*/`. Prefer MCP server **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`). Respect the consumer **project stack** skills policy.
+Skills live under `.ai/skills/eversis-*/`. Prefer MCP server **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`). Respect the consumer **project stack** skills policy. Includes 3 domain-context skills: `eversis-promote-domain-knowledge`, `eversis-import-confluence-knowledge`, `eversis-audit-domain-knowledge`.
 
 MVP does **not** ship a full `.cursor/skills` mirror.
+
+The same MCP server also exposes a separate tool group, `eversis_context_*`, for reading and syncing **domain context** — see [Domain Context (SSOT)](./domain-context) and the [full tool inventory](./integrations/eversis-collections#domain-context).
 
 ## Multi-agent and isolation
 

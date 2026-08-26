@@ -54,7 +54,7 @@ Do not keep both env vars pointing at different frameworks for the same skills s
 
 ### What each MCP is used for
 
-- **eversis-collections** — list/get/validate skills from `.ai/skills/`; optional Word `.docx` tools when BA Docs is in scope for the consumer.
+- **eversis-collections** — list/get/validate skills from `.ai/skills/`; read/list/sync **domain context** (durable, cross-task knowledge — see [Domain Context (SSOT)](../domain-context)) from the consumer project's own `docs/context/`; optional Word `.docx` tools when BA Docs is in scope for the consumer.
 - **Atlassian** — Jira and Confluence for implement, review, and research.
 - **Figma** — design context for UI implement and UI review.
 - **Context7** — up-to-date library documentation.
@@ -62,6 +62,21 @@ Do not keep both env vars pointing at different frameworks for the same skills s
 - **Sequential Thinking** — structured reasoning for complex analysis.
 - **PDF Reader** — workshop PDFs for analyze-materials.
 - **AWS / GCP MCPs** — cloud APIs and docs for DevOps prompts (optional).
+
+### Domain context needs the project volume, not just the framework volume
+
+If `eversis_context_get/list/sync` come back empty, check this first.
+
+The `eversis-collections` container mounts two separate **volumes** (folders shared between your machine and the container):
+
+- *`./repo`* — the framework checkout. Always available.
+- *`${PWD}/workspace`* — your consumer project. Resolved from the working directory of the process that *starts* the container — not from `AGENT_COLLECTIONS_HOME`.
+
+Domain-context tools read and write `docs/context/` through `/workspace`, never `/repo`.
+
+:::caution Silent failure, not an error
+If your IDE starts the MCP process from somewhere other than your consumer project's root, these tools mount the wrong directory — you get missing or empty results, with no error to flag it.
+:::
 
 ### Verify
 

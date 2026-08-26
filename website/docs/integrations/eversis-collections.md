@@ -23,19 +23,22 @@ Unlike third-party servers that run via `npx`, this server **must be built** bef
 
 | Agent / prompt | When |
 | --- | --- |
-| **Engineering Manager** (`@eversis-implement`) | Skill discovery during implement; **`eversis-fine-handoff`** on Fine |
+| **Engineering Manager** (`@eversis-implement`) | Skill discovery during implement; **`eversis-fine-handoff`** on Fine, plus **`eversis-promote-domain-knowledge`** when Fine's optional second draft applies |
 | **QA practice** (`@eversis-qa-workflow`) | QA skills on demand (`eversis-planning-tests`, regression, AC verify, …) |
 | **Code Reviewer** (`@eversis-review`) | Procedural review skills via `eversis_skills_get` |
 | **Business Analyst** (`@eversis-ba-docs-planner`, `@eversis-ba-docs-writer`) | Word chapter tools for release documentation |
+| **Context Engineer** (Research step) | `eversis_context_get`/`list` — budget-aware read of `docs/context/<project>/` (see [Domain Context (SSOT)](../domain-context)) |
 | **All agents** | When `eversis-agent-core` instructs skill discovery before broad implementation |
+| **Any agent (on request)** | `eversis-import-confluence-knowledge` (seed domain context from an existing Confluence page), `eversis-audit-domain-knowledge` (periodic review) |
 | **Contributors** | `eversis_skills_validate` (same checks as `npm run validate` in the MCP package) |
 
-## Tool inventory (14 tools)
+## Tool inventory (17 tools)
 
 | Group | Tools | Count |
 | --- | --- | --- |
 | **Skills** | `eversis_skills_list`, `eversis_skills_get`, `eversis_skills_validate`, `eversis_skill_run_script` | 4 |
 | **Repo** | `eversis_repo_run_script` (`sync-prompts`, `sync-framework-doc`) | 1 |
+| **Domain context** | `eversis_context_get`, `eversis_context_list`, `eversis_context_sync` | 3 |
 | **Word / BA Docs** | `generate_summary_map`, `read_chapter`, `append_chapter`, `update_chapter`, `update_table_cell`, `list_section_elements`, `inspect_document`, `backup_docx`, `upload_to_sharepoint` (stub) | 9 |
 
 ## Tool reference
@@ -77,6 +80,28 @@ When adding or changing MCP tools, update this section and the matching **Tool r
 - **Focus:** Run allowlisted maintenance scripts at the repository root.
 - **How to use:** Agent passes `script`: `sync-prompts` or `sync-framework-doc`.
 - **Outcome:** JSON with `exitCode`, `stdout`, and `stderr`.
+
+### Domain context {#domain-context}
+
+Read, list, and refresh **domain context** — durable, cross-task knowledge (a confirmed business rule, a reusable integration pattern) stored as plain Markdown in `docs/context/`. Full concept: [Domain Context (SSOT)](../domain-context).
+
+#### `eversis_context_list`
+
+- **Focus:** Discover which components exist across both layers (`docs/context/<project>/` and `docs/context/global/`).
+- **How to use:** No arguments. Example: `eversis_context_list()`.
+- **Outcome:** JSON array of component names with their source layer (`project` or `global`).
+
+#### `eversis_context_get`
+
+- **Focus:** Read one named component — project layer first, falling back to global.
+- **How to use:** Pass `component` (the name from `eversis_context_list`). Example: `eversis_context_get({ component: "billing" })`.
+- **Outcome:** JSON with the file's content and frontmatter; on a global-layer result, also a staleness flag comparing the local copy against the `domain-context` remote. Updates the file's `last_consulted` field as a side effect.
+
+#### `eversis_context_sync`
+
+- **Focus:** Pull the latest `domain-context` content into `docs/context/global/`.
+- **How to use:** Optional `branch` (defaults to `main`). Example: `eversis_context_sync({ branch: "main" })`.
+- **Outcome:** JSON with `{ synced, message }` — runs a `git subtree pull --squash`; failures are reported, never silently retried.
 
 ### Word (Business Manager Docs)
 
@@ -186,7 +211,7 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 }
 ```
 
-The `-f` path is relative to the **repository root** that contains `.cursor/mcp.json`; `docker-compose.yml` bind-mounts that same repository root into the container, so no other path configuration is needed.
+`docker-compose.yml` bind-mounts **two** separate volumes, each resolved differently: `.:/repo` (the framework checkout, resolved relative to `docker-compose.yml`'s own directory — the `-f` path is what points Compose at that file) and `${PWD}:/workspace` (your consumer project, resolved from the **current directory of the process that runs `docker compose`**). Domain-context tools read `docs/context/` through `/workspace`, not `/repo` — if the launching process's cwd isn't your consumer project's root, those tools silently mount the wrong directory. See [Domain Context (SSOT)](../domain-context) and [MCP Setup](../getting-started/mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume).
 
 ### Consumer project (framework outside workspace)
 
@@ -194,7 +219,7 @@ The `-f` path is relative to the **repository root** that contains `.cursor/mcp.
 2. Bootstrap with `setup-agent-collections.sh --build-mcp` — see [Installation §4](../getting-started/installation).
 3. Enable **`eversis-collections`** in Cursor MCP settings and restart.
 
-The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the bind mount relative to that file's own directory. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../getting-started/installation).
+The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. The second volume, `${PWD}:/workspace` (used by domain-context tools), resolves independently from the launching process's own current directory, **not** from `AGENT_COLLECTIONS_HOME`. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../getting-started/installation).
 
 ## Do not register skills as Agent Skills
 

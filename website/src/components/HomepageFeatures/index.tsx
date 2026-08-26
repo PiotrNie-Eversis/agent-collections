@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 
-import AgentsIcon from "./icons/agents.svg";
-import IntegrationsIcon from "./icons/integrations.svg";
-import LifecycleIcon from "./icons/lifecycle.svg";
-import RequirementsIcon from "./icons/requirements.svg";
-import VerificationIcon from "./icons/verification.svg";
-import WorkflowIcon from "./icons/workflow.svg";
-import styles from "./styles.module.css";
+import AgentsIcon from './icons/agents.svg';
+import IntegrationsIcon from './icons/integrations.svg';
+import LifecycleIcon from './icons/lifecycle.svg';
+import RequirementsIcon from './icons/requirements.svg';
+import VerificationIcon from './icons/verification.svg';
+import WorkflowIcon from './icons/workflow.svg';
+import styles from './styles.module.css';
 
 /* ── Card data ──────────────────────────────────────────────── */
 
@@ -19,39 +19,39 @@ type CardItem = {
 const cards: CardItem[] = [
   {
     icon: <LifecycleIcon className={styles.cardIcon} />,
-    title: "Ideate → Implement → Review",
+    title: 'Ideate → Implement → Review',
     description:
-      "Full SDLC in one framework — workshop transcript to production-ready code. Every phase has dedicated rules, prompts, skills, and workflows with human gates.",
+      'Full SDLC in one framework — workshop transcript to production-ready code. Every phase has dedicated rules, prompts, skills, and workflows with human gates.',
   },
   {
     icon: <AgentsIcon className={styles.cardIcon} />,
-    title: "12 Specialized AI Agents",
+    title: '12 Specialized AI Agents',
     description:
-      "Business Analyst, Architect, Software Engineer, Prompt Engineer, Code Reviewer, UI Reviewer, E2E Engineer, DevOps Engineer, Engineering Manager, Context Engineer, and framework customization (rules, skills, prompts) — each focused on its phase, working together in a structured sequence.",
+      'Business Analyst, Architect, Software Engineer, Prompt Engineer, Code Reviewer, UI Reviewer, E2E Engineer, DevOps Engineer, Engineering Manager, Context Engineer, and framework customization (rules, skills, prompts) — each focused on its phase, working together in a structured sequence.',
   },
   {
     icon: <WorkflowIcon className={styles.cardIcon} />,
-    title: "Structured Delivery Workflow",
+    title: 'Structured Delivery Workflow',
     description:
-      "Research → Plan → Implement → Review. Each phase feeds the next. Research becomes the plan. The plan becomes the implementation checklist. Review returns issues to the exact phase.",
+      'Research → Plan → Implement → Review. Each phase feeds the next. Research becomes the plan. The plan becomes the implementation checklist. Review returns issues to the exact phase.',
   },
   {
     icon: <VerificationIcon className={styles.cardIcon} />,
-    title: "Pixel-Perfect UI Verification",
+    title: 'Pixel-Perfect UI Verification',
     description:
-      "Automated Figma comparison loop in every UI implementation cycle. Playwright captures the rendered state and compares it to the design spec. Mismatches are fixed before review.",
+      'Automated Figma comparison loop in every UI implementation cycle. Playwright captures the rendered state and compares it to the design spec. Mismatches are fixed before review.',
   },
   {
     icon: <RequirementsIcon className={styles.cardIcon} />,
-    title: "Requirements Processing",
+    title: 'Requirements Processing',
     description:
-      "Turn workshop transcripts and meeting notes into Jira-ready user stories before a line of code is written. The framework starts at the source of the work, not just the ticket.",
+      'Turn workshop transcripts and meeting notes into Jira-ready user stories before a line of code is written. The framework starts at the source of the work, not just the ticket.',
   },
   {
     icon: <IntegrationsIcon className={styles.cardIcon} />,
-    title: "MCP Tool Integrations",
+    title: 'MCP Tool Integrations',
     description:
-      "Jira, Figma Dev Mode, Context7, Playwright, Sequential Thinking, AWS API, GCP Gcloud, and more — wired into the workflow phases, not bolted on. Context flows through every step automatically.",
+      'Jira, Figma Dev Mode, Context7, Playwright, Sequential Thinking, AWS API, GCP Gcloud, and more — wired into the workflow phases, not bolted on. Context flows through every step automatically.',
   },
 ];
 

@@ -18,6 +18,7 @@ The Context Engineer gathers requirements, analyzes processes, and produces a re
 - Reviewing Figma designs when linked to the task.
 - Identifying ambiguities and missing information, asking for clarification.
 - Exploring industry standards and domain-specific best practices.
+- Reading **domain context** (durable, cross-task knowledge — see [Domain Context (SSOT)](../domain-context)) from `docs/context/<project>/`: read `INDEX.md` first, match the task's topic to one listed component, then read only that component's file — never the whole directory by default.
 
 ## What It Produces
 
@@ -44,6 +45,7 @@ A `.research.md` document containing:
 | **PDF Reader** | Read and extract content from PDF requirement documents |
 | **Sequential Thinking** | Analyze complex business rules, identify edge cases, map dependencies |
 | **Cursor Agent** | Read code and docs, search the workspace for usages and related files, edit research output (e.g. `.research.md`) |
+| **eversis-collections MCP** | `eversis_context_get`/`list` — budget-aware read of `docs/context/<project>/INDEX.md` and one matched component file |
 | **Todo** | Track research progress with structured checklists |
 
 ## Skills Loaded

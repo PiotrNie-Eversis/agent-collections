@@ -33,7 +33,7 @@ Markdown artifacts under `docs/specs/<workshop-name>/` (or `specifications/<work
 
 **Project continuity** (refreshed after successful Jira push):
 
-- **`docs/context/<project>/task-baseline.md`** — Epic/story index keyed by Jira Key for future workshop overlap checks.
+- **`docs/context/<project>/task-baseline.md`** — Epic/story index keyed by Jira Key for future workshop overlap checks. Lives alongside `INDEX.md` in the same directory but is a separate, sibling file — not one of the components `INDEX.md` indexes (see [Domain Context (SSOT)](../domain-context)).
 
 ## What it does NOT do
 

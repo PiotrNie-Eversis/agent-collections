@@ -36,6 +36,10 @@
   color: #ffffff;
 }
 
+.cardDark:last-child {
+  grid-column: 1 / -1;
+}
+
 .cardIcon {
   width: 32px;
   height: 32px;
