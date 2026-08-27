@@ -5,7 +5,7 @@ title: Verifying Acceptance Criteria
 
 # Verifying Acceptance Criteria
 
-**Folder:** `.cursor/skills/eversis-verifying-acceptance-criteria/`  
+**Folder:** `.ai/skills/eversis-verifying-acceptance-criteria/`  
 **Used by:** [`@eversis-qa-workflow`](../workflow/qa-workflow) — side-flow `verify ac`
 
 Compares implementation against stated acceptance criteria and produces a gap table (implemented / partial / missing / blocked).

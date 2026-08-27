@@ -5,7 +5,7 @@ title: Implementing Filters
 
 # Implementing Filters
 
-**Folder:** `.cursor/skills/eversis-implementing-filters/`  
+**Folder:** `.ai/skills/eversis-implementing-filters/`  
 **Used by:** Software Engineer on filterable **list** tasks (when stack policy allows)
 
 URL-synced filter lists for **Next.js** with shareable query state, aligned to REST list APIs. Headless patterns: filter schema, serialize/deserialize, `useFilters`-style hooks, `push` vs `replace` navigation.

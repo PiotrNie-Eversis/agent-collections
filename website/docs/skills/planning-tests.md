@@ -5,7 +5,7 @@ title: Planning Tests
 
 # Planning Tests
 
-**Folder:** `.cursor/skills/eversis-planning-tests/`  
+**Folder:** `.ai/skills/eversis-planning-tests/`  
 **Used by:** [`@eversis-qa-workflow`](../workflow/qa-workflow) — phases 1–2 (test plan, test cases)
 
 Generates structured test plans and executable test cases from acceptance criteria, with edge-case detection and environment matrix coverage.

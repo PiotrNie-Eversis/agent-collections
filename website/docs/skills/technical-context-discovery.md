@@ -5,7 +5,7 @@ title: Technical Context Discovery
 
 # Technical Context Discovery
 
-**Folder:** `.cursor/skills/eversis-technical-context-discovering/`  
+**Folder:** `.ai/skills/eversis-technical-context-discovering/`  
 **Used by:** Architect, Code Reviewer, Software Engineer, E2E Engineer, framework customization, Context Engineer
 
 Provides a systematic process for understanding project context before any code changes. Enforces a strict priority hierarchy to ensure consistency.
@@ -30,7 +30,7 @@ Never introduce new patterns unless explicitly requested by the user. Always rep
 Search for project rules and instructions:
 
 - **`AGENTS.md`** — Entry point for AI behavior in the repo.
-- **`.cursor/rules/*.mdc`** — Cursor project rules (always-on or `globs`).
+- **`.ai/rules/`** — project rules (SSOT; the Cursor adapter emits `.cursor/rules/*.mdc`, the Claude Code adapter generates `CLAUDE.md`) — always-on or scoped by `globs`.
 - Optional per-folder **`RULE.md`** (when used by your team).
 
 ### Step 2: Analyse Codebase Patterns

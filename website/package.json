@@ -5,9 +5,10 @@
   "scripts": {
     "sync-changelog": "node ../scripts/sync-changelog.mjs",
     "check-changelog": "node ../scripts/sync-changelog.mjs --check",
-    "prestart": "npm run sync-changelog",
+    "sync-docs": "node ../adapters/website/generate.mjs",
+    "prestart": "npm run sync-changelog && npm run sync-docs",
     "start": "docusaurus start",
-    "prebuild": "npm run sync-changelog",
+    "prebuild": "npm run sync-changelog && npm run sync-docs",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear"

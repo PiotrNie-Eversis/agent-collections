@@ -5,7 +5,7 @@ title: Task Quality Review
 
 # Task Quality Review
 
-**Folder:** `.cursor/skills/eversis-task-quality-reviewing/`  
+**Folder:** `.ai/skills/eversis-task-quality-reviewing/`  
 **Used by:** Business Analyst via [`eversis-analyze-materials`](../prompts/public/analyze-materials) (Gate 1.5)
 
 Systematic quality analysis on a Gate 1-approved task list (`extracted-tasks.md`) to identify gaps, missing edge cases, and improvement opportunities. Produces structured suggestions the user accepts or rejects individually.

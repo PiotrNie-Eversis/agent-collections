@@ -6,11 +6,12 @@ import styles from "./styles.module.css";
 const steps = [
   {
     num: 1,
-    title: "Open in Cursor",
+    title: "Open in Cursor or Claude Code",
     description: (
       <>
-        Open this repository in <strong>Cursor</strong> (
-        <code>File → Open Folder</code>).
+        Open this repository in <strong>Cursor</strong> or{" "}
+        <strong>Claude Code</strong> — canonical content under{" "}
+        <code>.ai/</code> works in either.
       </>
     ),
   },
@@ -30,8 +31,9 @@ const steps = [
     title: "Configure rules",
     description: (
       <>
-        Start with <code>eversis-agent-core.mdc</code> and edit{" "}
-        <code>eversis-project-stack.mdc</code> for your stack.
+        Start with <code>.ai/rules/orchestration/agent-core.md</code> and
+        add your own stack rules — the Cursor adapter packages these as{" "}
+        <code>.mdc</code>, the Claude adapter as <code>CLAUDE.md</code>.
       </>
     ),
   },
@@ -40,8 +42,9 @@ const steps = [
     title: "Run your first prompt",
     description: (
       <>
-        Attach <code>@eversis-implement</code> or use{" "}
-        <code>/eversis-implement</code> with your ticket or task text.
+        Attach <code>@eversis-implement</code> in Cursor, or run{" "}
+        <code>/eversis-implement</code> (Cursor project command or Claude
+        Code slash command) with your ticket or task text.
       </>
     ),
   },
@@ -50,22 +53,21 @@ const steps = [
     title: "Build MCP",
     description: (
       <>
-        <code>
-          cd mcp/eversis-collections-mcp && npm install && npm run build
-        </code>
-        — enable <code>eversis-collections</code> from{" "}
-        <code>.cursor/mcp.json</code>.
+        <code>export AGENT_COLLECTIONS_HOME=/path/to/agent-collections</code>
+        , then <code>docker compose build eversis-collections</code> (Docker
+        Engine + Compose v2 required).
       </>
     ),
   },
   {
     num: 6,
-    title: "Use skills via MCP",
+    title: "Use skills",
     description: (
       <>
-        With MCP enabled, Agent calls <code>eversis_skills_list</code> /{" "}
-        <code>eversis_skills_get</code> — see{" "}
-        <Link to="/docs/skills/overview">Skills overview</Link>.
+        Claude Code resolves skills natively from <code>.ai/skills/</code>{" "}
+        (no MCP needed); with MCP enabled, Agent calls{" "}
+        <code>eversis_skills_list</code> / <code>eversis_skills_get</code> —
+        see <Link to="/docs/skills/overview">Skills overview</Link>.
       </>
     ),
   },
@@ -85,9 +87,10 @@ export default function GettingStartedSection(): React.JSX.Element {
           </h2>
           <p className={styles.sub}>
             <strong>Ideate → Implement → Review</strong> — clone or bootstrap,
-            build <code>eversis-collections</code>, attach{" "}
-            <code>eversis-*.md</code> prompts with <code>@</code> or{" "}
-            <code>/eversis-*</code> project commands.
+            build the <code>eversis-collections</code> MCP with Docker, run{" "}
+            <code>eversis-*.md</code> prompts by stable id — <code>@</code>{" "}
+            attach or <code>/eversis-*</code> in Cursor, the matching slash
+            command in Claude Code.
           </p>
           <div className={styles.gsActions}>
             <Link

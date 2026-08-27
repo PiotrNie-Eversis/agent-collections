@@ -5,7 +5,7 @@ title: Skills Overview
 
 # Skills Overview
 
-Agent Collections includes **43 reusable skills** — knowledge modules that provide specialized domain expertise, structured processes, and quality templates. They encode tested best practices for every phase of the product lifecycle. Skills are stored in `.cursor/skills/`. In Agent, use them through the **`eversis-collections` MCP** server (**`eversis_skills_list`**, **`eversis_skills_get`**, **`eversis_skill_run_script`** for allowlisted per-skill scripts, and related tools) after building [`mcp/eversis-collections-mcp/`](https://github.com/PiotrNie-Eversis/agent-collections/tree/main/mcp/eversis-collections-mcp); do not register the folder separately as Cursor **Agent Skills** for this framework.
+Agent Collections includes **48 reusable skills** — knowledge modules that provide specialized domain expertise, structured processes, and quality templates. They encode tested best practices for every phase of the product lifecycle. Skills are stored under **`.ai/skills/`** (SSOT — consumed directly by hosts that read files, such as Claude Code; also available through adapters). In Cursor Agent, use them through the **`eversis-collections` MCP** server (**`eversis_skills_list`**, **`eversis_skills_get`**, **`eversis_skill_run_script`** for allowlisted per-skill scripts, and related tools) after building [`mcp/eversis-collections-mcp/`](https://github.com/PiotrNie-Eversis/agent-collections/tree/main/mcp/eversis-collections-mcp); do not register the folder separately as Cursor **Agent Skills** for this framework — this repo does not ship a full `.cursor/skills/` mirror.
 
 ## How Skills Work
 
@@ -29,7 +29,7 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 
 ## Available Skills
 
-> **Note:** The skill links below are for human browsing and overview only. Agents must use the `eversis-collections` MCP tools or read the `.cursor/skills/*/SKILL.md` files directly for normative procedures.
+> **Note:** The skill links below are for human browsing and overview only. Agents must use the `eversis-collections` MCP tools or read the `.ai/skills/*/SKILL.md` files directly for normative procedures.
 
 ### 📋 Ideate skills
 
@@ -40,6 +40,8 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 | [eversis-task-extracting](./task-extraction)             | Epic and user story extraction from workshop materials | Business Analyst               |
 | [eversis-task-quality-reviewing](./task-quality-review)  | Quality analysis for extracted task lists              | Business Analyst               |
 | [eversis-jira-task-formatting](./jira-task-formatting)   | Jira-ready task formatting and import/push management  | Business Analyst               |
+| [eversis-ba-docs-planner](./ba-docs-planner)             | Plan Word `.docx` chapter updates from a Jira release + Confluence rules | Business Analyst |
+| [eversis-ba-docs-writer](./ba-docs-writer)               | Apply an approved docs-update-plan.md to a Word `.docx` file | Business Analyst |
 
 ### 🛠 Implement skills
 
@@ -60,6 +62,9 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 | [eversis-codebase-analysing](./codebase-analysis)                      | Deep codebase analysis and dependency mapping                 | Architect, BA, CE, SE      |
 | [eversis-writing-repo-documentation](./writing-repo-documentation) | Repository docs: README, CHANGELOG, docs site | Repo Docs writer, EM delegate |
 | [eversis-engineering-prompts](./prompt-engineering)                    | LLM prompt design, optimization, security, and evaluation     | PE, SE, Architect, CR      |
+| [eversis-promote-domain-knowledge](./promote-domain-knowledge)         | Optional Fine-turn draft promoting durable cross-task facts to `docs/context/` | Engineering Manager |
+| [eversis-import-confluence-knowledge](./import-confluence-knowledge)   | One-time seed of `docs/context/<project>/` from a Confluence AS-IS Pack page | Business Analyst, Context Engineer |
+| [eversis-audit-domain-knowledge](./audit-domain-knowledge)             | Periodic Keep/Update/Consolidate/Replace/Delete review of `docs/context/` | Anyone (scheduled) |
 
 ### ☁️ Cloud & Infrastructure Skills
 
@@ -104,6 +109,9 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 | Skill                                  | BA  | CE  | Architect | SE  | PE  | CR  | UI Reviewer | E2E | DevOps | Customize |
 | -------------------------------------- | --- | --- | --------- | --- | --- | --- | ----------- | --- | ------ | --------- |
 | eversis-architecture-designing             |     |     | ✅        |     |     |     |             |     |        |           |
+| eversis-audit-domain-knowledge             |     |     |           |     |     |     |             |     |        |           |
+| eversis-ba-docs-planner                    | ✅  |     |           |     |     |     |             |     |        |           |
+| eversis-ba-docs-writer                     | ✅  |     |           |     |     |     |             |     |        |           |
 | eversis-creating-implementation-plans        |     |     | ✅        |     |     |     |             |     |        |           |
 | eversis-code-reviewing                     |     |     |           |     | ✅  | ✅  |             |     |        |           |
 | eversis-codebase-analysing                 | ✅  | ✅  | ✅        | ✅  |     |     |             |     | ✅     | ✅        |
@@ -123,11 +131,13 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 | eversis-implementing-observability         |     |     | ✅        |     |     |     |             |     | ✅     |           |
 | eversis-implementing-terraform-modules     |     |     | ✅        |     |     |     |             |     | ✅     |           |
 | eversis-implementation-gap-analysing       |     |     | ✅        | ✅  |     | ✅  |             |     |        |           |
+| eversis-import-confluence-knowledge        | ✅  | ✅  |           |     |     |     |             |     |        |           |
 | eversis-jira-task-formatting               | ✅  |     |           |     |     |     |             |     |        |           |
 | eversis-managing-secrets                   |     |     | ✅        |     |     |     |             |     | ✅     |           |
 | eversis-optimizing-cloud-cost              |     |     | ✅        |     |     |     |             |     | ✅     |           |
 | eversis-optimizing-frontend                |     |     |           | ✅  |     |     |             |     |        |           |
 | eversis-fine-handoff                         |     |     |           | ✅  |     | ✅  |             | ✅  |        |           |
+| eversis-promote-domain-knowledge           |     |     |           |     |     |     |             |     |        |           |
 | eversis-planning-tests                     |     |     |           |     |     |     |             |     |        |           |
 | eversis-analyzing-regression-risk          |     |     |           |     |     |     |             |     |        |           |
 | eversis-verifying-acceptance-criteria      |     |     |           |     |     |     |             |     |        |           |
@@ -148,7 +158,7 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 
 Skills follow a strict priority hierarchy:
 
-1. **Project constitution** — [AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md) and **`.cursor/rules/*.mdc`** (highest priority for behavior).
+1. **Project constitution** — [AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md) and **`.ai/rules/`** (SSOT; the Cursor adapter emits **`.cursor/rules/*.mdc`**, the Claude Code adapter generates **`CLAUDE.md`**) — highest priority for behavior.
 2. **Existing codebase patterns** — replicate established conventions.
 3. **Skill guidelines** — domain best practices and templates.
 4. **External documentation** — framework docs, OWASP, industry standards.

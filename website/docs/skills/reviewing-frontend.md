@@ -5,7 +5,7 @@ title: Frontend Review
 
 # Frontend Review
 
-**Folder:** `.cursor/skills/eversis-reviewing-frontend/`  
+**Folder:** `.ai/skills/eversis-reviewing-frontend/`  
 **Used by:** Code Reviewer
 
 Provides frontend-specific code review criteria covering component anti-patterns, hooks quality, rendering correctness, accessibility and performance spot-checks, and module organization issues.

@@ -5,7 +5,7 @@ title: Analyzing Bugs
 
 # Analyzing Bugs
 
-**Folder:** `.cursor/skills/eversis-analyzing-bugs/`  
+**Folder:** `.ai/skills/eversis-analyzing-bugs/`  
 **Used by:** [`@eversis-qa-workflow`](../workflow/qa-workflow) — phase 5 (quality health)
 
 Analyzes Jira bug history to produce quality health dashboards: trends, severity mix, component hotspots, and release readiness signals.

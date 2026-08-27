@@ -1,7 +1,7 @@
 import React from 'react';
-import SdlcDiagram from '@site/src/components/SdlcDiagram';
 
 import styles from './styles.module.css';
+import SdlcDiagram from '../SdlcDiagram';
 
 export default function WorkflowShowcase(): React.JSX.Element {
   return (

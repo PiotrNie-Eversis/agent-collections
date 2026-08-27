@@ -5,7 +5,7 @@ title: SQL & Database
 
 # SQL & Database
 
-**Folder:** `.cursor/skills/eversis-sql-and-database-understanding/`  
+**Folder:** `.ai/skills/eversis-sql-and-database-understanding/`  
 **Used by:** Architect, Code Reviewer, Software Engineer
 
 The most comprehensive skill (~1200 lines), providing end-to-end database engineering standards. Applies to PostgreSQL, MySQL, MariaDB, SQL Server, and Oracle. Covers ORM usage with TypeORM, Prisma, Doctrine, Eloquent, Entity Framework, Hibernate, and GORM.

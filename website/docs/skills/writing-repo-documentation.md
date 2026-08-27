@@ -5,7 +5,7 @@ title: Writing Repo Documentation
 
 # Writing Repo Documentation
 
-**Folder:** `.cursor/skills/eversis-writing-repo-documentation/`  
+**Folder:** `.ai/skills/eversis-writing-repo-documentation/`  
 **Used by:** Repo Docs writer via [`eversis-repo-docs-writer`](../prompts/public/repo-docs-writer)
 
 Authors and updates **repository** documentation without touching product code. README, CHANGELOG, in-repo `docs/`, and the published documentation site are the targets.

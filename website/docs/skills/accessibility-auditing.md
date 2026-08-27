@@ -5,7 +5,7 @@ title: Accessibility Auditing
 
 # Accessibility Auditing
 
-**Folder:** `.cursor/skills/eversis-accessibility-auditing/`  
+**Folder:** `.ai/skills/eversis-accessibility-auditing/`  
 **Used by:** [`@eversis-qa-workflow`](../workflow/qa-workflow) — side-flow `audit accessibility`
 
 WCAG 2.2 Level AA audits using automated tools plus manual POUR testing. Produces audit reports and business summaries.

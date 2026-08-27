@@ -5,87 +5,57 @@ title: Prompts Overview
 
 # Prompts Overview
 
-This framework includes **12 public prompts** — Markdown workflow definitions for **Cursor** (Chat or Agent). **Canonical sources** live under `.cursor/prompts/public/` as `eversis-*.md` files.
+This framework includes **16 public prompts** and **12 internal prompts** — Markdown workflow definitions loaded by stable id under **`.ai/prompts/`**. **Canonical sources** live under `.ai/prompts/public/` and `.ai/prompts/internal/` as `eversis-*.md` files; the content on this page is copied verbatim from there.
 
-**How to invoke:** Two equivalent options in Chat or Agent:
+**How to invoke — three adapters, not just Cursor:**
 
-- **`@` attachment (preferred):** Type **`@`** and the **file stem** (e.g. **`@eversis-implement`**, **`@eversis-review`**). Cursor resolves the file by name; use a full repo path only if the picker does not disambiguate.
-- **`/` project command:** Type **`/`** and select from the dropdown. This repo ships thin `.cursor/commands/eversis-*.md` delegates for the four primary SDLC prompts — they read and execute the canonical prompt file automatically.
+- **Claude Code:** stable prompt id as a slash command (e.g. **`/eversis-implement`**) generated under `.claude/commands/` by the Claude adapter — this is how prompts are triggered outside Cursor.
+- **Cursor `@` attachment:** type **`@`** and the file stem (e.g. **`@eversis-implement`**). Cursor resolves the file by name.
+- **Cursor `/` project command:** thin `.cursor/commands/eversis-*.md` shims (Cursor adapter) that point back at the SSOT file under `.ai/prompts/`.
 
-| `/` project command | Equivalent `@` attachment | Workflow |
-| --- | --- | --- |
-| `/eversis-analyze-materials` | `@eversis-analyze-materials` | Ideate — workshop → Jira stories |
-| `/eversis-implement` | `@eversis-implement` | Implement — research → plan → code |
-| `/eversis-review` | `@eversis-review` | Review — code quality against plan |
-| `/eversis-review-ui` | `@eversis-review-ui` | Review — Figma vs implementation |
+Public prompts are user-facing entry points; internal prompts are delegated to automatically by the Engineering Manager during `/eversis-implement` — you do not attach them directly.
 
-> Use **`@`** attachment or the **`/eversis-*`** project commands above — both load the same canonical `.cursor/prompts/public/` files.
-
-The first column in the tables below lists each **prompt by file stem** (links go to the catalog page).
-
-**Documentation site:** From the repository’s **`website/`** directory, `npm run start` and `npm run build` run **`sync-prompts`** first, copying these files into `website/docs/prompts/` for Docusaurus. The generated `eversis-*.md` copies there are gitignored and are listed in **`.cursorignore`** so they are not double-indexed next to the sources under **`.cursor/prompts/`.**
-
-## How Prompts Work
-
-Each prompt file defines:
-
-- **Role** — Who executes the workflow (conceptual; backed by **rules** in `.cursor/rules/` when you use them).
-- **Description** — Short summary of the workflow’s purpose.
-- **Instructions** — Detailed steps, required skills, and output format.
-
-In **Cursor**, the **attachable body** is the Markdown file. The **Executable prompt** section at the bottom of each catalog page is the full body to follow in Agent mode.
+**Documentation site:** this page and every page under `prompts/public/` and `prompts/internal/` are **generated** from `.ai/prompts/**` by `node adapters/website/generate-prompts.mjs` (`npm run sync:website-docs`). The generated files are **committed to git** (not gitignored) — same convention as `.cursor/rules/*.mdc` and `.claude/commands/*.md` under `adapters/sync.mjs`. Run `npm run sync:website-docs:check` to detect drift; do not hand-edit files under this generated tree — edit the `.ai/prompts/` source and regenerate.
 
 ## Public Prompts
 
-These are the user-facing prompts. Doc paths use stable URLs (`slug`); files on disk are `eversis-*.md`.
+| Prompt | Role | Description |
+| --- | --- | --- |
+| [eversis-implement](./public/implement) | Engineering Manager | Implement feature according to the plan. |
+| [eversis-review](./public/review) | Code reviewer | Check the implementation against the plan and feature context. |
+| [eversis-review-ui](./public/review-ui) | UI reviewer | Single-pass UI verification: compare implementation against Figma and report differences. |
+| [eversis-review-codebase](./public/review-codebase) | Architect | Perform a comprehensive code quality analysis: dead code, duplications, and improvement opportunities. |
+| [eversis-analyze-materials](./public/analyze-materials) | Business analyst | Process discovery workshop materials and create Jira-ready epics and user stories, or iterate on an existing Jira backlog. |
+| [eversis-ba-docs-planner](./public/ba-docs-planner) | BA Docs (Word) planner | Build docs-update-plan.md from Confluence rules, a Jira release, and summary.md — for .docx chapters. |
+| [eversis-ba-docs-writer](./public/ba-docs-writer) | BA Docs (Word) writer | Apply docs-update-plan.md to .docx via eversis-collections MCP — not README or website markdown. |
+| [eversis-create-custom-agent](./public/create-custom-agent) | Cursor customization orchestrator | Create new Cursor role packaging — typically `.ai/rules/` plus optional Cursor adapter `.mdc` packaging and optional agent docs. Researches existing rules, designs the role, and validates against the eversis-creating-agents skill. |
+| [eversis-repo-docs-writer](./public/repo-docs-writer) | Repo Docs writer | Author or update repository documentation (README, CHANGELOG, docs/, website/) — not Word .docx. |
+| [eversis-create-custom-skill](./public/create-custom-skill) | Cursor customization orchestrator | Create a new Agent Skill: SKILL.md under .ai/skills/ with gerund-style folder name. Follows eversis-creating-skills. |
+| [eversis-qa-workflow](./public/qa-workflow) | QA practice | Single QA entrypoint — test planning, regression, AC verification, bug reports, quality health, and accessibility audits. |
+| [eversis-create-custom-prompt](./public/create-custom-prompt) | Cursor customization orchestrator | Create a new attachable prompt as .ai/prompts/public\|internal/eversis-*.md with Docusaurus frontmatter. Analyzes existing prompts for patterns and validates using eversis-creating-prompts. |
+| [eversis-audit-infrastructure](./public/audit-infrastructure) | DevOps engineer | Audit infrastructure for security gaps, cost waste, and best practices violations. |
+| [eversis-create-custom-instructions](./public/create-custom-instructions) | Cursor customization orchestrator | Create or extend project instructions for Cursor: AGENTS.md, .cursor/rules, optional RULE.md. Follows eversis-creating-instructions. |
+| [eversis-analyze-aws-costs](./public/analyze-aws-costs) | DevOps engineer | Perform a comprehensive AWS cost optimization and tagging compliance audit — checks IaC code first, then validates everything against live infrastructure via API. |
+| [eversis-analyze-gcp-costs](./public/analyze-gcp-costs) | DevOps engineer | Perform a comprehensive GCP cost optimization and labeling compliance audit — checks IaC code first, then validates everything against live infrastructure via API. |
 
-### Product Ideation
+## Internal Prompts
 
-| Prompt | Description |
-| --- | --- |
-| [eversis-analyze-materials](./public/analyze-materials) | Process workshop materials into Jira-ready epics and stories |
+Not invoked directly by users — delegated to automatically during `/eversis-implement` when the workflow requires them.
 
-### Development
-
-| Prompt | Description |
-| --- | --- |
-| [eversis-implement](./public/implement) | Orchestrate research → plan → implementation |
-
-### Quality
-
-| Prompt | Description |
-| --- | --- |
-| [eversis-review](./public/review) | Review implementation against plan and standards |
-| [eversis-review-ui](./public/review-ui) | Single-pass Figma vs implementation comparison |
-| [eversis-review-codebase](./public/review-codebase) | Comprehensive code quality analysis |
-
-### Framework customization
-
-| Prompt | Description |
-| --- | --- |
-| [eversis-create-custom-agent](./public/create-custom-agent) | New Cursor rules / role documentation |
-| [eversis-create-custom-skill](./public/create-custom-skill) | New Agent Skill (SKILL.md) |
-| [eversis-create-custom-prompt](./public/create-custom-prompt) | New attachable prompt Markdown |
-| [eversis-create-custom-instructions](./public/create-custom-instructions) | AGENTS.md and project instruction layout |
-
-### Infrastructure and cost
-
-| Prompt | Description |
-| --- | --- |
-| [eversis-audit-infrastructure](./public/audit-infrastructure) | Infra security and best-practices audit |
-| [eversis-analyze-aws-costs](./public/analyze-aws-costs) | AWS cost and tagging compliance |
-| [eversis-analyze-gcp-costs](./public/analyze-gcp-costs) | GCP cost and labeling compliance |
-
-## Delegation via Implement
-
-When you run **[eversis-implement](./public/implement)** (attach the file), the workflow describes how the **Engineering Manager** pattern delegates research, planning, and implementation. You do not need to open every internal prompt by hand — follow the public `eversis-implement.md` body; it references **`.cursor/prompts/internal/`** when needed.
-
-| Phase | Delegated to (conceptual) |
-| --- | --- |
-| Research | Context Engineer (see [internal research](./internal/research)) |
-| Planning | Architect (see [internal plan](./internal/plan)) |
-| Implementation | Software Engineer, Prompt Engineer, DevOps, E2E, etc. (per task) |
-| UI verification | UI Reviewer and internal UI prompts as applicable |
+| Prompt | Role | Description |
+| --- | --- | --- |
+| [eversis-implement-common-task](./internal/implement-common-task) | Software engineer | Implement common feature according to the plan. |
+| [eversis-implement-ui-common-task](./internal/implement-ui-common-task) | Software engineer | Implement UI feature according to the plan with frontend-specific setup and design reference handling. |
+| [eversis-implement-e2e](./internal/implement-e2e) | E2E engineer | Create, maintain, and execute E2E tests for given feature or user story. |
+| [eversis-implement-ui](./internal/implement-ui) | Engineering Manager | Implement UI feature according to the plan, orchestrating iterative Figma verification until pixel-perfect. |
+| [eversis-research](./internal/research) | Context engineer | Prepare a context for a specific task or feature from a context engineering perspective. |
+| [eversis-plan](./internal/plan) | Architect | Prepare detailed implementation plan for given feature. |
+| [eversis-engineer-prompt](./internal/engineer-prompt) | Prompt engineer | Design, optimize, audit, or review LLM application prompts for quality, security, and consistency. |
+| [eversis-review-plan](./internal/review-plan) | Plan Reviewer | Stress-test an implementation plan before coding begins. |
+| [eversis-deploy-kubernetes](./internal/deploy-kubernetes) | DevOps engineer | Create Kubernetes deployments, Helm charts, and configure workload resources. |
+| [eversis-implement-terraform](./internal/implement-terraform) | DevOps engineer | Create Terraform modules and provision cloud infrastructure safely. |
+| [eversis-implement-pipeline](./internal/implement-pipeline) | DevOps engineer | Create or modify CI/CD pipelines with deployment stages and environment protection. |
+| [eversis-implement-observability](./internal/implement-observability) | DevOps engineer | Implement observability solutions including metrics, logs, traces, and alerting. |
 
 ## Input Format
 
@@ -95,3 +65,5 @@ All prompts accept either:
 - A **task description** (e.g. add pagination to the user list API)
 
 The agent adapts based on the input type.
+
+<!-- GENERATED by adapters/website/generate-prompts.mjs from .ai/prompts/ — do not edit; run `npm run sync:website-docs` -->

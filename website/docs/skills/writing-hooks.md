@@ -5,7 +5,7 @@ title: Writing Hooks
 
 # Writing Hooks
 
-**Folder:** `.cursor/skills/eversis-writing-hooks/`  
+**Folder:** `.ai/skills/eversis-writing-hooks/`  
 **Used by:** Software Engineer
 
 Provides patterns for writing composable, testable custom hooks (React hooks, Vue composables) with stable APIs, proper effect lifecycle management, and clear responsibility boundaries.

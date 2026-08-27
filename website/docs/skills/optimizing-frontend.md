@@ -5,7 +5,7 @@ title: Frontend Optimization
 
 # Frontend Optimization
 
-**Folder:** `.cursor/skills/eversis-optimizing-frontend/`  
+**Folder:** `.ai/skills/eversis-optimizing-frontend/`  
 **Used by:** Software Engineer
 
 Provides frontend rendering optimization strategies, code splitting patterns, memoization guidelines, bundle size control, asset optimization, and memory management practices.

@@ -6,7 +6,7 @@ title: Fine Handoff
 # Fine Handoff (QA comment draft)
 
 **Skill:** `eversis-fine-handoff`  
-**Folder:** `.cursor/skills/eversis-fine-handoff/`
+**Folder:** `.ai/skills/eversis-fine-handoff/`
 
 This skill bridges communication between developers and Quality Assurance at the **end of Implement**. It generates a clear, English-language summary of changes written specifically for people who will **test the feature**, not read the code.
 
@@ -91,4 +91,4 @@ Below is an illustrative comment for a hypothetical MFA-in-settings task. An act
 - **API**: New endpoint `POST /api/v1/auth/mfa/verify` handles code validation.
 - **Error Handling**: Invalid codes return a `422 Unprocessable Entity` with a `code_expired` or `code_invalid` reason.
 
-The canonical few-shot template (including a readability contrast example for auth flows) is [`fine-handoff.example.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/skills/eversis-fine-handoff/fine-handoff.example.md) under `.cursor/skills/eversis-fine-handoff/`.
+The canonical few-shot template (including a readability contrast example for auth flows) is [`fine-handoff.example.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.ai/skills/eversis-fine-handoff/fine-handoff.example.md) under `.ai/skills/eversis-fine-handoff/`.

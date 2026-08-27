@@ -5,7 +5,7 @@ title: Code Review
 
 # Code Review
 
-**Folder:** `.cursor/skills/eversis-code-reviewing/`  
+**Folder:** `.ai/skills/eversis-code-reviewing/`  
 **Used by:** Code Reviewer
 
 Provides a structured 11-step code review process covering correctness, quality, security, testing, and scalability. Enforces **STRICT FORBIDDEN** scope, documentation, and dependency checks from `eversis-code-reviewer.mdc`.

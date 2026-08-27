@@ -45,10 +45,10 @@ The Engineering Manager identifies that the task is missing necessary context an
 
 ## Output
 
-A `.research.md` file placed in `specifications/<task-name>/`:
+A `.research.md` file placed in `docs/specs/<issue-kebab>/` (or your team's `specifications/<task-name>/`):
 
 ```text
-specifications/
+docs/specs/
   user-authentication/
     user-authentication.research.md
 ```

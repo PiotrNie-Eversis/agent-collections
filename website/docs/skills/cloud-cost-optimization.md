@@ -5,7 +5,7 @@ title: Cloud Cost Optimization
 
 # Cloud Cost Optimization
 
-**Folder:** `.cursor/skills/eversis-optimizing-cloud-cost/`
+**Folder:** `.ai/skills/eversis-optimizing-cloud-cost/`
 **Used by:** DevOps Engineer
 
 Provides strategies for cloud cost optimization through resource rightsizing, tagging compliance, reserved instances, and spending analysis.

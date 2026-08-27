@@ -1,0 +1,53 @@
+[      90ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom-client.development.js:28002
+[  279841ms] [LOG] [HMR] Reload all css @ webpack-internal:///./node_modules/mini-css-extract-plugin/dist/hmr/hotModuleReplacement.js:247
+[  279851ms] [LOG] [HMR] Reload all css @ webpack-internal:///./node_modules/mini-css-extract-plugin/dist/hmr/hotModuleReplacement.js:247
+[  280828ms] [LOG] [HMR] Reload all css @ webpack-internal:///./node_modules/mini-css-extract-plugin/dist/hmr/hotModuleReplacement.js:247
+[  346898ms] [LOG] [HMR] Reload all css @ webpack-internal:///./node_modules/mini-css-extract-plugin/dist/hmr/hotModuleReplacement.js:247
+[  469998ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom-client.development.js:28002
+[ 1822220ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom-client.development.js:28002
+[ 1860939ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Connection closed before receiving a handshake response @ webpack-internal:///./node_modules/webpack-dev-server/client/clients/WebSocketClient.js:24
+[ 1860941ms] [ERROR] [webpack-dev-server] Event @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:640
+[ 1862998ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Connection closed before receiving a handshake response @ webpack-internal:///./node_modules/webpack-dev-server/client/clients/WebSocketClient.js:24
+[ 1862998ms] [ERROR] [webpack-dev-server] Event @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:640
+[ 1867051ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Connection closed before receiving a handshake response @ webpack-internal:///./node_modules/webpack-dev-server/client/clients/WebSocketClient.js:24
+[ 1867052ms] [ERROR] [webpack-dev-server] Event @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:640
+[ 1875165ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Connection closed before receiving a handshake response @ webpack-internal:///./node_modules/webpack-dev-server/client/clients/WebSocketClient.js:24
+[ 1875170ms] [ERROR] [webpack-dev-server] Event @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:640
+[ 1891333ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Connection closed before receiving a handshake response @ webpack-internal:///./node_modules/webpack-dev-server/client/clients/WebSocketClient.js:24
+[ 1891333ms] [ERROR] [webpack-dev-server] Event @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:640
+[ 1923443ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Connection closed before receiving a handshake response @ webpack-internal:///./node_modules/webpack-dev-server/client/clients/WebSocketClient.js:24
+[ 1923443ms] [ERROR] [webpack-dev-server] Event @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:640
+[ 1987510ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Connection closed before receiving a handshake response @ webpack-internal:///./node_modules/webpack-dev-server/client/clients/WebSocketClient.js:24
+[ 1987511ms] [ERROR] [webpack-dev-server] Event @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:640
+[ 2115600ms] [ERROR] WebSocket connection to 'ws://localhost:3000/ws' failed: Connection closed before receiving a handshake response @ webpack-internal:///./node_modules/webpack-dev-server/client/clients/WebSocketClient.js:24
+[ 2115600ms] [ERROR] [webpack-dev-server] Event @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:640
+[ 2235596ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/aba21aa0.js:0
+[ 2235596ms] [ERROR] Refused to execute script from 'http://localhost:3000/aba21aa0.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[ 2235801ms] ChunkLoadError: Loading chunk aba21aa0 failed.
+(error: http://localhost:3000/aba21aa0.js)
+    at __webpack_require__.f.j (http://localhost:3000/runtime~main.js:843:31)
+    at http://localhost:3000/runtime~main.js:167:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (http://localhost:3000/runtime~main.js:166:67)
+    at fn.e (http://localhost:3000/runtime~main.js:373:50)
+    at __WEBPACK_DEFAULT_EXPORT__.aba21aa0 (webpack-internal:///./.docusaurus/registry.js:5:27376)
+    at load (webpack-internal:///./node_modules/react-loadable/lib/index.js:28:17)
+    at eval (webpack-internal:///./node_modules/react-loadable/lib/index.js:56:20)
+    at Array.forEach (<anonymous>)
+    at loadMap (webpack-internal:///./node_modules/react-loadable/lib/index.js:55:22)
+[ 2235666ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/a94703ab.js:0
+[ 2235666ms] [ERROR] Refused to execute script from 'http://localhost:3000/a94703ab.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[ 2235666ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/0058b4c6.js:0
+[ 2235666ms] [ERROR] Refused to execute script from 'http://localhost:3000/0058b4c6.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[ 2235686ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/a7bd4aaa.js:0
+[ 2235686ms] [ERROR] Refused to execute script from 'http://localhost:3000/a7bd4aaa.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[ 2235751ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/vendors-node_modules_docusaurus_theme-classic_lib_theme_Admonition_Type_Caution_js-node_modul-acd861.js:0
+[ 2235751ms] [ERROR] Refused to execute script from 'http://localhost:3000/vendors-node_modules_docusaurus_theme-classic_lib_theme_Admonition_Type_Caution_js-node_modul-acd861.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[ 2235767ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/5e95c892.js:0
+[ 2235767ms] [ERROR] Refused to execute script from 'http://localhost:3000/5e95c892.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[ 2235884ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/vendors-node_modules_docusaurus_theme-classic_lib_theme_DocItem_index_js.js:0
+[ 2235884ms] [ERROR] Refused to execute script from 'http://localhost:3000/vendors-node_modules_docusaurus_theme-classic_lib_theme_DocItem_index_js.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[ 2235891ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/17896441.js:0
+[ 2235891ms] [ERROR] Refused to execute script from 'http://localhost:3000/17896441.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[ 2235891ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/d3b0ed25.js:0
+[ 2235891ms] [ERROR] Refused to execute script from 'http://localhost:3000/d3b0ed25.js' because its MIME type ('') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0

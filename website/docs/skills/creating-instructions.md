@@ -5,12 +5,12 @@ title: Creating Instructions
 
 # Creating instructions
 
-**Folder:** `.cursor/skills/eversis-creating-instructions/`  
+**Folder:** `.ai/skills/eversis-creating-instructions/`  
 **Used by:** Framework maintainers (customization track)
 
-Helps place **declarative rules** for **Cursor**: **[AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md)**, **`.cursor/rules/eversis-*.mdc`**, and optional scoped rules — not legacy repo-root instruction files outside **`.cursor/`**.
+Helps place **declarative rules**: **[AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md)**, **`.ai/rules/`** (SSOT — the Cursor adapter may emit **`.cursor/rules/eversis-*.mdc`**; the Claude Code adapter generates **`CLAUDE.md`**), and optional scoped rules — not legacy per-vendor instruction files that bypass **`.ai/`**.
 
-## Instruction types (Cursor)
+## Instruction types
 
 | Aspect            | Project constitution                                  | Scoped                                                    |
 | ----------------- | ----------------------------------------------------- | --------------------------------------------------------- |
@@ -30,7 +30,7 @@ Helps place **declarative rules** for **Cursor**: **[AGENTS.md](https://github.c
 
 - No duplicated always-on rules across many `.mdc` files
 - No long procedural content (use skills)
-- Templates: see `.cursor/skills/eversis-creating-instructions/assets/`
+- Templates: see `.ai/skills/eversis-creating-instructions/assets/`
 
 ## Connected skills
 

@@ -47,6 +47,10 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+
+  &:last-child {
+    grid-column: 1 / -1;
+  }
 }
 
 .ucTrack {
@@ -59,15 +63,15 @@
 }
 
 .ucTrack.product {
-  color: #B4B4FF;
+  color: #b4b4ff;
 }
 
 .ucTrack.dev {
-  color: #8DD4FF;
+  color: #8dd4ff;
 }
 
 .ucTrack.quality {
-  color: #FFC269;
+  color: #ffc269;
 }
 
 .ucTitle {
@@ -76,7 +80,7 @@
   letter-spacing: -0.01em;
   margin-bottom: 10px;
   line-height: 1.3;
-  color: #EDF1F4;
+  color: #edf1f4;
 }
 
 .ucProblem {
@@ -109,7 +113,7 @@
 }
 
 .timeBracket {
-  color: #B4B4FF;
+  color: #b4b4ff;
   font-weight: 600;
 }
 

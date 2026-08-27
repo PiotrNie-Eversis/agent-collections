@@ -5,7 +5,7 @@ title: Creating Implementation Plans
 
 # Creating Implementation Plans
 
-**Folder:** `.cursor/skills/eversis-creating-implementation-plans/`  
+**Folder:** `.ai/skills/eversis-creating-implementation-plans/`  
 **Used by:** Architect via [`eversis-plan`](../prompts/internal/plan); consulted by Plan Reviewer via [`eversis-review-plan`](../prompts/internal/review-plan)
 
 Turns a designed solution into a phased, verifiable implementation plan.
@@ -49,8 +49,8 @@ Write the plan as a document that follows `plan.example.md` exactly. Do not add 
 
 ## Templates
 
-- [`plan.example.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/skills/eversis-creating-implementation-plans/plan.example.md) — canonical plan structure
-- [`plan-review.example.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/skills/eversis-creating-implementation-plans/plan-review.example.md) — plan review report skeleton
+- [`plan.example.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.ai/skills/eversis-creating-implementation-plans/plan.example.md) — canonical plan structure
+- [`plan-review.example.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.ai/skills/eversis-creating-implementation-plans/plan-review.example.md) — plan review report skeleton
 
 ## Connected Skills
 

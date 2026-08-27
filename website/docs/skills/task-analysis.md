@@ -5,7 +5,7 @@ title: Task Analysis
 
 # Task Analysis
 
-**Folder:** `.cursor/skills/eversis-task-analysing/`  
+**Folder:** `.ai/skills/eversis-task-analysing/`  
 **Used by:** Context Engineer, E2E Engineer
 
 Provides a structured process for gathering and expanding task context from multiple sources.
