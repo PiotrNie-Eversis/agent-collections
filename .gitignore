@@ -20,6 +20,9 @@ website/node_modules/
 website/build/
 website/.docusaurus/
 
+# Local MCP tooling output
+.playwright-mcp/
+
 # IDEs
 .vscode/
 .idea/
