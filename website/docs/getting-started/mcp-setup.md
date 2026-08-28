@@ -75,7 +75,7 @@ The `eversis-collections` container mounts two separate **volumes** (folders sha
 Domain-context tools read and write `docs/context/` through `/workspace`, never `/repo`.
 
 :::caution Silent failure, not an error
-If your IDE starts the MCP process from somewhere other than your consumer project's root, these tools mount the wrong directory — you get missing or empty results, with no error to flag it.
+If your IDE starts the MCP process from somewhere other than your consumer project's root, these tools mount the wrong directory — you get missing or empty results, with no error to flag it. This also means one session can never cover more than one repo — see [Working across the whole group yourself](../domain-context#working-across-the-whole-group-yourself) if you operate across several repos in the same GitLab group.
 :::
 
 ### Verify
