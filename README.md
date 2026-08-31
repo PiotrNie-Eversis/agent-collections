@@ -200,7 +200,7 @@ Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS
 bash scripts/setup-agent-collections.sh --upgrade --sync --non-interactive
 ```
 
-Reuses agents / MCP / profile / vendor / link from selection. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths are not overwritten without opt-in (see below).
+Reuses agents / MCP / profile / vendor / link / `ssot.externalSsotRepo` (and `ssot.confluenceSpaceKey`) from selection. Omit `--ssot-source` to keep the recorded domain-context URL; pass an empty value (`--ssot-source ""` or `--ssot-source=`) to clear it. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths are not overwritten without opt-in (see below).
 
 ---
 

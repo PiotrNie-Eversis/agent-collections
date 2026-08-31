@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Upgrade/sync SSOT URL wipe** — `--upgrade --sync` without `--ssot-source` no longer writes `null` over `ssot.externalSsotRepo` in `.agent-collections/install-selection.json` (same preserve for `ssot.confluenceSpaceKey` when `--confluence-space-key` is omitted). Pass `--ssot-source ""` or `--ssot-source=` to clear the recorded URL.
 - **Vendor install home marker** — `--upgrade --sync` / install no longer writes `.agent-collections/framework-home.txt` (an absolute machine path) when `vendorMode` is `submodule` or `copy`. Leftover files from older installers are deleted. Local mode still writes the gitignored pointer.
 - **Installer submodule skew (`--framework-prefix`)** — `--upgrade --sync` no longer passes new `adapters/sync.mjs` flags into an older vendor pin (`unknown argument: --framework-prefix`). A clean submodule is aligned to the launching installer SHA; a dirty pin or missing SHA fails with recovery git commands (never `checkout --force`)
 - **Vercel docs deploy** — `vercel.json` install/build paths are relative to the dashboard Root Directory `website` (no nested `cd website`); matches prior agent-collections.vercel.app config

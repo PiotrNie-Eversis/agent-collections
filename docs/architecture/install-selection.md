@@ -33,5 +33,6 @@ When `ssot.externalSsotRepo` is set, the knowledge-promotion skill (`eversis-pro
 ## Rules
 
 - Project-owned-ish: upgrade/sync **reads** this file; does not delete it.
+- `--upgrade` / `--sync` **reuse** `ssot.externalSsotRepo` and `ssot.confluenceSpaceKey` unless the matching CLI flag is passed. Empty `--ssot-source` (`""` or `--ssot-source=`) **clears** `externalSsotRepo` to `null`. Omitting `--ssot-source` must not wipe a recorded URL.
 - Missing or corrupt file → upgrade **fails** with wizard instructions (no invented multi-agent install).
 - See README Upgrade contract for operational CLI (`--upgrade` / `--sync`).

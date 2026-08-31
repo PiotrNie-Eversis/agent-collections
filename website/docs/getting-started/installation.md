@@ -74,7 +74,7 @@ Selection is written to **`.agent-collections/install-selection.json`**. Schema:
 | `--non-interactive` | No prompts — defaults + flags |
 | `--target DIR` | Consumer path when not running from that repo |
 | `--collections-home DIR` | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion) |
-| `--ssot-source URL` | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit to start empty) |
+| `--ssot-source URL` | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit on **first** install to start empty). On `--upgrade` / `--sync`, omit to **keep** the URL already in `install-selection.json`; pass `--ssot-source ""` or `--ssot-source=` to **clear** it. |
 | `--ssot-branch NAME` | Branch to pull from `--ssot-source` (default `main`) |
 | `--confluence-space-key KEY` | Records a Confluence space key for later use by `eversis-import-confluence-knowledge` (optional — never calls Confluence itself) |
 
@@ -111,7 +111,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
   --upgrade --sync --non-interactive
 ```
 
-Reuses agents / MCP / profile / vendor / link from selection. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths (stack rule, `docs/plans|specs`, local `AGENTS.md`, secrets) are not overwritten without opt-in — `docs/context/` is the one partial exception: `INDEX.md` is **actively created** if missing, and `docs/context/global/` is **actively refreshed** by `eversis_context_sync`, not left untouched like the rest.
+Reuses agents / MCP / profile / vendor / link / `ssot.externalSsotRepo` (and `ssot.confluenceSpaceKey`) from selection. Omit `--ssot-source` to keep the recorded domain-context URL; pass an empty value (`--ssot-source ""` or `--ssot-source=`) to clear it. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths (stack rule, `docs/plans|specs`, local `AGENTS.md`, secrets) are not overwritten without opt-in — `docs/context/` is the one partial exception: `INDEX.md` is **actively created** if missing, and `docs/context/global/` is **actively refreshed** by `eversis_context_sync`, not left untouched like the rest.
 
 If your team vendors the framework as a **Git submodule**, `--upgrade --sync` only auto-updates that submodule's pinned version in one narrow case — see [Advanced: keeping a team submodule in sync](#advanced-keeping-a-team-submodule-in-sync) below before assuming an upgrade picked up the latest framework changes.
 

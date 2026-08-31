@@ -9,6 +9,8 @@ trap cleanup EXIT
 
 echo "[smoke] framework-home unit tests"
 bash "${ROOT}/scripts/lib/setup-agent-collections/framework-home.test.sh"
+echo "[smoke] selection SSOT unit tests"
+bash "${ROOT}/scripts/lib/setup-agent-collections/selection-ssot.test.sh"
 
 TARGET="${TMP}/consumer"
 mkdir -p "$TARGET"
@@ -39,6 +41,10 @@ node -e '
   for (const k of req) if (j[k]==null) { console.error("missing",k); process.exit(1); }
   if (!j.agents.includes("cursor")) process.exit(1);
   if (j.domainProfile!=="frontend") process.exit(1);
+  if (j.ssot && j.ssot.externalSsotRepo !== null) {
+    console.error("FAIL: first install without --ssot-source must record externalSsotRepo null");
+    process.exit(1);
+  }
   console.log("selection OK", JSON.stringify(j,null,2));
 ' "$SEL"
 
@@ -172,6 +178,44 @@ bash "${ROOT}/scripts/setup-agent-collections.sh" \
   --collections-home "$ROOT" \
   --target "$TARGET" \
   --upgrade --sync --non-interactive
+
+SSOT_URL="https://gitlab3.eversis.com/dawis/domain-context.git"
+node -e "
+  const fs=require('fs');
+  const p=process.argv[1];
+  const j=JSON.parse(fs.readFileSync(p,'utf8'));
+  j.ssot=j.ssot||{};
+  j.ssot.externalSsotRepo=process.argv[2];
+  j.ssot.confluenceSpaceKey='DAWIS';
+  fs.writeFileSync(p, JSON.stringify(j,null,2)+'\n');
+" "${TARGET}/.agent-collections/install-selection.json" "$SSOT_URL"
+# Restore fills ARG_SSOT_SOURCE; seed_ssot_global skips when global/ already exists (Q4).
+mkdir -p "${TARGET}/docs/context/global"
+
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET" \
+  --upgrade --sync --non-interactive
+
+node -e "
+  const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));
+  if (j.ssot.externalSsotRepo !== process.argv[2]) { console.error('FAIL: upgrade wiped externalSsotRepo'); process.exit(1); }
+  if (j.ssot.confluenceSpaceKey !== 'DAWIS') { console.error('FAIL: upgrade wiped confluenceSpaceKey'); process.exit(1); }
+  console.log('upgrade preserved ssot.externalSsotRepo and confluenceSpaceKey');
+" "${TARGET}/.agent-collections/install-selection.json" "$SSOT_URL"
+
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET" \
+  --upgrade --sync --non-interactive \
+  --ssot-source=
+
+node -e "
+  const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));
+  if (j.ssot.externalSsotRepo !== null) { console.error('FAIL: empty --ssot-source did not clear externalSsotRepo'); process.exit(1); }
+  if (j.ssot.confluenceSpaceKey !== 'DAWIS') { console.error('FAIL: clear ssot-source also wiped confluenceSpaceKey'); process.exit(1); }
+  console.log('empty --ssot-source cleared externalSsotRepo and kept confluenceSpaceKey');
+" "${TARGET}/.agent-collections/install-selection.json"
 
 # Fail-safe missing selection
 BAD="${TMP}/bad"
