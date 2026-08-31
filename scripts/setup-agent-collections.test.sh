@@ -7,6 +7,9 @@ TMP="$(mktemp -d "${TMPDIR:-/tmp}/ac-smoke.XXXXXX")"
 cleanup() { rm -rf "$TMP"; }
 trap cleanup EXIT
 
+echo "[smoke] framework-home unit tests"
+bash "${ROOT}/scripts/lib/setup-agent-collections/framework-home.test.sh"
+
 TARGET="${TMP}/consumer"
 mkdir -p "$TARGET"
 (cd "$TARGET" && git init -q)
@@ -48,6 +51,13 @@ grep -q 'frontend-scope' "${TARGET}/.agent-collections/area-profile.txt"
 [[ -f "${TARGET}/docs/context/README.md" ]] || { echo "FAIL: missing docs/context/README.md"; exit 1; }
 [[ -f "${TARGET}/docs/plans/README.md" ]] || { echo "FAIL: missing docs/plans/README.md"; exit 1; }
 
+EXPECTED_HOME="$(cd "$ROOT" && pwd)"
+HOME_MARKER="${TARGET}/.agent-collections/framework-home.txt"
+[[ -f "$HOME_MARKER" ]] \
+  || { echo "FAIL: local mode missing .agent-collections/framework-home.txt"; exit 1; }
+grep -qxF "$EXPECTED_HOME" "$HOME_MARKER" \
+  || { echo "FAIL: local framework-home.txt does not match collections home (${EXPECTED_HOME})"; cat "$HOME_MARKER"; exit 1; }
+
 # --agents=claude, vendored (--vendor=copy) — exercises Phases A/B/D of the
 # claude-code-setup plan: .mcp.json (not .cursor/mcp.json), and CLAUDE.md
 # pointing at the vendored .ai/ prefix instead of the dangling bare .ai/...
@@ -80,6 +90,9 @@ grep -qF 'Review AGENTS.md' "$CLAUDE_INSTALL_LOG" \
   || { echo "FAIL: Next steps missing the AGENTS.md reminder for --agents=claude"; exit 1; }
 grep -qF '.claude/skills/' "$CLAUDE_INSTALL_LOG" \
   || { echo "FAIL: Deselection paragraph doesn't mention .claude/skills/ pruning"; exit 1; }
+
+[[ -f "${TARGET_CLAUDE}/.agent-collections/framework-home.txt" ]] \
+  && { echo "FAIL: vendor mode wrote machine-local .agent-collections/framework-home.txt"; exit 1; }
 
 [[ -f "${TARGET_CLAUDE}/.mcp.json" ]] || { echo "FAIL: missing .mcp.json for --agents=claude"; exit 1; }
 [[ -f "${TARGET_CLAUDE}/.cursor/mcp.json" ]] && { echo "FAIL: .cursor/mcp.json should not exist for --agents=claude"; exit 1; }
