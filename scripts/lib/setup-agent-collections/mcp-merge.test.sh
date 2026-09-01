@@ -120,5 +120,25 @@ _assert_docker_entry "${TARGET_DIR}/.cursor/mcp.json" '${env:AGENT_COLLECTIONS_H
 _assert_docker_entry "${TARGET_DIR}/.mcp.json" "\${AGENT_COLLECTIONS_HOME:-${REPO_ROOT}}/docker-compose.yml" \
   "claude mcp.json (paired with cursor) still resolves the absolute-mode docker entry correctly"
 
+# Case 5: AWS API pins MCP Python SDK < 2; AWS docs requires SDK 2 (do not pin).
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json"
+unset SELECTED_AGENTS VENDOR_MODE
+MCP_SELECTED_IDS="eversis-collections,awslabs.aws-api-mcp-server,awslabs.aws-documentation-mcp-server"
+merge_mcp_json
+if node -e '
+    const fs = require("fs");
+    const j = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    const api = j.mcpServers["awslabs.aws-api-mcp-server"] && j.mcpServers["awslabs.aws-api-mcp-server"].args;
+    const docs = j.mcpServers["awslabs.aws-documentation-mcp-server"] && j.mcpServers["awslabs.aws-documentation-mcp-server"].args;
+    const apiExpected = ["--with", "mcp<2", "awslabs.aws-api-mcp-server@latest"];
+    const docsExpected = ["awslabs.aws-documentation-mcp-server@latest"];
+    if (JSON.stringify(api) !== JSON.stringify(apiExpected)) process.exit(1);
+    if (JSON.stringify(docs) !== JSON.stringify(docsExpected)) process.exit(1);
+  ' "${TARGET_DIR}/.cursor/mcp.json"; then
+  _pass "AWS API uvx pins mcp<2; AWS docs server stays unpinned"
+else
+  _fail "AWS API uvx pins mcp<2; AWS docs server stays unpinned"
+fi
+
 echo ""
 echo "  ✅  All ${PASS} mcp-merge unit tests passed."
