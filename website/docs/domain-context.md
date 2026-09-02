@@ -55,7 +55,7 @@ For a group with several consumer repos (frontend, backend, a portal, …), the 
 
 Step-by-step:
 
-1. **Create the `domain-context` project once**, at the group level. It can start empty — content grows over time through the Fine promotion flow described below.
+1. **Create the `domain-context` project once**, at the group level. It can start empty — content grows when a **group-wide** fact is published into it ([Tools and skills](#tools-and-skills), step 5), not on every Fine.
 2. **Install (or re-install) each consumer**, pointing it at that project:
    ```bash
    bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
@@ -69,7 +69,7 @@ Step-by-step:
    This scaffolds `docs/context/<project>/INDEX.md` and best-effort seeds `docs/context/global/` from that URL. The same `--ssot-source` is passed to every consumer in the group — the install itself still runs **per repo**; there is no group-wide install step.
 3. **Repeat step 2 for every other consumer repo** in the group.
 4. **Keep each consumer's global layer current** with `eversis_context_sync` (or `--upgrade --sync`) — manual and one-way, per repo, same as described above.
-5. **Knowledge flows the other direction** (consumer → `domain-context`) only through the Fine second draft, never automatically — see [Publishing to the global layer](#publishing-to-the-global-layer).
+5. **Knowledge flows the other direction** (consumer → `domain-context`) only when you later publish a **group-wide** fact — never automatically, and not on every Fine. Everyday Fine writes stay in that consumer's `docs/context/<project>/`. See [Tools and skills](#tools-and-skills).
 
 ### What about a shared repo for `.claude` / `.cursor` / `.mcp.json`?
 
@@ -102,7 +102,7 @@ Practical setup:
 1. Clone every repo in the group under one local parent folder, purely for your own convenience (browsing, running `git status` across all of them) — never as the directory you launch an IDE or agent session from.
 2. Install the framework separately in each repo (as in the steps above), all pointed at the same `--ssot-source`, so every repo reads the same global layer.
 3. Open or run each repo as its own IDE root or terminal session — always `cd` into that specific repo first. A shared parent folder is never a valid session root.
-4. Treat a task that spans several repos as several independent Implement runs, one per repo, not one session covering all of them. Carry a shared learning between repos through `domain-context` — promote it once (Fine, in whichever repo you did the work first), then `eversis_context_sync` picks it up in the others — rather than expecting one session to see everything at once.
+4. Treat a task that spans several repos as several independent Implement runs, one per repo, not one session covering all of them. Carry a shared learning between repos by promoting it in the repo where you did the work (Fine → `docs/context/<project>/`), then — only if it is true for the whole group — publishing into `domain-context` and running `eversis_context_sync` in the others. Do not expect one session to see every repo at once.
 5. Refresh each repo's global layer independently — `eversis_context_sync` never fans out to other repos, so running it in `proj-a/` has no effect on `proj-b/` or `proj-c/`.
 
 This is a workaround for today's one-session-per-repo design, not a documented "group mode" — if your team needs a single session spanning multiple repos routinely, treat that as a fresh proposal rather than an existing capability.
@@ -113,16 +113,46 @@ An agent doing Research reads `docs/context/<project>/INDEX.md` first, matches t
 
 ## Tools and skills
 
-Three MCP tools (part of the `eversis-collections` server — see [full inventory](./integrations/eversis-collections#domain-context)):
+Agents forget facts between tasks. **MCP tools** (functions the assistant calls on the `eversis-collections` server) **read** the store. **Skills** (written procedures the assistant follows) **write or clean** it. A human approves every write.
 
-- **`eversis_context_list`** — list known components across both layers.
-- **`eversis_context_get`** — read one named component (project first, then global); marks the file's `last_consulted` field.
-- **`eversis_context_sync`** — pull the latest `domain-context` content into `docs/context/global/`.
+Tool inventory: [eversis-collections — Domain context](./integrations/eversis-collections#domain-context).
 
-Three skills write and maintain this content: `eversis-promote-domain-knowledge` (the Fine second draft), `eversis-import-confluence-knowledge` (seed from an existing Confluence page, on request), and `eversis-audit-domain-knowledge` (periodic review — keep, update, consolidate, replace, or delete each entry).
+### The loop (learn this first)
+
+1. **Read** during Research: `eversis_context_list` → pick **one** name → `eversis_context_get` (or open that one file). Do not scan all of `docs/context/`.
+2. **Do the task** as usual.
+3. **Promote** at Fine, if a *future different task* would need this fact (a named convention, a durable business rule, or a reusable pattern): follow [`eversis-promote-domain-knowledge`](./skills/promote-domain-knowledge). Most tasks produce **no** draft.
+4. **Approve that draft** separately from the QA comment. The write goes to **this repo**: `docs/context/<project>/`.
+5. **Share with other repos** (optional, later): only if the fact is true across the GitLab group. Publish into the shared `domain-context` project, then each consumer runs `eversis_context_sync`. Not the same Fine turn — see [Publishing to the global layer](#publishing-to-the-global-layer).
+6. **Seed from Confluence once** (optional): [`eversis-import-confluence-knowledge`](./skills/import-confluence-knowledge) when `ssot.confluenceSpaceKey` is set **and** there is **one AS-IS Pack page** (a single Confluence page split into topics). Not the installer. Not a whole space. Skip empty template sections.
+7. **Clean the project layer** (optional, on a team cadence such as quarterly): [`eversis-audit-domain-knowledge`](./skills/audit-domain-knowledge). Never edit `docs/context/global/` in place — the next sync overwrites it.
+
+### What to use
+
+| You want to… | Use | Writes to | When |
+| --- | --- | --- | --- |
+| See what knowledge exists | `eversis_context_list` | nowhere (read) | Research |
+| Read one topic | `eversis_context_get` | `last_consulted` only | Research |
+| Refresh the shared copy in this repo | `eversis_context_sync` | `docs/context/global/` (pull) | After someone updated `domain-context` |
+| Save a fact from this task | [`eversis-promote-domain-knowledge`](./skills/promote-domain-knowledge) | `docs/context/<project>/` after draft OK | Fine; skip if not durable |
+| Share that fact with other repos | same GitLab publish, targeting `domain-context` | the shared GitLab project | Later, explicit; then others sync |
+| Seed from Confluence once | [`eversis-import-confluence-knowledge`](./skills/import-confluence-knowledge) | `docs/context/<project>/` | Human asks; one pack page |
+| Clean old project files | [`eversis-audit-domain-knowledge`](./skills/audit-domain-knowledge) | `docs/context/<project>/` | Team cadence (for example quarterly) |
+
+### The three write skills
+
+**[Promote](./skills/promote-domain-knowledge)** — Optional Fine draft for a durable fact. **Do not** invent a new approval gate, and **do not** emit a draft when nothing is durable.
+
+**[Import](./skills/import-confluence-knowledge)** — Split one AS-IS Pack page into topic files. `--confluence-space-key` only **records** the space; it does not import. **Do not** live-sync Confluence or copy the whole page into one file.
+
+**[Audit](./skills/audit-domain-knowledge)** — Exactly five outcomes: Keep, Update, Consolidate, Replace, Delete. **Do not** run this on every Fine, and **do not** patch `docs/context/global/`.
 
 ## Publishing to the global layer
 
-Writing to `domain-context` happens through the GitLab REST API (branch + commit + merge request), never a local checkout, and always behind the same two-phase human gate as the QA comment draft: a labeled draft first, publication only after explicit approval. It requires a `GITLAB_TOKEN` with write access, provided by the agent's runtime environment — the installer never generates, stores, or requests this token (see [Install Selection Schema](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/install-selection.md)).
+Everyday Fine writes stay in `docs/context/<project>/` (step 4 above). Publishing to `domain-context` is **step 5**: only facts that remain true in other repos in the same GitLab group.
+
+That publish uses the GitLab REST API (branch + commit + merge request), never a local checkout of `domain-context`. It uses the same two-phase human gate as the QA comment: a labeled draft first, then explicit approval. It needs a `GITLAB_TOKEN` with write access from the agent's environment — the installer never generates, stores, or requests this token (see [Install Selection Schema](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/install-selection.md)).
+
+After the merge, each consumer refreshes with `eversis_context_sync`. Sync in one repo does not update the others.
 
 Canonical detail: [`docs/architecture/agents-md-standard.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/agents-md-standard.md) (the `docs/context`/`docs/plans`/`docs/specs` triad) and [`docs/architecture/install-selection.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/install-selection.md) (the `ssot.*` install schema) in the repository.
