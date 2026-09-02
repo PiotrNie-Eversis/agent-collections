@@ -283,7 +283,7 @@ docker compose build eversis-collections
 Enable **`eversis-collections`** in Settings → MCP and restart the agent tool.
 
 - **Skills** — `eversis_skills_list` / `eversis_skills_get` load `.ai/skills/`
-- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the `${PWD}:/workspace` mount in `docker-compose.yml`, not just `AGENT_COLLECTIONS_HOME`
+- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the consumer project mounted as `/workspace` via `CONSUMER_PROJECT_ROOT` (installer writes this into MCP `env`; Compose falls back to `${PWD}`), not just `AGENT_COLLECTIONS_HOME`
 - **Word tools** — used by BA docs prompts when that workflow is in scope
 - Tool reference: [`mcp/eversis-collections-mcp/README.md`](./mcp/eversis-collections-mcp/README.md)
 

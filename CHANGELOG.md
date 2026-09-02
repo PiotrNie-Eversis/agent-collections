@@ -13,8 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Migration
+
+- **Domain-context `/workspace` mount** — existing consumers whose `.cursor/mcp.json` / `.mcp.json` was generated before this fix still omit `env.CONSUMER_PROJECT_ROOT`. Re-run `setup-agent-collections.sh --upgrade --sync` (or add `env.CONSUMER_PROJECT_ROOT` to the `eversis-collections` MCP entry: Cursor `${workspaceFolder}`, Claude Code `${CLAUDE_PROJECT_DIR:-.}`). Until then Compose falls back to `${PWD}`, which is often the vendor tree when `-f` points at `vendor/agent-collections/docker-compose.yml`.
+
 ### Fixed
 
+- **Domain-context tools used the vendor tree as `/workspace`** — Cursor `docker compose -f vendor/agent-collections/docker-compose.yml` often has `PWD` = the compose-file directory, so `eversis_context_list` failed with `install-selection.json not found under /workspace`. Host MCP `env.CONSUMER_PROJECT_ROOT` (written by `mcp-merge.mjs`), Compose bind `${CONSUMER_PROJECT_ROOT:-${PWD}}:/workspace`, and `resolveWorkspaceRoot` (use `/workspace` only when `install-selection.json` is there) fix the mount. INDEX first-column markdown links (`[name](./name/index.md)`) are stripped so `eversis_context_get` no longer treats `/` as path traversal. See Migration above.
 - **Cursor MCP User vs project doubling** — the installer already writes catalog servers into the workspace `.cursor/mcp.json`. Cursor also loads `~/.cursor/mcp.json` (Settings badge **User**), so the same ids in both files appeared twice. Setup now **warns** on that overlap (ids only; it never edits the User file). README and the MCP setup playbook no longer recommend merging `templates/mcp.json` into User config; workspace catalog is the default, User MCP is for personal servers.
 - **AWS API MCP crash on MCP Python SDK 2.x** — `uvx awslabs.aws-api-mcp-server@latest` resolved `mcp>=1.23.0` to SDK 2, which renamed `McpError` to `MCPError`. That package (`1.5.4`) still imports `McpError`, so the process exits before initialize. Installer template `templates/mcp.json` now passes `--with mcp<2` for `awslabs.aws-api-mcp-server` only. Drop the pin when that package supports SDK 2.
 - **AWS Documentation MCP `mcp<2` pin is unsatisfiable** — `awslabs.aws-documentation-mcp-server==1.2.0` depends on `mcp[cli]>=2.0.0,<3.0.0`. A blanket `--with mcp<2` made uvx fail with "No solution found". That server is unpinned again; keep the pin on the API server only.

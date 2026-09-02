@@ -211,7 +211,7 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 }
 ```
 
-`docker-compose.yml` bind-mounts **two** separate volumes, each resolved differently: `.:/repo` (the framework checkout, resolved relative to `docker-compose.yml`'s own directory — the `-f` path is what points Compose at that file) and `${PWD}:/workspace` (your consumer project, resolved from the **current directory of the process that runs `docker compose`**). Domain-context tools read `docs/context/` through `/workspace`, not `/repo` — if the launching process's cwd isn't your consumer project's root, those tools silently mount the wrong directory. See [Domain Context (SSOT)](../domain-context) and [MCP Setup](../getting-started/mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume).
+`docker-compose.yml` bind-mounts **two** separate volumes: `.:/repo` (the framework checkout, resolved relative to `docker-compose.yml`'s own directory — the `-f` path is what points Compose at that file) and `${CONSUMER_PROJECT_ROOT:-${PWD}}:/workspace` (your consumer project). The installer writes `CONSUMER_PROJECT_ROOT` on the MCP server `env` so Compose interpolates the IDE project folder, not the vendor tree (`PWD` is often the compose-file directory when `-f` is `vendor/agent-collections/docker-compose.yml`). Domain-context tools read `docs/context/` through `/workspace`, not `/repo`, and only treat `/workspace` as the project when `install-selection.json` is there. See [Domain Context (SSOT)](../domain-context) and [MCP Setup](../getting-started/mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume).
 
 ### Consumer project (framework outside workspace)
 
@@ -219,7 +219,7 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 2. Bootstrap with `setup-agent-collections.sh --build-mcp` — see [Installation §4](../getting-started/installation).
 3. Enable **`eversis-collections`** in Cursor MCP settings and restart.
 
-The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. The second volume, `${PWD}:/workspace` (used by domain-context tools), resolves independently from the launching process's own current directory, **not** from `AGENT_COLLECTIONS_HOME`. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../getting-started/installation).
+The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. The second volume uses host `CONSUMER_PROJECT_ROOT` (installer sets it to `${workspaceFolder}` in Cursor / `${CLAUDE_PROJECT_DIR:-.}` in Claude Code), with `${PWD}` only as fallback. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../getting-started/installation).
 
 ## Do not register skills as Agent Skills
 

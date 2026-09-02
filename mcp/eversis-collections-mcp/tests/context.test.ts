@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { test } from "node:test";
-import { listContext, getContext, syncContext } from "../src/context.ts";
+import { listContext, getContext, syncContext, resolveWorkspaceRootFrom } from "../src/context.ts";
 
 function _gitSubtreeAvailable(): boolean {
   // `git subtree --help` shells out to `man` and fails on systems without the
@@ -193,6 +193,83 @@ test("syncContext — reports no-op when externalSsotRepo is not configured", as
     const result = syncContext();
     assert.equal(result.synced, false);
     assert.match(result.message, /nothing to sync/);
+  } finally {
+    restoreRoot();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("resolveWorkspaceRootFrom — ignores a workspace mount that has no install-selection.json", async () => {
+  const mount = await mkdtemp(path.join(tmpdir(), "eversis-workspace-mount-"));
+  const cwd = await mkdtemp(path.join(tmpdir(), "eversis-workspace-cwd-"));
+  try {
+    const root = resolveWorkspaceRootFrom({}, mount, cwd);
+    assert.equal(root, cwd);
+  } finally {
+    await rm(mount, { recursive: true, force: true });
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
+
+test("resolveWorkspaceRootFrom — uses the workspace mount when install-selection.json is there", async () => {
+  const mount = await makeConsumerRoot();
+  const cwd = await mkdtemp(path.join(tmpdir(), "eversis-workspace-cwd-"));
+  try {
+    const root = resolveWorkspaceRootFrom({}, mount, cwd);
+    assert.equal(root, mount);
+  } finally {
+    await rm(mount, { recursive: true, force: true });
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
+
+test("resolveWorkspaceRootFrom — ignores CONSUMER_PROJECT_ROOT when it has no install-selection.json", async () => {
+  const envDir = await mkdtemp(path.join(tmpdir(), "eversis-env-root-"));
+  const mount = await makeConsumerRoot();
+  const cwd = await mkdtemp(path.join(tmpdir(), "eversis-workspace-cwd-"));
+  try {
+    const root = resolveWorkspaceRootFrom({ CONSUMER_PROJECT_ROOT: envDir }, mount, cwd);
+    assert.equal(root, mount);
+  } finally {
+    await rm(envDir, { recursive: true, force: true });
+    await rm(mount, { recursive: true, force: true });
+    await rm(cwd, { recursive: true, force: true });
+  }
+});
+
+test("listContext/getContext — strips markdown links in the INDEX first column", async () => {
+  const root = await makeConsumerRoot();
+  const compDir = path.join(root, "docs/context/project/checkout");
+  await mkdir(compDir, { recursive: true });
+  await writeFile(
+    path.join(root, "docs/context/project/INDEX.md"),
+    "| Component | One-line summary |\n|---|---|\n| [checkout](./checkout/index.md) | payment and cart |\n"
+  );
+  await writeFile(path.join(compDir, "index.md"), "# Checkout\n");
+  setRoot(root);
+  try {
+    const list = listContext();
+    assert.equal(list.find((c) => c.component === "checkout")?.source, "project");
+    const entry = getContext("checkout");
+    assert.equal(entry.source, "project");
+    assert.match(entry.content, /Checkout/);
+  } finally {
+    restoreRoot();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("listContext — bare INDEX component names still work", async () => {
+  const root = await makeConsumerRoot();
+  await mkdir(path.join(root, "docs/context/project"), { recursive: true });
+  await writeFile(
+    path.join(root, "docs/context/project/INDEX.md"),
+    "| Component | One-line summary |\n|---|---|\n| checkout | payment and cart |\n"
+  );
+  setRoot(root);
+  try {
+    const list = listContext();
+    assert.equal(list[0]?.component, "checkout");
   } finally {
     restoreRoot();
     await rm(root, { recursive: true, force: true });

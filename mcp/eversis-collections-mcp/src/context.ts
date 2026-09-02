@@ -32,11 +32,24 @@ type SsotSelection = {
 
 const SELECTION_REL = path.join(".agent-collections", "install-selection.json");
 
+function hasInstallSelection(dir: string): boolean {
+  return fs.existsSync(path.join(dir, SELECTION_REL));
+}
+
+/** Injected seam for tests — production callers use `resolveWorkspaceRoot()`. */
+export function resolveWorkspaceRootFrom(
+  env: NodeJS.Dict<string | undefined>,
+  workspaceMount: string,
+  cwd: string
+): string {
+  const envRoot = env["CONSUMER_PROJECT_ROOT"];
+  if (envRoot && hasInstallSelection(envRoot)) return envRoot;
+  if (hasInstallSelection(workspaceMount)) return workspaceMount;
+  return cwd;
+}
+
 export function resolveWorkspaceRoot(): string {
-  const envRoot = process.env["CONSUMER_PROJECT_ROOT"];
-  if (envRoot && fs.existsSync(envRoot)) return envRoot;
-  if (fs.existsSync("/workspace")) return "/workspace";
-  return process.cwd();
+  return resolveWorkspaceRootFrom(process.env, "/workspace", process.cwd());
 }
 
 function readSelection(workspaceRoot: string): SsotSelection {
@@ -87,6 +100,12 @@ function touchLastConsulted(filePath: string): void {
   }
 }
 
+/** First INDEX column is a bare id; strip `[text](url)` so markdown-link rows still resolve. */
+function stripIndexComponentName(cell: string): string {
+  const link = cell.match(/^\[([^\]]+)\]\([^)]+\)$/);
+  return (link ? link[1]! : cell).trim();
+}
+
 function readIndexComponents(indexPath: string, source: ContextSource): ContextComponent[] {
   if (!fs.existsSync(indexPath)) return [];
   const raw = fs.readFileSync(indexPath, "utf8");
@@ -95,7 +114,7 @@ function readIndexComponents(indexPath: string, source: ContextSource): ContextC
     // Table row: | component | one-line summary |
     const m = line.match(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/);
     if (!m) continue;
-    const component = m[1]!.trim();
+    const component = stripIndexComponentName(m[1]!.trim());
     const summary = m[2]!.trim();
     if (component === "Component" || component.startsWith("---")) continue;
     rows.push({ component, summary, source });
