@@ -41,6 +41,8 @@ merge_mcp_json() {
     _merge_mcp_json_for_host claude "${TARGET_DIR}/.mcp.json" \
       "$use_relative" "$template_path" "$server_list" "$merge_mjs" "$dist_index"
   fi
+
+  warn_user_mcp_catalog_overlap
 }
 
 _merge_mcp_json_for_host() {

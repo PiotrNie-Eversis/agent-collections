@@ -3,22 +3,25 @@
 # unmodified whether this is the framework's own checkout or a consumer
 # project's vendored copy — see mcp/eversis-collections-mcp/Dockerfile.
 #
-# Second mount (${PWD}:/workspace): the framework mount (/repo) never contains
-# the CONSUMER project's own files (docs/context/, .agent-collections/) — those
-# live wherever the IDE/agent's working directory is when it launches this
-# command. ${PWD} is substituted by docker compose from the invoking shell's
-# cwd, which the MCP client (Claude Code / Cursor) sets to the consumer
-# project root before spawning stdio servers. eversis_context_* tools
-# (global-domain-context-ssot.research.md, Question 2/6) read/write /workspace,
-# never /repo — see mcp/eversis-collections-mcp/src/context.ts.
+# Second mount (${CONSUMER_PROJECT_ROOT:-${PWD}}:/workspace): the framework
+# mount (/repo) never contains the CONSUMER project's own files
+# (docs/context/, .agent-collections/). Compose interpolates
+# CONSUMER_PROJECT_ROOT from the host process that runs `docker compose`
+# (the MCP client sets it from the IDE folder via mcp-merge.mjs). Fallback
+# ${PWD} is the compose-process cwd — often the vendor tree when `-f` points
+# at vendor/agent-collections/docker-compose.yml, so do not rely on PWD
+# alone. Inside the container, CONSUMER_PROJECT_ROOT=/workspace so
+# eversis_context_* tools read the consumer project, never /repo —
+# see mcp/eversis-collections-mcp/src/context.ts.
 services:
   eversis-collections:
     build:
       context: ./mcp/eversis-collections-mcp
     volumes:
       - .:/repo
-      - ${PWD}:/workspace
+      - ${CONSUMER_PROJECT_ROOT:-${PWD}}:/workspace
     environment:
       AGENT_COLLECTIONS_HOME: /repo
+      CONSUMER_PROJECT_ROOT: /workspace
     stdin_open: true
     tty: false

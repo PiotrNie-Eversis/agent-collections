@@ -33,6 +33,9 @@
 #   --profile NAME            Domain profile: frontend | backend | fullstack
 #   --ssot-source URL         GitLab domain-context project to seed docs/context/global/
 #                             from (git subtree add, best-effort — never blocks install).
+#                             On --upgrade/--sync: omit to keep the recorded URL in
+#                             install-selection.json; pass an empty value
+#                             (--ssot-source "" or --ssot-source=) to clear it.
 #   --ssot-branch NAME        Branch of --ssot-source to seed from. Default: main.
 #   --confluence-space-key KEY
 #                             Optional. Records a Confluence space key for the
@@ -79,13 +82,16 @@ ARG_MCP_SERVERS=""
 ARG_AGENTS=""
 ARG_PROFILE=""
 ARG_SSOT_SOURCE=""
+ARG_SSOT_SOURCE_PASSED="false"
 ARG_SSOT_BRANCH="main"
 ARG_CONFLUENCE_SPACE_KEY=""
+ARG_CONFLUENCE_SPACE_KEY_PASSED="false"
 
 export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_LINK_MODE \
        ARG_SYNC ARG_UPGRADE ARG_NON_INTERACTIVE ARG_FORCE \
        ARG_GITIGNORE_AGENT_ARTIFACTS ARG_MCP_SERVERS ARG_AGENTS ARG_PROFILE \
-       ARG_SSOT_SOURCE ARG_SSOT_BRANCH ARG_CONFLUENCE_SPACE_KEY \
+       ARG_SSOT_SOURCE ARG_SSOT_SOURCE_PASSED ARG_SSOT_BRANCH \
+       ARG_CONFLUENCE_SPACE_KEY ARG_CONFLUENCE_SPACE_KEY_PASSED \
        SETUP_SCRIPT_DIR="${SCRIPT_DIR}" LIB_DIR="${LIB_DIR}"
 
 while [[ $# -gt 0 ]]; do
@@ -129,16 +135,26 @@ while [[ $# -gt 0 ]]; do
     --profile=*) ARG_PROFILE="${1#*=}"; shift ;;
     --ssot-source)
       [[ $# -lt 2 ]] && { echo "ERROR: --ssot-source requires a value" >&2; exit 1; }
-      ARG_SSOT_SOURCE="$2"; shift 2 ;;
-    --ssot-source=*) ARG_SSOT_SOURCE="${1#*=}"; shift ;;
+      ARG_SSOT_SOURCE="$2"
+      ARG_SSOT_SOURCE_PASSED="true"
+      shift 2 ;;
+    --ssot-source=*)
+      ARG_SSOT_SOURCE="${1#*=}"
+      ARG_SSOT_SOURCE_PASSED="true"
+      shift ;;
     --ssot-branch)
       [[ $# -lt 2 ]] && { echo "ERROR: --ssot-branch requires a value" >&2; exit 1; }
       ARG_SSOT_BRANCH="$2"; shift 2 ;;
     --ssot-branch=*) ARG_SSOT_BRANCH="${1#*=}"; shift ;;
     --confluence-space-key)
       [[ $# -lt 2 ]] && { echo "ERROR: --confluence-space-key requires a value" >&2; exit 1; }
-      ARG_CONFLUENCE_SPACE_KEY="$2"; shift 2 ;;
-    --confluence-space-key=*) ARG_CONFLUENCE_SPACE_KEY="${1#*=}"; shift ;;
+      ARG_CONFLUENCE_SPACE_KEY="$2"
+      ARG_CONFLUENCE_SPACE_KEY_PASSED="true"
+      shift 2 ;;
+    --confluence-space-key=*)
+      ARG_CONFLUENCE_SPACE_KEY="${1#*=}"
+      ARG_CONFLUENCE_SPACE_KEY_PASSED="true"
+      shift ;;
     --help|-h)
       awk '/^# setup-agent-collections.sh/,/^[^#]/ { if ($0 ~ /^#/) { sub(/^# ?/, ""); print } }' "$0"
       exit 0 ;;
@@ -183,6 +199,8 @@ source "${LIB_DIR}/vendor-sync-skew.sh"
 source "${LIB_DIR}/mcp-prompt.sh"
 # shellcheck source=lib/setup-agent-collections/mcp-merge.sh
 source "${LIB_DIR}/mcp-merge.sh"
+# shellcheck source=lib/setup-agent-collections/mcp-user-overlap.sh
+source "${LIB_DIR}/mcp-user-overlap.sh"
 # shellcheck source=lib/setup-agent-collections/gitignore.sh
 source "${LIB_DIR}/gitignore.sh"
 # shellcheck source=lib/setup-agent-collections/ignore-triad.sh

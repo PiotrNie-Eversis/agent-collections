@@ -24,6 +24,13 @@ write_install_selection() {
   local ssot_repo="${ARG_SSOT_SOURCE:-}"
   local project_context_path="docs/context/${SSOT_PROJECT_SLUG:-project}/"
   local global_context_path="docs/context/global/"
+  if [[ -f "$out" ]]; then
+    local existing_project existing_global
+    existing_project="$(node -e "const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); const p=j.ssot&&j.ssot.projectContextPath; if (typeof p==='string' && p.trim()) process.stdout.write(p);" "$out")" || true
+    existing_global="$(node -e "const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); const p=j.ssot&&j.ssot.globalContextPath; if (typeof p==='string' && p.trim()) process.stdout.write(p);" "$out")" || true
+    [[ -n "$existing_project" ]] && project_context_path="$existing_project"
+    [[ -n "$existing_global" ]] && global_context_path="$existing_global"
+  fi
 
   node -e "
     const fs = require('fs');

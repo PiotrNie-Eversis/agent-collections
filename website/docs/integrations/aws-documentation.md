@@ -39,6 +39,8 @@ Provides access to AWS service documentation and reference materials for accurat
 }
 ```
 
+This package (`1.2.0`) depends on `mcp[cli]>=2.0.0,<3.0.0`. Do not add `--with mcp<2` — that pin conflicts with SDK 2 and uvx fails to resolve. The AWS API MCP server is different: it still needs `mcp<2` (see [AWS API](./aws-api.md)).
+
 ## Prerequisites
 
 - Python with `uvx` installed (for running the MCP server).

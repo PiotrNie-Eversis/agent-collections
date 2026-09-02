@@ -218,9 +218,19 @@ link_framework_files() {
   _seed_stack_rule
   _link_claude_skills
 
-  # Optional: relative pointer for local mode documentation
+  _write_or_clear_framework_home
+  return 0
+}
+
+# Local mode: machine-local absolute path, gitignored.
+# Vendor submodule/copy: SSOT is in-repo vendor/agent-collections — never write
+# this file, and remove leftovers from older installer versions.
+_write_or_clear_framework_home() {
   local home_marker="${TARGET_DIR}/.agent-collections"
   mkdir -p "$home_marker"
+  if [[ "${VENDOR_MODE:-}" == "submodule" ]] || [[ "${VENDOR_MODE:-}" == "copy" ]]; then
+    rm -f "${home_marker}/framework-home.txt"
+    return 0
+  fi
   echo "${COLLECTIONS_HOME}" > "${home_marker}/framework-home.txt"
-  return 0
 }

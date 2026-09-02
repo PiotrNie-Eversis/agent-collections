@@ -34,6 +34,9 @@
         "-T",
         "eversis-collections"
       ],
+      "env": {
+        "CONSUMER_PROJECT_ROOT": "${workspaceFolder}"
+      },
       "type": "stdio"
     },
     "playwright": {
@@ -43,7 +46,7 @@
     },
     "awslabs.aws-api-mcp-server": {
       "command": "uvx",
-      "args": ["awslabs.aws-api-mcp-server@latest"],
+      "args": ["--with", "mcp<2", "awslabs.aws-api-mcp-server@latest"],
       "type": "stdio"
     },
     "awslabs.aws-documentation-mcp-server": {

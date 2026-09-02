@@ -62,12 +62,12 @@ if (picked['eversis-collections']) {
   let cmdPath;
   if (host === 'claude') {
     // Claude Code only expands ${VAR} / ${VAR:-default} — no ${env:X}. The
-    // compose file itself now hardcodes AGENT_COLLECTIONS_HOME=/repo inside
-    // the container (no env passthrough needed), but the *host-side* -f path
-    // in absolute mode still needs a value for ${AGENT_COLLECTIONS_HOME} —
-    // GUI-launched hosts don't reliably inherit shell profile exports, so
-    // the value already resolved by the installer (`collections`) is baked
-    // in as the `${VAR:-default}` fallback instead of a separate env block.
+    // compose file hardcodes AGENT_COLLECTIONS_HOME=/repo inside the
+    // container; CONSUMER_PROJECT_ROOT is a separate host env (below).
+    // The *host-side* -f path in absolute mode still needs a value for
+    // ${AGENT_COLLECTIONS_HOME} — GUI-launched hosts don't reliably inherit
+    // shell profile exports, so the value already resolved by the installer
+    // (`collections`) is baked in as the `${VAR:-default}` fallback.
     if (useRelative) {
       cmdPath = `\${CLAUDE_PROJECT_DIR:-.}/vendor/agent-collections/${composeFile}`;
     } else {
@@ -78,10 +78,18 @@ if (picked['eversis-collections']) {
   } else {
     cmdPath = `\${env:AGENT_COLLECTIONS_HOME}/${composeFile}`;
   }
+  // CONSUMER_PROJECT_ROOT is interpolated by Compose on the host for the
+  // /workspace bind. AGENT_COLLECTIONS_HOME stays hardcoded as /repo inside
+  // the container. Cursor expands ${workspaceFolder}; Claude expands
+  // ${CLAUDE_PROJECT_DIR:-.} (no ${workspaceFolder}, no ${env:X}).
+  const consumerRoot = host === 'claude' ? '${CLAUDE_PROJECT_DIR:-.}' : '${workspaceFolder}';
   picked['eversis-collections'] = {
     command: 'docker',
     args: ['compose', '-f', cmdPath, 'run', '--rm', '-T', 'eversis-collections'],
     type: 'stdio',
+    env: {
+      CONSUMER_PROJECT_ROOT: consumerRoot,
+    },
   };
 }
 

@@ -200,7 +200,7 @@ Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS
 bash scripts/setup-agent-collections.sh --upgrade --sync --non-interactive
 ```
 
-Reuses agents / MCP / profile / vendor / link from selection. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths are not overwritten without opt-in (see below).
+Reuses agents / MCP / profile / vendor / link / `ssot.externalSsotRepo` (and `ssot.confluenceSpaceKey`) from selection. Omit `--ssot-source` to keep the recorded domain-context URL; pass an empty value (`--ssot-source ""` or `--ssot-source=`) to clear it. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths are not overwritten without opt-in (see below).
 
 ---
 
@@ -260,19 +260,19 @@ Roles are expressed as **rules**, **prompts**, and **skills**, organized by life
 
 ## MCP setup
 
-MCP unlocks Jira, Figma, library docs, browser automation, and procedural skills. Seed config: [`templates/mcp.json`](./templates/mcp.json). Playbook: [MCP setup](./website/docs/getting-started/mcp-setup.md).
+MCP (Model Context Protocol) unlocks Jira, Figma, library docs, browser automation, and procedural skills. Seed config: [`templates/mcp.json`](./templates/mcp.json). Playbook: [MCP setup](./website/docs/getting-started/mcp-setup.md).
 
-### Option 1 — User profile (recommended)
+### Default — workspace configuration (installer)
 
-Best when you want the same tools **across projects**.
+The installer writes catalog servers into the **project** file (`.cursor/mcp.json` for Cursor, `.mcp.json` for Claude Code). Cursor Settings → MCP labels that copy with the **project folder name**.
 
-1. Command Palette → **MCP: Open User Configuration**.
-2. Merge the `mcpServers` object from [`templates/mcp.json`](./templates/mcp.json) into your user config.
-3. Ensure `AGENT_COLLECTIONS_HOME` points at your Agent Collections checkout.
+Do **not** also merge those same catalog ids into Cursor **User** config (`~/.cursor/mcp.json`, badge **User**). Cursor loads both files; Settings shows **User vs** the project folder name for each duplicate, and two processes start (`eversis-collections` would then point at the wrong tree).
 
-### Option 2 — Workspace configuration
+If the installer warns that User MCP already has catalog ids, remove those ids from the User file. The installer never edits `~/.cursor/mcp.json`.
 
-Use when tools should apply **only to one project** (copy or generate workspace MCP config via the installer).
+### Personal tools — User profile
+
+Keep User MCP for tools that are yours across every repo (not the Agent Collections catalog). Command Palette → **MCP: Open User Configuration**.
 
 ### Build local server: `eversis-collections`
 
@@ -283,7 +283,7 @@ docker compose build eversis-collections
 Enable **`eversis-collections`** in Settings → MCP and restart the agent tool.
 
 - **Skills** — `eversis_skills_list` / `eversis_skills_get` load `.ai/skills/`
-- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the `${PWD}:/workspace` mount in `docker-compose.yml`, not just `AGENT_COLLECTIONS_HOME`
+- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the consumer project mounted as `/workspace` via `CONSUMER_PROJECT_ROOT` (installer writes this into MCP `env`; Compose falls back to `${PWD}`), not just `AGENT_COLLECTIONS_HOME`
 - **Word tools** — used by BA docs prompts when that workflow is in scope
 - Tool reference: [`mcp/eversis-collections-mcp/README.md`](./mcp/eversis-collections-mcp/README.md)
 

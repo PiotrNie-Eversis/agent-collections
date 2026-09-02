@@ -75,7 +75,7 @@ All servers are configured in **`.cursor/mcp.json`** at the repository root (Cur
     },
     "awslabs.aws-api-mcp-server": {
       "command": "uvx",
-      "args": ["awslabs.aws-api-mcp-server@latest"]
+      "args": ["--with", "mcp<2", "awslabs.aws-api-mcp-server@latest"]
     },
     "awslabs.aws-documentation-mcp-server": {
       "command": "uvx",
