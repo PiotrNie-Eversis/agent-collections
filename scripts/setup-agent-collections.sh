@@ -199,6 +199,8 @@ source "${LIB_DIR}/vendor-sync-skew.sh"
 source "${LIB_DIR}/mcp-prompt.sh"
 # shellcheck source=lib/setup-agent-collections/mcp-merge.sh
 source "${LIB_DIR}/mcp-merge.sh"
+# shellcheck source=lib/setup-agent-collections/mcp-user-overlap.sh
+source "${LIB_DIR}/mcp-user-overlap.sh"
 # shellcheck source=lib/setup-agent-collections/gitignore.sh
 source "${LIB_DIR}/gitignore.sh"
 # shellcheck source=lib/setup-agent-collections/ignore-triad.sh

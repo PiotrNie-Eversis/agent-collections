@@ -92,6 +92,12 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 
 Allowed ids match the installer MCP allowlist (see `scripts/setup-agent-collections.sh --help` and template `templates/mcp.json`).
 
+:::caution User vs workspace (Cursor)
+Cursor loads **both** `~/.cursor/mcp.json` (Settings badge **User**) and the project `.cursor/mcp.json` (badge = folder name). The installer writes the catalog into the **project** file. If you also keep the same ids in User config, each server appears twice and `eversis-collections` may start from the wrong tree.
+
+Keep User MCP for personal tools only. Do not merge `templates/mcp.json` into User config when the installer already wrote the workspace file. The installer warns on overlap and **does not** edit `~/.cursor/mcp.json` — Command Palette → **MCP: Open User Configuration** to remove duplicate catalog ids.
+:::
+
 ## Claude Code note
 
 Claude Code has MCP config parity with Cursor: the installer writes a root **`.mcp.json`** with the same servers, using Claude-native syntax (`${VAR}` / `${VAR:-default}`, no `${env:...}`). The **`eversis-collections`** entry runs `docker compose ... run --rm -T eversis-collections`, not a bare `node` process — Docker is required, Node.js is not. Skills additionally resolve **natively** via `.claude/skills/` (linked by the installer), not only through MCP. Document which MCP servers your team enables in `.claude/CLAUDE.md`.

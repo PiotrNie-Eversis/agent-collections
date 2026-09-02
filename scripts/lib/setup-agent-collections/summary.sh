@@ -72,6 +72,11 @@ print_summary() {
   echo "  ${step}. Review AGENTS.md — shared orientation map (never auto-overwritten on re-run)"
   step=$((step + 1))
 
+  if [[ -n "${MCP_USER_OVERLAP_IDS:-}" ]]; then
+    echo "  ${step}. Cursor User MCP overlaps catalog ids (${MCP_USER_OVERLAP_IDS}) — remove those ids from ~/.cursor/mcp.json (Settings badge User). Installer did not edit the User file."
+    step=$((step + 1))
+  fi
+
   echo ""
   echo "Deselection: re-run with a smaller --mcp-servers / --agents list to refresh managed"
   echo "entries. MCP catalog servers are pruned automatically; adapter sync removes orphan"

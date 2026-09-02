@@ -173,6 +173,76 @@ shopt -u nullglob
 # per-server *contents* are pruned by mcp-merge.mjs's "kept" logic, not the
 # host config file; deleting host config files on deselect is out of scope.
 
+# Cursor User MCP overlap (warn-only). Isolate from the real ~/.cursor/mcp.json.
+TARGET_OVERLAP="${TMP}/consumer-overlap"
+mkdir -p "$TARGET_OVERLAP"
+(cd "$TARGET_OVERLAP" && git init -q)
+USER_MCP_FIXTURE="${TMP}/user-mcp/mcp.json"
+mkdir -p "$(dirname "$USER_MCP_FIXTURE")"
+printf '%s\n' '{"mcpServers":{"eversis-collections":{"command":"node","args":["/unused/dist/index.js"]},"personal-only":{"command":"true"}}}' > "$USER_MCP_FIXTURE"
+USER_MCP_BEFORE="$(cksum "$USER_MCP_FIXTURE")"
+OVERLAP_LOG="${TMP}/overlap-install.log"
+AGENT_COLLECTIONS_USER_MCP="$USER_MCP_FIXTURE" \
+  bash "${ROOT}/scripts/setup-agent-collections.sh" \
+    --collections-home "$ROOT" \
+    --target "$TARGET_OVERLAP" \
+    --non-interactive \
+    --agents=cursor \
+    --mcp-servers=eversis-collections \
+    --profile=frontend \
+    --link-mode=copy \
+    > "$OVERLAP_LOG" 2>&1
+grep -q 'Cursor User MCP already has catalog server(s): eversis-collections' "$OVERLAP_LOG" \
+  || { echo "FAIL: expected User MCP overlap warning"; cat "$OVERLAP_LOG"; exit 1; }
+grep -q 'badge User' "$OVERLAP_LOG" \
+  || { echo "FAIL: overlap warning missing Cursor User vs project badge hint"; cat "$OVERLAP_LOG"; exit 1; }
+grep -q 'does not edit the User file' "$OVERLAP_LOG" \
+  || { echo "FAIL: overlap warning missing 'does not edit the User file'"; cat "$OVERLAP_LOG"; exit 1; }
+[[ -f "${TARGET_OVERLAP}/.cursor/mcp.json" ]] \
+  || { echo "FAIL: overlap run did not write project .cursor/mcp.json"; exit 1; }
+[[ "$(cksum "$USER_MCP_FIXTURE")" == "$USER_MCP_BEFORE" ]] \
+  || { echo "FAIL: installer modified the User MCP fixture"; exit 1; }
+
+TARGET_NO_USER="${TMP}/consumer-no-user-mcp"
+mkdir -p "$TARGET_NO_USER"
+(cd "$TARGET_NO_USER" && git init -q)
+NO_USER_LOG="${TMP}/no-user-mcp-install.log"
+AGENT_COLLECTIONS_USER_MCP="${TMP}/missing-user-mcp.json" \
+  bash "${ROOT}/scripts/setup-agent-collections.sh" \
+    --collections-home "$ROOT" \
+    --target "$TARGET_NO_USER" \
+    --non-interactive \
+    --agents=cursor \
+    --mcp-servers=eversis-collections \
+    --profile=frontend \
+    --link-mode=copy \
+    > "$NO_USER_LOG" 2>&1
+grep -q 'Cursor User MCP already has catalog' "$NO_USER_LOG" \
+  && { echo "FAIL: warned about User MCP overlap when User file is missing"; cat "$NO_USER_LOG"; exit 1; }
+[[ -f "${TARGET_NO_USER}/.cursor/mcp.json" ]] \
+  || { echo "FAIL: missing-User-file run did not write project .cursor/mcp.json"; exit 1; }
+
+# Invalid User JSON must not fail install.
+TARGET_BAD_USER="${TMP}/consumer-bad-user-mcp"
+mkdir -p "$TARGET_BAD_USER"
+(cd "$TARGET_BAD_USER" && git init -q)
+BAD_USER_MCP="${TMP}/bad-user-mcp.json"
+echo '{not-json' > "$BAD_USER_MCP"
+BAD_USER_LOG="${TMP}/bad-user-mcp-install.log"
+AGENT_COLLECTIONS_USER_MCP="$BAD_USER_MCP" \
+  bash "${ROOT}/scripts/setup-agent-collections.sh" \
+    --collections-home "$ROOT" \
+    --target "$TARGET_BAD_USER" \
+    --non-interactive \
+    --agents=cursor \
+    --mcp-servers=eversis-collections \
+    --profile=frontend \
+    --link-mode=copy \
+    > "$BAD_USER_LOG" 2>&1 \
+  || { echo "FAIL: invalid User MCP JSON should not fail install"; cat "$BAD_USER_LOG"; exit 1; }
+[[ -f "${TARGET_BAD_USER}/.cursor/mcp.json" ]] \
+  || { echo "FAIL: invalid-User-JSON run did not write project .cursor/mcp.json"; exit 1; }
+
 # Upgrade reuse
 bash "${ROOT}/scripts/setup-agent-collections.sh" \
   --collections-home "$ROOT" \
