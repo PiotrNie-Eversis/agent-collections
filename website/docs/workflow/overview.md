@@ -70,7 +70,7 @@ The draft is labeled **`QA comment — review before posting to Jira`**. Post to
 
 So that a durable fact learned during one task (a confirmed business rule, a reusable integration pattern — not a one-off implementation detail) survives beyond that single task and beyond a single repo, Fine can also produce a **second, independent draft**: a proposal to write that fact into `docs/context/<project>/` (the project's own **domain knowledge** store — durable notes about the codebase and business rules, separate from per-task history). Most tasks do **not** produce this kind of finding — it appears only when the task actually surfaces one.
 
-This second draft is labeled **`Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing`** and has its **own** approval: accepting or rejecting the QA comment draft has no effect on it, and vice versa. Once approved, it publishes via the GitLab REST API directly to the `domain-context` repository — never a local checkout.
+This second draft is labeled **`Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing`** and has its **own** approval: accepting or rejecting the QA comment draft has no effect on it, and vice versa. Once approved, it is written to **this repo** (`docs/context/<project>/`). Sharing the same fact with other repos (the group `domain-context` GitLab project) is a **later, optional** step — see [Domain Context — Tools and skills](../domain-context#tools-and-skills).
 
 ```mermaid
 flowchart TD
@@ -83,12 +83,12 @@ flowchart TD
     check -->|"No — most tasks"| nosecond["No second draft —\nQA comment draft above\nstill applies as normal"]
     check -->|"Yes"| promo["+ Domain-knowledge promotion draft\n(independent, second draft)"]
     promo --> gate2{"Human approves\npromotion draft?\n(separate decision)"}
-    gate2 -->|"yes"| gitlab["GitLab REST API commit\nto domain-context repo"]
+    gate2 -->|"yes"| project["Write docs/context/<project>/\nin this repo"]
 
     style qa fill:#FFF9C4
     style promo fill:#BBDEFB
     style jira fill:#C8E6C9
-    style gitlab fill:#C8E6C9
+    style project fill:#C8E6C9
 ```
 
 ## Workflow diagram
