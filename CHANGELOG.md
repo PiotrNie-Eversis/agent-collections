@@ -107,108 +107,108 @@ Entries below predate Agent Collections SemVer releases (`0.0.1` and later). The
 
 ### Changed
 
-- **Implement readiness review suggestions** — Standard Flow first-content + Research DELTA; English **needs verification** QA signal; Plan REFRESH in mirror; agent-core Plan adequacy; `AGENTS.md` pointer. See [Orchestrating Implementation](/docs/skills/orchestrating-implementation).
-- **Implement readiness P0 hardening** — exact four-line readiness block as first content; adequacy checklist before Research SKIP; updated QA/bugfix and analyze entry signals; same-session research file for CREATE/DELTA. See [Orchestrating Implementation](/docs/skills/orchestrating-implementation).
+- **Implement readiness review suggestions** — Standard Flow first-content + Research DELTA; English **needs verification** QA signal; Plan REFRESH in mirror; agent-core Plan adequacy; `AGENTS.md` pointer. See [Orchestrating Implementation](/docs/reference/skills/orchestrating-implementation).
+- **Implement readiness P0 hardening** — exact four-line readiness block as first content; adequacy checklist before Research SKIP; updated QA/bugfix and analyze entry signals; same-session research file for CREATE/DELTA. See [Orchestrating Implementation](/docs/reference/skills/orchestrating-implementation).
 - **Workflow Overview** — Implement Role/Prompt bullets aligned with Ideate and Review; Quick/Full table kept.
 
 ## 2026-07-28
 
 ### Changed
 
-- **Implement readiness:** `@eversis-implement` / `/eversis-implement` — mandatory first-response readiness block; entry signals skip Ideate when plan + research exist. See [Orchestrating Implementation](/docs/skills/orchestrating-implementation).
+- **Implement readiness:** `@eversis-implement` / `/eversis-implement` — mandatory first-response readiness block; entry signals skip Ideate when plan + research exist. See [Orchestrating Implementation](/docs/reference/skills/orchestrating-implementation).
 
 ## 2026-06-19
 
 ### Added
 
-- **Implementing filters (Phase I):** `eversis-implementing-filters` — Next.js URL-sync for filterable lists; Nest flat Zod variant; gated by Agent skills policy. Docs: [implementing-filters](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/skills/implementing-filters.md).
+- **Implementing filters (Phase I):** `eversis-implementing-filters` — Next.js URL-sync for filterable lists; Nest flat Zod variant; gated by Agent skills policy. Docs: [implementing-filters](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/skills/implementing-filters.md).
 - **Agent skills policy (OSS governance):** stack template, agent-core, orchestration, and docs — mitigates wrong skill activation across consumer projects.
 
 ### Changed
 
-- **Agent artifacts local-only (framework repo)** — `docs/specs/*/`, `docs/context/*/`, and `docs/plans/*` (except README) gitignored; normative BA Docs spec on [business-docs-workflow](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/specs/business-docs-workflow.md).
-- **Breaking:** Skill rename **`eversis-qa-comment`** → **`eversis-fine-handoff`** — same Fine-turn QA comment draft contract; new docs page [Fine Handoff](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/skills/fine-handoff.md). See [CHANGELOG.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/CHANGELOG.md) for consumer migration steps.
+- **Agent artifacts local-only (framework repo)** — `docs/specs/*/`, `docs/context/*/`, and `docs/plans/*` (except README) gitignored; normative BA Docs spec on [business-docs-workflow](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/specs/business-docs-workflow.md).
+- **Breaking:** Skill rename **`eversis-qa-comment`** → **`eversis-fine-handoff`** — same Fine-turn QA comment draft contract; new docs page [Fine Handoff](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/skills/fine-handoff.md). See [CHANGELOG.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/CHANGELOG.md) for consumer migration steps.
 
 ## 2026-05-13
 
 ### Removed
 
-- **Legacy standalone docs MCP packages** — Deleted `mcp/eversis-docs-mcp/` (Python) and `mcp/eversis-docs-mcp-node/` (Node). Business Manager Docs `.docx` tools ship only via [`mcp/eversis-collections-mcp/`](https://github.com/PiotrNie-Eversis/agent-collections/tree/main/mcp/eversis-collections-mcp) and **`eversis-collections`** in **`.cursor/mcp.json`**.
+- **Legacy standalone docs MCP packages** — Deleted `mcp/eversis-docs-mcp/` (Python) and `mcp/eversis-docs-mcp-node/` (Node). Business Manager Docs `.docx` tools ship only via [`mcp/eversis-collections-mcp/`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/main/mcp/eversis-collections-mcp) and **`eversis-collections`** in **`.cursor/mcp.json`**.
 
 ### Added
 
 - **`.cursor/commands/`** — New directory with four thin Cursor `/` project command files (`eversis-implement.md`, `eversis-review.md`, `eversis-analyze-materials.md`, `eversis-review-ui.md`). Each delegates to the canonical `.cursor/prompts/public/*.md` without duplicating workflow bodies. Type `/` in Cursor Chat or Agent to invoke from the dropdown.
-- **Business Manager Docs (Word)** — Public prompts **`eversis-ba-docs-planner`** / **`eversis-ba-docs-writer`** ([**`eversis-ba-docs-planner.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/prompts/public/eversis-ba-docs-planner.md), [**`eversis-ba-docs-writer.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/prompts/public/eversis-ba-docs-writer.md)) with attach-on-demand rules [**`eversis-ba-docs-planner.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-ba-docs-planner.mdc) / [**`eversis-ba-docs-writer.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-ba-docs-writer.mdc). Uses the same **`eversis-collections`** MCP `.docx` tools (no separate docs server in Cursor config).
-- **`eversis-collections` MCP — `.docx` chapter tools** — `generate_summary_map`, `read_chapter`, `update_chapter`, `upload_to_sharepoint` (stub); implementation under [`mcp/eversis-collections-mcp/src/docx/`](https://github.com/PiotrNie-Eversis/agent-collections/tree/main/mcp/eversis-collections-mcp/src/docx); tests in [`chapters.test.ts`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/mcp/eversis-collections-mcp/tests/chapters.test.ts).
-- **Business Docs normative spec** — [`website/docs/specs/business-docs-workflow.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/specs/business-docs-workflow.md) (BA Word workflow requirements; migrated from local `docs/specs/` in 2026-06-19).
-- [**`website/docs/workflow/business-manager-docs.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/business-manager-docs.md) — docs site workflow page.
+- **Business Manager Docs (Word)** — Public prompts **`eversis-ba-docs-planner`** / **`eversis-ba-docs-writer`** ([**`eversis-ba-docs-planner.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/prompts/public/eversis-ba-docs-planner.md), [**`eversis-ba-docs-writer.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/prompts/public/eversis-ba-docs-writer.md)) with attach-on-demand rules [**`eversis-ba-docs-planner.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-ba-docs-planner.mdc) / [**`eversis-ba-docs-writer.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-ba-docs-writer.mdc). Uses the same **`eversis-collections`** MCP `.docx` tools (no separate docs server in Cursor config).
+- **`eversis-collections` MCP — `.docx` chapter tools** — `generate_summary_map`, `read_chapter`, `update_chapter`, `upload_to_sharepoint` (stub); implementation under [`mcp/eversis-collections-mcp/src/docx/`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/main/mcp/eversis-collections-mcp/src/docx); tests in [`chapters.test.ts`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/mcp/eversis-collections-mcp/tests/chapters.test.ts).
+- **Business Docs normative spec** — [`website/docs/specs/business-docs-workflow.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/specs/business-docs-workflow.md) (BA Word workflow requirements; migrated from local `docs/specs/` in 2026-06-19).
+- [**`website/docs/workflow/business-manager-docs.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/business-manager-docs.md) — docs site workflow page.
 
 ### Changed
 
-- [**`eversis-implement.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/prompts/public/eversis-implement.md), [**`eversis-review.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/prompts/public/eversis-review.md), [**`eversis-analyze-materials.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/prompts/public/eversis-analyze-materials.md), [**`eversis-review-ui.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/prompts/public/eversis-review-ui.md) — Usage section updated to document both `@` attachment and the new `/eversis-*` project command as equivalent invocations.
-- [**`documentation/agent-collection.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/documentation/agent-collection.md) — "How to run a prompt" section: added step 3 for `/` project commands; slash naming clarification distinguishing Docusaurus URL slugs from vendor-neutral multi-agent `.cursor/commands/`.
+- [**`eversis-implement.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/prompts/public/eversis-implement.md), [**`eversis-review.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/prompts/public/eversis-review.md), [**`eversis-analyze-materials.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/prompts/public/eversis-analyze-materials.md), [**`eversis-review-ui.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/prompts/public/eversis-review-ui.md) — Usage section updated to document both `@` attachment and the new `/eversis-*` project command as equivalent invocations.
+- [**`documentation/agent-collection.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/documentation/agent-collection.md) — "How to run a prompt" section: added step 3 for `/` project commands; slash naming clarification distinguishing Docusaurus URL slugs from vendor-neutral multi-agent `.cursor/commands/`.
 - **`website/docs/intro.md`** — Intro updated: `@` attachment and `/eversis-*` project commands are the two valid Cursor invocations.
 - **`website/docs/prompts/overview.md`** — "How to invoke" block with comparison table of `/` commands and `@` equivalents.
 - **`website/src/components/SdlcDiagram/index.tsx`** — `aria-label` updated for `@` or `/eversis-*` project commands.
-- [**`eversis-creating-prompts/SKILL.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/skills/eversis-creating-prompts/SKILL.md) — Step 7 extended with guidance on thin `.cursor/commands/` siblings; Step 8 checklist item added.
-- [**`documentation/agent-collection.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/documentation/agent-collection.md) — Clarified SSOT policy for agents vs. human-facing `website/docs/`; Business Manager Docs / Word tooling cross-links.
+- [**`eversis-creating-prompts/SKILL.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/skills/eversis-creating-prompts/SKILL.md) — Step 7 extended with guidance on thin `.cursor/commands/` siblings; Step 8 checklist item added.
+- [**`documentation/agent-collection.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/documentation/agent-collection.md) — Clarified SSOT policy for agents vs. human-facing `website/docs/`; Business Manager Docs / Word tooling cross-links.
 - **`README.md`** — Phase table (`@` / `/`, **Business Manager Docs** row), quick start (**MCP** step documents `.docx` tools), prompts table (**`eversis-ba-docs-*`**), **MCP servers** / **Summary** for Word tools on **`eversis-collections`**; QA comment references (`SKILL.md` primary; website links optional).
 - **`website/docs/skills/overview.md`** — Notice blockquote: skills catalog is human browsing only; agents use MCP or `SKILL.md`.
 - **`website/docs/workflow/overview.md`** — "Status: Fine" link points to `eversis-qa-comment` `SKILL.md`.
 - **`.cursor/commands/`** — Added `eversis-ba-docs-planner.md` and `eversis-ba-docs-writer.md`; six thin `/` commands total.
-- [**`AGENTS.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md) — `.docx` chapter tools on **`eversis-collections`** and BA docs prompts (single MCP for skills + Word tooling).
-- [**`mcp/eversis-collections-mcp/README.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/mcp/eversis-collections-mcp/README.md) — Tool table and dependencies for `.docx` chapter tools (`JSZip`, `@xmldom/xmldom`).
-- [**`docs/specs/README.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/specs/README.md) — Index entry for business-docs-workflow spec folder.
+- [**`AGENTS.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md) — `.docx` chapter tools on **`eversis-collections`** and BA docs prompts (single MCP for skills + Word tooling).
+- [**`mcp/eversis-collections-mcp/README.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/mcp/eversis-collections-mcp/README.md) — Tool table and dependencies for `.docx` chapter tools (`JSZip`, `@xmldom/xmldom`).
+- [**`docs/specs/README.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/specs/README.md) — Index entry for business-docs-workflow spec folder.
 - **`website/docs/getting-started/mcp-setup.md`**, **`website/docs/integrations/overview.md`**, **`website/docusaurus.config.ts`**, **`website/package.json`** / **`website/README.md`** — Docs site navigation and MCP copy aligned with unified **`eversis-collections`** Word tools where applicable.
 
 ## 2026-05-11
 
 ### Changed
 
-- **`eversis-qa-comment`** skill ([`.cursor/skills/eversis-qa-comment/SKILL.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/skills/eversis-qa-comment/SKILL.md)) — **mandatory** QA comment draft on **Fine** (no longer optional); two-phase human gate: draft in Fine turn, Atlassian MCP `addCommentToJiraIssue` only after explicit approval; expanded readability rules (Before / After framing, jargon gloss, outcome-first ordering). Breaking: adopting teams should expect a QA draft artifact on every Fine.
+- **`eversis-qa-comment`** skill ([`.cursor/skills/eversis-qa-comment/SKILL.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/skills/eversis-qa-comment/SKILL.md)) — **mandatory** QA comment draft on **Fine** (no longer optional); two-phase human gate: draft in Fine turn, Atlassian MCP `addCommentToJiraIssue` only after explicit approval; expanded readability rules (Before / After framing, jargon gloss, outcome-first ordering). Breaking: adopting teams should expect a QA draft artifact on every Fine.
 - **`qa-comment.example.md`** — added "avoid vs prefer" contrast section using an OAuth callback scenario to illustrate human-readable bullet writing.
-- [**`eversis-engineering-manager.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-engineering-manager.mdc) — QA Handoff Policy: Fine always produces the draft in the same turn; Atlassian MCP call requires explicit human approval.
-- [**`eversis-agent-core.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-agent-core.mdc) — added step 5 to Orchestration: QA draft is a required Fine output; Jira publication requires human approval.
-- [**`eversis-implement.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/prompts/public/eversis-implement.md) — added workflow step 10 (Fine + QA draft) and updated "What It Does" list.
-- **Workflow docs** — [Overview](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/overview.md) **Status: Fine** updated; [Standard](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/standard-flow.md), [Frontend](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/frontend-flow.md), and [E2E](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/e2e-flow.md) — optional tip replaced with mandatory QA draft note.
-- [**`website/docs/skills/qa-comment.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/skills/qa-comment.md) — rewritten: user story, readability expectations, Atlassian MCP publishing instructions.
+- [**`eversis-engineering-manager.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-engineering-manager.mdc) — QA Handoff Policy: Fine always produces the draft in the same turn; Atlassian MCP call requires explicit human approval.
+- [**`eversis-agent-core.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-agent-core.mdc) — added step 5 to Orchestration: QA draft is a required Fine output; Jira publication requires human approval.
+- [**`eversis-implement.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/prompts/public/eversis-implement.md) — added workflow step 10 (Fine + QA draft) and updated "What It Does" list.
+- **Workflow docs** — [Overview](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/overview.md) **Status: Fine** updated; [Standard](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/standard-flow.md), [Frontend](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/frontend-flow.md), and [E2E](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/e2e-flow.md) — optional tip replaced with mandatory QA draft note.
+- [**`website/docs/skills/qa-comment.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/skills/qa-comment.md) — rewritten: user story, readability expectations, Atlassian MCP publishing instructions.
 - **`website/docs/skills/overview.md`** — `eversis-qa-comment` table row updated to **mandatory draft after Fine**.
 - **`README.md`** — QA section updated to mandatory draft after Fine; Atlassian MCP posting described.
 - **`CHANGELOG.md`** — this entry also in root changelog.
-- [**`documentation/agent-collection.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/documentation/agent-collection.md) — QA handoff subsection added under Part A Workflow.
+- [**`documentation/agent-collection.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/documentation/agent-collection.md) — QA handoff subsection added under Part A Workflow.
 
 ## 2026-05-05
 
 ### Added
 
-- **`docs/plans/`** directory with [`docs/plans/README.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/plans/README.md) and a local plan file for `.mdc` frontmatter `globs` normalization (plan file no longer committed after 2026-06-19 local-only policy).
+- **`docs/plans/`** directory with [`docs/plans/README.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/plans/README.md) and a local plan file for `.mdc` frontmatter `globs` normalization (plan file no longer committed after 2026-06-19 local-only policy).
 
 ### Changed
 
-- [**`.cursor/rules/eversis-accessibility.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-accessibility.mdc) — `globs` field converted from a comma-separated string to a **YAML list** to match the canonical template and be unambiguous across Cursor versions.
+- [**`.cursor/rules/eversis-accessibility.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-accessibility.mdc) — `globs` field converted from a comma-separated string to a **YAML list** to match the canonical template and be unambiguous across Cursor versions.
 - **`documentation/agent-collection.md`** — rules format section now documents the three `.mdc` activation modes: `alwaysApply: true`, `globs: [...]` YAML list, and `globs: []` / `alwaysApply: false` (role rules attached on demand with `@`).
-- [**`.cursor/skills/eversis-creating-agents/SKILL.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/skills/eversis-creating-agents/SKILL.md) — frontmatter table extended with the three-mode reference and a note that `globs` must be a YAML list with `**/` prefixed patterns.
+- [**`.cursor/skills/eversis-creating-agents/SKILL.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/skills/eversis-creating-agents/SKILL.md) — frontmatter table extended with the three-mode reference and a note that `globs` must be a YAML list with `**/` prefixed patterns.
 - **`README.md`** — step 3 of "Getting started" mentions the three `.mdc` rule modes with a link to the framework doc; "Using this framework in another repository" step 3 mentions `docs/plans/`.
-- [**`.cursor/rules/eversis-code-reviewer.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-code-reviewer.mdc) — added `## STRICT FORBIDDEN` section with three hard limits (file scope, documentation comments, new package-manager dependencies); violations classify as **BLOCKER** in the PASS / BLOCKER / SUGGESTION output.
-- [**`.cursor/rules/eversis-agent-core.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-agent-core.mdc) — added `## Hard limits (implement)` mirroring the same three prohibitions so they apply during implementation (`alwaysApply: true`), not only at review.
-- [**`.cursor/skills/eversis-code-reviewing/SKILL.md`**](https://github.com/PiotrNie-Eversis/agent-collections/tree/main/.cursor/skills/eversis-code-reviewing) — Step 3 extended with mandatory verification of the three `STRICT FORBIDDEN` constraints (scope, documentation comments, dependencies).
+- [**`.cursor/rules/eversis-code-reviewer.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-code-reviewer.mdc) — added `## STRICT FORBIDDEN` section with three hard limits (file scope, documentation comments, new package-manager dependencies); violations classify as **BLOCKER** in the PASS / BLOCKER / SUGGESTION output.
+- [**`.cursor/rules/eversis-agent-core.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-agent-core.mdc) — added `## Hard limits (implement)` mirroring the same three prohibitions so they apply during implementation (`alwaysApply: true`), not only at review.
+- [**`.cursor/skills/eversis-code-reviewing/SKILL.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/main/.cursor/skills/eversis-code-reviewing) — Step 3 extended with mandatory verification of the three `STRICT FORBIDDEN` constraints (scope, documentation comments, dependencies).
 - **`README.md`** — Roles and documentation section notes the `STRICT FORBIDDEN` limits and their cross-rule enforcement.
-- [**`.cursor/rules/eversis-agent-core.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-agent-core.mdc) — added `## Skills discovery` section: before broad implementation the agent checks `.cursor/skills/` for a domain-matching package; prefers `eversis-collections` MCP tools (`eversis_skills_list` / `eversis_skills_get`) when available, otherwise reads `SKILL.md` directly; reinforces that the folder must not be registered as Cursor Agent Skills.
-- [**`README.md`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/README.md) — Skills section extended with a Discovery bullet explaining the `eversis-agent-core.mdc` skills-check behavior.
+- [**`.cursor/rules/eversis-agent-core.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-agent-core.mdc) — added `## Skills discovery` section: before broad implementation the agent checks `.cursor/skills/` for a domain-matching package; prefers `eversis-collections` MCP tools (`eversis_skills_list` / `eversis_skills_get`) when available, otherwise reads `SKILL.md` directly; reinforces that the folder must not be registered as Cursor Agent Skills.
+- [**`README.md`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/README.md) — Skills section extended with a Discovery bullet explaining the `eversis-agent-core.mdc` skills-check behavior.
 
 ## 2026-05-04
 
 ### Added
 
-- Skill **`eversis-qa-comment`** under [`.cursor/skills/eversis-qa-comment/`](https://github.com/PiotrNie-Eversis/agent-collections/tree/main/.cursor/skills/eversis-qa-comment) — manual, English **QA / Jira** comment after orchestration reaches **Fine**; few-shot template **`qa-comment.example.md`**; consumed via **`eversis-collections` MCP** (`eversis_skills_get`). Agents **suggest** use when appropriate and **do not** run the skill automatically.
-- Documentation: **[QA Comment](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/skills/qa-comment.md)** skill page (usage, rules, example output, link to canonical few-shot in repo).
+- Skill **`eversis-qa-comment`** under [`.cursor/skills/eversis-qa-comment/`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/main/.cursor/skills/eversis-qa-comment) — manual, English **QA / Jira** comment after orchestration reaches **Fine**; few-shot template **`qa-comment.example.md`**; consumed via **`eversis-collections` MCP** (`eversis_skills_get`). Agents **suggest** use when appropriate and **do not** run the skill automatically.
+- Documentation: **[QA Comment](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/skills/qa-comment.md)** skill page (usage, rules, example output, link to canonical few-shot in repo).
 
 ### Changed
 
-- [ **`eversis-engineering-manager.mdc`**](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/rules/eversis-engineering-manager.mdc) — **QA Handoff Policy** (Fine → suggest `eversis-qa-comment`, never auto-invoke).
-- **Workflow docs** — [Overview](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/overview.md) (**Status: Fine** + optional QA comment); [Standard](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/standard-flow.md), [Frontend](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/frontend-flow.md), and [E2E](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/workflow/e2e-flow.md) flows — aligned tips for optional QA handoff.
-- **[Skills overview](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/website/docs/skills/overview.md)** — `eversis-qa-comment` in Quality table and agent–skill matrix; total skills **33**.
-- **[README](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/README.md)** — optional QA handoff after Implement / Fine, standard-flow example line, Skills and Summary mentions.
+- [ **`eversis-engineering-manager.mdc`**](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/rules/eversis-engineering-manager.mdc) — **QA Handoff Policy** (Fine → suggest `eversis-qa-comment`, never auto-invoke).
+- **Workflow docs** — [Overview](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/overview.md) (**Status: Fine** + optional QA comment); [Standard](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/standard-flow.md), [Frontend](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/frontend-flow.md), and [E2E](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/workflow/e2e-flow.md) flows — aligned tips for optional QA handoff.
+- **[Skills overview](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/website/docs/skills/overview.md)** — `eversis-qa-comment` in Quality table and agent–skill matrix; total skills **33**.
+- **[README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/README.md)** — optional QA handoff after Implement / Fine, standard-flow example line, Skills and Summary mentions.
 
 ## 2026-04-23
 
@@ -224,7 +224,7 @@ Entries below predate Agent Collections SemVer releases (`0.0.1` and later). The
 
 ### Removed (breaking)
 
-- **`.github/prompts/`**, **`.github/internal-prompts/`**, and **`.github/agents/`** — the repository is **multi-agent**. Prompts live under **`.cursor/prompts/`** (attach with `@`); copies for this documentation site are generated under `website/docs/prompts/` via **`sync-prompts`**. Role behavior is expressed with **`.cursor/rules/eversis-*.mdc`** and **[AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md)**. As of **2026-04-23**, skills live under **`.cursor/skills/eversis-*/`**; consume them in Agent through the **`eversis-collections` MCP** (not a separate **Agent Skills** UI path).
+- **`.github/prompts/`**, **`.github/internal-prompts/`**, and **`.github/agents/`** — the repository is **multi-agent**. Prompts live under **`.cursor/prompts/`** (attach with `@`); copies for this documentation site are generated under `website/docs/prompts/` via **`sync-prompts`**. Role behavior is expressed with **`.cursor/rules/eversis-*.mdc`** and **[AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md)**. As of **2026-04-23**, skills live under **`.cursor/skills/eversis-*/`**; consume them in Agent through the **`eversis-collections` MCP** (not a separate **Agent Skills** UI path).
 
 ### Changed
 

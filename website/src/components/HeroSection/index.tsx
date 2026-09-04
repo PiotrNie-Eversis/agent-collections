@@ -30,11 +30,11 @@ const HeroSection = () => {
           </Link>
           <Link
             className={styles.btnSecondary}
-            href="https://github.com/PiotrNie-Eversis/agent-collections"
+            href="https://gitlab3.eversis.com/eversis-ai/agent-collections"
             target="_blank"
             rel="noopener noreferrer"
           >
-            See on GitHub
+            See on GitLab
           </Link>
         </div>
         <p className={styles.heroProof}>

@@ -27,7 +27,7 @@ Complete these steps on a **sample consumer project** (empty folder or small rep
 6. Open the consumer project in your agent tool and attach **`@eversis-implement`** (or load prompt id `eversis-implement`) with a short task — or read `.ai/skills/*/SKILL.md` via MCP.
 7. **Done** when: installer exited 0, MCP skills list works (or skills readable from `.ai/skills/`), and a first Implement readiness block appears in chat.
 
-That is a **first successful install**. Optional next steps: [Quick wins](./quick-wins), [Migration from Cursor Collections](./migration-from-cursor-collections), [Workflow overview](../workflow/overview).
+That is a **first successful install**. Optional next steps: [Quick wins](./quick-wins), [Migration from Cursor Collections](../advanced/migration-from-cursor-collections), [Workflow overview](../main-flow/workflow/overview).
 
 ## Setup checklist (maintainers)
 
@@ -35,17 +35,17 @@ That is a **first successful install**. Optional next steps: [Quick wins](./quic
 2. **[Installation](./installation)** — framework checkout + consumer bootstrap
 3. **[MCP setup](./mcp-setup)** — build and enable `eversis-collections`
 4. **First prompt** — attach `@eversis-implement` / load `eversis-implement` with your ticket or task text
-5. **[Workflow overview](../workflow/overview)** — pick a variant (standard, UI, workshop, E2E)
-6. **Go deeper** — [Framework reference](../framework), [Agents overview](../agents/overview), [Skills overview](../skills/overview)
+5. **[Workflow overview](../main-flow/workflow/overview)** — pick a variant (standard, UI, workshop, E2E)
+6. **Go deeper** — [Framework reference](../framework), [Agents overview](../reference/agents/overview), [Skills overview](../reference/skills/overview)
 
 ## Requirements traceability
 
-See [Requirements traceability](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/requirements-traceability.md) (WF-01…WF-05 and key WNF → docs / stories).
+See [Requirements traceability](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/requirements-traceability.md) (WF-01…WF-05 and key WNF → docs / stories).
 
 ## Canonical references
 
-- Root **[README](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/README.md)** — install, upgrade, versioning
-- **[AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md)** — agent entry map
+- Root **[README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/README.md)** — install, upgrade, versioning
+- **[AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md)** — agent entry map
 - **[Framework reference](../framework)** — authoritative short guide (`documentation/agent-collection.md`)
 - Architecture: isolation, adapter mapping, install selection under `docs/architecture/`
 
@@ -55,4 +55,4 @@ See [Requirements traceability](https://github.com/PiotrNie-Eversis/agent-collec
 - [Installation](./installation)
 - [MCP setup](./mcp-setup)
 - [Quick wins](./quick-wins)
-- [Migration from Cursor Collections](./migration-from-cursor-collections)
+- [Migration from Cursor Collections](../advanced/migration-from-cursor-collections)

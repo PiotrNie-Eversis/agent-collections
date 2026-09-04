@@ -6,11 +6,12 @@ import styles from "./styles.module.css";
 const steps = [
   {
     num: 1,
-    title: "Open in Cursor",
+    title: "Open in Cursor or Claude Code",
     description: (
       <>
-        Open this repository in <strong>Cursor</strong> (
-        <code>File → Open Folder</code>).
+        Open this repository in <strong>Cursor</strong> or{" "}
+        <strong>Claude Code</strong> — canonical content under{" "}
+        <code>.ai/</code> works in either.
       </>
     ),
   },
@@ -27,45 +28,12 @@ const steps = [
   },
   {
     num: 3,
-    title: "Configure rules",
-    description: (
-      <>
-        Start with <code>eversis-agent-core.mdc</code> and edit{" "}
-        <code>eversis-project-stack.mdc</code> for your stack.
-      </>
-    ),
-  },
-  {
-    num: 4,
     title: "Run your first prompt",
     description: (
       <>
-        Attach <code>@eversis-implement</code> or use{" "}
-        <code>/eversis-implement</code> with your ticket or task text.
-      </>
-    ),
-  },
-  {
-    num: 5,
-    title: "Build MCP",
-    description: (
-      <>
-        <code>
-          cd mcp/eversis-collections-mcp && npm install && npm run build
-        </code>
-        — enable <code>eversis-collections</code> from{" "}
-        <code>.cursor/mcp.json</code>.
-      </>
-    ),
-  },
-  {
-    num: 6,
-    title: "Use skills via MCP",
-    description: (
-      <>
-        With MCP enabled, Agent calls <code>eversis_skills_list</code> /{" "}
-        <code>eversis_skills_get</code> — see{" "}
-        <Link to="/docs/skills/overview">Skills overview</Link>.
+        Attach <code>@eversis-implement</code> in Cursor, or run{" "}
+        <code>/eversis-implement</code> (Cursor project command or Claude
+        Code slash command) with your ticket or task text.
       </>
     ),
   },
@@ -85,9 +53,10 @@ export default function GettingStartedSection(): React.JSX.Element {
           </h2>
           <p className={styles.sub}>
             <strong>Ideate → Implement → Review</strong> — clone or bootstrap,
-            build <code>eversis-collections</code>, attach{" "}
-            <code>eversis-*.md</code> prompts with <code>@</code> or{" "}
-            <code>/eversis-*</code> project commands.
+            build the <code>eversis-collections</code> MCP with Docker, run{" "}
+            <code>eversis-*.md</code> prompts by stable id — <code>@</code>{" "}
+            attach or <code>/eversis-*</code> in Cursor, the matching slash
+            command in Claude Code.
           </p>
           <div className={styles.gsActions}>
             <Link
@@ -98,11 +67,11 @@ export default function GettingStartedSection(): React.JSX.Element {
             </Link>
             <Link
               className={styles.btnSecondary}
-              href="https://github.com/PiotrNie-Eversis/agent-collections"
+              href="https://gitlab3.eversis.com/eversis-ai/agent-collections"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Get the repo on GitHub
+              Get the repo on GitLab
             </Link>
           </div>
         </div>
@@ -119,6 +88,9 @@ export default function GettingStartedSection(): React.JSX.Element {
               </div>
             </div>
           ))}
+          <Link className={styles.fullChecklistLink} to="/docs/getting-started/start-here">
+            See the full 7-step checklist →
+          </Link>
         </div>
       </div>
     </section>

@@ -6,15 +6,30 @@ title: Introduction
 
 # Introduction
 
-**Agent Collections** is a **vendor-neutral multi-agent** product engineering framework — core rules, skills, and prompts under **`.ai/`**, packaged for Cursor, Claude Code, and (placeholder) OpenCode.
+AI agents are only as good as the process you give them. Left to guess, they skip research, plan against the wrong context, and ship code nobody reviewed against real acceptance criteria.
+
+**Agent Collections** fixes that: a structured, repeatable workflow — Ideate → Research → Plan → Implement → Review → Fine — with a human approval gate exactly where it matters, so an agent never plans or ships without your sign-off.
 
 > **Ideate → Research → Plan → Implement → Review → Fine**
 
+Under the hood, it's a **vendor-neutral multi-agent** product engineering framework — core rules, skills, and prompts under **`.ai/`** (the project's [SSOT](./reference/glossary#ssot)), packaged by [adapters](./reference/glossary#adapters) for Cursor, Claude Code, and (placeholder) OpenCode.
+
 Maintained by [Eversis](https://eversis.com).
 
-:::info Start here
-New reader? Follow the curated path: **[Start here](./getting-started/start-here)**.
+## How it works
+
+import SdlcDiagram from '@site/src/components/SdlcDiagram';
+
+<SdlcDiagram />
+
+**~15 min vs 1–2 days** — turning a discovery-workshop transcript into a Jira-ready backlog, structured start to finish, with a human approval gate at every phase.
+
+:::tip What are you here for?
+- **New to the framework?** → **[Start here](./getting-started/start-here)** — the first successful install checklist.
+- **Evaluating for your team?** → **[For CTOs](./advanced/for-ctos)** — the business case and adoption path.
 :::
+
+Teams using this exact workflow report cutting workshop-to-backlog time from **1–2 days to ~15 minutes** — see [How it works](#how-it-works) above.
 
 :::note Docs hosting
 Build this site locally (`cd website && npm run build`). **Public hosting is deferred** — no production docs URL in MVP.
@@ -27,7 +42,7 @@ Build this site locally (`cd website && npm run build`). **Public hosting is def
 | **Core SSOT** | `.ai/rules`, `.ai/skills`, `.ai/prompts` | Canonical content |
 | **Adapters** | `adapters/cursor`, `adapters/claude`, `adapters/opencode` | Tool packaging + `sync.mjs` |
 | **Installer** | `scripts/setup-agent-collections.sh` | Local / submodule / copy into consumers |
-| **MCP** | `mcp/eversis-collections-mcp` | Skills tools via `AGENT_COLLECTIONS_HOME` |
+| **[MCP](./reference/glossary#mcp)** | `mcp/eversis-collections-mcp` | Skills tools via `AGENT_COLLECTIONS_HOME`, plus **domain context** tools (`eversis_context_*`, see [Domain Context (SSOT)](./domain-context)) via a second, independent volume |
 
 ### Lifecycle
 
@@ -46,7 +61,7 @@ Use Cursor and/or Claude Code in the same monorepo with [isolation](./isolation)
 
 ## Migrating from Cursor Collections
 
-See **[Migration from Cursor Collections](./getting-started/migration-from-cursor-collections)**. Documentation channels stay fully separate (no shared docs portal).
+See **[Migration from Cursor Collections](./advanced/migration-from-cursor-collections)**. Documentation channels stay fully separate (no shared docs portal).
 
 ## Next steps
 

@@ -15,11 +15,11 @@ Installing Agent Collections into a project turns on the assistant's built-in to
 
 ```bash
 cd ~/projects
-git clone https://github.com/PiotrNie-Eversis/agent-collections.git agent-collections
+git clone https://gitlab3.eversis.com/eversis-ai/agent-collections.git agent-collections
 export AGENT_COLLECTIONS_HOME="$(pwd)/agent-collections"
 ```
 
-You can use any folder name. Paths in [AGENTS.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md) and [`documentation/agent-collection.md`](../framework) are relative to the repo root.
+You can use any folder name. Paths in [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md) and [`documentation/agent-collection.md`](../framework) are relative to the repo root.
 
 **Pin** (lock) consumers to a **SemVer git tag** when you leave local development (see root README versioning).
 
@@ -50,7 +50,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
   --profile=fullstack
 ```
 
-Selection is written to **`.agent-collections/install-selection.json`**. Schema: [`docs/architecture/install-selection.md`](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/install-selection.md).
+Selection is written to **`.agent-collections/install-selection.json`**. Schema: [`docs/architecture/install-selection.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/install-selection.md).
 
 ### Vendor modes
 
@@ -85,7 +85,7 @@ When the consumer uses `--vendor submodule`, teammates clone the app repo then:
 git submodule update --init --recursive
 ```
 
-Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains at `.agent-collections/install-selection.json` (see [install-selection.md](https://github.com/PiotrNie-Eversis/agent-collections/blob/main/docs/architecture/install-selection.md)).
+Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains at `.agent-collections/install-selection.json` (see [install-selection.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/install-selection.md)).
 
 ### Customising stack (Cursor vs Claude)
 

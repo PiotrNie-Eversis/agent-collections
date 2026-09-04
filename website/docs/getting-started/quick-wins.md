@@ -67,7 +67,7 @@ TASK-123
 
 **When:** You already use `setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`.
 
-Follow **[Migration from Cursor Collections](./migration-from-cursor-collections)** — cutover, ownership, rollback, capability matrix. Docs channels stay fully separate (no shared docs portal).
+Follow **[Migration from Cursor Collections](../advanced/migration-from-cursor-collections)** — cutover, ownership, rollback, capability matrix. Docs channels stay fully separate (no shared docs portal).
 
 ---
 
