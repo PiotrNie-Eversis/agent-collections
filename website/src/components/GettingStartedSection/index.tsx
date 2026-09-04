@@ -28,46 +28,12 @@ const steps = [
   },
   {
     num: 3,
-    title: "Configure rules",
-    description: (
-      <>
-        Start with <code>.ai/rules/orchestration/agent-core.md</code> and
-        add your own stack rules — the Cursor adapter packages these as{" "}
-        <code>.mdc</code>, the Claude adapter as <code>CLAUDE.md</code>.
-      </>
-    ),
-  },
-  {
-    num: 4,
     title: "Run your first prompt",
     description: (
       <>
         Attach <code>@eversis-implement</code> in Cursor, or run{" "}
         <code>/eversis-implement</code> (Cursor project command or Claude
         Code slash command) with your ticket or task text.
-      </>
-    ),
-  },
-  {
-    num: 5,
-    title: "Build MCP",
-    description: (
-      <>
-        <code>export AGENT_COLLECTIONS_HOME=/path/to/agent-collections</code>
-        , then <code>docker compose build eversis-collections</code> (Docker
-        Engine + Compose v2 required).
-      </>
-    ),
-  },
-  {
-    num: 6,
-    title: "Use skills",
-    description: (
-      <>
-        Claude Code resolves skills natively from <code>.ai/skills/</code>{" "}
-        (no MCP needed); with MCP enabled, Agent calls{" "}
-        <code>eversis_skills_list</code> / <code>eversis_skills_get</code> —
-        see <Link to="/docs/skills/overview">Skills overview</Link>.
       </>
     ),
   },
@@ -101,11 +67,11 @@ export default function GettingStartedSection(): React.JSX.Element {
             </Link>
             <Link
               className={styles.btnSecondary}
-              href="https://github.com/PiotrNie-Eversis/agent-collections"
+              href="https://gitlab3.eversis.com/eversis-ai/agent-collections"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Get the repo on GitHub
+              Get the repo on GitLab
             </Link>
           </div>
         </div>
@@ -122,6 +88,9 @@ export default function GettingStartedSection(): React.JSX.Element {
               </div>
             </div>
           ))}
+          <Link className={styles.fullChecklistLink} to="/docs/getting-started/start-here">
+            See the full 7-step checklist →
+          </Link>
         </div>
       </div>
     </section>

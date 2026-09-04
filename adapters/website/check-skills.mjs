@@ -4,8 +4,8 @@
  * Skill pages are curated summaries, NOT generated 1:1 from SKILL.md (procedural agent content
  * vs. a short human-facing page) — so this script only checks existence/count drift, never content:
  *   1. Every .ai/skills/<id>/ folder must be mentioned (by id string) somewhere in some
- *      website/docs/skills/*.md file (content match, not filename — page slugs differ from ids).
- *   2. The "N reusable skills" count declared in website/docs/skills/overview.md must match
+ *      website/docs/reference/skills/*.md file (content match, not filename — page slugs differ from ids).
+ *   2. The "N reusable skills" count declared in website/docs/reference/skills/overview.md must match
  *      the actual number of .ai/skills subfolders.
  * Zero npm dependencies. Exit 1 on any drift (write mode: informational; --check/blocking use
  * the exit code from the caller).
@@ -54,7 +54,7 @@ function listSkillIds(repoRoot) {
 }
 
 function readSkillPagesText(repoRoot) {
-  const dir = path.join(repoRoot, "website", "docs", "skills");
+  const dir = path.join(repoRoot, "website", "docs", "reference", "skills");
   const texts = [];
   for (const name of fs.readdirSync(dir).sort()) {
     if (!name.endsWith(".md")) continue;
@@ -72,7 +72,7 @@ function findMissingSkillPages(repoRoot) {
 }
 
 function checkOverviewCount(repoRoot, actualCount) {
-  const overviewPath = path.join(repoRoot, "website", "docs", "skills", "overview.md");
+  const overviewPath = path.join(repoRoot, "website", "docs", "reference", "skills", "overview.md");
   if (!fs.existsSync(overviewPath)) {
     return `overview.md not found at ${overviewPath}`;
   }
@@ -95,7 +95,7 @@ function run(repoRoot) {
   const problems = [];
   if (missing.length > 0) {
     problems.push(
-      `${missing.length} skill(s) with no matching website/docs/skills/*.md page: ${missing.join(", ")}`,
+      `${missing.length} skill(s) with no matching website/docs/reference/skills/*.md page: ${missing.join(", ")}`,
     );
   }
   if (countError) {

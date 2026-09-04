@@ -1,6 +1,8 @@
 # Agent Collections
 
-A **vendor-neutral** multi-agent product engineering framework — rules, prompts, skills, adapters, and MCP — so teams can move work from idea to reviewed delivery with clear human checkpoints.
+Shipping with AI agents usually means picking between speed and control — let them run loose and quality drifts, or review every step and lose the speed. Agent Collections is a structured workflow that keeps both: agents move fast inside a repeatable process, and you approve the results at the points that matter.
+
+Under the hood, it's a **vendor-neutral** multi-agent product engineering framework — rules, prompts, skills, adapters, and MCP — so teams can move work from idea to reviewed delivery with clear human checkpoints.
 
 **Ideate → Research → Plan → Implement → Review → Fine** — one Delivery Standard, end to end.
 
@@ -98,7 +100,7 @@ Rules and prompts work best **in order**, with **your review** at each gate.
 - Optional UI vs Figma checks (`eversis-review-ui`) and Playwright E2E when the plan includes them.
 - Codebase-wide analysis via `eversis-review-codebase` when you need a health pass.
 
-More variants (workshop-only, UI + Figma, E2E, BA Word docs): [workflow overview](./website/docs/workflow/overview.md).
+More variants (workshop-only, UI + Figma, E2E, BA Word docs): [workflow overview](./website/docs/main-flow/workflow/overview.md).
 
 ### Example: Full lifecycle (standard flow)
 
@@ -192,7 +194,7 @@ Selection is recorded at `.agent-collections/install-selection.json` (schema: [`
 **Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `AGENTS.md` (do not hand-edit generated `CLAUDE.md`).
 Full install guide (including Windows): [Installation](./website/docs/getting-started/installation.md).
 
-Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`): [Migration guide](./website/docs/getting-started/migration-from-cursor-collections.md).
+Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`): [Migration guide](./website/docs/advanced/migration-from-cursor-collections.md).
 
 ### Upgrade
 
@@ -206,7 +208,7 @@ Reuses agents / MCP / profile / vendor / link / `ssot.externalSsotRepo` (and `ss
 
 ## Public prompts at a glance
 
-Prompt bodies live under **`.ai/prompts/public/`**. Full catalog: [prompts overview](./website/docs/prompts/overview.md).
+Prompt bodies live under **`.ai/prompts/public/`**. Full catalog: [prompts overview](./website/docs/reference/prompts/overview.md).
 
 | Workflow | Stable id (optional Cursor `@` attach) |
 | -------- | -------------------------------------- |
@@ -226,7 +228,7 @@ Internal delegation prompts (research, plan, implement-ui, …) live under **`.a
 
 ## Agents
 
-Roles are expressed as **rules**, **prompts**, and **skills**, organized by lifecycle phase. Full roster: [agents overview](./website/docs/agents/overview.md). Entry map for this repo: [`AGENTS.md`](./AGENTS.md).
+Roles are expressed as **rules**, **prompts**, and **skills**, organized by lifecycle phase. Full roster: [agents overview](./website/docs/reference/agents/overview.md). Entry map for this repo: [`AGENTS.md`](./AGENTS.md).
 
 ### Product ideation
 
@@ -398,6 +400,10 @@ docs/architecture/    # Mapping, isolation, AGENTS standard, selection, WF/WNF
 
 ## Related documentation
 
+Grouped the same way the docs site itself is now organized — by what you're trying to do, not by artifact type.
+
+### Getting Started
+
 | Resource | Purpose |
 | -------- | ------- |
 | [Start here](./website/docs/getting-started/start-here.md) | First successful install checklist |
@@ -405,8 +411,29 @@ docs/architecture/    # Mapping, isolation, AGENTS standard, selection, WF/WNF
 | [Installation](./website/docs/getting-started/installation.md) | Consumer install (incl. Windows) |
 | [MCP setup](./website/docs/getting-started/mcp-setup.md) | Workspace vs user MCP |
 | [Quick wins](./website/docs/getting-started/quick-wins.md) | Short practical scenarios |
-| [Migration from Cursor Collections](./website/docs/getting-started/migration-from-cursor-collections.md) | Cut over from `CURSOR_COLLECTIONS_HOME` |
-| [Workflow overview](./website/docs/workflow/overview.md) | Lifecycle variants |
+
+### The Main Flow
+
+| Resource | Purpose |
+| -------- | ------- |
+| [Workflow overview](./website/docs/main-flow/workflow/overview.md) | Lifecycle variants |
+
+### Reference
+
+| Resource | Purpose |
+| -------- | ------- |
+| [Reference index](./website/docs/reference/index.md) | Agents, Skills, Prompts, Integrations, Domain Context, and Glossary — one browsable index |
+
+### Advanced / CTO
+
+| Resource | Purpose |
+| -------- | ------- |
+| [Migration from Cursor Collections](./website/docs/advanced/migration-from-cursor-collections.md) | Cut over from `CURSOR_COLLECTIONS_HOME` |
+
+### In this repository
+
+| Resource | Purpose |
+| -------- | ------- |
 | [`AGENTS.md`](./AGENTS.md) | Agent entry map for this repository |
 | [Framework reference](./documentation/agent-collection.md) | Authoritative short guide |
 | [Requirements traceability](./docs/architecture/requirements-traceability.md) | WF / WNF → docs / stories |

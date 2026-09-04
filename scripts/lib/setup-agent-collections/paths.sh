@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # lib/setup-agent-collections/paths.sh — resolve AGENT_COLLECTIONS_HOME + clone.
 
-readonly DEFAULT_REPO_URL="https://github.com/PiotrNie-Eversis/agent-collections.git"
+readonly DEFAULT_REPO_URL="https://gitlab3.eversis.com/eversis-ai/agent-collections.git"
 
 resolve_collections_home() {
   local cli_home="${ARG_COLLECTIONS_HOME:-}"

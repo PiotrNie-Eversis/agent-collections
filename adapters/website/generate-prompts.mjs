@@ -2,7 +2,7 @@
 /**
  * Website docs adapter — prompts generator (TASK: website-docs-skills-prompts-sync).
  * Reads .ai/prompts/{public,internal}/eversis-*.md → writes verbatim copies under
- * website/docs/prompts/{public,internal}/ plus a generated website/docs/prompts/overview.md
+ * website/docs/reference/prompts/{public,internal}/ plus a generated website/docs/reference/prompts/overview.md
  * catalog page (tables built from frontmatter, not hardcoded — counts self-correct).
  * Zero npm dependencies.
  *
@@ -132,12 +132,12 @@ function discoverPrompts(repoRoot) {
 }
 
 const GITHUB_REPO_BASE =
-  "https://github.com/PiotrNie-Eversis/agent-collections";
+  "https://gitlab3.eversis.com/eversis-ai/agent-collections";
 
 /**
  * `.ai/prompts/{public,internal}/` links are written relative to that source location.
- * Two kinds need adjusting once copied into `website/docs/prompts/{public,internal}/`:
- *  - Links into `website/docs/agents/<id>.md` land inside the *destination's own* subtree
+ * Two kinds need adjusting once copied into `website/docs/reference/prompts/{public,internal}/`:
+ *  - Links into `website/docs/reference/agents/<id>.md` land inside the *destination's own* subtree
  *    once copied — collapse to a docs-relative slug link (`../../agents/<id>`), matching the
  *    convention other website/docs pages already use (e.g. `../agents/overview`).
  *  - Links to anything else at repo root (`AGENTS.md`, `mcp/...`) point *outside* the
@@ -157,13 +157,13 @@ function rewriteCrossTreeLinks(body) {
     .replace(/\(\.\.\/\.\.\/\.\.\/(?!website\/docs\/agents)([^)]+)\)/g, (_m, target) => {
       const kind = target.endsWith("/") ? "tree" : "blob";
       const cleanTarget = target.endsWith("/") ? target.slice(0, -1) : target;
-      return `(${GITHUB_REPO_BASE}/${kind}/main/${cleanTarget})`;
+      return `(${GITHUB_REPO_BASE}/-/${kind}/main/${cleanTarget})`;
     });
 }
 
 function writePromptCopies(prompts, outRoot) {
   for (const prompt of prompts) {
-    const destDir = path.join(outRoot, "website", "docs", "prompts", prompt.bucket);
+    const destDir = path.join(outRoot, "website", "docs", "reference", "prompts", prompt.bucket);
     fs.mkdirSync(destDir, { recursive: true });
     const destPath = path.join(destDir, prompt.name);
     const rewritten = rewriteCrossTreeLinks(prompt.text);
@@ -234,7 +234,7 @@ function buildOverview(prompts) {
 }
 
 function writeOverview(prompts, outRoot) {
-  const destDir = path.join(outRoot, "website", "docs", "prompts");
+  const destDir = path.join(outRoot, "website", "docs", "reference", "prompts");
   fs.mkdirSync(destDir, { recursive: true });
   fs.writeFileSync(path.join(destDir, "overview.md"), buildOverview(prompts), "utf8");
 }
