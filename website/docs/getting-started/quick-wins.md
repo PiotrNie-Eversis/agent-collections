@@ -85,7 +85,7 @@ List domain context components (eversis_context_list)
 
 **When:** You already use `setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`.
 
-Follow **[Migration from Cursor Collections](./migration-from-cursor-collections)** — cutover, ownership, rollback, capability matrix. Docs channels stay fully separate (no shared docs portal).
+Follow **[Migration from Cursor Collections](../advanced/migration-from-cursor-collections)** — cutover, ownership, rollback, capability matrix. Docs channels stay fully separate (no shared docs portal).
 
 ---
 

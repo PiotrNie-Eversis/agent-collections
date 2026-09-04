@@ -1,0 +1,65 @@
+---
+sidebar_position: 4
+title: E2E Testing Flow
+---
+
+# E2E Testing Flow
+
+For features that need end-to-end test coverage, use the E2E testing workflow. This creates comprehensive, reliable Playwright test suites for critical user journeys.
+
+## Command Sequence
+
+```text
+1️⃣ @eversis-implement <JIRA_ID or task description>
+   ↳ 🔍 Engineering Manager delegates to Context Engineer for research
+   ↳ 📖 Review research doc – understand feature scope and user journeys
+   ↳ ✅ Identify critical paths that need E2E coverage
+   ↳ 🧱 Engineering Manager delegates to Architect for planning
+   ↳ 📖 Review plan – confirm test scenarios and acceptance criteria
+   ↳ ✅ Ensure E2E testing is included in the plan
+   ↳ 🧪 Engineering Manager delegates E2E tasks to the E2E Engineer agent
+   ↳ 📖 Implements Page Objects, test files, and fixtures
+   ↳ ✅ Run tests locally, verify they pass
+   ↳ 🔄 Iterate on flaky or failing tests
+```
+
+:::tip
+E2E test implementation is handled by the Engineering Manager as part of the standard **`eversis-implement`** workflow. When the plan contains E2E test tasks, the Engineering Manager automatically delegates them to the E2E Engineer agent using the internal **`.cursor/prompts/internal/eversis-implement-e2e.md`** prompt.
+:::
+
+:::note Mandatory QA comment draft after Fine
+After implementation (including E2E tasks) reaches **Fine**, the agent **always produces a QA comment draft in the same response** following the **[Fine Handoff](../../reference/skills/fine-handoff)** skill (`eversis-fine-handoff`). Review the draft, edit if needed, then paste it into Jira or ask the agent to post it via Atlassian MCP. A durable, cross-task finding also gets a second, separately-approved draft proposing a `docs/context/<project>/` update — see [Workflow Overview](./overview#status-fine--handoff).
+:::
+
+## What the E2E Engineer Does
+
+When delegated to by the Engineering Manager, the E2E Engineer:
+
+- Analyzes the application, designs test scenarios, and implements Page Objects.
+- Uses **Playwright MCP** for real-time browser interaction and test verification.
+- Follows BDD-style scenarios with proper Arrange-Act-Assert structure.
+- Maps acceptance criteria to test scenarios.
+- Verifies tests pass consistently **(3+ consecutive passes)** in headless mode before committing.
+
+## What It Produces
+
+- **Page Objects** — Reusable page abstractions with accessibility-first locators.
+- **Test files** — Comprehensive test suites following the `should [behavior] when [condition]` naming pattern.
+- **Fixtures** — Test data and setup utilities.
+- **Execution report** — Summary of coverage, results, and any issues found.
+
+## Testing Standards
+
+The E2E Engineer agent enforces these standards:
+
+| Standard | Approach |
+|---|---|
+| **Locators** | Use `getByRole`, `getByLabel`, `getByText`. Avoid CSS selectors. Use `getByTestId` only as fallback. |
+| **Synchronization** | Built-in auto-waiting assertions. No `waitForTimeout()`. No `waitForLoadState('networkidle')`. |
+| **Test data** | Dynamic data for every run (timestamps/UUIDs). Tests must not depend on state from other tests. |
+| **Security** | Never hardcode credentials. Use environment variables. |
+| **Naming** | `should [behavior] when [condition]` pattern. |
+
+:::warning Important
+The E2E Engineer agent generates tests using Playwright MCP for real-time browser interaction. Always run the generated tests locally, review test scenarios for completeness, and verify they cover the critical user journeys identified during research.
+:::
