@@ -3,7 +3,7 @@ title: Changelog
 ---
 
 :::tip Source of truth
-This page is **generated** from [`CHANGELOG.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/CHANGELOG.md) in the repository root. Edit that file only, then run `node scripts/sync-changelog.mjs` (or rely on `website` `prestart` / `prebuild`). Do not hand-edit this page.
+This page is **generated** from [`CHANGELOG.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/CHANGELOG.md) in the repository root. Edit that file only, then run `node scripts/sync-changelog.mjs` (or rely on `website` `prestart` / `prebuild`). Do not hand-edit this page.
 :::
 
 # Changelog
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Policy
 
 - **Release unit:** one SemVer git tag on this repository (core `.ai/`, plus adapters / installer / MCP when present).
-- **Breaking changes:** every breaking release **must** include a **Migration** subsection with consumer steps (see [README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/README.md) upgrade contract).
+- **Breaking changes:** every breaking release **must** include a **Migration** subsection with consumer steps (see [README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/README.md) upgrade contract).
 - **Project-owned paths** are never overwritten by upgrade tooling without explicit opt-in (see README).
 
 ## [Unreleased]
@@ -106,7 +106,7 @@ Placeholder pre-distribution version. Self-contained bootstrap and installer are
 
 ### Migration
 
-No consumer migration required for `0.0.1` (first placeholder). When upgrading from a future `0.0.x` / `0.1.x` with breaking changes, follow the **Migration** notes in that release and the [README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/README.md) upgrade modes.
+No consumer migration required for `0.0.1` (first placeholder). When upgrading from a future `0.0.x` / `0.1.x` with breaking changes, follow the **Migration** notes in that release and the [README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/README.md) upgrade modes.
 
 ## Prior history (cursor-collections lineage)
 

@@ -24,7 +24,7 @@ In **Cursor**, attach the file above (or open it and reference it with `@`) plus
 
 ## What it does
 
-1. **Research** — Review existing **`.ai/rules/`** (and adapter `.mdc` if present) and [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md) for patterns; optionally read the [Agents overview](../../agents/overview).
+1. **Research** — Review existing **`.ai/rules/`** (and adapter `.mdc` if present) and [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md) for patterns; optionally read the [Agents overview](../../agents/overview).
 2. **Clarify** — Scope, responsibilities, which prompts attach this rule, and globs (`alwaysApply` vs `globs`).
 3. **Design** — File name, description, section outline, and how the role composes with `eversis-agent-core.mdc`.
 4. **Create** — Write the `.mdc` (and short agent doc if needed) following **`eversis-creating-agents`** (skill path: `.ai/skills/eversis-creating-agents/SKILL.md`).
