@@ -35,10 +35,10 @@ Each phase passes a reviewed deliverable to the next. Workshop materials feed th
 
 At Step 0 the EM recommends **Quick** or **Full** (you may override). See [Orchestrating Implementation](../../reference/skills/orchestrating-implementation).
 
-| Flow | Steps | When to use |
-| ---- | ----- | ----------- |
-| **Quick** | implement → quality checks → `@eversis-review` → **Fine** + QA draft | Criteria pass, artifacts exist |
-| **Full** | research → plan → plan validation → code → **Fine** + QA draft | Artifacts missing or scope requires it |
+| Flow      | Steps                                                                | When to use                            |
+| --------- | -------------------------------------------------------------------- | -------------------------------------- |
+| **Quick** | implement → quality checks → `@eversis-review` → **Fine** + QA draft | Criteria pass, artifacts exist         |
+| **Full**  | research → plan → plan validation → code → **Fine** + QA draft       | Artifacts missing or scope requires it |
 
 :::info Quick vs Full
 **Hard exclusion:** Figma, UI verification tasks, cross-domain work, or likely >3 files → **Full Flow only**. Quick is for narrow, low-risk fixes after you confirm the EM recommendation.
@@ -54,15 +54,15 @@ At Step 0 the EM recommends **Quick** or **Full** (you may override). See [Orche
 
 ## Implement → Review
 
-| Step | Attach | What happens |
-| ---- | ------ | ------------ |
-| Implement (Quick) | `@eversis-implement` | EM: implement → review → Fine + QA draft |
-| Implement (Full) | `@eversis-implement` | EM: research → plan → plan validation → implementation → Fine + QA draft |
-| Review | `@eversis-review` | Structured code review |
+| Step              | Attach               | What happens                                                             |
+| ----------------- | -------------------- | ------------------------------------------------------------------------ |
+| Implement (Quick) | `@eversis-implement` | EM: implement → review → Fine + QA draft                                 |
+| Implement (Full)  | `@eversis-implement` | EM: research → plan → plan validation → implementation → Fine + QA draft |
+| Review            | `@eversis-review`    | Structured code review                                                   |
 
 ## Status: Fine — handoff
 
-When Implement is complete, the Engineering Manager declares **Fine** and **must** output a **QA comment draft in the same response** (not a separate turn). Normative procedure: [`.cursor/skills/eversis-fine-handoff/SKILL.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.cursor/skills/eversis-fine-handoff/SKILL.md) or MCP `eversis_skills_get` for `eversis-fine-handoff`. Onboarding overview: [Fine Handoff](../../reference/skills/fine-handoff).
+When Implement is complete, the Engineering Manager declares **Fine** and **must** output a **QA comment draft in the same response** (not a separate turn). Normative procedure: [`.cursor/skills/eversis-fine-handoff/SKILL.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/.cursor/skills/eversis-fine-handoff/SKILL.md) or MCP `eversis_skills_get` for `eversis-fine-handoff`. Onboarding overview: [Fine Handoff](../../reference/skills/fine-handoff).
 
 The draft is labeled **`QA comment — review before posting to Jira`**. Post to Jira only after you approve (copy-paste or explicit Atlassian MCP instruction).
 
@@ -105,15 +105,15 @@ Each step requires your review. Open generated documents, iterate until correct,
 
 ## Workflow variants
 
-| Variant | Entry | Use when |
-| ------- | ----- | -------- |
-| **Standard flow** | `@eversis-implement` → `@eversis-review` | Backend / fullstack — Quick or Full at Step 0 |
-| **UI + Figma** | `@eversis-implement` + `@eversis-review-ui` loop | Design-driven UI |
-| **[Workshop analysis](./workshop-flow)** | `@eversis-analyze-materials` | Workshop → Jira only |
-| **[E2E testing](./e2e-flow)** | `@eversis-implement` (E2E tasks in plan) | Playwright coverage |
-| **[Business Manager Docs](./business-manager-docs)** | `@eversis-ba-docs-planner` → writer | Word `.docx` release docs |
-| **[Repo Docs](./repo-docs)** | `@eversis-repo-docs-writer` (or EM delegate) | README, CHANGELOG, `website/docs` after Implement |
-| **[QA workflow](./qa-workflow)** | `@eversis-qa-workflow` | Manual test planning, regression, AC verify, quality health |
+| Variant                                              | Entry                                            | Use when                                                    |
+| ---------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
+| **Standard flow**                                    | `@eversis-implement` → `@eversis-review`         | Backend / fullstack — Quick or Full at Step 0               |
+| **UI + Figma**                                       | `@eversis-implement` + `@eversis-review-ui` loop | Design-driven UI                                            |
+| **[Workshop analysis](./workshop-flow)**             | `@eversis-analyze-materials`                     | Workshop → Jira only                                        |
+| **[E2E testing](./e2e-flow)**                        | `@eversis-implement` (E2E tasks in plan)         | Playwright coverage                                         |
+| **[Business Manager Docs](./business-manager-docs)** | `@eversis-ba-docs-planner` → writer              | Word `.docx` release docs                                   |
+| **[Repo Docs](./repo-docs)**                         | `@eversis-repo-docs-writer` (or EM delegate)     | README, CHANGELOG, `website/docs` after Implement           |
+| **[QA workflow](./qa-workflow)**                     | `@eversis-qa-workflow`                           | Manual test planning, regression, AC verify, quality health |
 
 :::info Standard flow
 Full step-by-step: [Standard Flow](./standard-flow) — **Quick vs Full** at Step 0, then research, plan, implement, review with human gates.

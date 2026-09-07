@@ -44,30 +44,30 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 
 ## Ownership model (local / core / generated)
 
-| Layer | Owns | Examples | Upgrade behavior |
-|-------|------|----------|------------------|
-| **Local (consumer)** | Project policy and product context | Stack rule, `docs/context|plans|specs`, local `AGENTS.md`, secrets, custom ignore overlays | **Never** overwritten without opt-in — `docs/context/PROJECT/INDEX.md` is the one exception, actively scaffolded by the installer |
-| **Core (framework SSOT)** | Vendor-neutral content | `.ai/rules`, `.ai/skills`, `.ai/prompts` | Updated by pulling/tagging `agent-collections` |
-| **Generated (adapters)** | Tool packaging from core | `.cursor/rules/eversis-*.mdc`, `.cursor/commands/*.md`, root `CLAUDE.md`, `.claude/rules/*.md`, `.claude/commands/*.md` | Regenerated via `sync:adapters` / installer `--sync` — do not hand-edit as SSOT |
-| **Shared (domain-context)** | Cross-repo domain knowledge, not owned by this consumer or by `agent-collections` | `docs/context/global/` (see [Domain Context (SSOT)](../domain-context)) | Refreshed via `eversis_context_sync` — a `git subtree pull` from a separate `domain-context` GitLab project, distinct from both Local and Core |
+| Layer                       | Owns                                                                              | Examples                                                                                                                | Upgrade behavior                                                                                                                               |
+| --------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Local (consumer)**        | Project policy and product context                                                | Stack rule, `docs/context                                                                                               | plans                                                                                                                                          | specs`, local `AGENTS.md`, secrets, custom ignore overlays | **Never** overwritten without opt-in — `docs/context/PROJECT/INDEX.md` is the one exception, actively scaffolded by the installer |
+| **Core (framework SSOT)**   | Vendor-neutral content                                                            | `.ai/rules`, `.ai/skills`, `.ai/prompts`                                                                                | Updated by pulling/tagging `agent-collections`                                                                                                 |
+| **Generated (adapters)**    | Tool packaging from core                                                          | `.cursor/rules/eversis-*.mdc`, `.cursor/commands/*.md`, root `CLAUDE.md`, `.claude/rules/*.md`, `.claude/commands/*.md` | Regenerated via `sync:adapters` / installer `--sync` — do not hand-edit as SSOT                                                                |
+| **Shared (domain-context)** | Cross-repo domain knowledge, not owned by this consumer or by `agent-collections` | `docs/context/global/` (see [Domain Context (SSOT)](../domain-context))                                                 | Refreshed via `eversis_context_sync` — a `git subtree pull` from a separate `domain-context` GitLab project, distinct from both Local and Core |
 
 Selection file `.agent-collections/install-selection.json` is **consumer install metadata** (read by `--upgrade`; not wiped casually).
 
 ## Capability matrix (Cursor vs Claude MVP)
 
-| Capability | Cursor | Claude Code |
-|------------|--------|-------------------|
-| Core rules packaging | Generated `.cursor/rules/*.mdc` | Root `CLAUDE.md` (mapped rules) + `.claude/rules/*.md` (glob-scoped rules, `paths:` frontmatter) |
-| Skills | MCP `eversis-collections` → `.ai/skills` (no full `.cursor/skills` mirror) | **Native** `.claude/skills/eversis-*/` (linked by the installer, no MCP required) — Claude Code has a fuller skills story here than Cursor |
-| Prompts | Stable id / optional `@` attach | Load by id; project notes belong in `.claude/CLAUDE.md`, not `AGENTS.md` (Claude Code does not auto-read it) |
-| Slash commands | Thin `.cursor/commands/` from `.ai/prompts` (TASK-598) | Thin `.claude/commands/` from `.ai/prompts` — same generator contract, `/eversis-*` after sync |
-| Ignore triad | `.cursorignore` | `.claudeignore` — class source only; Claude Code enforces via `.claude/settings.json` `permissions.deny` (not `.claudeignore` directly) |
-| Settings / permissions | N/A | `.claude/settings.json` — `permissions.deny` generated from `.claudeignore` classes, `enabledMcpjsonServers` from MCP selection |
-| Area profiles | Path scope via installer profile | Same path profiles (tool-agnostic) |
-| Domain context | MCP `eversis-collections` → `eversis_context_get`/`list`/`sync` | Same MCP tools (tool-agnostic — identical mechanism for both) |
-| OpenCode | Placeholder only | — |
+| Capability             | Cursor                                                                     | Claude Code                                                                                                                                |
+| ---------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Core rules packaging   | Generated `.cursor/rules/*.mdc`                                            | Root `CLAUDE.md` (mapped rules) + `.claude/rules/*.md` (glob-scoped rules, `paths:` frontmatter)                                           |
+| Skills                 | MCP `eversis-collections` → `.ai/skills` (no full `.cursor/skills` mirror) | **Native** `.claude/skills/eversis-*/` (linked by the installer, no MCP required) — Claude Code has a fuller skills story here than Cursor |
+| Prompts                | Stable id / optional `@` attach                                            | Load by id; project notes belong in `.claude/CLAUDE.md`, not `AGENTS.md` (Claude Code does not auto-read it)                               |
+| Slash commands         | Thin `.cursor/commands/` from `.ai/prompts` (TASK-598)                     | Thin `.claude/commands/` from `.ai/prompts` — same generator contract, `/eversis-*` after sync                                             |
+| Ignore triad           | `.cursorignore`                                                            | `.claudeignore` — class source only; Claude Code enforces via `.claude/settings.json` `permissions.deny` (not `.claudeignore` directly)    |
+| Settings / permissions | N/A                                                                        | `.claude/settings.json` — `permissions.deny` generated from `.claudeignore` classes, `enabledMcpjsonServers` from MCP selection            |
+| Area profiles          | Path scope via installer profile                                           | Same path profiles (tool-agnostic)                                                                                                         |
+| Domain context         | MCP `eversis-collections` → `eversis_context_get`/`list`/`sync`            | Same MCP tools (tool-agnostic — identical mechanism for both)                                                                              |
+| OpenCode               | Placeholder only                                                           | —                                                                                                                                          |
 
-Full mapping: [`docs/architecture/adapter-mapping.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/adapter-mapping.md).
+Full mapping: [`docs/architecture/adapter-mapping.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/adapter-mapping.md).
 
 ## Consumer monorepo overlay (Q7)
 

@@ -29,3 +29,6 @@ website/.docusaurus/
 
 # macOS
 .DS_Store
+
+# Playwright
+.playwright-mcp/

@@ -14,10 +14,10 @@ Generic AI tools don't know your team's business rules or codebase conventions �
 
 `docs/context/` has two layers, both plain Markdown, both readable with normal file tools — no special search tool required.
 
-| Layer | Path | Owned by | How it gets there |
-|-------|------|----------|--------------------|
-| Project | `docs/context/<project>/` | This repository | `INDEX.md` is scaffolded by the installer on every install; component files are written by agents during Fine (see [Workflow Overview](./main-flow/workflow/overview#status-fine--handoff)) |
-| Global | `docs/context/global/` | A dedicated `domain-context` GitLab project, shared across repos in the same group | Seeded best-effort at install time, refreshed later via `eversis_context_sync` — a **subtree** (a Git mechanism that copies another repository's history into a subfolder of this one) pull, not a live link |
+| Layer   | Path                      | Owned by                                                                           | How it gets there                                                                                                                                                                                            |
+| ------- | ------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Project | `docs/context/<project>/` | This repository                                                                    | `INDEX.md` is scaffolded by the installer on every install; component files are written by agents during Fine (see [Workflow Overview](./main-flow/workflow/overview#status-fine--handoff))                  |
+| Global  | `docs/context/global/`    | A dedicated `domain-context` GitLab project, shared across repos in the same group | Seeded best-effort at install time, refreshed later via `eversis_context_sync` — a **subtree** (a Git mechanism that copies another repository's history into a subfolder of this one) pull, not a live link |
 
 **Project wins on conflict.** When a component exists in both layers, reading it (`eversis_context_get`) returns the project version — the global layer is a shared default, not an override.
 
@@ -121,7 +121,7 @@ Tool inventory: [eversis-collections — Domain context](./reference/integration
 
 1. **Read** during Research: `eversis_context_list` → pick **one** name → `eversis_context_get` (or open that one file). Do not scan all of `docs/context/`.
 2. **Do the task** as usual.
-3. **Promote** at Fine, if a *future different task* would need this fact (a named convention, a durable business rule, or a reusable pattern): follow [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge). Most tasks produce **no** draft.
+3. **Promote** at Fine, if a _future different task_ would need this fact (a named convention, a durable business rule, or a reusable pattern): follow [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge). Most tasks produce **no** draft.
 4. **Approve that draft** separately from the QA comment. The write goes to **this repo**: `docs/context/<project>/`.
 5. **Share with other repos** (optional, later): only if the fact is true across the GitLab group. Publish into the shared `domain-context` project, then each consumer runs `eversis_context_sync`. Not the same Fine turn — see [Publishing to the global layer](#publishing-to-the-global-layer).
 6. **Seed from Confluence once** (optional): [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) when `ssot.confluenceSpaceKey` is set **and** there is **one AS-IS Pack page** (a single Confluence page split into topics). Not the installer. Not a whole space. Skip empty template sections.
@@ -129,15 +129,15 @@ Tool inventory: [eversis-collections — Domain context](./reference/integration
 
 ### What to use
 
-| You want to… | Use | Writes to | When |
-| --- | --- | --- | --- |
-| See what knowledge exists | `eversis_context_list` | nowhere (read) | Research |
-| Read one topic | `eversis_context_get` | `last_consulted` only | Research |
-| Refresh the shared copy in this repo | `eversis_context_sync` | `docs/context/global/` (pull) | After someone updated `domain-context` |
-| Save a fact from this task | [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge) | `docs/context/<project>/` after draft OK | Fine; skip if not durable |
-| Share that fact with other repos | same GitLab publish, targeting `domain-context` | the shared GitLab project | Later, explicit; then others sync |
-| Seed from Confluence once | [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) | `docs/context/<project>/` | Human asks; one pack page |
-| Clean old project files | [`eversis-audit-domain-knowledge`](./reference/skills/audit-domain-knowledge) | `docs/context/<project>/` | Team cadence (for example quarterly) |
+| You want to…                         | Use                                                                                     | Writes to                                | When                                   |
+| ------------------------------------ | --------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------- |
+| See what knowledge exists            | `eversis_context_list`                                                                  | nowhere (read)                           | Research                               |
+| Read one topic                       | `eversis_context_get`                                                                   | `last_consulted` only                    | Research                               |
+| Refresh the shared copy in this repo | `eversis_context_sync`                                                                  | `docs/context/global/` (pull)            | After someone updated `domain-context` |
+| Save a fact from this task           | [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge)       | `docs/context/<project>/` after draft OK | Fine; skip if not durable              |
+| Share that fact with other repos     | same GitLab publish, targeting `domain-context`                                         | the shared GitLab project                | Later, explicit; then others sync      |
+| Seed from Confluence once            | [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) | `docs/context/<project>/`                | Human asks; one pack page              |
+| Clean old project files              | [`eversis-audit-domain-knowledge`](./reference/skills/audit-domain-knowledge)           | `docs/context/<project>/`                | Team cadence (for example quarterly)   |
 
 ### The three write skills
 
@@ -151,8 +151,8 @@ Tool inventory: [eversis-collections — Domain context](./reference/integration
 
 Everyday Fine writes stay in `docs/context/<project>/` (step 4 above). Publishing to `domain-context` is **step 5**: only facts that remain true in other repos in the same GitLab group.
 
-That publish uses the GitLab REST API (branch + commit + merge request), never a local checkout of `domain-context`. It uses the same two-phase human gate as the QA comment: a labeled draft first, then explicit approval. It needs a `GITLAB_TOKEN` with write access from the agent's environment — the installer never generates, stores, or requests this token (see [Install Selection Schema](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/install-selection.md)).
+That publish uses the GitLab REST API (branch + commit + merge request), never a local checkout of `domain-context`. It uses the same two-phase human gate as the QA comment: a labeled draft first, then explicit approval. It needs a `GITLAB_TOKEN` with write access from the agent's environment — the installer never generates, stores, or requests this token (see [Install Selection Schema](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/install-selection.md)).
 
 After the merge, each consumer refreshes with `eversis_context_sync`. Sync in one repo does not update the others.
 
-Canonical detail: [`docs/architecture/agents-md-standard.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/agents-md-standard.md) (the `docs/context`/`docs/plans`/`docs/specs` triad) and [`docs/architecture/install-selection.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/install-selection.md) (the `ssot.*` install schema) in the repository.
+Canonical detail: [`docs/architecture/agents-md-standard.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/agents-md-standard.md) (the `docs/context`/`docs/plans`/`docs/specs` triad) and [`docs/architecture/install-selection.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/install-selection.md) (the `ssot.*` install schema) in the repository.

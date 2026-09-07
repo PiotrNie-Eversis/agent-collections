@@ -38,19 +38,19 @@ Write the plan as a document that follows `plan.example.md` exactly. Do not add 
 
 ## Key Rules
 
-| Area | Rule |
-| --- | --- |
-| Goal hierarchy | One Wildly Important Goal per plan, with Success Measure and Do NOT touch / do NOT add list. Every phase has Goal, Description, and `**Verification:**`. Every task has Description, `**Files:**`, DoD, and optional Clues. |
-| Technical Context | Persist project conventions, test commands, and patterns during planning so implementers do not re-discover them. |
-| Definition of Done | Each task's DoD must include at least one reviewer-verifiable check — preferably a runnable command from Technical Context. No deployment steps or manual QA. |
-| No real code | No production implementation bodies. Seam artifacts (types, signatures, DTOs) are allowed to clarify contracts. |
-| Open-questions gate | No dispatch while any `## Open Questions` row has Status `❓ Open`. |
-| Mandatory cross-cutting tasks | End with code review via `@eversis-review`. Add `[REUSE]` UI verification for Figma-based UI via `@eversis-review-ui`, and prompt engineering tasks when LLM prompts are in scope. |
+| Area                          | Rule                                                                                                                                                                                                                        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Goal hierarchy                | One Wildly Important Goal per plan, with Success Measure and Do NOT touch / do NOT add list. Every phase has Goal, Description, and `**Verification:**`. Every task has Description, `**Files:**`, DoD, and optional Clues. |
+| Technical Context             | Persist project conventions, test commands, and patterns during planning so implementers do not re-discover them.                                                                                                           |
+| Definition of Done            | Each task's DoD must include at least one reviewer-verifiable check — preferably a runnable command from Technical Context. No deployment steps or manual QA.                                                               |
+| No real code                  | No production implementation bodies. Seam artifacts (types, signatures, DTOs) are allowed to clarify contracts.                                                                                                             |
+| Open-questions gate           | No dispatch while any `## Open Questions` row has Status `❓ Open`.                                                                                                                                                         |
+| Mandatory cross-cutting tasks | End with code review via `@eversis-review`. Add `[REUSE]` UI verification for Figma-based UI via `@eversis-review-ui`, and prompt engineering tasks when LLM prompts are in scope.                                          |
 
 ## Templates
 
-- [`plan.example.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.ai/skills/eversis-creating-implementation-plans/plan.example.md) — canonical plan structure
-- [`plan-review.example.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/.ai/skills/eversis-creating-implementation-plans/plan-review.example.md) — plan review report skeleton
+- [`plan.example.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/.ai/skills/eversis-creating-implementation-plans/plan.example.md) — canonical plan structure
+- [`plan-review.example.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/.ai/skills/eversis-creating-implementation-plans/plan-review.example.md) — plan review report skeleton
 
 ## Connected Skills
 

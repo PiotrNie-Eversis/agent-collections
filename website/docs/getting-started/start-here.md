@@ -40,12 +40,12 @@ That is a **first successful install**. Optional next steps: [Quick wins](./quic
 
 ## Requirements traceability
 
-See [Requirements traceability](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/requirements-traceability.md) (WF-01…WF-05 and key WNF → docs / stories).
+See [Requirements traceability](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/requirements-traceability.md) (WF-01…WF-05 and key WNF → docs / stories).
 
 ## Canonical references
 
-- Root **[README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/README.md)** — install, upgrade, versioning
-- **[AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md)** — agent entry map
+- Root **[README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/README.md)** — install, upgrade, versioning
+- **[AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md)** — agent entry map
 - **[Framework reference](../framework)** — authoritative short guide (`documentation/agent-collection.md`)
 - Architecture: isolation, adapter mapping, install selection under `docs/architecture/`
 
