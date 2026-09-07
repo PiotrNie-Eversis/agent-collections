@@ -1,7 +1,11 @@
 {
   "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
-    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "./node_modules/@docusaurus/tsconfig/*"
+      ]
+    },
     "jsx": "react-jsx",
     "esModuleInterop": true
   }

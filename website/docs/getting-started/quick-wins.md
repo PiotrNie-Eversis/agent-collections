@@ -56,10 +56,28 @@ TASK-123
 **When:** Frontend and backend live in different trees; Cursor and Claude both installed.
 
 1. Install with `--agents=cursor,claude` and a suitable `--profile`.
-2. Keep framework abstract paths (`apps/web`, `apps/api`); map local names (`portal`, `cms`, …) in **consumer** overlay / `docs/context/` — do not hardcode client names into framework profiles.
+2. Keep framework abstract paths (`apps/web`, `apps/api`); map local names (`portal`, `cms`, …) in **consumer** overlay / `docs/context/<project>/` (a structured store, not free-form notes — see [Domain Context (SSOT)](../domain-context)) — do not hardcode client names into framework profiles.
 3. Confirm ignore triad excludes other tools’ packaging (see [isolation strategy](../isolation)).
 
 **Value:** Each session sees the right shelf, not the whole library (WNF-03).
+
+---
+
+## Domain context — check what the installer already set up
+
+**When:** You just installed the framework and want to confirm domain context (see [Domain Context (SSOT)](../domain-context)) is working before relying on it during Implement.
+
+```text
+List domain context components (eversis_context_list)
+```
+
+| Step | What happens |
+|------|----------------|
+| Confirm scaffold | `docs/context/<project>/INDEX.md` exists — created on every install, empty until an agent promotes a finding into it |
+| List components | `eversis_context_list` returns any project or global components already present |
+| Optional: pull shared knowledge | `eversis_context_sync` refreshes `docs/context/global/` from the team's `domain-context` repo, if one was configured with `--ssot-source` |
+
+**Value:** Confirms the mechanism is live without waiting for the first Fine turn to surface a durable fact.
 
 ---
 

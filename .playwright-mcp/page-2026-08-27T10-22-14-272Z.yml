@@ -1,0 +1,1372 @@
+- generic [ref=f23e2]:
+  - region "Skip to main content":
+    - link "Skip to main content" [ref=f23e3] [cursor=pointer]:
+      - /url: "#__docusaurus_skipToContent_fallback"
+  - navigation "Main" [ref=f23e4]:
+    - generic [ref=f23e5]:
+      - generic [ref=f23e6]:
+        - link "Agent Collections" [ref=f23e7] [cursor=pointer]:
+          - /url: /
+        - link "Docs" [ref=f23e9] [cursor=pointer]:
+          - /url: /docs/
+        - link "Get started" [ref=f23e10] [cursor=pointer]:
+          - /url: /docs/getting-started/start-here
+        - link "Framework" [ref=f23e11] [cursor=pointer]:
+          - /url: /docs/framework
+        - link "Isolation" [ref=f23e12] [cursor=pointer]:
+          - /url: /docs/isolation
+        - link "Workflow" [ref=f23e13] [cursor=pointer]:
+          - /url: /docs/workflow/overview
+        - button "Components ▾" [ref=f23e15] [cursor=pointer]
+        - link "Use Cases" [ref=f23e16] [cursor=pointer]:
+          - /url: /docs/use-cases
+        - link "For CTOs" [ref=f23e17] [cursor=pointer]:
+          - /url: /docs/for-ctos
+      - generic [ref=f23e18]:
+        - link "Changelog" [ref=f23e19] [cursor=pointer]:
+          - /url: /changelog
+        - link "GitHub" [ref=f23e20] [cursor=pointer]:
+          - /url: https://github.com/PiotrNie-Eversis/agent-collections
+        - button "Switch between dark and light mode (currently system mode)" [ref=f23e28] [cursor=pointer]
+        - generic [ref=f23e32]:
+          - textbox "Search" [ref=f23e33]
+          - generic:
+            - generic: ⌘
+            - generic: K
+  - generic [ref=f23e36]:
+    - complementary [ref=f23e37]:
+      - navigation "Docs sidebar" [ref=f23e40]:
+        - list [ref=f23e41]:
+          - listitem [ref=f23e42]:
+            - link "Introduction" [ref=f23e43] [cursor=pointer]:
+              - /url: /docs/
+          - listitem [ref=f23e45]:
+            - link "Framework reference" [ref=f23e46] [cursor=pointer]:
+              - /url: /docs/framework
+          - listitem [ref=f23e48]:
+            - button "Getting Started" [ref=f23e50] [cursor=pointer]
+          - listitem [ref=f23e52]:
+            - link "Isolation and context reduction" [ref=f23e53] [cursor=pointer]:
+              - /url: /docs/isolation
+          - listitem [ref=f23e55]:
+            - button "Workflow" [ref=f23e57] [cursor=pointer]
+          - listitem [ref=f23e59]:
+            - button "Agents" [ref=f23e61] [cursor=pointer]
+          - listitem [ref=f23e63]:
+            - link "Domain Context (SSOT)" [ref=f23e64] [cursor=pointer]:
+              - /url: /docs/domain-context
+          - listitem [ref=f23e66]:
+            - button "Prompts" [ref=f23e68] [cursor=pointer]
+          - listitem [ref=f23e70]:
+            - button "Skills" [expanded] [ref=f23e72] [cursor=pointer]
+            - list [ref=f23e74]:
+              - listitem [ref=f23e75]:
+                - link "Skills Overview" [ref=f23e76] [cursor=pointer]:
+                  - /url: /docs/skills/overview
+              - listitem [ref=f23e78]:
+                - link "Architecture Design" [ref=f23e79] [cursor=pointer]:
+                  - /url: /docs/skills/architecture-design
+              - listitem [ref=f23e81]:
+                - link "Code Review" [ref=f23e82] [cursor=pointer]:
+                  - /url: /docs/skills/code-review
+              - listitem [ref=f23e84]:
+                - link "Creating Implementation Plans" [ref=f23e85] [cursor=pointer]:
+                  - /url: /docs/skills/creating-implementation-plans
+              - listitem [ref=f23e87]:
+                - link "Codebase Analysis" [ref=f23e88] [cursor=pointer]:
+                  - /url: /docs/skills/codebase-analysis
+              - listitem [ref=f23e90]:
+                - link "Orchestrating Implementation" [ref=f23e91] [cursor=pointer]:
+                  - /url: /docs/skills/orchestrating-implementation
+              - listitem [ref=f23e93]:
+                - link "E2E Testing" [ref=f23e94] [cursor=pointer]:
+                  - /url: /docs/skills/e2e-testing
+              - listitem [ref=f23e96]:
+                - link "Frontend Implementation" [ref=f23e97] [cursor=pointer]:
+                  - /url: /docs/skills/frontend-implementation
+              - listitem [ref=f23e99]:
+                - link "Implementation Gap Analysis" [ref=f23e100] [cursor=pointer]:
+                  - /url: /docs/skills/implementation-gap-analysis
+              - listitem [ref=f23e102]:
+                - link "SQL & Database" [ref=f23e103] [cursor=pointer]:
+                  - /url: /docs/skills/sql-and-database
+              - listitem [ref=f23e105]:
+                - link "Task Analysis" [ref=f23e106] [cursor=pointer]:
+                  - /url: /docs/skills/task-analysis
+              - listitem [ref=f23e108]:
+                - link "Technical Context Discovery" [ref=f23e109] [cursor=pointer]:
+                  - /url: /docs/skills/technical-context-discovery
+              - listitem [ref=f23e111]:
+                - link "UI Verification" [ref=f23e112] [cursor=pointer]:
+                  - /url: /docs/skills/ui-verification
+              - listitem [ref=f23e114]:
+                - link "Transcript Processing" [ref=f23e115] [cursor=pointer]:
+                  - /url: /docs/skills/transcript-processing
+              - listitem [ref=f23e117]:
+                - link "Task Extraction" [ref=f23e118] [cursor=pointer]:
+                  - /url: /docs/skills/task-extraction
+              - listitem [ref=f23e120]:
+                - link "Task Quality Review" [ref=f23e121] [cursor=pointer]:
+                  - /url: /docs/skills/task-quality-review
+              - listitem [ref=f23e123]:
+                - link "Jira Task Formatting" [ref=f23e124] [cursor=pointer]:
+                  - /url: /docs/skills/jira-task-formatting
+              - listitem [ref=f23e126]:
+                - link "Creating role rules" [ref=f23e127] [cursor=pointer]:
+                  - /url: /docs/skills/creating-agents
+              - listitem [ref=f23e129]:
+                - link "Creating Skills" [ref=f23e130] [cursor=pointer]:
+                  - /url: /docs/skills/creating-skills
+              - listitem [ref=f23e132]:
+                - link "Creating prompts" [ref=f23e133] [cursor=pointer]:
+                  - /url: /docs/skills/creating-prompts
+              - listitem [ref=f23e135]:
+                - link "Creating Instructions" [ref=f23e136] [cursor=pointer]:
+                  - /url: /docs/skills/creating-instructions
+              - listitem [ref=f23e138]:
+                - link "CI/CD Implementation" [ref=f23e139] [cursor=pointer]:
+                  - /url: /docs/skills/ci-cd-implementation
+              - listitem [ref=f23e141]:
+                - link "Kubernetes Implementation" [ref=f23e142] [cursor=pointer]:
+                  - /url: /docs/skills/kubernetes-implementation
+              - listitem [ref=f23e144]:
+                - link "Terraform Modules" [ref=f23e145] [cursor=pointer]:
+                  - /url: /docs/skills/terraform-modules
+              - listitem [ref=f23e147]:
+                - link "Observability Implementation" [ref=f23e148] [cursor=pointer]:
+                  - /url: /docs/skills/observability-implementation
+              - listitem [ref=f23e150]:
+                - link "Secrets Management" [ref=f23e151] [cursor=pointer]:
+                  - /url: /docs/skills/secrets-management
+              - listitem [ref=f23e153]:
+                - link "Cloud Cost Optimization" [ref=f23e154] [cursor=pointer]:
+                  - /url: /docs/skills/cloud-cost-optimization
+              - listitem [ref=f23e156]:
+                - link "Multi-Cloud Architecture" [ref=f23e157] [cursor=pointer]:
+                  - /url: /docs/skills/multi-cloud-architecture
+              - listitem [ref=f23e159]:
+                - link "Ensuring Accessibility" [ref=f23e160] [cursor=pointer]:
+                  - /url: /docs/skills/ensuring-accessibility
+              - listitem [ref=f23e162]:
+                - link "Implementing Forms" [ref=f23e163] [cursor=pointer]:
+                  - /url: /docs/skills/implementing-forms
+              - listitem [ref=f23e165]:
+                - link "Frontend Optimization" [ref=f23e166] [cursor=pointer]:
+                  - /url: /docs/skills/optimizing-frontend
+              - listitem [ref=f23e168]:
+                - link "Frontend Review" [ref=f23e169] [cursor=pointer]:
+                  - /url: /docs/skills/reviewing-frontend
+              - listitem [ref=f23e171]:
+                - link "Writing Hooks" [ref=f23e172] [cursor=pointer]:
+                  - /url: /docs/skills/writing-hooks
+              - listitem [ref=f23e174]:
+                - link "Prompt Engineering" [ref=f23e175] [cursor=pointer]:
+                  - /url: /docs/skills/prompt-engineering
+              - listitem [ref=f23e177]:
+                - link "Fine Handoff" [ref=f23e178] [cursor=pointer]:
+                  - /url: /docs/skills/fine-handoff
+              - listitem [ref=f23e180]:
+                - link "Writing Repo Documentation" [ref=f23e181] [cursor=pointer]:
+                  - /url: /docs/skills/writing-repo-documentation
+              - listitem [ref=f23e183]:
+                - link "QA Workflow (practice)" [ref=f23e184] [cursor=pointer]:
+                  - /url: /docs/skills/qa-workflow
+              - listitem [ref=f23e186]:
+                - link "Planning Tests" [ref=f23e187] [cursor=pointer]:
+                  - /url: /docs/skills/planning-tests
+              - listitem [ref=f23e189]:
+                - link "Verifying Acceptance Criteria" [ref=f23e190] [cursor=pointer]:
+                  - /url: /docs/skills/verifying-acceptance-criteria
+              - listitem [ref=f23e192]:
+                - link "Analyzing Bugs" [ref=f23e193] [cursor=pointer]:
+                  - /url: /docs/skills/analyzing-bugs
+              - listitem [ref=f23e195]:
+                - link "Analyzing Regression Risk" [ref=f23e196] [cursor=pointer]:
+                  - /url: /docs/skills/analyzing-regression-risk
+              - listitem [ref=f23e198]:
+                - link "Accessibility Auditing" [ref=f23e199] [cursor=pointer]:
+                  - /url: /docs/skills/accessibility-auditing
+              - listitem [ref=f23e201]:
+                - link "Functional Testing" [ref=f23e202] [cursor=pointer]:
+                  - /url: /docs/skills/functional-testing
+              - listitem [ref=f23e204]:
+                - link "Implementing Filters" [ref=f23e205] [cursor=pointer]:
+                  - /url: /docs/skills/implementing-filters
+              - listitem [ref=f23e207]:
+                - link "Promoting domain knowledge" [ref=f23e208] [cursor=pointer]:
+                  - /url: /docs/skills/promote-domain-knowledge
+              - listitem [ref=f23e210]:
+                - link "Importing Confluence knowledge" [ref=f23e211] [cursor=pointer]:
+                  - /url: /docs/skills/import-confluence-knowledge
+              - listitem [ref=f23e213]:
+                - link "Auditing domain knowledge" [ref=f23e214] [cursor=pointer]:
+                  - /url: /docs/skills/audit-domain-knowledge
+              - listitem [ref=f23e216]:
+                - link "BA Docs (Word) planner" [ref=f23e217] [cursor=pointer]:
+                  - /url: /docs/skills/ba-docs-planner
+              - listitem [ref=f23e219]:
+                - link "BA Docs (Word) writer" [ref=f23e220] [cursor=pointer]:
+                  - /url: /docs/skills/ba-docs-writer
+          - listitem [ref=f23e222]:
+            - button "Integrations" [ref=f23e224] [cursor=pointer]
+          - listitem [ref=f23e226]:
+            - link "Use Cases" [ref=f23e227] [cursor=pointer]:
+              - /url: /docs/use-cases
+          - listitem [ref=f23e229]:
+            - link "For CTOs" [ref=f23e230] [cursor=pointer]:
+              - /url: /docs/for-ctos
+    - main [ref=f23e232]:
+      - generic [ref=f23e234]:
+        - generic [ref=f23e236]:
+          - article [ref=f23e237]:
+            - navigation "Breadcrumbs" [ref=f23e238]:
+              - list [ref=f23e239]:
+                - listitem [ref=f23e240]:
+                  - link "Home page" [ref=f23e241] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=f23e244]:
+                  - generic [ref=f23e245]: Skills
+                - listitem [ref=f23e246]:
+                  - generic [ref=f23e247]: Skills Overview
+            - generic [ref=f23e248]:
+              - heading "Skills Overview" [level=1] [ref=f23e250]
+              - paragraph [ref=f23e251]:
+                - text: Agent Collections includes
+                - strong [ref=f23e252]: 48 reusable skills
+                - text: — knowledge modules that provide specialized domain expertise, structured processes, and quality templates. They encode tested best practices for every phase of the product lifecycle. Skills are stored under
+                - strong [ref=f23e253]:
+                  - code [ref=f23e254]: .ai/skills/
+                - text: (SSOT — consumed directly by hosts that read files, such as Claude Code; also available through adapters). In Cursor Agent, use them through the
+                - strong [ref=f23e255]:
+                  - code [ref=f23e256]: eversis-collections
+                  - text: MCP
+                - text: server (
+                - strong [ref=f23e257]:
+                  - code [ref=f23e258]: eversis_skills_list
+                - text: ","
+                - strong [ref=f23e259]:
+                  - code [ref=f23e260]: eversis_skills_get
+                - text: ","
+                - strong [ref=f23e261]:
+                  - code [ref=f23e262]: eversis_skill_run_script
+                - text: for allowlisted per-skill scripts, and related tools) after building
+                - link [ref=f23e263] [cursor=pointer]:
+                  - /url: https://github.com/PiotrNie-Eversis/agent-collections/tree/main/mcp/eversis-collections-mcp
+                  - code [ref=f23e264]: mcp/eversis-collections-mcp/
+                - text: ; do not register the folder separately as Cursor
+                - strong [ref=f23e265]: Agent Skills
+                - text: for this framework — this repo does not ship a full
+                - code [ref=f23e266]: .cursor/skills/
+                - text: mirror.
+              - heading [level=2] [ref=f23e267]:
+                - text: How Skills Work
+                - link "Direct link to How Skills Work" [ref=f23e268] [cursor=pointer]:
+                  - /url: "#how-skills-work"
+                  - text: "#"
+              - paragraph [ref=f23e269]:
+                - text: Each skill folder contains a
+                - code [ref=f23e270]: SKILL.md
+                - text: "file with:"
+              - list [ref=f23e271]:
+                - listitem [ref=f23e272]:
+                  - strong [ref=f23e273]: Domain-specific guidelines
+                  - text: — Best practices, checklists, and processes.
+                - listitem [ref=f23e274]:
+                  - strong [ref=f23e275]: Templates
+                  - text: — Example output formats (e.g.,
+                  - code [ref=f23e276]: plan.example.md
+                  - text: ","
+                  - code [ref=f23e277]: research.example.md
+                  - text: ).
+                - listitem [ref=f23e278]:
+                  - strong [ref=f23e279]: Connected skills
+                  - text: — References to other skills that complement or support this one.
+              - paragraph [ref=f23e280]:
+                - text: When an agent needs specialized procedures, it can pull
+                - strong [ref=f23e281]:
+                  - code [ref=f23e282]: SKILL.md
+                  - text: content
+                - text: via
+                - strong [ref=f23e283]: MCP
+                - text: (e.g.
+                - code [ref=f23e284]: eversis_skills_get
+                - text: ), run
+                - strong [ref=f23e285]: allowlisted automation
+                - text: under a skill via
+                - strong [ref=f23e286]:
+                  - code [ref=f23e287]: eversis_skill_run_script
+                - text: when one is registered for that topic, or follow rules and prompts. Multiple skills can be combined for tasks spanning different domains.
+              - paragraph [ref=f23e288]:
+                - strong [ref=f23e289]: "OSS consumers:"
+                - text: the full skill tree is vendored, but
+                - strong [ref=f23e290]:
+                  - code [ref=f23e291]: eversis-project-stack.mdc
+                  - text: § Agent skills policy
+                - text: defines which skills apply to your project. See
+                - link "Installation" [ref=f23e292] [cursor=pointer]:
+                  - /url: /docs/getting-started/installation
+                - text: and
+                - link "Framework reference" [ref=f23e293] [cursor=pointer]:
+                  - /url: /docs/framework
+                - text: (Agent skills policy).
+              - heading [level=3] [ref=f23e294]:
+                - text: Skill classes (framework)
+                - link "Direct link to Skill classes (framework)" [ref=f23e295] [cursor=pointer]:
+                  - /url: "#skill-classes-framework"
+                  - text: "#"
+              - table [ref=f23e296]:
+                - rowgroup [ref=f23e297]:
+                  - row [ref=f23e298]:
+                    - columnheader "Class" [ref=f23e299]
+                    - columnheader "Load default" [ref=f23e300]
+                    - columnheader "Examples" [ref=f23e301]
+                - rowgroup [ref=f23e302]:
+                  - row [ref=f23e303]:
+                    - cell "Universal" [ref=f23e304]
+                    - cell "When task-relevant" [ref=f23e305]
+                    - cell [ref=f23e306]:
+                      - code [ref=f23e307]: eversis-fine-handoff
+                      - text: ","
+                      - code [ref=f23e308]: eversis-code-reviewing
+                  - row [ref=f23e309]:
+                    - cell "Stack" [ref=f23e310]
+                    - cell "When stack rule + task match" [ref=f23e311]
+                    - cell [ref=f23e312]:
+                      - code [ref=f23e313]: eversis-implementing-frontend
+                      - text: ","
+                      - code [ref=f23e314]: eversis-implementing-backend
+                  - row [ref=f23e315]:
+                    - cell "Domain / optional" [ref=f23e316]
+                    - cell "Only when stack policy or plan requires" [ref=f23e317]
+                    - cell [ref=f23e318]:
+                      - code [ref=f23e319]: eversis-implementing-filters
+                      - text: ","
+                      - code [ref=f23e320]: eversis-ba-docs-*
+              - heading [level=2] [ref=f23e321]:
+                - text: Available Skills
+                - link "Direct link to Available Skills" [ref=f23e322] [cursor=pointer]:
+                  - /url: "#available-skills"
+                  - text: "#"
+              - blockquote [ref=f23e323]:
+                - paragraph [ref=f23e324]:
+                  - strong [ref=f23e325]: "Note:"
+                  - text: The skill links below are for human browsing and overview only. Agents must use the
+                  - code [ref=f23e326]: eversis-collections
+                  - text: MCP tools or read the
+                  - code [ref=f23e327]: .ai/skills/*/SKILL.md
+                  - text: files directly for normative procedures.
+              - heading [level=3] [ref=f23e328]:
+                - text: 📋 Ideate skills
+                - link "Direct link to 📋 Ideate skills" [ref=f23e329] [cursor=pointer]:
+                  - /url: "#-ideate-skills"
+                  - text: "#"
+              - table [ref=f23e330]:
+                - rowgroup [ref=f23e331]:
+                  - row [ref=f23e332]:
+                    - columnheader "Skill" [ref=f23e333]
+                    - columnheader "Description" [ref=f23e334]
+                    - columnheader "Used By" [ref=f23e335]
+                - rowgroup [ref=f23e336]:
+                  - row [ref=f23e337]:
+                    - cell [ref=f23e338]:
+                      - link "eversis-task-analysing" [ref=f23e339] [cursor=pointer]:
+                        - /url: /docs/skills/task-analysis
+                    - cell "Task context gathering and research" [ref=f23e340]
+                    - cell "Context Engineer, E2E Engineer" [ref=f23e341]
+                  - row [ref=f23e342]:
+                    - cell [ref=f23e343]:
+                      - link "eversis-transcript-processing" [ref=f23e344] [cursor=pointer]:
+                        - /url: /docs/skills/transcript-processing
+                    - cell "Workshop transcript cleaning and structuring" [ref=f23e345]
+                    - cell "Business Analyst" [ref=f23e346]
+                  - row [ref=f23e347]:
+                    - cell [ref=f23e348]:
+                      - link "eversis-task-extracting" [ref=f23e349] [cursor=pointer]:
+                        - /url: /docs/skills/task-extraction
+                    - cell "Epic and user story extraction from workshop materials" [ref=f23e350]
+                    - cell "Business Analyst" [ref=f23e351]
+                  - row [ref=f23e352]:
+                    - cell [ref=f23e353]:
+                      - link "eversis-task-quality-reviewing" [ref=f23e354] [cursor=pointer]:
+                        - /url: /docs/skills/task-quality-review
+                    - cell "Quality analysis for extracted task lists" [ref=f23e355]
+                    - cell "Business Analyst" [ref=f23e356]
+                  - row [ref=f23e357]:
+                    - cell [ref=f23e358]:
+                      - link "eversis-jira-task-formatting" [ref=f23e359] [cursor=pointer]:
+                        - /url: /docs/skills/jira-task-formatting
+                    - cell "Jira-ready task formatting and import/push management" [ref=f23e360]
+                    - cell "Business Analyst" [ref=f23e361]
+                  - row [ref=f23e362]:
+                    - cell [ref=f23e363]:
+                      - link "eversis-ba-docs-planner" [ref=f23e364] [cursor=pointer]:
+                        - /url: /docs/skills/ba-docs-planner
+                    - cell [ref=f23e365]:
+                      - text: Plan Word
+                      - code [ref=f23e366]: .docx
+                      - text: chapter updates from a Jira release + Confluence rules
+                    - cell "Business Analyst" [ref=f23e367]
+                  - row [ref=f23e368]:
+                    - cell [ref=f23e369]:
+                      - link "eversis-ba-docs-writer" [ref=f23e370] [cursor=pointer]:
+                        - /url: /docs/skills/ba-docs-writer
+                    - cell [ref=f23e371]:
+                      - text: Apply an approved docs-update-plan.md to a Word
+                      - code [ref=f23e372]: .docx
+                      - text: file
+                    - cell "Business Analyst" [ref=f23e373]
+              - heading [level=3] [ref=f23e374]:
+                - text: 🛠 Implement skills
+                - link "Direct link to 🛠 Implement skills" [ref=f23e375] [cursor=pointer]:
+                  - /url: "#-implement-skills"
+                  - text: "#"
+              - table [ref=f23e376]:
+                - rowgroup [ref=f23e377]:
+                  - row [ref=f23e378]:
+                    - columnheader "Skill" [ref=f23e379]
+                    - columnheader "Description" [ref=f23e380]
+                    - columnheader "Used By" [ref=f23e381]
+                - rowgroup [ref=f23e382]:
+                  - row [ref=f23e383]:
+                    - cell [ref=f23e384]:
+                      - link "eversis-orchestrating-implementation" [ref=f23e385] [cursor=pointer]:
+                        - /url: /docs/skills/orchestrating-implementation
+                    - 'cell "Implement-phase orchestration: Quick vs Full, routing, gates, Fine handoff" [ref=f23e386]'
+                    - cell "Engineering Manager" [ref=f23e387]
+                  - row [ref=f23e388]:
+                    - cell [ref=f23e389]:
+                      - link "eversis-architecture-designing" [ref=f23e390] [cursor=pointer]:
+                        - /url: /docs/skills/architecture-design
+                    - cell "Solution architecture design" [ref=f23e391]
+                    - cell "Architect" [ref=f23e392]
+                  - row [ref=f23e393]:
+                    - cell [ref=f23e394]:
+                      - link "eversis-creating-implementation-plans" [ref=f23e395] [cursor=pointer]:
+                        - /url: /docs/skills/creating-implementation-plans
+                    - cell "Plan template, WIG, Technical Context, phased tasks, DoD rules" [ref=f23e396]
+                    - cell "Architect, Plan Reviewer" [ref=f23e397]
+                  - row [ref=f23e398]:
+                    - cell [ref=f23e399]:
+                      - link "eversis-technical-context-discovering" [ref=f23e400] [cursor=pointer]:
+                        - /url: /docs/skills/technical-context-discovery
+                    - cell "Project conventions and pattern discovery" [ref=f23e401]
+                    - cell "Architect, CR, SE, E2E, CE" [ref=f23e402]
+                  - row [ref=f23e403]:
+                    - cell [ref=f23e404]:
+                      - link "eversis-implementing-frontend" [ref=f23e405] [cursor=pointer]:
+                        - /url: /docs/skills/frontend-implementation
+                    - cell "UI component patterns, composition, design tokens" [ref=f23e406]
+                    - cell "Software Engineer" [ref=f23e407]
+                  - row [ref=f23e408]:
+                    - cell [ref=f23e409]:
+                      - link "eversis-implementing-filters" [ref=f23e410] [cursor=pointer]:
+                        - /url: /docs/skills/implementing-filters
+                    - cell "URL-synced filter lists (Next + REST); stack policy required" [ref=f23e411]
+                    - cell "Software Engineer" [ref=f23e412]
+                  - row [ref=f23e413]:
+                    - cell [ref=f23e414]:
+                      - link "eversis-implementing-forms" [ref=f23e415] [cursor=pointer]:
+                        - /url: /docs/skills/implementing-forms
+                    - cell "Form architecture, schema validation, multi-step flows" [ref=f23e416]
+                    - cell "Software Engineer" [ref=f23e417]
+                  - row [ref=f23e418]:
+                    - cell [ref=f23e419]:
+                      - link "eversis-writing-hooks" [ref=f23e420] [cursor=pointer]:
+                        - /url: /docs/skills/writing-hooks
+                    - cell "Custom hook/composable patterns, lifecycle, testing" [ref=f23e421]
+                    - cell "Software Engineer" [ref=f23e422]
+                  - row [ref=f23e423]:
+                    - cell [ref=f23e424]:
+                      - link "eversis-ensuring-accessibility" [ref=f23e425] [cursor=pointer]:
+                        - /url: /docs/skills/ensuring-accessibility
+                    - cell "WCAG 2.1 AA compliance, semantic HTML, ARIA, keyboard nav" [ref=f23e426]
+                    - cell "Software Engineer" [ref=f23e427]
+                  - row [ref=f23e428]:
+                    - cell [ref=f23e429]:
+                      - link "eversis-optimizing-frontend" [ref=f23e430] [cursor=pointer]:
+                        - /url: /docs/skills/optimizing-frontend
+                    - cell "Rendering optimization, code splitting, bundle size" [ref=f23e431]
+                    - cell "Software Engineer" [ref=f23e432]
+                  - row [ref=f23e433]:
+                    - cell [ref=f23e434]:
+                      - link "eversis-implementation-gap-analysing" [ref=f23e435] [cursor=pointer]:
+                        - /url: /docs/skills/implementation-gap-analysis
+                    - cell "Gap analysis between plan and current state" [ref=f23e436]
+                    - cell "Architect, CR, SE" [ref=f23e437]
+                  - row [ref=f23e438]:
+                    - cell [ref=f23e439]:
+                      - link "eversis-sql-and-database-understanding" [ref=f23e440] [cursor=pointer]:
+                        - /url: /docs/skills/sql-and-database
+                    - cell "Database engineering standards and ORM integration" [ref=f23e441]
+                    - cell "Architect, CR, SE" [ref=f23e442]
+                  - row [ref=f23e443]:
+                    - cell [ref=f23e444]:
+                      - link "eversis-codebase-analysing" [ref=f23e445] [cursor=pointer]:
+                        - /url: /docs/skills/codebase-analysis
+                    - cell "Deep codebase analysis and dependency mapping" [ref=f23e446]
+                    - cell "Architect, BA, CE, SE" [ref=f23e447]
+                  - row [ref=f23e448]:
+                    - cell [ref=f23e449]:
+                      - link "eversis-writing-repo-documentation" [ref=f23e450] [cursor=pointer]:
+                        - /url: /docs/skills/writing-repo-documentation
+                    - 'cell "Repository docs: README, CHANGELOG, docs site" [ref=f23e451]'
+                    - cell "Repo Docs writer, EM delegate" [ref=f23e452]
+                  - row [ref=f23e453]:
+                    - cell [ref=f23e454]:
+                      - link "eversis-engineering-prompts" [ref=f23e455] [cursor=pointer]:
+                        - /url: /docs/skills/prompt-engineering
+                    - cell "LLM prompt design, optimization, security, and evaluation" [ref=f23e456]
+                    - cell "PE, SE, Architect, CR" [ref=f23e457]
+                  - row [ref=f23e458]:
+                    - cell [ref=f23e459]:
+                      - link "eversis-promote-domain-knowledge" [ref=f23e460] [cursor=pointer]:
+                        - /url: /docs/skills/promote-domain-knowledge
+                    - cell [ref=f23e461]:
+                      - text: Optional Fine-turn draft promoting durable cross-task facts to
+                      - code [ref=f23e462]: docs/context/
+                    - cell "Engineering Manager" [ref=f23e463]
+                  - row [ref=f23e464]:
+                    - cell [ref=f23e465]:
+                      - link "eversis-import-confluence-knowledge" [ref=f23e466] [cursor=pointer]:
+                        - /url: /docs/skills/import-confluence-knowledge
+                    - cell [ref=f23e467]:
+                      - text: One-time seed of
+                      - code [ref=f23e468]: docs/context/<project>/
+                      - text: from a Confluence AS-IS Pack page
+                    - cell "Business Analyst, Context Engineer" [ref=f23e469]
+                  - row [ref=f23e470]:
+                    - cell [ref=f23e471]:
+                      - link "eversis-audit-domain-knowledge" [ref=f23e472] [cursor=pointer]:
+                        - /url: /docs/skills/audit-domain-knowledge
+                    - cell [ref=f23e473]:
+                      - text: Periodic Keep/Update/Consolidate/Replace/Delete review of
+                      - code [ref=f23e474]: docs/context/
+                    - cell "Anyone (scheduled)" [ref=f23e475]
+              - heading [level=3] [ref=f23e476]:
+                - text: ☁️ Cloud & Infrastructure Skills
+                - link "Direct link to ☁️ Cloud & Infrastructure Skills" [ref=f23e477] [cursor=pointer]:
+                  - /url: "#️-cloud--infrastructure-skills"
+                  - text: "#"
+              - table [ref=f23e478]:
+                - rowgroup [ref=f23e479]:
+                  - row [ref=f23e480]:
+                    - columnheader "Skill" [ref=f23e481]
+                    - columnheader "Description" [ref=f23e482]
+                    - columnheader "Used By" [ref=f23e483]
+                - rowgroup [ref=f23e484]:
+                  - row [ref=f23e485]:
+                    - cell [ref=f23e486]:
+                      - link "eversis-implementing-ci-cd" [ref=f23e487] [cursor=pointer]:
+                        - /url: /docs/skills/ci-cd-implementation
+                    - cell "CI/CD pipeline design patterns and deployment strategies" [ref=f23e488]
+                    - cell "DevOps Engineer" [ref=f23e489]
+                  - row [ref=f23e490]:
+                    - cell [ref=f23e491]:
+                      - link "eversis-implementing-kubernetes" [ref=f23e492] [cursor=pointer]:
+                        - /url: /docs/skills/kubernetes-implementation
+                    - cell "Kubernetes deployment patterns, Helm charts, and cluster management" [ref=f23e493]
+                    - cell "DevOps Engineer" [ref=f23e494]
+                  - row [ref=f23e495]:
+                    - cell [ref=f23e496]:
+                      - link "eversis-implementing-terraform-modules" [ref=f23e497] [cursor=pointer]:
+                        - /url: /docs/skills/terraform-modules
+                    - cell "Reusable Terraform modules for AWS, Azure, and GCP infrastructure" [ref=f23e498]
+                    - cell "DevOps Engineer" [ref=f23e499]
+                  - row [ref=f23e500]:
+                    - cell [ref=f23e501]:
+                      - link "eversis-implementing-observability" [ref=f23e502] [cursor=pointer]:
+                        - /url: /docs/skills/observability-implementation
+                    - cell "Observability patterns for logging, monitoring, alerting, and distributed tracing" [ref=f23e503]
+                    - cell "DevOps Engineer" [ref=f23e504]
+                  - row [ref=f23e505]:
+                    - cell [ref=f23e506]:
+                      - link "eversis-managing-secrets" [ref=f23e507] [cursor=pointer]:
+                        - /url: /docs/skills/secrets-management
+                    - cell "Secrets management patterns for cloud and Kubernetes environments" [ref=f23e508]
+                    - cell "DevOps Engineer" [ref=f23e509]
+                  - row [ref=f23e510]:
+                    - cell [ref=f23e511]:
+                      - link "eversis-optimizing-cloud-cost" [ref=f23e512] [cursor=pointer]:
+                        - /url: /docs/skills/cloud-cost-optimization
+                    - cell "Cloud cost optimization through rightsizing, tagging, and spending analysis" [ref=f23e513]
+                    - cell "DevOps Engineer" [ref=f23e514]
+                  - row [ref=f23e515]:
+                    - cell [ref=f23e516]:
+                      - link "eversis-designing-multi-cloud-architecture" [ref=f23e517] [cursor=pointer]:
+                        - /url: /docs/skills/multi-cloud-architecture
+                    - cell "Multi-cloud architecture design across AWS, Azure, and GCP" [ref=f23e518]
+                    - cell "DevOps Engineer, Architect" [ref=f23e519]
+              - heading [level=3] [ref=f23e520]:
+                - text: ✅ Quality Skills
+                - link "Direct link to ✅ Quality Skills" [ref=f23e521] [cursor=pointer]:
+                  - /url: "#-quality-skills"
+                  - text: "#"
+              - table [ref=f23e522]:
+                - rowgroup [ref=f23e523]:
+                  - row [ref=f23e524]:
+                    - columnheader "Skill" [ref=f23e525]
+                    - columnheader "Description" [ref=f23e526]
+                    - columnheader "Used By" [ref=f23e527]
+                - rowgroup [ref=f23e528]:
+                  - row [ref=f23e529]:
+                    - cell [ref=f23e530]:
+                      - link "eversis-code-reviewing" [ref=f23e531] [cursor=pointer]:
+                        - /url: /docs/skills/code-review
+                    - cell "Structured code review process" [ref=f23e532]
+                    - cell "Code Reviewer" [ref=f23e533]
+                  - row [ref=f23e534]:
+                    - cell [ref=f23e535]:
+                      - link "eversis-reviewing-frontend" [ref=f23e536] [cursor=pointer]:
+                        - /url: /docs/skills/reviewing-frontend
+                    - 'cell "Frontend-specific review: components, hooks, rendering, a11y" [ref=f23e537]'
+                    - cell "Code Reviewer" [ref=f23e538]
+                  - row [ref=f23e539]:
+                    - cell [ref=f23e540]:
+                      - link "eversis-ui-verifying" [ref=f23e541] [cursor=pointer]:
+                        - /url: /docs/skills/ui-verification
+                    - cell "Figma vs implementation verification criteria" [ref=f23e542]
+                    - cell "UI Reviewer, SE" [ref=f23e543]
+                  - row [ref=f23e544]:
+                    - cell [ref=f23e545]:
+                      - link "eversis-e2e-testing" [ref=f23e546] [cursor=pointer]:
+                        - /url: /docs/skills/e2e-testing
+                    - cell "Playwright E2E testing patterns and verification" [ref=f23e547]
+                    - cell "E2E Engineer" [ref=f23e548]
+                  - row [ref=f23e549]:
+                    - cell [ref=f23e550]:
+                      - link "eversis-fine-handoff" [ref=f23e551] [cursor=pointer]:
+                        - /url: /docs/skills/fine-handoff
+                    - cell "Mandatory QA comment draft after Fine (Implement handoff); human approves before Jira post" [ref=f23e552]
+                    - cell "Anyone (post-implement)" [ref=f23e553]
+                  - row [ref=f23e554]:
+                    - cell [ref=f23e555]:
+                      - link "QA practice overview" [ref=f23e556] [cursor=pointer]:
+                        - /url: /docs/skills/qa-workflow
+                    - cell [ref=f23e557]:
+                      - code [ref=f23e558]: "@eversis-qa-workflow"
+                      - text: — test plans, regression, AC verify, quality health
+                    - cell "QA / anyone" [ref=f23e559]
+                  - row [ref=f23e560]:
+                    - cell [ref=f23e561]:
+                      - link "eversis-planning-tests" [ref=f23e562] [cursor=pointer]:
+                        - /url: /docs/skills/planning-tests
+                    - cell "Test plans and test cases from acceptance criteria" [ref=f23e563]
+                    - cell "QA workflow" [ref=f23e564]
+                  - row [ref=f23e565]:
+                    - cell [ref=f23e566]:
+                      - link "eversis-analyzing-regression-risk" [ref=f23e567] [cursor=pointer]:
+                        - /url: /docs/skills/analyzing-regression-risk
+                    - cell "Regression scope and suites from change context" [ref=f23e568]
+                    - cell "QA workflow" [ref=f23e569]
+                  - row [ref=f23e570]:
+                    - cell [ref=f23e571]:
+                      - link "eversis-verifying-acceptance-criteria" [ref=f23e572] [cursor=pointer]:
+                        - /url: /docs/skills/verifying-acceptance-criteria
+                    - cell "AC gap table vs implementation" [ref=f23e573]
+                    - cell "QA workflow" [ref=f23e574]
+                  - row [ref=f23e575]:
+                    - cell [ref=f23e576]:
+                      - link "eversis-analyzing-bugs" [ref=f23e577] [cursor=pointer]:
+                        - /url: /docs/skills/analyzing-bugs
+                    - cell "Quality health dashboards from Jira defect history" [ref=f23e578]
+                    - cell "QA workflow" [ref=f23e579]
+                  - row [ref=f23e580]:
+                    - cell [ref=f23e581]:
+                      - link "eversis-accessibility-auditing" [ref=f23e582] [cursor=pointer]:
+                        - /url: /docs/skills/accessibility-auditing
+                    - cell "WCAG 2.2 AA audit reports (manual QA)" [ref=f23e583]
+                    - cell "QA workflow" [ref=f23e584]
+                  - row [ref=f23e585]:
+                    - cell [ref=f23e586]:
+                      - link "eversis-functional-testing" [ref=f23e587] [cursor=pointer]:
+                        - /url: /docs/skills/functional-testing
+                    - cell "Shared QA templates and severity matrix" [ref=f23e588]
+                    - cell "QA workflow" [ref=f23e589]
+              - heading [level=3] [ref=f23e590]:
+                - text: ⚙️ Framework customization skills
+                - link "Direct link to ⚙️ Framework customization skills" [ref=f23e591] [cursor=pointer]:
+                  - /url: "#️-framework-customization-skills"
+                  - text: "#"
+              - table [ref=f23e592]:
+                - rowgroup [ref=f23e593]:
+                  - row [ref=f23e594]:
+                    - columnheader "Skill" [ref=f23e595]
+                    - columnheader "Description" [ref=f23e596]
+                    - columnheader "Used By" [ref=f23e597]
+                - rowgroup [ref=f23e598]:
+                  - row [ref=f23e599]:
+                    - cell [ref=f23e600]:
+                      - link "eversis-creating-agents" [ref=f23e601] [cursor=pointer]:
+                        - /url: /docs/skills/creating-agents
+                    - cell [ref=f23e602]:
+                      - text: Creating Cursor rules (
+                      - code [ref=f23e603]: .mdc
+                      - text: ) and role docs
+                    - cell "Framework maintainer" [ref=f23e604]
+                  - row [ref=f23e605]:
+                    - cell [ref=f23e606]:
+                      - link "eversis-creating-skills" [ref=f23e607] [cursor=pointer]:
+                        - /url: /docs/skills/creating-skills
+                    - cell "Creating custom skills (SKILL.md)" [ref=f23e608]
+                    - cell "Framework maintainer" [ref=f23e609]
+                  - row [ref=f23e610]:
+                    - cell [ref=f23e611]:
+                      - link "eversis-creating-prompts" [ref=f23e612] [cursor=pointer]:
+                        - /url: /docs/skills/creating-prompts
+                    - cell "Creating attachable repo prompts (Markdown)" [ref=f23e613]
+                    - cell "Framework maintainer" [ref=f23e614]
+                  - row [ref=f23e615]:
+                    - cell [ref=f23e616]:
+                      - link "eversis-creating-instructions" [ref=f23e617] [cursor=pointer]:
+                        - /url: /docs/skills/creating-instructions
+                    - cell "Project instructions (AGENTS.md, rules)" [ref=f23e618]
+                    - cell "Framework maintainer" [ref=f23e619]
+              - heading [level=2] [ref=f23e620]:
+                - text: Agent–Skill Matrix
+                - link "Direct link to Agent–Skill Matrix" [ref=f23e621] [cursor=pointer]:
+                  - /url: "#agentskill-matrix"
+                  - text: "#"
+              - table [ref=f23e622]:
+                - rowgroup [ref=f23e623]:
+                  - row [ref=f23e624]:
+                    - columnheader "Skill" [ref=f23e625]
+                    - columnheader "BA" [ref=f23e626]
+                    - columnheader "CE" [ref=f23e627]
+                    - columnheader "Architect" [ref=f23e628]
+                    - columnheader "SE" [ref=f23e629]
+                    - columnheader "PE" [ref=f23e630]
+                    - columnheader "CR" [ref=f23e631]
+                    - columnheader "UI Reviewer" [ref=f23e632]
+                    - columnheader "E2E" [ref=f23e633]
+                    - columnheader "DevOps" [ref=f23e634]
+                    - columnheader "Customize" [ref=f23e635]
+                - rowgroup [ref=f23e636]:
+                  - row [ref=f23e637]:
+                    - cell "eversis-architecture-designing" [ref=f23e638]
+                    - cell [ref=f23e639]
+                    - cell [ref=f23e640]
+                    - cell "✅" [ref=f23e641]
+                    - cell [ref=f23e642]
+                    - cell [ref=f23e643]
+                    - cell [ref=f23e644]
+                    - cell [ref=f23e645]
+                    - cell [ref=f23e646]
+                    - cell [ref=f23e647]
+                    - cell [ref=f23e648]
+                  - row [ref=f23e649]:
+                    - cell "eversis-audit-domain-knowledge" [ref=f23e650]
+                    - cell [ref=f23e651]
+                    - cell [ref=f23e652]
+                    - cell [ref=f23e653]
+                    - cell [ref=f23e654]
+                    - cell [ref=f23e655]
+                    - cell [ref=f23e656]
+                    - cell [ref=f23e657]
+                    - cell [ref=f23e658]
+                    - cell [ref=f23e659]
+                    - cell [ref=f23e660]
+                  - row [ref=f23e661]:
+                    - cell "eversis-ba-docs-planner" [ref=f23e662]
+                    - cell "✅" [ref=f23e663]
+                    - cell [ref=f23e664]
+                    - cell [ref=f23e665]
+                    - cell [ref=f23e666]
+                    - cell [ref=f23e667]
+                    - cell [ref=f23e668]
+                    - cell [ref=f23e669]
+                    - cell [ref=f23e670]
+                    - cell [ref=f23e671]
+                    - cell [ref=f23e672]
+                  - row [ref=f23e673]:
+                    - cell "eversis-ba-docs-writer" [ref=f23e674]
+                    - cell "✅" [ref=f23e675]
+                    - cell [ref=f23e676]
+                    - cell [ref=f23e677]
+                    - cell [ref=f23e678]
+                    - cell [ref=f23e679]
+                    - cell [ref=f23e680]
+                    - cell [ref=f23e681]
+                    - cell [ref=f23e682]
+                    - cell [ref=f23e683]
+                    - cell [ref=f23e684]
+                  - row [ref=f23e685]:
+                    - cell "eversis-creating-implementation-plans" [ref=f23e686]
+                    - cell [ref=f23e687]
+                    - cell [ref=f23e688]
+                    - cell "✅" [ref=f23e689]
+                    - cell [ref=f23e690]
+                    - cell [ref=f23e691]
+                    - cell [ref=f23e692]
+                    - cell [ref=f23e693]
+                    - cell [ref=f23e694]
+                    - cell [ref=f23e695]
+                    - cell [ref=f23e696]
+                  - row [ref=f23e697]:
+                    - cell "eversis-code-reviewing" [ref=f23e698]
+                    - cell [ref=f23e699]
+                    - cell [ref=f23e700]
+                    - cell [ref=f23e701]
+                    - cell [ref=f23e702]
+                    - cell "✅" [ref=f23e703]
+                    - cell "✅" [ref=f23e704]
+                    - cell [ref=f23e705]
+                    - cell [ref=f23e706]
+                    - cell [ref=f23e707]
+                    - cell [ref=f23e708]
+                  - row [ref=f23e709]:
+                    - cell "eversis-codebase-analysing" [ref=f23e710]
+                    - cell "✅" [ref=f23e711]
+                    - cell "✅" [ref=f23e712]
+                    - cell "✅" [ref=f23e713]
+                    - cell "✅" [ref=f23e714]
+                    - cell [ref=f23e715]
+                    - cell [ref=f23e716]
+                    - cell [ref=f23e717]
+                    - cell [ref=f23e718]
+                    - cell "✅" [ref=f23e719]
+                    - cell "✅" [ref=f23e720]
+                  - row [ref=f23e721]:
+                    - cell "eversis-creating-agents" [ref=f23e722]
+                    - cell [ref=f23e723]
+                    - cell [ref=f23e724]
+                    - cell [ref=f23e725]
+                    - cell [ref=f23e726]
+                    - cell [ref=f23e727]
+                    - cell [ref=f23e728]
+                    - cell [ref=f23e729]
+                    - cell [ref=f23e730]
+                    - cell [ref=f23e731]
+                    - cell "✅" [ref=f23e732]
+                  - row [ref=f23e733]:
+                    - cell "eversis-creating-instructions" [ref=f23e734]
+                    - cell [ref=f23e735]
+                    - cell [ref=f23e736]
+                    - cell [ref=f23e737]
+                    - cell [ref=f23e738]
+                    - cell [ref=f23e739]
+                    - cell [ref=f23e740]
+                    - cell [ref=f23e741]
+                    - cell [ref=f23e742]
+                    - cell [ref=f23e743]
+                    - cell "✅" [ref=f23e744]
+                  - row [ref=f23e745]:
+                    - cell "eversis-creating-prompts" [ref=f23e746]
+                    - cell [ref=f23e747]
+                    - cell [ref=f23e748]
+                    - cell [ref=f23e749]
+                    - cell [ref=f23e750]
+                    - cell [ref=f23e751]
+                    - cell [ref=f23e752]
+                    - cell [ref=f23e753]
+                    - cell [ref=f23e754]
+                    - cell [ref=f23e755]
+                    - cell "✅" [ref=f23e756]
+                  - row [ref=f23e757]:
+                    - cell "eversis-creating-skills" [ref=f23e758]
+                    - cell [ref=f23e759]
+                    - cell [ref=f23e760]
+                    - cell [ref=f23e761]
+                    - cell [ref=f23e762]
+                    - cell [ref=f23e763]
+                    - cell [ref=f23e764]
+                    - cell [ref=f23e765]
+                    - cell [ref=f23e766]
+                    - cell [ref=f23e767]
+                    - cell "✅" [ref=f23e768]
+                  - row [ref=f23e769]:
+                    - cell "eversis-designing-multi-cloud-architecture" [ref=f23e770]
+                    - cell [ref=f23e771]
+                    - cell [ref=f23e772]
+                    - cell "✅" [ref=f23e773]
+                    - cell [ref=f23e774]
+                    - cell [ref=f23e775]
+                    - cell [ref=f23e776]
+                    - cell [ref=f23e777]
+                    - cell [ref=f23e778]
+                    - cell "✅" [ref=f23e779]
+                    - cell [ref=f23e780]
+                  - row [ref=f23e781]:
+                    - cell "eversis-e2e-testing" [ref=f23e782]
+                    - cell [ref=f23e783]
+                    - cell [ref=f23e784]
+                    - cell [ref=f23e785]
+                    - cell [ref=f23e786]
+                    - cell [ref=f23e787]
+                    - cell [ref=f23e788]
+                    - cell [ref=f23e789]
+                    - cell "✅" [ref=f23e790]
+                    - cell [ref=f23e791]
+                    - cell [ref=f23e792]
+                  - row [ref=f23e793]:
+                    - cell "eversis-engineering-prompts" [ref=f23e794]
+                    - cell [ref=f23e795]
+                    - cell [ref=f23e796]
+                    - cell "✅" [ref=f23e797]
+                    - cell "✅" [ref=f23e798]
+                    - cell "✅" [ref=f23e799]
+                    - cell "✅" [ref=f23e800]
+                    - cell [ref=f23e801]
+                    - cell [ref=f23e802]
+                    - cell [ref=f23e803]
+                    - cell [ref=f23e804]
+                  - row [ref=f23e805]:
+                    - cell "eversis-ensuring-accessibility" [ref=f23e806]
+                    - cell [ref=f23e807]
+                    - cell [ref=f23e808]
+                    - cell [ref=f23e809]
+                    - cell "✅" [ref=f23e810]
+                    - cell [ref=f23e811]
+                    - cell [ref=f23e812]
+                    - cell [ref=f23e813]
+                    - cell [ref=f23e814]
+                    - cell [ref=f23e815]
+                    - cell [ref=f23e816]
+                  - row [ref=f23e817]:
+                    - cell "eversis-implementing-ci-cd" [ref=f23e818]
+                    - cell [ref=f23e819]
+                    - cell [ref=f23e820]
+                    - cell "✅" [ref=f23e821]
+                    - cell [ref=f23e822]
+                    - cell [ref=f23e823]
+                    - cell [ref=f23e824]
+                    - cell [ref=f23e825]
+                    - cell [ref=f23e826]
+                    - cell "✅" [ref=f23e827]
+                    - cell [ref=f23e828]
+                  - row [ref=f23e829]:
+                    - cell "eversis-implementing-forms" [ref=f23e830]
+                    - cell [ref=f23e831]
+                    - cell [ref=f23e832]
+                    - cell [ref=f23e833]
+                    - cell "✅" [ref=f23e834]
+                    - cell [ref=f23e835]
+                    - cell [ref=f23e836]
+                    - cell [ref=f23e837]
+                    - cell [ref=f23e838]
+                    - cell [ref=f23e839]
+                    - cell [ref=f23e840]
+                  - row [ref=f23e841]:
+                    - cell "eversis-implementing-frontend" [ref=f23e842]
+                    - cell [ref=f23e843]
+                    - cell [ref=f23e844]
+                    - cell [ref=f23e845]
+                    - cell "✅" [ref=f23e846]
+                    - cell [ref=f23e847]
+                    - cell [ref=f23e848]
+                    - cell [ref=f23e849]
+                    - cell [ref=f23e850]
+                    - cell [ref=f23e851]
+                    - cell [ref=f23e852]
+                  - row [ref=f23e853]:
+                    - cell "eversis-implementing-filters" [ref=f23e854]
+                    - cell [ref=f23e855]
+                    - cell [ref=f23e856]
+                    - cell [ref=f23e857]
+                    - cell "✅" [ref=f23e858]
+                    - cell [ref=f23e859]
+                    - cell [ref=f23e860]
+                    - cell [ref=f23e861]
+                    - cell [ref=f23e862]
+                    - cell [ref=f23e863]
+                    - cell [ref=f23e864]
+                  - row [ref=f23e865]:
+                    - cell "eversis-implementing-kubernetes" [ref=f23e866]
+                    - cell [ref=f23e867]
+                    - cell [ref=f23e868]
+                    - cell "✅" [ref=f23e869]
+                    - cell [ref=f23e870]
+                    - cell [ref=f23e871]
+                    - cell [ref=f23e872]
+                    - cell [ref=f23e873]
+                    - cell [ref=f23e874]
+                    - cell "✅" [ref=f23e875]
+                    - cell [ref=f23e876]
+                  - row [ref=f23e877]:
+                    - cell "eversis-implementing-observability" [ref=f23e878]
+                    - cell [ref=f23e879]
+                    - cell [ref=f23e880]
+                    - cell "✅" [ref=f23e881]
+                    - cell [ref=f23e882]
+                    - cell [ref=f23e883]
+                    - cell [ref=f23e884]
+                    - cell [ref=f23e885]
+                    - cell [ref=f23e886]
+                    - cell "✅" [ref=f23e887]
+                    - cell [ref=f23e888]
+                  - row [ref=f23e889]:
+                    - cell "eversis-implementing-terraform-modules" [ref=f23e890]
+                    - cell [ref=f23e891]
+                    - cell [ref=f23e892]
+                    - cell "✅" [ref=f23e893]
+                    - cell [ref=f23e894]
+                    - cell [ref=f23e895]
+                    - cell [ref=f23e896]
+                    - cell [ref=f23e897]
+                    - cell [ref=f23e898]
+                    - cell "✅" [ref=f23e899]
+                    - cell [ref=f23e900]
+                  - row [ref=f23e901]:
+                    - cell "eversis-implementation-gap-analysing" [ref=f23e902]
+                    - cell [ref=f23e903]
+                    - cell [ref=f23e904]
+                    - cell "✅" [ref=f23e905]
+                    - cell "✅" [ref=f23e906]
+                    - cell [ref=f23e907]
+                    - cell "✅" [ref=f23e908]
+                    - cell [ref=f23e909]
+                    - cell [ref=f23e910]
+                    - cell [ref=f23e911]
+                    - cell [ref=f23e912]
+                  - row [ref=f23e913]:
+                    - cell "eversis-import-confluence-knowledge" [ref=f23e914]
+                    - cell "✅" [ref=f23e915]
+                    - cell "✅" [ref=f23e916]
+                    - cell [ref=f23e917]
+                    - cell [ref=f23e918]
+                    - cell [ref=f23e919]
+                    - cell [ref=f23e920]
+                    - cell [ref=f23e921]
+                    - cell [ref=f23e922]
+                    - cell [ref=f23e923]
+                    - cell [ref=f23e924]
+                  - row [ref=f23e925]:
+                    - cell "eversis-jira-task-formatting" [ref=f23e926]
+                    - cell "✅" [ref=f23e927]
+                    - cell [ref=f23e928]
+                    - cell [ref=f23e929]
+                    - cell [ref=f23e930]
+                    - cell [ref=f23e931]
+                    - cell [ref=f23e932]
+                    - cell [ref=f23e933]
+                    - cell [ref=f23e934]
+                    - cell [ref=f23e935]
+                    - cell [ref=f23e936]
+                  - row [ref=f23e937]:
+                    - cell "eversis-managing-secrets" [ref=f23e938]
+                    - cell [ref=f23e939]
+                    - cell [ref=f23e940]
+                    - cell "✅" [ref=f23e941]
+                    - cell [ref=f23e942]
+                    - cell [ref=f23e943]
+                    - cell [ref=f23e944]
+                    - cell [ref=f23e945]
+                    - cell [ref=f23e946]
+                    - cell "✅" [ref=f23e947]
+                    - cell [ref=f23e948]
+                  - row [ref=f23e949]:
+                    - cell "eversis-optimizing-cloud-cost" [ref=f23e950]
+                    - cell [ref=f23e951]
+                    - cell [ref=f23e952]
+                    - cell "✅" [ref=f23e953]
+                    - cell [ref=f23e954]
+                    - cell [ref=f23e955]
+                    - cell [ref=f23e956]
+                    - cell [ref=f23e957]
+                    - cell [ref=f23e958]
+                    - cell "✅" [ref=f23e959]
+                    - cell [ref=f23e960]
+                  - row [ref=f23e961]:
+                    - cell "eversis-optimizing-frontend" [ref=f23e962]
+                    - cell [ref=f23e963]
+                    - cell [ref=f23e964]
+                    - cell [ref=f23e965]
+                    - cell "✅" [ref=f23e966]
+                    - cell [ref=f23e967]
+                    - cell [ref=f23e968]
+                    - cell [ref=f23e969]
+                    - cell [ref=f23e970]
+                    - cell [ref=f23e971]
+                    - cell [ref=f23e972]
+                  - row [ref=f23e973]:
+                    - cell "eversis-fine-handoff" [ref=f23e974]
+                    - cell [ref=f23e975]
+                    - cell [ref=f23e976]
+                    - cell [ref=f23e977]
+                    - cell "✅" [ref=f23e978]
+                    - cell [ref=f23e979]
+                    - cell "✅" [ref=f23e980]
+                    - cell [ref=f23e981]
+                    - cell "✅" [ref=f23e982]
+                    - cell [ref=f23e983]
+                    - cell [ref=f23e984]
+                  - row [ref=f23e985]:
+                    - cell "eversis-promote-domain-knowledge" [ref=f23e986]
+                    - cell [ref=f23e987]
+                    - cell [ref=f23e988]
+                    - cell [ref=f23e989]
+                    - cell [ref=f23e990]
+                    - cell [ref=f23e991]
+                    - cell [ref=f23e992]
+                    - cell [ref=f23e993]
+                    - cell [ref=f23e994]
+                    - cell [ref=f23e995]
+                    - cell [ref=f23e996]
+                  - row [ref=f23e997]:
+                    - cell "eversis-planning-tests" [ref=f23e998]
+                    - cell [ref=f23e999]
+                    - cell [ref=f23e1000]
+                    - cell [ref=f23e1001]
+                    - cell [ref=f23e1002]
+                    - cell [ref=f23e1003]
+                    - cell [ref=f23e1004]
+                    - cell [ref=f23e1005]
+                    - cell [ref=f23e1006]
+                    - cell [ref=f23e1007]
+                    - cell [ref=f23e1008]
+                  - row [ref=f23e1009]:
+                    - cell "eversis-analyzing-regression-risk" [ref=f23e1010]
+                    - cell [ref=f23e1011]
+                    - cell [ref=f23e1012]
+                    - cell [ref=f23e1013]
+                    - cell [ref=f23e1014]
+                    - cell [ref=f23e1015]
+                    - cell [ref=f23e1016]
+                    - cell [ref=f23e1017]
+                    - cell [ref=f23e1018]
+                    - cell [ref=f23e1019]
+                    - cell [ref=f23e1020]
+                  - row [ref=f23e1021]:
+                    - cell "eversis-verifying-acceptance-criteria" [ref=f23e1022]
+                    - cell [ref=f23e1023]
+                    - cell [ref=f23e1024]
+                    - cell [ref=f23e1025]
+                    - cell [ref=f23e1026]
+                    - cell [ref=f23e1027]
+                    - cell [ref=f23e1028]
+                    - cell [ref=f23e1029]
+                    - cell [ref=f23e1030]
+                    - cell [ref=f23e1031]
+                    - cell [ref=f23e1032]
+                  - row [ref=f23e1033]:
+                    - cell "eversis-analyzing-bugs" [ref=f23e1034]
+                    - cell [ref=f23e1035]
+                    - cell [ref=f23e1036]
+                    - cell [ref=f23e1037]
+                    - cell [ref=f23e1038]
+                    - cell [ref=f23e1039]
+                    - cell [ref=f23e1040]
+                    - cell [ref=f23e1041]
+                    - cell [ref=f23e1042]
+                    - cell [ref=f23e1043]
+                    - cell [ref=f23e1044]
+                  - row [ref=f23e1045]:
+                    - cell "eversis-accessibility-auditing" [ref=f23e1046]
+                    - cell [ref=f23e1047]
+                    - cell [ref=f23e1048]
+                    - cell [ref=f23e1049]
+                    - cell [ref=f23e1050]
+                    - cell [ref=f23e1051]
+                    - cell [ref=f23e1052]
+                    - cell [ref=f23e1053]
+                    - cell [ref=f23e1054]
+                    - cell [ref=f23e1055]
+                    - cell [ref=f23e1056]
+                  - row [ref=f23e1057]:
+                    - cell "eversis-functional-testing" [ref=f23e1058]
+                    - cell [ref=f23e1059]
+                    - cell [ref=f23e1060]
+                    - cell [ref=f23e1061]
+                    - cell [ref=f23e1062]
+                    - cell [ref=f23e1063]
+                    - cell [ref=f23e1064]
+                    - cell [ref=f23e1065]
+                    - cell [ref=f23e1066]
+                    - cell [ref=f23e1067]
+                    - cell [ref=f23e1068]
+                  - row [ref=f23e1069]:
+                    - cell "eversis-reviewing-frontend" [ref=f23e1070]
+                    - cell [ref=f23e1071]
+                    - cell [ref=f23e1072]
+                    - cell [ref=f23e1073]
+                    - cell [ref=f23e1074]
+                    - cell [ref=f23e1075]
+                    - cell "✅" [ref=f23e1076]
+                    - cell [ref=f23e1077]
+                    - cell [ref=f23e1078]
+                    - cell [ref=f23e1079]
+                    - cell [ref=f23e1080]
+                  - row [ref=f23e1081]:
+                    - cell "eversis-sql-and-database-understanding" [ref=f23e1082]
+                    - cell [ref=f23e1083]
+                    - cell [ref=f23e1084]
+                    - cell "✅" [ref=f23e1085]
+                    - cell "✅" [ref=f23e1086]
+                    - cell [ref=f23e1087]
+                    - cell "✅" [ref=f23e1088]
+                    - cell [ref=f23e1089]
+                    - cell [ref=f23e1090]
+                    - cell [ref=f23e1091]
+                    - cell [ref=f23e1092]
+                  - row [ref=f23e1093]:
+                    - cell "eversis-task-analysing" [ref=f23e1094]
+                    - cell [ref=f23e1095]
+                    - cell "✅" [ref=f23e1096]
+                    - cell [ref=f23e1097]
+                    - cell [ref=f23e1098]
+                    - cell [ref=f23e1099]
+                    - cell [ref=f23e1100]
+                    - cell [ref=f23e1101]
+                    - cell "✅" [ref=f23e1102]
+                    - cell [ref=f23e1103]
+                    - cell [ref=f23e1104]
+                  - row [ref=f23e1105]:
+                    - cell "eversis-task-extracting" [ref=f23e1106]
+                    - cell "✅" [ref=f23e1107]
+                    - cell [ref=f23e1108]
+                    - cell [ref=f23e1109]
+                    - cell [ref=f23e1110]
+                    - cell [ref=f23e1111]
+                    - cell [ref=f23e1112]
+                    - cell [ref=f23e1113]
+                    - cell [ref=f23e1114]
+                    - cell [ref=f23e1115]
+                    - cell [ref=f23e1116]
+                  - row [ref=f23e1117]:
+                    - cell "eversis-task-quality-reviewing" [ref=f23e1118]
+                    - cell "✅" [ref=f23e1119]
+                    - cell [ref=f23e1120]
+                    - cell [ref=f23e1121]
+                    - cell [ref=f23e1122]
+                    - cell [ref=f23e1123]
+                    - cell [ref=f23e1124]
+                    - cell [ref=f23e1125]
+                    - cell [ref=f23e1126]
+                    - cell [ref=f23e1127]
+                    - cell [ref=f23e1128]
+                  - row [ref=f23e1129]:
+                    - cell "eversis-technical-context-discovering" [ref=f23e1130]
+                    - cell [ref=f23e1131]
+                    - cell "✅" [ref=f23e1132]
+                    - cell "✅" [ref=f23e1133]
+                    - cell "✅" [ref=f23e1134]
+                    - cell "✅" [ref=f23e1135]
+                    - cell "✅" [ref=f23e1136]
+                    - cell [ref=f23e1137]
+                    - cell "✅" [ref=f23e1138]
+                    - cell "✅" [ref=f23e1139]
+                    - cell "✅" [ref=f23e1140]
+                  - row [ref=f23e1141]:
+                    - cell "eversis-transcript-processing" [ref=f23e1142]
+                    - cell "✅" [ref=f23e1143]
+                    - cell [ref=f23e1144]
+                    - cell [ref=f23e1145]
+                    - cell [ref=f23e1146]
+                    - cell [ref=f23e1147]
+                    - cell [ref=f23e1148]
+                    - cell [ref=f23e1149]
+                    - cell [ref=f23e1150]
+                    - cell [ref=f23e1151]
+                    - cell [ref=f23e1152]
+                  - row [ref=f23e1153]:
+                    - cell "eversis-ui-verifying" [ref=f23e1154]
+                    - cell [ref=f23e1155]
+                    - cell [ref=f23e1156]
+                    - cell [ref=f23e1157]
+                    - cell "✅" [ref=f23e1158]
+                    - cell [ref=f23e1159]
+                    - cell [ref=f23e1160]
+                    - cell "✅" [ref=f23e1161]
+                    - cell [ref=f23e1162]
+                    - cell [ref=f23e1163]
+                    - cell [ref=f23e1164]
+                  - row [ref=f23e1165]:
+                    - cell "eversis-writing-hooks" [ref=f23e1166]
+                    - cell [ref=f23e1167]
+                    - cell [ref=f23e1168]
+                    - cell [ref=f23e1169]
+                    - cell "✅" [ref=f23e1170]
+                    - cell [ref=f23e1171]
+                    - cell [ref=f23e1172]
+                    - cell [ref=f23e1173]
+                    - cell [ref=f23e1174]
+                    - cell [ref=f23e1175]
+                    - cell [ref=f23e1176]
+              - heading [level=2] [ref=f23e1177]:
+                - text: Loading Priority
+                - link "Direct link to Loading Priority" [ref=f23e1178] [cursor=pointer]:
+                  - /url: "#loading-priority"
+                  - text: "#"
+              - paragraph [ref=f23e1179]: "Skills follow a strict priority hierarchy:"
+              - list [ref=f23e1180]:
+                - listitem [ref=f23e1181]:
+                  - strong [ref=f23e1182]: Project constitution
+                  - text: —
+                  - link "AGENTS.md" [ref=f23e1183] [cursor=pointer]:
+                    - /url: https://github.com/PiotrNie-Eversis/agent-collections/blob/main/AGENTS.md
+                  - text: and
+                  - strong [ref=f23e1184]:
+                    - code [ref=f23e1185]: .ai/rules/
+                  - text: (SSOT; the Cursor adapter emits
+                  - strong [ref=f23e1186]:
+                    - code [ref=f23e1187]: .cursor/rules/*.mdc
+                  - text: ", the Claude Code adapter generates"
+                  - strong [ref=f23e1188]:
+                    - code [ref=f23e1189]: CLAUDE.md
+                  - text: ) — highest priority for behavior.
+                - listitem [ref=f23e1190]:
+                  - strong [ref=f23e1191]: Existing codebase patterns
+                  - text: — replicate established conventions.
+                - listitem [ref=f23e1192]:
+                  - strong [ref=f23e1193]: Skill guidelines
+                  - text: — domain best practices and templates.
+                - listitem [ref=f23e1194]:
+                  - strong [ref=f23e1195]: External documentation
+                  - text: — framework docs, OWASP, industry standards.
+              - paragraph [ref=f23e1196]: "This ensures consistency: existing patterns are never overridden unless explicitly requested."
+          - navigation "Docs pages" [ref=f23e1197]:
+            - link "Previous « Implement observability" [ref=f23e1198] [cursor=pointer]:
+              - /url: /docs/prompts/internal/implement-observability
+              - generic [ref=f23e1199]: Previous
+              - generic [ref=f23e1200]: « Implement observability
+            - link "Next Architecture Design »" [ref=f23e1201] [cursor=pointer]:
+              - /url: /docs/skills/architecture-design
+              - generic [ref=f23e1202]: Next
+              - generic [ref=f23e1203]: Architecture Design »
+        - list [ref=f23e1206]:
+          - listitem [ref=f23e1207]:
+            - link "How Skills Work" [ref=f23e1208] [cursor=pointer]:
+              - /url: "#how-skills-work"
+            - list [ref=f23e1209]:
+              - listitem [ref=f23e1210]:
+                - link "Skill classes (framework)" [ref=f23e1211] [cursor=pointer]:
+                  - /url: "#skill-classes-framework"
+          - listitem [ref=f23e1212]:
+            - link "Available Skills" [ref=f23e1213] [cursor=pointer]:
+              - /url: "#available-skills"
+            - list [ref=f23e1214]:
+              - listitem [ref=f23e1215]:
+                - link "📋 Ideate skills" [ref=f23e1216] [cursor=pointer]:
+                  - /url: "#-ideate-skills"
+              - listitem [ref=f23e1217]:
+                - link "🛠 Implement skills" [ref=f23e1218] [cursor=pointer]:
+                  - /url: "#-implement-skills"
+              - listitem [ref=f23e1219]:
+                - link "☁️ Cloud & Infrastructure Skills" [ref=f23e1220] [cursor=pointer]:
+                  - /url: "#️-cloud--infrastructure-skills"
+              - listitem [ref=f23e1221]:
+                - link "✅ Quality Skills" [ref=f23e1222] [cursor=pointer]:
+                  - /url: "#-quality-skills"
+              - listitem [ref=f23e1223]:
+                - link "⚙️ Framework customization skills" [ref=f23e1224] [cursor=pointer]:
+                  - /url: "#️-framework-customization-skills"
+          - listitem [ref=f23e1225]:
+            - link "Agent–Skill Matrix" [ref=f23e1226] [cursor=pointer]:
+              - /url: "#agentskill-matrix"
+          - listitem [ref=f23e1227]:
+            - link "Loading Priority" [ref=f23e1228] [cursor=pointer]:
+              - /url: "#loading-priority"
+  - contentinfo [ref=f23e1229]:
+    - generic [ref=f23e1230]:
+      - list [ref=f23e1233]:
+        - listitem [ref=f23e1234]:
+          - link [ref=f23e1235] [cursor=pointer]:
+            - /url: https://github.com/PiotrNie-Eversis/agent-collections
+            - text: GitHub
+            - img "(opens in new tab)" [ref=f23e1236]
+        - listitem [ref=f23e1238]:
+          - link "Docs" [ref=f23e1239] [cursor=pointer]:
+            - /url: /docs/
+        - listitem [ref=f23e1240]:
+          - link "Methodology" [ref=f23e1241] [cursor=pointer]:
+            - /url: /docs/workflow/overview
+      - generic [ref=f23e1242]: agent-collections · Eversis Agent Collections · MIT licence

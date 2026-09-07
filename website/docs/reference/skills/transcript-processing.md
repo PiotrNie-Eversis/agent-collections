@@ -5,7 +5,7 @@ title: Transcript Processing
 
 # Transcript Processing
 
-**Folder:** `.cursor/skills/eversis-transcript-processing/`  
+**Folder:** `.ai/skills/eversis-transcript-processing/`  
 **Used by:** Business Analyst
 
 Cleans raw workshop or meeting transcripts from small talk, filler words, and off-topic tangents. Extracts and structures business-relevant content into a standardized format.

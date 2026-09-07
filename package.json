@@ -6,6 +6,8 @@
   "scripts": {
     "sync:adapters": "node adapters/sync.mjs",
     "sync:adapters:check": "node adapters/sync.mjs --check",
+    "sync:website-docs": "node adapters/website/generate.mjs",
+    "sync:website-docs:check": "node adapters/website/generate.mjs --check",
     "mcp:build": "npm --prefix mcp/eversis-collections-mcp run build",
     "mcp:test": "npm --prefix mcp/eversis-collections-mcp test",
     "mcp:install": "npm --prefix mcp/eversis-collections-mcp install",

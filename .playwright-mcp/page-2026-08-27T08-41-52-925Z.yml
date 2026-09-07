@@ -1,0 +1,323 @@
+- generic [ref=e2]:
+  - region "Skip to main content":
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#__docusaurus_skipToContent_fallback"
+  - navigation "Main" [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "Agent Collections" [ref=e7] [cursor=pointer]:
+          - /url: /
+        - link "Docs" [ref=e9] [cursor=pointer]:
+          - /url: /docs/
+        - link "Get started" [ref=e10] [cursor=pointer]:
+          - /url: /docs/getting-started/start-here
+        - link "Framework" [ref=e11] [cursor=pointer]:
+          - /url: /docs/framework
+        - link "Isolation" [ref=e12] [cursor=pointer]:
+          - /url: /docs/isolation
+        - link "Workflow" [ref=e13] [cursor=pointer]:
+          - /url: /docs/workflow/overview
+        - button "Components ▾" [ref=e15] [cursor=pointer]
+        - link "Use Cases" [ref=e16] [cursor=pointer]:
+          - /url: /docs/use-cases
+        - link "For CTOs" [ref=e17] [cursor=pointer]:
+          - /url: /docs/for-ctos
+      - generic [ref=e18]:
+        - link "Changelog" [ref=e19] [cursor=pointer]:
+          - /url: /changelog
+        - link "GitHub" [ref=e20] [cursor=pointer]:
+          - /url: https://github.com/PiotrNie-Eversis/agent-collections
+        - button "Switch between dark and light mode (currently system mode)" [disabled] [ref=e28]
+        - textbox "Search" [ref=e33]
+  - main [ref=e35]:
+    - generic [ref=e36]:
+      - heading "Agent Collections" [level=1] [ref=e38]: AgentCollections
+      - generic [ref=e39]:
+        - paragraph [ref=e40]:
+          - text: An opinionated
+          - strong [ref=e41]: vendor-neutral multi-agent
+          - text: product engineering framework — rules, prompts, MCP, and skills for the full SDLC.
+          - strong [ref=e42]: Ideate → Implement → Review
+          - text: — with human gates at every step.
+        - generic [ref=e43]:
+          - link "Get started" [ref=e44] [cursor=pointer]:
+            - /url: /docs/getting-started/start-here
+          - link "See on GitHub" [ref=e45] [cursor=pointer]:
+            - /url: https://github.com/PiotrNie-Eversis/agent-collections
+        - paragraph [ref=e46]: Maintained by Eversis · MIT · vendor-neutral multi-agent
+    - generic [ref=e49]:
+      - heading "A complete AI product engineering framework — not just a set of prompts" [level=2] [ref=e50]: A complete AIproduct engineeringframework — notjust a set of prompts
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - heading "Ideate → Implement → Review" [level=3] [ref=e59]
+          - paragraph [ref=e60]: Full SDLC in one framework — workshop transcript to production-ready code. Every phase has dedicated rules, prompts, skills, and workflows with human gates.
+        - generic [ref=e61]:
+          - heading "12 Specialized AI Agents" [level=3] [ref=e71]
+          - paragraph [ref=e72]: Business Analyst, Architect, Software Engineer, Prompt Engineer, Code Reviewer, UI Reviewer, E2E Engineer, DevOps Engineer, Engineering Manager, Context Engineer, and framework customization (rules, skills, prompts) — each focused on its phase, working together in a structured sequence.
+        - generic [ref=e73]:
+          - heading "Structured Delivery Workflow" [level=3] [ref=e80]
+          - paragraph [ref=e81]: Research → Plan → Implement → Review. Each phase feeds the next. Research becomes the plan. The plan becomes the implementation checklist. Review returns issues to the exact phase.
+        - generic [ref=e82]:
+          - heading "Pixel-Perfect UI Verification" [level=3] [ref=e88]
+          - paragraph [ref=e89]: Automated Figma comparison loop in every UI implementation cycle. Playwright captures the rendered state and compares it to the design spec. Mismatches are fixed before review.
+        - generic [ref=e90]:
+          - heading "Requirements Processing" [level=3] [ref=e98]
+          - paragraph [ref=e99]: Turn workshop transcripts and meeting notes into Jira-ready user stories before a line of code is written. The framework starts at the source of the work, not just the ticket.
+        - generic [ref=e100]:
+          - heading "MCP Tool Integrations" [level=3] [ref=e109]
+          - paragraph [ref=e110]: Jira, Figma Dev Mode, Context7, Playwright, Sequential Thinking, AWS API, GCP Gcloud, and more — wired into the workflow phases, not bolted on. Context flows through every step automatically.
+    - generic [ref=e113]:
+      - generic [ref=e114]:
+        - heading "Faster, more consistent delivery" [level=2] [ref=e115]: Faster, more consistentdelivery
+        - link "Read the methodology →" [ref=e116] [cursor=pointer]:
+          - /url: /docs/
+      - generic [ref=e117]:
+        - generic [ref=e118]:
+          - generic [ref=e119]: "01"
+          - paragraph [ref=e120]: "Example outcome teams report: faster lead time on structured AI-assisted delivery (varies by team and context)."
+        - generic [ref=e121]:
+          - generic [ref=e122]: "02"
+          - paragraph [ref=e123]: From juniors to principals. Full adoption across all seniority levels.
+    - generic [ref=e125]:
+      - generic [ref=e126]:
+        - heading "This is the new SDLC" [level=2] [ref=e127]: This is thenew SDLC
+        - paragraph [ref=e128]: Every phase of delivery restructured around how AI actually works — not bolted onto an existing process. From raw workshop transcripts to production-ready code.
+      - 'img "SDLC workflow: invoke eversis prompts with @ or / project commands. The flow moves from Human Intent to AI Agent to Ideate to Implement. Implement supports Quick and Full flow, where Quick skips research and planning delegates and Full uses them before implementation. Review can return issues or lead to approval, then Observe, Fine, QA Handoff, and Next Intent." [ref=e130]':
+        - generic [ref=e131]:
+          - generic [ref=e132]: Human Intent + Context
+          - generic [ref=e135]:
+            - generic [ref=e136]: AI Agent
+            - generic [ref=e137]: Agent Collections
+          - generic [ref=e139]:
+            - generic [ref=e140]: Ideate
+            - generic [ref=e142]:
+              - generic [ref=e143]:
+                - generic [ref=e144]: eversis-analyze-materials
+                - generic [ref=e145]: "@eversis-analyze-materials"
+              - generic [ref=e146]: Clean transcript → extract tasks → produce Jira-ready stories with full acceptance criteria
+          - generic [ref=e148]:
+            - generic [ref=e149]: Implement
+            - generic [ref=e151]:
+              - generic [ref=e152]:
+                - generic [ref=e153]: eversis-implementEngineering Manager
+                - generic [ref=e154]: "@eversis-implement"
+              - generic [ref=e155]: Orchestrates the full cycle — research, planning, and implementation via specialized agents
+            - generic [ref=e156]:
+              - generic [ref=e157]:
+                - strong [ref=e158]: Quick
+                - generic [ref=e159]: skips research and planning delegates
+              - generic [ref=e160]:
+                - strong [ref=e161]: Full
+                - generic [ref=e162]: uses the full delegate chain before implementation
+            - generic [ref=e163]: ↓ delegates by selected flow
+            - generic [ref=e164]:
+              - generic [ref=e165]:
+                - strong [ref=e167]: Context Engineer
+                - generic [ref=e168]: Research & context gathering
+              - generic [ref=e169]:
+                - strong [ref=e171]: Architect
+                - generic [ref=e172]: Architecture & implementation plan
+              - generic [ref=e173]:
+                - strong [ref=e175]: Software Engineer
+                - generic [ref=e176]: Backend, frontend, APIs, data layers
+              - generic [ref=e177]:
+                - strong [ref=e179]: DevOps Engineer
+                - generic [ref=e180]: Cloud and infrastructure
+              - generic [ref=e181]:
+                - strong [ref=e183]: E2E Engineer
+                - generic [ref=e184]: End-to-end tests
+              - generic [ref=e185]:
+                - strong [ref=e187]: Prompt Engineer
+                - generic [ref=e188]: LLM application prompts
+          - generic [ref=e190]:
+            - generic [ref=e191]: ↑
+            - text: Issues found
+            - generic [ref=e192]: ↓
+          - generic [ref=e194]:
+            - generic [ref=e195]: Review
+            - generic [ref=e197]:
+              - generic [ref=e198]:
+                - generic [ref=e199]:
+                  - generic [ref=e200]: eversis-review
+                  - generic [ref=e201]: "@eversis-review"
+                - generic [ref=e202]: PASS / BLOCKER / SUGGESTION — security, perf, coding standards
+              - generic [ref=e203]:
+                - generic [ref=e204]:
+                  - generic [ref=e205]: eversis-review-ui
+                  - generic [ref=e206]: "@eversis-review-ui"
+                - generic [ref=e207]: Playwright vs Figma · up to 5 auto-iterations
+          - generic [ref=e209]:
+            - generic [ref=e210]: ✓
+            - text: Approved
+          - generic [ref=e212]: Observe
+          - generic [ref=e216]:
+            - generic [ref=e217]: ✓
+            - text: Fine
+          - generic [ref=e219]:
+            - generic [ref=e220]: ≡
+            - text: QA Handoff
+          - generic [ref=e222]: Next Intent
+          - img:
+            - generic: PROBLEM
+      - paragraph [ref=e224]:
+        - text: Every step requires your review. In Cursor, attach prompts with
+        - code [ref=e225]: "@"
+        - text: in Chat or Agent (e.g.
+        - code [ref=e226]: "@eversis-implement"
+        - text: ) or use
+        - code [ref=e227]: /eversis-*
+        - text: project commands from
+        - code [ref=e228]: .cursor/commands/
+        - text: — each loads the canonical prompt file.
+    - generic [ref=e231]:
+      - generic [ref=e232]:
+        - heading "Core use cases" [level=2] [ref=e233]
+        - paragraph [ref=e234]: Every use case has dedicated agents, prompts, and workflows — not generic AI assistance.
+      - generic [ref=e235]:
+        - generic [ref=e236]:
+          - generic [ref=e237]: Ideate
+          - generic [ref=e238]: Workshop Outputs to Jira Backlog
+          - generic [ref=e239]: Discovery workshops produce valuable transcripts, Figma boards, and shared notes — but converting them into structured, actionable Jira tickets is a manual, error-prone process. Tasks are vague, edge cases are missed, and the backlog doesn’t reflect what was actually discussed.
+          - generic [ref=e240]: "[~15 min vs 1–2 days]"
+        - generic [ref=e242]:
+          - generic [ref=e243]: Implement
+          - generic [ref=e244]: Single-Session Context Gathering
+          - generic [ref=e245]: Requirements live in Jira, designs in Figma, documentation in Confluence, code in GitHub. Developers constantly context-switch to gather information. MCP integrations bring all context into a single Cursor session.
+          - generic [ref=e246]: "[~3 min vs 30–60 min]"
+        - generic [ref=e248]:
+          - generic [ref=e249]: Review
+          - generic [ref=e250]: Automated Code Review
+          - generic [ref=e251]: Multi-dimensional review checking acceptance criteria, security, performance, database patterns, and coding standards. Clear PASS/BLOCKER/SUGGESTION verdicts on every run.
+          - generic [ref=e252]: "[~5 min]"
+        - generic [ref=e254]:
+          - generic [ref=e255]: Implement
+          - generic [ref=e256]: Pixel-Perfect UI Delivery
+          - generic [ref=e257]: Frontend implementations deviate from Figma — wrong spacing, colours, component variants. QA catches these late, causing rework. The automated Figma verification loop runs up to 5 iterations, comparing the running app via Playwright against Figma specs before the code ever reaches human review.
+          - generic [ref=e258]: "[95–99% design accuracy]"
+        - generic [ref=e260]:
+          - generic [ref=e261]: Review
+          - generic [ref=e262]: Security Built Into Every Plan and Review
+          - generic [ref=e263]: Security reviews happen at the end of a sprint — if at all. DRY, KISS, and proper error handling are inconsistently applied. Every plan includes security considerations by default. The Code Reviewer agent checks for vulnerabilities, missing input validation, and exposed secrets on every run.
+          - generic [ref=e264]: "[Built in, every time]"
+        - generic [ref=e266]:
+          - generic [ref=e267]: Implement
+          - generic [ref=e268]: Onboarding New Team Members
+          - generic [ref=e269]: New developers spend days understanding the codebase, conventions, and task requirements before they can contribute. The eversis-implement prompt triggers the Engineering Manager, which automatically delegates to the Context Engineer to gather context from Jira, Confluence, Figma, and the codebase. It then delegates to the Architect to create a step-by-step implementation path — within minutes, not days.
+          - generic [ref=e270]: "[~5 min per task]"
+        - generic [ref=e272]:
+          - generic [ref=e273]: Implement
+          - generic [ref=e274]: Architecture Plan from a Ticket
+          - generic [ref=e275]: Generates a phased implementation plan with CREATE/MODIFY/REUSE labels, security considerations, and clear definitions of done — directly from a Jira ticket.
+          - generic [ref=e276]: "[~5 min]"
+        - generic [ref=e278]:
+          - generic [ref=e279]: Review
+          - generic [ref=e280]: Reliable E2E Test Suites
+          - generic [ref=e281]: E2E tests are written inconsistently, use brittle selectors, and break on unrelated changes. Teams stop trusting them and start skipping them. The E2E Engineer agent enforces Page Object patterns, accessibility-first locators, and verifies tests for 3+ consecutive passes before commit.
+          - generic [ref=e282]: "[~10 min per test suite]"
+        - generic [ref=e284]:
+          - generic [ref=e285]: Implement
+          - generic [ref=e286]: Cloud Cost Optimization
+          - generic [ref=e287]: Cloud bills keep growing but nobody knows which resources are wasteful. The DevOps Engineer agent performs hybrid audits — analyzing IaC code and validating against live infrastructure via AWS/GCP APIs to identify savings opportunities.
+          - generic [ref=e288]: "[~10 min per audit]"
+    - generic [ref=e292]:
+      - generic [ref=e293]:
+        - heading "Set up once. Works across every project." [level=2] [ref=e294]: Set up once.Works acrossevery project.
+        - paragraph [ref=e295]:
+          - strong [ref=e296]: Ideate → Implement → Review
+          - text: — clone or bootstrap, build
+          - code [ref=e297]: eversis-collections
+          - text: ", attach"
+          - code [ref=e298]: eversis-*.md
+          - text: prompts with
+          - code [ref=e299]: "@"
+          - text: or
+          - code [ref=e300]: /eversis-*
+          - text: project commands.
+        - generic [ref=e301]:
+          - link "Start here" [ref=e302] [cursor=pointer]:
+            - /url: /docs/getting-started/start-here
+          - link "Get the repo on GitHub" [ref=e303] [cursor=pointer]:
+            - /url: https://github.com/PiotrNie-Eversis/agent-collections
+      - generic [ref=e304]:
+        - generic [ref=e305]:
+          - generic [ref=e306]: "1"
+          - generic [ref=e307]:
+            - heading "Open in Cursor" [level=4] [ref=e308]
+            - paragraph [ref=e309]:
+              - text: Open this repository in
+              - strong [ref=e310]: Cursor
+              - text: (
+              - code [ref=e311]: File → Open Folder
+              - text: ).
+        - generic [ref=e312]:
+          - generic [ref=e313]: "2"
+          - generic [ref=e314]:
+            - heading "Read AGENTS.md + framework" [level=4] [ref=e315]
+            - paragraph [ref=e316]:
+              - text: Read
+              - code [ref=e317]: AGENTS.md
+              - text: and the
+              - link "Framework reference" [ref=e318] [cursor=pointer]:
+                - /url: /docs/framework
+              - text: (or
+              - code [ref=e319]: documentation/agent-collection.md
+              - text: in the repo).
+        - generic [ref=e320]:
+          - generic [ref=e321]: "3"
+          - generic [ref=e322]:
+            - heading "Configure rules" [level=4] [ref=e323]
+            - paragraph [ref=e324]:
+              - text: Start with
+              - code [ref=e325]: eversis-agent-core.mdc
+              - text: and edit
+              - code [ref=e326]: eversis-project-stack.mdc
+              - text: for your stack.
+        - generic [ref=e327]:
+          - generic [ref=e328]: "4"
+          - generic [ref=e329]:
+            - heading "Run your first prompt" [level=4] [ref=e330]
+            - paragraph [ref=e331]:
+              - text: Attach
+              - code [ref=e332]: "@eversis-implement"
+              - text: or use
+              - code [ref=e333]: /eversis-implement
+              - text: with your ticket or task text.
+        - generic [ref=e334]:
+          - generic [ref=e335]: "5"
+          - generic [ref=e336]:
+            - heading "Build MCP" [level=4] [ref=e337]
+            - paragraph [ref=e338]:
+              - code [ref=e339]: cd mcp/eversis-collections-mcp && npm install && npm run build
+              - text: — enable
+              - code [ref=e340]: eversis-collections
+              - text: from
+              - code [ref=e341]: .cursor/mcp.json
+              - text: .
+        - generic [ref=e342]:
+          - generic [ref=e343]: "6"
+          - generic [ref=e344]:
+            - heading "Use skills via MCP" [level=4] [ref=e345]
+            - paragraph [ref=e346]:
+              - text: With MCP enabled, Agent calls
+              - code [ref=e347]: eversis_skills_list
+              - text: /
+              - code [ref=e348]: eversis_skills_get
+              - text: — see
+              - link "Skills overview" [ref=e349] [cursor=pointer]:
+                - /url: /docs/skills/overview
+              - text: .
+  - contentinfo [ref=e350]:
+    - generic [ref=e351]:
+      - list [ref=e354]:
+        - listitem [ref=e355]:
+          - link [ref=e356] [cursor=pointer]:
+            - /url: https://github.com/PiotrNie-Eversis/agent-collections
+            - text: GitHub
+            - img "(opens in new tab)" [ref=e357]
+        - listitem [ref=e359]:
+          - link "Docs" [ref=e360] [cursor=pointer]:
+            - /url: /docs/
+        - listitem [ref=e361]:
+          - link "Methodology" [ref=e362] [cursor=pointer]:
+            - /url: /docs/workflow/overview
+      - generic [ref=e363]: agent-collections · Eversis Agent Collections · MIT licence

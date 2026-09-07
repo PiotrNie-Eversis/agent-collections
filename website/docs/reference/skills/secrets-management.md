@@ -5,7 +5,7 @@ title: Secrets Management
 
 # Secrets Management
 
-**Folder:** `.cursor/skills/eversis-managing-secrets/`
+**Folder:** `.ai/skills/eversis-managing-secrets/`
 **Used by:** DevOps Engineer
 
 Provides patterns for secure credential storage, rotation, and CI/CD authentication across cloud and Kubernetes environments.

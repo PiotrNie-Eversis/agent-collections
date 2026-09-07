@@ -31,7 +31,7 @@ Framework docs and profiles use open-source names only:
 | Light shared | `docs/**`, `scripts/**` |
 | Heavy infra | charts, large vendor dumps, … — default exclude |
 
-Consumers whose folders differ (for example a portal tree and a CMS/API tree) map those names in **consumer-owned** overlays / `docs/context/` — do **not** commit client names into framework `adapters/profiles/`.
+Consumers whose folders differ (for example a portal tree and a CMS/API tree) map those names in **consumer-owned** overlays / `docs/context/` — do **not** commit client names into framework `adapters/profiles/`. `docs/context/` itself has a defined shape, not free-form notes: `docs/context/<project>/INDEX.md` (always scaffolded on install) plus one file per component, and an optional `docs/context/global/` synced from a shared `domain-context` repo — see [Domain Context (SSOT)](./domain-context).
 
 ## WNF-03 (context reduction)
 
@@ -42,7 +42,7 @@ Target: **≥30%** less material vs an unscoped baseline, measured with the §7.
 3. Reduction ≈ \(1 - |S|/|U|\). Document the proxy used.
 4. If below 30%, record a **justified estimate** and a plan to tighten profiles / ignores.
 
-Empirical pilot notes live under `docs/context/eog/` when present.
+Empirical pilot notes live under `docs/context/<project>/` when present.
 
 ## Multi-agent MVP
 

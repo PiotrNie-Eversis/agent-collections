@@ -27,6 +27,8 @@ docker compose build eversis-collections
 
 **Node.js ≥ 18** is required only to **develop** the `eversis-collections` MCP package (`mcp/eversis-collections-mcp/`) itself — running `npm run mcp:test` or building outside Docker for debugging. It is not a prerequisite for end users who only run the server.
 
+**Gotcha:** the domain-context tools (`eversis_context_*`) need your IDE to start the MCP process with its working directory set to your consumer project's root — see [MCP Setup](./mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume) for why.
+
 ## Git
 
 You need **Git** to clone this repository, pin tags, and (for teams) vendor as a **submodule**.

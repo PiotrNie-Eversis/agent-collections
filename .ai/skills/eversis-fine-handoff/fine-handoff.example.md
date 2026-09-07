@@ -48,3 +48,34 @@ These bullets describe internal implementation decisions. A QA engineer cannot r
 > - **After a successful logout**, the behavior is unchanged: the user's session is cleared and they are taken to the home page.
 
 Write for the tester who will click through the app, not for the reviewer reading the diff.
+
+---
+
+## Example — Fine turn with both drafts (QA + domain-knowledge promotion)
+
+The QA comment draft above is always present. When `eversis-promote-domain-knowledge` finds a durable, cross-task fact, a second, independent draft follows it in the same turn:
+
+**Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing**
+
+File: `docs/context/proj/checkout-flow/index.md` (new)
+
+```yaml
+---
+scope: project
+source: agent-discovered
+last_updated: "2026-08-25"
+tags: [checkout, mfa]
+code_paths: ["src/auth/mfa/**"]
+related_specs: ["docs/specs/mfa-toggle/"]
+---
+```
+
+```markdown
+# Checkout flow — MFA gate
+
+Login challenges the user for an email code whenever MFA is enabled in
+account settings. The check happens after password verification, before
+session creation — see `POST /api/v1/auth/mfa/verify`.
+```
+
+This draft is approved separately from the QA draft — approving one has no effect on the other. Had this convention not already been confirmed a second time in an unrelated task (see the "second occurrence" heuristic in `eversis-promote-domain-knowledge`), this draft would not have appeared at all, and the Fine turn would have ended with just the QA comment draft above.

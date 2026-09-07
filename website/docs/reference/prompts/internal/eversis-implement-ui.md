@@ -9,18 +9,18 @@ upstream_agent: "eversis-engineering-manager"
 # eversis-implement-ui
 
 :::info
-Not invoked directly by users. The UI implementation workflow is triggered via the [eversis-implement](../public/implement) public prompt — the [Engineering Manager](../../agents/engineering-manager.md) uses this internal prompt to orchestrate UI tasks with Figma verification.
+Not invoked directly by users. The UI implementation workflow is triggered via the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../agents/engineering-manager) uses this internal prompt to orchestrate UI tasks with Figma verification.
 :::
 
 **Agent:** Engineering Manager  
-**File:** `.cursor/prompts/internal/eversis-implement-ui.md`
+**File:** `.ai/prompts/internal/eversis-implement-ui.md`
 
 Orchestrates the implementation of UI features with iterative Figma verification, delegating to specialized agents.
 
 ## How It's Triggered
 
 ```text
-@eversis-implement
+eversis-implement
 <JIRA_ID or task description>
 ```
 
@@ -30,7 +30,7 @@ When the implementation plan contains UI tasks with Figma references, the Engine
 
 ## What It Does
 
-Everything from the [eversis-implement](../public/implement) public prompt, plus:
+Everything from the [eversis-implement](../public/eversis-implement.md) public prompt, plus:
 
 1. **Extracts Figma URLs** from the research and plan files.
 2. **Confirms dev server URL** with the user before the first verification.
@@ -123,9 +123,9 @@ Do NOT skip verification or delegate without a Figma reference.
 
 3. **Confirm dev server URL** — **Ask the user in chat** for the dev server URL now (e.g., "What URL is the frontend app running at? Is it http://localhost:3000?"). Do not defer this to later — you need the confirmed URL before any verification can start. Do not guess from running processes or port scans — multiple services may run on different ports. Use the confirmed URL for all subsequent verifications in this session.
 
-4. **Delegate UI implementation** — For each UI implementation task, delegate to Software engineer using [`eversis-implement-ui-common-task.md`](./implement-ui-common-task). Pass the relevant Figma URLs, component context, and plan section. For non-Figma frontend and backend tasks, use [`eversis-implement-common-task.md`](./implement-common-task).
+4. **Delegate UI implementation** — For each UI implementation task, delegate to Software engineer using [`eversis-implement-ui-common-task.md`](./eversis-implement-ui-common-task.md). Pass the relevant Figma URLs, component context, and plan section. For non-Figma frontend and backend tasks, use [`eversis-implement-common-task.md`](./eversis-implement-common-task.md).
 
-5. **Delegate UI verification** — After each UI implementation task completes, delegate verification to UI reviewer: run a focused Agent turn with [`eversis-review-ui.md`](../public/review-ui) attached. Pass: the Figma URL, the user-confirmed dev server URL from step 3, and the component/section name. The UI reviewer compares the Figma design against the running implementation and returns a structured report. **Note:** You may not have `figma` or `playwright` in this session; the verification prompt assumes those MCP tools are available to the sub-task. Never skip verification because tools are not in your own list—delegate the verification turn instead.
+5. **Delegate UI verification** — After each UI implementation task completes, delegate verification to UI reviewer: run a focused Agent turn with [`eversis-review-ui.md`](../public/eversis-review-ui.md) attached. Pass: the Figma URL, the user-confirmed dev server URL from step 3, and the component/section name. The UI reviewer compares the Figma design against the running implementation and returns a structured report. **Note:** You may not have `figma` or `playwright` in this session; the verification prompt assumes those MCP tools are available to the sub-task. Never skip verification because tools are not in your own list—delegate the verification turn instead.
 
 6. **Handle verification results**:
    - If **PASS** → mark the task and its verification step as complete in the plan. Move to the next task.
@@ -148,7 +148,7 @@ Do NOT skip verification or delegate without a Figma reference.
 - Design gaps discovered and how they were handled
 - Any deviations from design with rationale
 
-11. **Delegate code review** — Use [`eversis-review.md`](../public/review). Include E2E test execution as part of the review. The reviewer runs all quality gates (unit, integration, E2E tests, linting, build).
+11. **Delegate code review** — Use [`eversis-review.md`](../public/eversis-review.md). Include E2E test execution as part of the review. The reviewer runs all quality gates (unit, integration, E2E tests, linting, build).
 
 ## Verification Rules
 
@@ -185,3 +185,5 @@ If UI reviewer consistently returns LOW confidence or tool errors:
 4. Continue with next component or escalate
 
 <!-- Eversis port; upstream: eversis-implement-ui -->
+
+<!-- GENERATED by adapters/website/generate-prompts.mjs from .ai/prompts/ — do not edit; run `npm run sync:website-docs` -->

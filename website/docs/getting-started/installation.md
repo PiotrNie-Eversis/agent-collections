@@ -57,7 +57,7 @@ Selection is written to **`.agent-collections/install-selection.json`**. Schema:
 | Mode | Flag | Notes |
 |------|------|-------|
 | **Local** (default) | (omit `--vendor`) | Framework stays outside the consumer repo; set `AGENT_COLLECTIONS_HOME` |
-| **Submodule** | `--vendor submodule` | **Team / EOG default** — pin (lock) a specific version tag in `.gitmodules` |
+| **Submodule** | `--vendor submodule` | **Common team default** — pin (lock) a specific version tag in `.gitmodules` |
 | **Copy** | `--vendor copy` | Tree under `vendor/agent-collections/` |
 
 ### Useful flags
@@ -74,6 +74,9 @@ Selection is written to **`.agent-collections/install-selection.json`**. Schema:
 | `--non-interactive` | No prompts — defaults + flags |
 | `--target DIR` | Consumer path when not running from that repo |
 | `--collections-home DIR` | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion) |
+| `--ssot-source URL` | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit on **first** install to start empty). On `--upgrade` / `--sync`, omit to **keep** the URL already in `install-selection.json`; pass `--ssot-source ""` or `--ssot-source=` to **clear** it. |
+| `--ssot-branch NAME` | Branch to pull from `--ssot-source` (default `main`) |
+| `--confluence-space-key KEY` | Records a Confluence space key for later use by `eversis-import-confluence-knowledge` (optional — never calls Confluence itself) |
 
 Interactive runs (TTY, without `--non-interactive`) prompt for agents × domain profile × MCP servers. `--build-mcp` is optional on interactive installs. Re-runs are idempotent; partial failures list completed vs failed steps.
 
@@ -99,6 +102,7 @@ Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains
 - **Skills** resolve from **`.ai/skills/`** via MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), by reading `SKILL.md` directly, or — for Claude Code only — **natively** via `.claude/skills/eversis-*/` (linked/copied by the installer, no MCP required).
 - **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced.
 - This MVP does **not** ship a full mirror under `.cursor/skills` or `.cursor/prompts` — Cursor's skills stay MCP-only. Both adapters **do** generate thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`).
+- **Domain context** (durable, cross-task knowledge — see [Domain Context (SSOT)](../domain-context)) is scaffolded on **every** install: `docs/context/<project>/INDEX.md` is created if missing. If `--ssot-source` is reachable, the installer also best-effort seeds `docs/context/global/` from it — this step never blocks or fails the install; an unreachable source just logs a warning with the manual recovery command.
 
 ## 5. Upgrade
 
@@ -107,7 +111,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
   --upgrade --sync --non-interactive
 ```
 
-Reuses agents / MCP / profile / vendor / link from selection. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths (stack rule, `docs/context|plans|specs`, local `AGENTS.md`, secrets) are not overwritten without opt-in.
+Reuses agents / MCP / profile / vendor / link / `ssot.externalSsotRepo` (and `ssot.confluenceSpaceKey`) from selection. Omit `--ssot-source` to keep the recorded domain-context URL; pass an empty value (`--ssot-source ""` or `--ssot-source=`) to clear it. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths (stack rule, `docs/plans|specs`, local `AGENTS.md`, secrets) are not overwritten without opt-in — `docs/context/` is the one partial exception: `INDEX.md` is **actively created** if missing, and `docs/context/global/` is **actively refreshed** by `eversis_context_sync`, not left untouched like the rest.
 
 If your team vendors the framework as a **Git submodule**, `--upgrade --sync` only auto-updates that submodule's pinned version in one narrow case — see [Advanced: keeping a team submodule in sync](#advanced-keeping-a-team-submodule-in-sync) below before assuming an upgrade picked up the latest framework changes.
 

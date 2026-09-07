@@ -9,6 +9,8 @@ trap cleanup EXIT
 
 echo "[smoke] framework-home unit tests"
 bash "${ROOT}/scripts/lib/setup-agent-collections/framework-home.test.sh"
+echo "[smoke] selection SSOT unit tests"
+bash "${ROOT}/scripts/lib/setup-agent-collections/selection-ssot.test.sh"
 
 TARGET="${TMP}/consumer"
 mkdir -p "$TARGET"
@@ -39,6 +41,10 @@ node -e '
   for (const k of req) if (j[k]==null) { console.error("missing",k); process.exit(1); }
   if (!j.agents.includes("cursor")) process.exit(1);
   if (j.domainProfile!=="frontend") process.exit(1);
+  if (j.ssot && j.ssot.externalSsotRepo !== null) {
+    console.error("FAIL: first install without --ssot-source must record externalSsotRepo null");
+    process.exit(1);
+  }
   console.log("selection OK", JSON.stringify(j,null,2));
 ' "$SEL"
 
@@ -167,11 +173,119 @@ shopt -u nullglob
 # per-server *contents* are pruned by mcp-merge.mjs's "kept" logic, not the
 # host config file; deleting host config files on deselect is out of scope.
 
+# Cursor User MCP overlap (warn-only). Isolate from the real ~/.cursor/mcp.json.
+TARGET_OVERLAP="${TMP}/consumer-overlap"
+mkdir -p "$TARGET_OVERLAP"
+(cd "$TARGET_OVERLAP" && git init -q)
+USER_MCP_FIXTURE="${TMP}/user-mcp/mcp.json"
+mkdir -p "$(dirname "$USER_MCP_FIXTURE")"
+printf '%s\n' '{"mcpServers":{"eversis-collections":{"command":"node","args":["/unused/dist/index.js"]},"personal-only":{"command":"true"}}}' > "$USER_MCP_FIXTURE"
+USER_MCP_BEFORE="$(cksum "$USER_MCP_FIXTURE")"
+OVERLAP_LOG="${TMP}/overlap-install.log"
+AGENT_COLLECTIONS_USER_MCP="$USER_MCP_FIXTURE" \
+  bash "${ROOT}/scripts/setup-agent-collections.sh" \
+    --collections-home "$ROOT" \
+    --target "$TARGET_OVERLAP" \
+    --non-interactive \
+    --agents=cursor \
+    --mcp-servers=eversis-collections \
+    --profile=frontend \
+    --link-mode=copy \
+    > "$OVERLAP_LOG" 2>&1
+grep -q 'Cursor User MCP already has catalog server(s): eversis-collections' "$OVERLAP_LOG" \
+  || { echo "FAIL: expected User MCP overlap warning"; cat "$OVERLAP_LOG"; exit 1; }
+grep -q 'badge User' "$OVERLAP_LOG" \
+  || { echo "FAIL: overlap warning missing Cursor User vs project badge hint"; cat "$OVERLAP_LOG"; exit 1; }
+grep -q 'does not edit the User file' "$OVERLAP_LOG" \
+  || { echo "FAIL: overlap warning missing 'does not edit the User file'"; cat "$OVERLAP_LOG"; exit 1; }
+[[ -f "${TARGET_OVERLAP}/.cursor/mcp.json" ]] \
+  || { echo "FAIL: overlap run did not write project .cursor/mcp.json"; exit 1; }
+[[ "$(cksum "$USER_MCP_FIXTURE")" == "$USER_MCP_BEFORE" ]] \
+  || { echo "FAIL: installer modified the User MCP fixture"; exit 1; }
+
+TARGET_NO_USER="${TMP}/consumer-no-user-mcp"
+mkdir -p "$TARGET_NO_USER"
+(cd "$TARGET_NO_USER" && git init -q)
+NO_USER_LOG="${TMP}/no-user-mcp-install.log"
+AGENT_COLLECTIONS_USER_MCP="${TMP}/missing-user-mcp.json" \
+  bash "${ROOT}/scripts/setup-agent-collections.sh" \
+    --collections-home "$ROOT" \
+    --target "$TARGET_NO_USER" \
+    --non-interactive \
+    --agents=cursor \
+    --mcp-servers=eversis-collections \
+    --profile=frontend \
+    --link-mode=copy \
+    > "$NO_USER_LOG" 2>&1
+grep -q 'Cursor User MCP already has catalog' "$NO_USER_LOG" \
+  && { echo "FAIL: warned about User MCP overlap when User file is missing"; cat "$NO_USER_LOG"; exit 1; }
+[[ -f "${TARGET_NO_USER}/.cursor/mcp.json" ]] \
+  || { echo "FAIL: missing-User-file run did not write project .cursor/mcp.json"; exit 1; }
+
+# Invalid User JSON must not fail install.
+TARGET_BAD_USER="${TMP}/consumer-bad-user-mcp"
+mkdir -p "$TARGET_BAD_USER"
+(cd "$TARGET_BAD_USER" && git init -q)
+BAD_USER_MCP="${TMP}/bad-user-mcp.json"
+echo '{not-json' > "$BAD_USER_MCP"
+BAD_USER_LOG="${TMP}/bad-user-mcp-install.log"
+AGENT_COLLECTIONS_USER_MCP="$BAD_USER_MCP" \
+  bash "${ROOT}/scripts/setup-agent-collections.sh" \
+    --collections-home "$ROOT" \
+    --target "$TARGET_BAD_USER" \
+    --non-interactive \
+    --agents=cursor \
+    --mcp-servers=eversis-collections \
+    --profile=frontend \
+    --link-mode=copy \
+    > "$BAD_USER_LOG" 2>&1 \
+  || { echo "FAIL: invalid User MCP JSON should not fail install"; cat "$BAD_USER_LOG"; exit 1; }
+[[ -f "${TARGET_BAD_USER}/.cursor/mcp.json" ]] \
+  || { echo "FAIL: invalid-User-JSON run did not write project .cursor/mcp.json"; exit 1; }
+
 # Upgrade reuse
 bash "${ROOT}/scripts/setup-agent-collections.sh" \
   --collections-home "$ROOT" \
   --target "$TARGET" \
   --upgrade --sync --non-interactive
+
+SSOT_URL="https://gitlab3.eversis.com/dawis/domain-context.git"
+node -e "
+  const fs=require('fs');
+  const p=process.argv[1];
+  const j=JSON.parse(fs.readFileSync(p,'utf8'));
+  j.ssot=j.ssot||{};
+  j.ssot.externalSsotRepo=process.argv[2];
+  j.ssot.confluenceSpaceKey='DAWIS';
+  fs.writeFileSync(p, JSON.stringify(j,null,2)+'\n');
+" "${TARGET}/.agent-collections/install-selection.json" "$SSOT_URL"
+# Restore fills ARG_SSOT_SOURCE; seed_ssot_global skips when global/ already exists (Q4).
+mkdir -p "${TARGET}/docs/context/global"
+
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET" \
+  --upgrade --sync --non-interactive
+
+node -e "
+  const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));
+  if (j.ssot.externalSsotRepo !== process.argv[2]) { console.error('FAIL: upgrade wiped externalSsotRepo'); process.exit(1); }
+  if (j.ssot.confluenceSpaceKey !== 'DAWIS') { console.error('FAIL: upgrade wiped confluenceSpaceKey'); process.exit(1); }
+  console.log('upgrade preserved ssot.externalSsotRepo and confluenceSpaceKey');
+" "${TARGET}/.agent-collections/install-selection.json" "$SSOT_URL"
+
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET" \
+  --upgrade --sync --non-interactive \
+  --ssot-source=
+
+node -e "
+  const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));
+  if (j.ssot.externalSsotRepo !== null) { console.error('FAIL: empty --ssot-source did not clear externalSsotRepo'); process.exit(1); }
+  if (j.ssot.confluenceSpaceKey !== 'DAWIS') { console.error('FAIL: clear ssot-source also wiped confluenceSpaceKey'); process.exit(1); }
+  console.log('empty --ssot-source cleared externalSsotRepo and kept confluenceSpaceKey');
+" "${TARGET}/.agent-collections/install-selection.json"
 
 # Fail-safe missing selection
 BAD="${TMP}/bad"

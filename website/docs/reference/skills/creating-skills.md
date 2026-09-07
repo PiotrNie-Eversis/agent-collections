@@ -5,7 +5,7 @@ title: Creating Skills
 
 # Creating Skills
 
-**Folder:** `.cursor/skills/eversis-creating-skills/`
+**Folder:** `.ai/skills/eversis-creating-skills/`
 **Used by:** Framework maintainers (customization track)
 
 Provides naming conventions (gerund form), description guidelines, body structure, progressive disclosure patterns, templates, and validation checklists for creating new skills (`SKILL.md`).

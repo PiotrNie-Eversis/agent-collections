@@ -5,7 +5,7 @@ title: Orchestrating Implementation
 
 # Orchestrating Implementation
 
-**Folder:** `.cursor/skills/eversis-orchestrating-implementation/`  
+**Folder:** `.ai/skills/eversis-orchestrating-implementation/`  
 **Used by:** Engineering Manager via [`eversis-implement`](../prompts/public/implement)
 
 Canonical workflow owner for the Implement phase. The public **`@eversis-implement`** prompt is a thin trigger; this skill contains the full orchestration procedure.
@@ -40,7 +40,7 @@ Before creating artifacts, delegating, or writing product code, inspect `docs/sp
 - Exactly four bullet lines: Flow, Research, Plan, Next gate — optional fifth `Reason:` line.
 - Do not substitute narrative summaries or A/B/C menus for the block.
 
-Normative detail lives in **`.cursor/skills/eversis-orchestrating-implementation/SKILL.md`** — do not duplicate the full contract here.
+Normative detail lives in **`.ai/skills/eversis-orchestrating-implementation/SKILL.md`** — do not duplicate the full contract here.
 
 | Value | Meaning |
 | --- | --- |

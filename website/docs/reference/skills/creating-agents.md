@@ -5,15 +5,15 @@ title: Creating role rules
 
 # Creating role rules (`.mdc`)
 
-**Folder:** `.cursor/skills/eversis-creating-agents/`  
+**Folder:** `.ai/skills/eversis-creating-agents/`  
 **Used by:** Framework maintainers (customization track)
 
-Build **Cursor project rules** — **`.cursor/rules/eversis-*.mdc`** — that define **role behavior** (who/when), not full workflows. Optional narrative docs: **`website/docs/agents/`**. This monorepo does **not** use `.github/agents/*.agent.md`.
+Build **role behavior rules** under **`.ai/rules/`** (SSOT — the Cursor adapter may emit **`.cursor/rules/eversis-*.mdc`**; the Claude Code adapter generates **`CLAUDE.md`**) that define **role behavior** (who/when), not full workflows. Optional narrative docs: **`website/docs/agents/`**. This monorepo does **not** use `.github/agents/*.agent.md`.
 
 ## Principles
 
-- **Separation of concerns** — Rules = stable role and boundaries; **skills** = HOW; **prompts** = runnable workflow under **`.cursor/prompts/`**.
-- **XML-style sections** — The underlying skill may still use XML-like tags in the **body** for structure; YAML frontmatter is for Cursor (`description`, `globs`, `alwaysApply`).
+- **Separation of concerns** — Rules = stable role and boundaries; **skills** = HOW; **prompts** = runnable workflow under **`.ai/prompts/`**.
+- **XML-style sections** — The underlying skill may still use XML-like tags in the **body** for structure; YAML frontmatter (`description`, `globs`, `alwaysApply`) is what adapters key off of (e.g. Cursor's `.mdc`).
 
 ## Rule structure (typical)
 

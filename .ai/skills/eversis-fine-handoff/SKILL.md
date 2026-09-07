@@ -33,6 +33,16 @@ Prefer loading this skill via the **`eversis-collections` MCP** (`eversis_skills
 - Set `contentFormat: "markdown"` when the server supports it.
 - If the issue key is ambiguous, confirm with the human before posting.
 
+## Optional second draft — domain-knowledge promotion
+
+When `eversis-promote-domain-knowledge` determines the task produced durable, cross-task knowledge (a convention, a confirmed business rule, a reusable integration pattern — never a one-off implementation detail), add a **second, independent draft** in this same Fine turn:
+
+- Its own header: `**Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing**`
+- Show the target file path, full frontmatter, and content.
+- Independent approval from the QA comment draft — approving one has no effect on the other.
+- Most tasks will **not** have this draft at all — that is the normal case, not a gap. Only add it when the promotion skill actually finds a candidate.
+- The write happens only after explicit approval of this specific draft, via the GitLab REST API (Branches → Commits multi-action → Merge Requests) — never through a local `domain-context` checkout.
+
 ## Readability rules
 
 These rules exist because QA engineers are **not** reading the codebase. They need to understand the change from the outside.

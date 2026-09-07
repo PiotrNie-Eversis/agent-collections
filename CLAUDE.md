@@ -43,6 +43,12 @@ Work moves through these stages:
 When acting as Engineering Manager or running the **Implement** prompt (`eversis-implement`):
 
 1. **Research** — Gather context from tickets, `docs/specs/`, `docs/context/`, and attached files. Produce a **research artifact** (`*.research.md`). Run the **adequacy checklist** (orchestration skill `eversis-orchestrating-implementation`) before `Research: SKIP` when a file already exists. When readiness shows **CREATE** or **DELTA**, the research file MUST be written or updated in the **same session** before ending the turn. **Stop** for human approval before planning.
+
+   When reading `docs/context/` for domain knowledge (distinct from `docs/specs/` task history), read in this order — smallest sufficient read first, never the whole tree by default:
+   1. `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` only if the topic is not covered locally) — bounded, cheap, always safe to read.
+   2. Match the task's topic to **one** component listed there.
+   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies.
+   4. Follow `related_specs`/`confluence_url` from that file only if it signals a real gap (missing recent history, missing business context) — 1-2 most recent links, not all of them. Fall back to searching `docs/specs/`/the codebase directly only when the component has no entry yet in `INDEX.md`.
 2. **Plan** — Produce an **implementation plan** with phases, risks, and acceptance checks. Run the **adequacy checklist** before `Plan: SKIP` when `*.plan.md` exists. When readiness shows **REFRESH** or **CREATE**, update or write the plan in the **same session** before broad code changes. **Stop** for human approval before execution.
 3. **Implement** — Make focused edits; run the repo's lint/test/typecheck commands after substantive changes (see `testing-and-terminal.md` in this folder).
 4. **Review** — In the **same session**, load and execute the **Review** prompt (`eversis-review`) with PASS / BLOCKER / SUGGESTION structure. Do **not** end the turn solely to wait for the human to attach `/eversis-review`, unless the user opted out with **`pause before review`** or **`review later`**.
@@ -203,6 +209,16 @@ The detailed skill package is **`eversis-fine-handoff`** (body lands under `.ai/
 - Publish only when the human **explicitly** approves (e.g. “post this”, “add to ticket PROJ-123”).
 - Use the **approved or human-edited** body — never the unreviewed draft blindly if the human changed it.
 - Confirm the issue key if ambiguous.
+
+## Optional second draft — domain-knowledge promotion
+
+When `eversis-promote-domain-knowledge` (see that skill) determines the task produced a durable, cross-task fact (a convention, a confirmed business rule, a reusable integration pattern — not a one-off implementation detail), add a **second, independent draft** in the same Fine turn, alongside the QA comment draft:
+
+- Begin it with its own header: `**Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing**`
+- Show the proposed file path, the frontmatter, and the content to be written.
+- This draft has its **own** approval — approving or rejecting the QA comment draft has no effect on this one, and vice versa. Only write to `docs/context/<project>/` after this specific draft is explicitly approved.
+- If `eversis-promote-domain-knowledge` finds nothing worth promoting for this task, do not add this draft at all — the QA comment draft alone is a complete, valid Fine turn (this is the common case, not an exception).
+- Publication mechanism once approved: GitLab REST API (Branches → Commits with multiple file actions → Merge Requests), never a local checkout of `domain-context` (see `eversis-promote-domain-knowledge`).
 
 ## Readability rules
 

@@ -5,16 +5,16 @@ title: Creating prompts
 
 # Creating prompts
 
-**Folder:** `.cursor/skills/eversis-creating-prompts/`  
+**Folder:** `.ai/skills/eversis-creating-prompts/`  
 **Used by:** Framework maintainers (customization track)
 
-Create **attachable Markdown prompts** — **`.cursor/prompts/public/eversis-*.md`** and **`internal/eversis-*.md`** — with Docusaurus frontmatter. Not `.github/prompts/*.prompt.md` (removed).
+Create **attachable Markdown prompts** — **`.ai/prompts/public/eversis-*.md`** and **`internal/eversis-*.md`** — with Docusaurus frontmatter. Not `.github/prompts/*.prompt.md` (removed).
 
 ## Principles
 
-- **Prompt** = workflow steps, artifacts, human gates, `@` paths for rules to attach
-- **Rules** = `.cursor/rules/eversis-*.mdc` for stable behavior
-- **Skills** = `.cursor/skills/eversis-*/SKILL.md` for procedures
+- **Prompt** = workflow steps, artifacts, human gates, which rules to load (`.ai/rules/`; Cursor users may `@`-attach the adapter's `.mdc` form)
+- **Rules** = `.ai/rules/` for stable behavior (SSOT; Cursor adapter emits `.cursor/rules/eversis-*.mdc`, Claude Code adapter generates `CLAUDE.md`)
+- **Skills** = `.ai/skills/eversis-*/SKILL.md` for procedures
 
 ## Frontmatter (this site)
 

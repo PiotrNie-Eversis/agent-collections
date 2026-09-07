@@ -5,7 +5,7 @@ title: UI Verification
 
 # UI Verification
 
-**Folder:** `.cursor/skills/eversis-ui-verifying/`  
+**Folder:** `.ai/skills/eversis-ui-verifying/`  
 **Used by:** UI Reviewer, Software Engineer
 
 Provides detailed criteria for comparing UI implementations against Figma designs, with severity definitions, tolerance rules, and structured report formats.

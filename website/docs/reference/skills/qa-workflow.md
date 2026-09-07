@@ -21,4 +21,4 @@ Manual QA practice layer — test plans, regression, AC verification, bug report
 | `eversis-accessibility-auditing` | [Accessibility Auditing](./accessibility-auditing) |
 | `eversis-functional-testing` | [Functional Testing](./functional-testing) (templates) |
 
-Normative procedures live in `.cursor/skills/*/SKILL.md` — load via MCP `eversis_skills_get` or read files directly in Agent.
+Normative procedures live in `.ai/skills/*/SKILL.md` — load via MCP `eversis_skills_get` or read files directly in Agent.

@@ -42,7 +42,7 @@ For converting discovery workshop materials into structured, Jira-ready epics an
    ↳ 🔍 Read back Jira issues — verify summary, links, AC, status
 
 8️⃣ Baseline refresh
-   ↳ 📁 Update `docs/context/<project>/task-baseline.md`
+   ↳ 📁 Update `docs/context/<project>/task-baseline.md` (a sibling file next to `INDEX.md`, not one of its indexed components)
    ↳ 🔗 Index workshop session at `docs/specs/<workshop-name>/`
 ```
 

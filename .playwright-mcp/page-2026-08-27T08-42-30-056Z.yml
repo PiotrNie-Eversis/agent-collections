@@ -1,0 +1,650 @@
+- generic [ref=f1e2]:
+  - region "Skip to main content":
+    - link "Skip to main content" [ref=f1e3] [cursor=pointer]:
+      - /url: "#__docusaurus_skipToContent_fallback"
+  - navigation "Main" [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link "Agent Collections" [ref=f1e7] [cursor=pointer]:
+          - /url: /
+        - link "Docs" [ref=f1e9] [cursor=pointer]:
+          - /url: /docs/
+        - link "Get started" [ref=f1e10] [cursor=pointer]:
+          - /url: /docs/getting-started/start-here
+        - link "Framework" [ref=f1e11] [cursor=pointer]:
+          - /url: /docs/framework
+        - link "Isolation" [ref=f1e12] [cursor=pointer]:
+          - /url: /docs/isolation
+        - link "Workflow" [ref=f1e13] [cursor=pointer]:
+          - /url: /docs/workflow/overview
+        - button "Components ▾" [ref=f1e15] [cursor=pointer]
+        - link "Use Cases" [ref=f1e16] [cursor=pointer]:
+          - /url: /docs/use-cases
+        - link "For CTOs" [ref=f1e17] [cursor=pointer]:
+          - /url: /docs/for-ctos
+      - generic [ref=f1e18]:
+        - link "Changelog" [ref=f1e19] [cursor=pointer]:
+          - /url: /changelog
+        - link "GitHub" [ref=f1e20] [cursor=pointer]:
+          - /url: https://github.com/PiotrNie-Eversis/agent-collections
+        - button "Switch between dark and light mode (currently system mode)" [disabled] [ref=f1e28]
+        - textbox "Search" [ref=f1e33]
+  - generic [ref=f1e36]:
+    - complementary [ref=f1e37]:
+      - navigation "Docs sidebar" [ref=f1e40]:
+        - list [ref=f1e41]:
+          - listitem [ref=f1e42]:
+            - link "Introduction" [ref=f1e43] [cursor=pointer]:
+              - /url: /docs/
+          - listitem [ref=f1e45]:
+            - link "Framework reference" [ref=f1e46] [cursor=pointer]:
+              - /url: /docs/framework
+          - listitem [ref=f1e48]:
+            - button "Getting Started" [ref=f1e50] [cursor=pointer]
+          - listitem [ref=f1e52]:
+            - link "Isolation and context reduction" [ref=f1e53] [cursor=pointer]:
+              - /url: /docs/isolation
+          - listitem [ref=f1e55]:
+            - button "Workflow" [expanded] [ref=f1e57] [cursor=pointer]
+            - list [ref=f1e59]:
+              - listitem [ref=f1e60]:
+                - link "Workflow Overview" [ref=f1e61] [cursor=pointer]:
+                  - /url: /docs/workflow/overview
+              - listitem [ref=f1e63]:
+                - link "Standard Flow" [ref=f1e64] [cursor=pointer]:
+                  - /url: /docs/workflow/standard-flow
+              - listitem [ref=f1e66]:
+                - link "Frontend Flow" [ref=f1e67] [cursor=pointer]:
+                  - /url: /docs/workflow/frontend-flow
+              - listitem [ref=f1e69]:
+                - link "E2E Testing Flow" [ref=f1e70] [cursor=pointer]:
+                  - /url: /docs/workflow/e2e-flow
+              - listitem [ref=f1e72]:
+                - link "Workshop Analysis Flow" [ref=f1e73] [cursor=pointer]:
+                  - /url: /docs/workflow/workshop-flow
+              - listitem [ref=f1e75]:
+                - link "Business Manager Docs" [ref=f1e76] [cursor=pointer]:
+                  - /url: /docs/workflow/business-manager-docs
+              - listitem [ref=f1e78]:
+                - link "Repo Docs" [ref=f1e79] [cursor=pointer]:
+                  - /url: /docs/workflow/repo-docs
+              - listitem [ref=f1e81]:
+                - link "QA Workflow" [ref=f1e82] [cursor=pointer]:
+                  - /url: /docs/workflow/qa-workflow
+          - listitem [ref=f1e84]:
+            - button "Agents" [ref=f1e86] [cursor=pointer]
+          - listitem [ref=f1e88]:
+            - link "Domain Context (SSOT)" [ref=f1e89] [cursor=pointer]:
+              - /url: /docs/domain-context
+          - listitem [ref=f1e91]:
+            - button "Prompts" [ref=f1e93] [cursor=pointer]
+          - listitem [ref=f1e95]:
+            - button "Skills" [ref=f1e97] [cursor=pointer]
+          - listitem [ref=f1e99]:
+            - button "Integrations" [ref=f1e101] [cursor=pointer]
+          - listitem [ref=f1e103]:
+            - link "Use Cases" [ref=f1e104] [cursor=pointer]:
+              - /url: /docs/use-cases
+          - listitem [ref=f1e106]:
+            - link "For CTOs" [ref=f1e107] [cursor=pointer]:
+              - /url: /docs/for-ctos
+    - main [ref=f1e109]:
+      - generic [ref=f1e111]:
+        - generic [ref=f1e113]:
+          - article [ref=f1e114]:
+            - navigation "Breadcrumbs" [ref=f1e115]:
+              - list [ref=f1e116]:
+                - listitem [ref=f1e117]:
+                  - link "Home page" [ref=f1e118] [cursor=pointer]:
+                    - /url: /
+                - listitem [ref=f1e121]:
+                  - generic [ref=f1e122]: Workflow
+                - listitem [ref=f1e123]:
+                  - generic [ref=f1e124]: Workflow Overview
+            - generic [ref=f1e125]:
+              - heading "Workflow Overview" [level=1] [ref=f1e127]
+              - paragraph [ref=f1e128]:
+                - strong [ref=f1e129]: Agent Collections
+                - text: covers the
+                - strong [ref=f1e130]: full product lifecycle
+                - text: ":"
+              - blockquote [ref=f1e131]:
+                - paragraph [ref=f1e132]:
+                  - strong [ref=f1e133]: Ideate → Implement → Review
+              - paragraph [ref=f1e134]:
+                - text: Attach
+                - strong [ref=f1e135]:
+                  - code [ref=f1e136]: "@eversis-implement"
+                - text: (or
+                - code [ref=f1e137]: /eversis-implement
+                - text: ) for the Implement phase — research and planning run inside that flow. Each phase produces documented artifacts with
+                - strong [ref=f1e138]: human gates
+                - text: where the prompts require them.
+              - generic [ref=f1e139]:
+                - generic [ref=f1e140]: The relay race
+                - paragraph [ref=f1e145]: Each phase passes a reviewed deliverable to the next. Workshop materials feed the backlog; the Engineering Manager orchestrates research, planning, and implementation; implementation feeds review.
+              - heading [level=2] [ref=f1e146]:
+                - text: The phases
+                - link "Direct link to The phases" [ref=f1e147] [cursor=pointer]:
+                  - /url: "#the-phases"
+                  - text: "#"
+              - heading [level=3] [ref=f1e148]:
+                - text: 1. Ideate
+                - link "Direct link to 1. Ideate" [ref=f1e149] [cursor=pointer]:
+                  - /url: "#1-ideate"
+                  - text: "#"
+              - list [ref=f1e150]:
+                - listitem [ref=f1e151]:
+                  - strong [ref=f1e152]: "Role:"
+                  - text: Business Analyst
+                - listitem [ref=f1e153]:
+                  - strong [ref=f1e154]: "Prompt:"
+                  - code [ref=f1e155]: "@eversis-analyze-materials"
+                - listitem [ref=f1e156]: Workshop materials → Jira-ready epics and stories with acceptance criteria.
+                - listitem [ref=f1e157]:
+                  - strong [ref=f1e158]: "Gates:"
+                  - text: Gate 1, Gate 1.5, and Gate 2 before Jira sync — see
+                  - link "Workshop Analysis Flow" [ref=f1e159] [cursor=pointer]:
+                    - /url: /docs/workflow/workshop-flow
+                  - text: .
+              - heading [level=3] [ref=f1e160]:
+                - text: 2. Implement
+                - link "Direct link to 2. Implement" [ref=f1e161] [cursor=pointer]:
+                  - /url: "#2-implement"
+                  - text: "#"
+              - list [ref=f1e162]:
+                - listitem [ref=f1e163]:
+                  - strong [ref=f1e164]: "Role:"
+                  - text: Engineering Manager (delegates Context Engineer, Architect, Plan Reviewer, implementers)
+                - listitem [ref=f1e165]:
+                  - strong [ref=f1e166]: "Prompt:"
+                  - code [ref=f1e167]: "@eversis-implement"
+                  - text: with a Jira ID, task description, or
+                  - code [ref=f1e168]: "@docs/specs/.../*.plan.md"
+                - listitem [ref=f1e169]:
+                  - text: The EM’s
+                  - strong [ref=f1e170]: first response
+                  - text: is always an
+                  - strong [ref=f1e171]: Implement readiness
+                  - text: block (Flow / Research / Plan / Next gate) — before any artifacts or code. See
+                  - link "Orchestrating Implementation" [ref=f1e172] [cursor=pointer]:
+                    - /url: /docs/skills/orchestrating-implementation#implement-readiness-mandatory-first-output
+                  - text: .
+                - listitem [ref=f1e173]:
+                  - strong [ref=f1e174]: Entry signals
+                  - text: — existing adequate
+                  - code [ref=f1e175]: "*.research.md"
+                  - text: + attached plan (after
+                  - strong [ref=f1e176]: adequacy checklist
+                  - text: ) → skip new research/plan. No need to type “Research” in the prompt. Pure analysis without implement is also valid (chat + specs).
+              - heading [level=4] [ref=f1e177]:
+                - text: Flow selection
+                - link "Direct link to Flow selection" [ref=f1e178] [cursor=pointer]:
+                  - /url: "#flow-selection"
+                  - text: "#"
+              - paragraph [ref=f1e179]:
+                - text: At Step 0 the EM recommends
+                - strong [ref=f1e180]: Quick
+                - text: or
+                - strong [ref=f1e181]: Full
+                - text: (you may override). See
+                - link "Orchestrating Implementation" [ref=f1e182] [cursor=pointer]:
+                  - /url: /docs/skills/orchestrating-implementation
+                - text: .
+              - table [ref=f1e183]:
+                - rowgroup [ref=f1e184]:
+                  - row [ref=f1e185]:
+                    - columnheader "Flow" [ref=f1e186]
+                    - columnheader "Steps" [ref=f1e187]
+                    - columnheader "When to use" [ref=f1e188]
+                - rowgroup [ref=f1e189]:
+                  - row [ref=f1e190]:
+                    - cell [ref=f1e191]:
+                      - strong [ref=f1e192]: Quick
+                    - cell [ref=f1e193]:
+                      - text: implement → quality checks →
+                      - code [ref=f1e194]: "@eversis-review"
+                      - text: →
+                      - strong [ref=f1e195]: Fine
+                      - text: + QA draft
+                    - cell "Criteria pass, artifacts exist" [ref=f1e196]
+                  - row [ref=f1e197]:
+                    - cell [ref=f1e198]:
+                      - strong [ref=f1e199]: Full
+                    - cell [ref=f1e200]:
+                      - text: research → plan → plan validation → code →
+                      - strong [ref=f1e201]: Fine
+                      - text: + QA draft
+                    - cell "Artifacts missing or scope requires it" [ref=f1e202]
+              - generic [ref=f1e203]:
+                - generic [ref=f1e204]: Quick vs Full
+                - paragraph [ref=f1e209]:
+                  - strong [ref=f1e210]: "Hard exclusion:"
+                  - text: Figma, UI verification tasks, cross-domain work, or likely >3 files →
+                  - strong [ref=f1e211]: Full Flow only
+                  - text: . Quick is for narrow, low-risk fixes after you confirm the EM recommendation.
+              - list [ref=f1e212]:
+                - listitem [ref=f1e213]:
+                  - strong [ref=f1e214]: "Produces:"
+                  - code [ref=f1e215]: "*.research.md"
+                  - text: ","
+                  - code [ref=f1e216]: "*.plan.md"
+                  - text: ","
+                  - code [ref=f1e217]: "*.plan-review.md"
+                  - strong [ref=f1e218]: when a gap exists
+                  - text: ; code changes; Implement readiness summary in chat.
+              - heading [level=3] [ref=f1e219]:
+                - text: 3. Review
+                - link "Direct link to 3. Review" [ref=f1e220] [cursor=pointer]:
+                  - /url: "#3-review"
+                  - text: "#"
+              - list [ref=f1e221]:
+                - listitem [ref=f1e222]:
+                  - strong [ref=f1e223]: "Role:"
+                  - text: Code Reviewer
+                - listitem [ref=f1e224]:
+                  - strong [ref=f1e225]: "Prompt:"
+                  - code [ref=f1e226]: "@eversis-review"
+                - listitem [ref=f1e227]: Structured review — PASS / BLOCKER / SUGGESTION.
+              - heading [level=2] [ref=f1e228]:
+                - text: Implement → Review
+                - link "Direct link to Implement → Review" [ref=f1e229] [cursor=pointer]:
+                  - /url: "#implement--review"
+                  - text: "#"
+              - table [ref=f1e230]:
+                - rowgroup [ref=f1e231]:
+                  - row [ref=f1e232]:
+                    - columnheader "Step" [ref=f1e233]
+                    - columnheader "Attach" [ref=f1e234]
+                    - columnheader "What happens" [ref=f1e235]
+                - rowgroup [ref=f1e236]:
+                  - row [ref=f1e237]:
+                    - cell "Implement (Quick)" [ref=f1e238]
+                    - cell [ref=f1e239]:
+                      - code [ref=f1e240]: "@eversis-implement"
+                    - 'cell "EM: implement → review → Fine + QA draft" [ref=f1e241]'
+                  - row [ref=f1e242]:
+                    - cell "Implement (Full)" [ref=f1e243]
+                    - cell [ref=f1e244]:
+                      - code [ref=f1e245]: "@eversis-implement"
+                    - 'cell "EM: research → plan → plan validation → implementation → Fine + QA draft" [ref=f1e246]'
+                  - row [ref=f1e247]:
+                    - cell "Review" [ref=f1e248]
+                    - cell [ref=f1e249]:
+                      - code [ref=f1e250]: "@eversis-review"
+                    - cell "Structured code review" [ref=f1e251]
+              - heading [level=2] [ref=f1e252]:
+                - text: "Status: Fine — handoff"
+                - 'link "Direct link to Status: Fine — handoff" [ref=f1e253] [cursor=pointer]':
+                  - /url: "#status-fine--handoff"
+                  - text: "#"
+              - paragraph [ref=f1e254]:
+                - text: When Implement is complete, the Engineering Manager declares
+                - strong [ref=f1e255]: Fine
+                - text: and
+                - strong [ref=f1e256]: must
+                - text: output a
+                - strong [ref=f1e257]: QA comment draft in the same response
+                - text: "(not a separate turn). Normative procedure:"
+                - link [ref=f1e258] [cursor=pointer]:
+                  - /url: https://github.com/PiotrNie-Eversis/agent-collections/blob/main/.cursor/skills/eversis-fine-handoff/SKILL.md
+                  - code [ref=f1e259]: .cursor/skills/eversis-fine-handoff/SKILL.md
+                - text: or MCP
+                - code [ref=f1e260]: eversis_skills_get
+                - text: for
+                - code [ref=f1e261]: eversis-fine-handoff
+                - text: ". Onboarding overview:"
+                - link "Fine Handoff" [ref=f1e262] [cursor=pointer]:
+                  - /url: /docs/skills/fine-handoff
+                - text: .
+              - paragraph [ref=f1e263]:
+                - text: The draft is labeled
+                - strong [ref=f1e264]:
+                  - code [ref=f1e265]: QA comment — review before posting to Jira
+                - text: . Post to Jira only after you approve (copy-paste or explicit Atlassian MCP instruction).
+              - heading [level=3] [ref=f1e266]:
+                - text: Domain-knowledge promotion
+                - link "Direct link to Domain-knowledge promotion" [ref=f1e267] [cursor=pointer]:
+                  - /url: "#domain-knowledge-promotion"
+                  - text: "#"
+              - paragraph [ref=f1e268]:
+                - text: So that a durable fact learned during one task (a confirmed business rule, a reusable integration pattern — not a one-off implementation detail) survives beyond that single task and beyond a single repo, Fine can also produce a
+                - strong [ref=f1e269]: second, independent draft
+                - text: ": a proposal to write that fact into"
+                - code [ref=f1e270]: docs/context/<project>/
+                - text: (the project's own
+                - strong [ref=f1e271]: domain knowledge
+                - text: store — durable notes about the codebase and business rules, separate from per-task history). Most tasks do
+                - strong [ref=f1e272]: not
+                - text: produce this kind of finding — it appears only when the task actually surfaces one.
+              - paragraph [ref=f1e273]:
+                - text: This second draft is labeled
+                - strong [ref=f1e274]:
+                  - code [ref=f1e275]: "Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing"
+                - text: and has its
+                - strong [ref=f1e276]: own
+                - text: "approval: accepting or rejecting the QA comment draft has no effect on it, and vice versa. Once approved, it publishes via the GitLab REST API directly to the"
+                - code [ref=f1e277]: domain-context
+                - text: repository — never a local checkout.
+              - heading [level=2] [ref=f1e278]:
+                - text: Workflow diagram
+                - link "Direct link to Workflow diagram" [ref=f1e279] [cursor=pointer]:
+                  - /url: "#workflow-diagram"
+                  - text: "#"
+              - 'img "SDLC workflow: invoke eversis prompts with @ or / project commands. The flow moves from Human Intent to AI Agent to Ideate to Implement. Implement supports Quick and Full flow, where Quick skips research and planning delegates and Full uses them before implementation. Review can return issues or lead to approval, then Observe, Fine, QA Handoff, and Next Intent." [ref=f1e280]':
+                - generic [ref=f1e281]:
+                  - generic [ref=f1e282]: Human Intent + Context
+                  - generic [ref=f1e285]:
+                    - generic [ref=f1e286]: AI Agent
+                    - generic [ref=f1e287]: Agent Collections
+                  - generic [ref=f1e289]:
+                    - generic [ref=f1e290]: Ideate
+                    - generic [ref=f1e292]:
+                      - generic [ref=f1e293]:
+                        - generic [ref=f1e294]: eversis-analyze-materials
+                        - generic [ref=f1e295]: "@eversis-analyze-materials"
+                      - generic [ref=f1e296]: Clean transcript → extract tasks → produce Jira-ready stories with full acceptance criteria
+                  - generic [ref=f1e298]:
+                    - generic [ref=f1e299]: Implement
+                    - generic [ref=f1e301]:
+                      - generic [ref=f1e302]:
+                        - generic [ref=f1e303]: eversis-implementEngineering Manager
+                        - generic [ref=f1e304]: "@eversis-implement"
+                      - generic [ref=f1e305]: Orchestrates the full cycle — research, planning, and implementation via specialized agents
+                    - generic [ref=f1e306]:
+                      - generic [ref=f1e307]:
+                        - strong [ref=f1e308]: Quick
+                        - generic [ref=f1e309]: skips research and planning delegates
+                      - generic [ref=f1e310]:
+                        - strong [ref=f1e311]: Full
+                        - generic [ref=f1e312]: uses the full delegate chain before implementation
+                    - generic [ref=f1e313]: ↓ delegates by selected flow
+                    - generic [ref=f1e314]:
+                      - generic [ref=f1e315]:
+                        - strong [ref=f1e317]: Context Engineer
+                        - generic [ref=f1e318]: Research & context gathering
+                      - generic [ref=f1e319]:
+                        - strong [ref=f1e321]: Architect
+                        - generic [ref=f1e322]: Architecture & implementation plan
+                      - generic [ref=f1e323]:
+                        - strong [ref=f1e325]: Software Engineer
+                        - generic [ref=f1e326]: Backend, frontend, APIs, data layers
+                      - generic [ref=f1e327]:
+                        - strong [ref=f1e329]: DevOps Engineer
+                        - generic [ref=f1e330]: Cloud and infrastructure
+                      - generic [ref=f1e331]:
+                        - strong [ref=f1e333]: E2E Engineer
+                        - generic [ref=f1e334]: End-to-end tests
+                      - generic [ref=f1e335]:
+                        - strong [ref=f1e337]: Prompt Engineer
+                        - generic [ref=f1e338]: LLM application prompts
+                  - generic [ref=f1e340]:
+                    - generic [ref=f1e341]: ↑
+                    - text: Issues found
+                    - generic [ref=f1e342]: ↓
+                  - generic [ref=f1e344]:
+                    - generic [ref=f1e345]: Review
+                    - generic [ref=f1e347]:
+                      - generic [ref=f1e348]:
+                        - generic [ref=f1e349]:
+                          - generic [ref=f1e350]: eversis-review
+                          - generic [ref=f1e351]: "@eversis-review"
+                        - generic [ref=f1e352]: PASS / BLOCKER / SUGGESTION — security, perf, coding standards
+                      - generic [ref=f1e353]:
+                        - generic [ref=f1e354]:
+                          - generic [ref=f1e355]: eversis-review-ui
+                          - generic [ref=f1e356]: "@eversis-review-ui"
+                        - generic [ref=f1e357]: Playwright vs Figma · up to 5 auto-iterations
+                  - generic [ref=f1e359]:
+                    - generic [ref=f1e360]: ✓
+                    - text: Approved
+                  - generic [ref=f1e362]: Observe
+                  - generic [ref=f1e366]:
+                    - generic [ref=f1e367]: ✓
+                    - text: Fine
+                  - generic [ref=f1e369]:
+                    - generic [ref=f1e370]: ≡
+                    - text: QA Handoff
+                  - generic [ref=f1e372]: Next Intent
+                  - img:
+                    - generic: PROBLEM
+              - heading [level=2] [ref=f1e374]:
+                - text: Human review at every step
+                - link "Direct link to Human review at every step" [ref=f1e375] [cursor=pointer]:
+                  - /url: "#human-review-at-every-step"
+                  - text: "#"
+              - generic [ref=f1e376]:
+                - generic [ref=f1e377]: Important
+                - paragraph [ref=f1e382]: Each step requires your review. Open generated documents, iterate until correct, then approve before proceeding. AI output is always a draft.
+              - heading [level=2] [ref=f1e383]:
+                - text: Workflow variants
+                - link "Direct link to Workflow variants" [ref=f1e384] [cursor=pointer]:
+                  - /url: "#workflow-variants"
+                  - text: "#"
+              - table [ref=f1e385]:
+                - rowgroup [ref=f1e386]:
+                  - row [ref=f1e387]:
+                    - columnheader "Variant" [ref=f1e388]
+                    - columnheader "Entry" [ref=f1e389]
+                    - columnheader "Use when" [ref=f1e390]
+                - rowgroup [ref=f1e391]:
+                  - row [ref=f1e392]:
+                    - cell [ref=f1e393]:
+                      - strong [ref=f1e394]: Standard flow
+                    - cell [ref=f1e395]:
+                      - code [ref=f1e396]: "@eversis-implement"
+                      - text: →
+                      - code [ref=f1e397]: "@eversis-review"
+                    - cell "Backend / fullstack — Quick or Full at Step 0" [ref=f1e398]
+                  - row [ref=f1e399]:
+                    - cell [ref=f1e400]:
+                      - strong [ref=f1e401]: UI + Figma
+                    - cell [ref=f1e402]:
+                      - code [ref=f1e403]: "@eversis-implement"
+                      - text: +
+                      - code [ref=f1e404]: "@eversis-review-ui"
+                      - text: loop
+                    - cell "Design-driven UI" [ref=f1e405]
+                  - row [ref=f1e406]:
+                    - cell [ref=f1e407]:
+                      - strong [ref=f1e408]:
+                        - link "Workshop analysis" [ref=f1e409] [cursor=pointer]:
+                          - /url: /docs/workflow/workshop-flow
+                    - cell [ref=f1e410]:
+                      - code [ref=f1e411]: "@eversis-analyze-materials"
+                    - cell "Workshop → Jira only" [ref=f1e412]
+                  - row [ref=f1e413]:
+                    - cell [ref=f1e414]:
+                      - strong [ref=f1e415]:
+                        - link "E2E testing" [ref=f1e416] [cursor=pointer]:
+                          - /url: /docs/workflow/e2e-flow
+                    - cell [ref=f1e417]:
+                      - code [ref=f1e418]: "@eversis-implement"
+                      - text: (E2E tasks in plan)
+                    - cell "Playwright coverage" [ref=f1e419]
+                  - row [ref=f1e420]:
+                    - cell [ref=f1e421]:
+                      - strong [ref=f1e422]:
+                        - link "Business Manager Docs" [ref=f1e423] [cursor=pointer]:
+                          - /url: /docs/workflow/business-manager-docs
+                    - cell [ref=f1e424]:
+                      - code [ref=f1e425]: "@eversis-ba-docs-planner"
+                      - text: → writer
+                    - cell [ref=f1e426]:
+                      - text: Word
+                      - code [ref=f1e427]: .docx
+                      - text: release docs
+                  - row [ref=f1e428]:
+                    - cell [ref=f1e429]:
+                      - strong [ref=f1e430]:
+                        - link "Repo Docs" [ref=f1e431] [cursor=pointer]:
+                          - /url: /docs/workflow/repo-docs
+                    - cell [ref=f1e432]:
+                      - code [ref=f1e433]: "@eversis-repo-docs-writer"
+                      - text: (or EM delegate)
+                    - cell [ref=f1e434]:
+                      - text: README, CHANGELOG,
+                      - code [ref=f1e435]: website/docs
+                      - text: after Implement
+                  - row [ref=f1e436]:
+                    - cell [ref=f1e437]:
+                      - strong [ref=f1e438]:
+                        - link "QA workflow" [ref=f1e439] [cursor=pointer]:
+                          - /url: /docs/workflow/qa-workflow
+                    - cell [ref=f1e440]:
+                      - code [ref=f1e441]: "@eversis-qa-workflow"
+                    - cell "Manual test planning, regression, AC verify, quality health" [ref=f1e442]
+              - generic [ref=f1e443]:
+                - generic [ref=f1e444]: Standard flow
+                - paragraph [ref=f1e449]:
+                  - text: "Full step-by-step:"
+                  - link "Standard Flow" [ref=f1e450] [cursor=pointer]:
+                    - /url: /docs/workflow/standard-flow
+                  - text: —
+                  - strong [ref=f1e451]: Quick vs Full
+                  - text: at Step 0, then research, plan, implement, review with human gates.
+              - generic [ref=f1e452]:
+                - generic [ref=f1e453]: Frontend / UI flow
+                - paragraph [ref=f1e458]:
+                  - text: "Figma-driven UI with verification loop:"
+                  - link "Frontend Flow" [ref=f1e459] [cursor=pointer]:
+                    - /url: /docs/workflow/frontend-flow
+                  - text: — includes the 5-step UI verification loop (
+                  - code [ref=f1e460]: "@eversis-review-ui"
+                  - text: ).
+              - generic [ref=f1e461]:
+                - generic [ref=f1e462]: Workshop analysis
+                - paragraph [ref=f1e467]:
+                  - text: "Ideate-only with Gates 1, 1.5, 2:"
+                  - link "Workshop Analysis Flow" [ref=f1e468] [cursor=pointer]:
+                    - /url: /docs/workflow/workshop-flow
+                  - text: .
+              - generic [ref=f1e469]:
+                - generic [ref=f1e470]: E2E testing
+                - paragraph [ref=f1e475]:
+                  - text: "Playwright work inside Implement:"
+                  - link "E2E Testing Flow" [ref=f1e476] [cursor=pointer]:
+                    - /url: /docs/workflow/e2e-flow
+                  - text: .
+              - generic [ref=f1e477]:
+                - generic [ref=f1e478]: Repo Docs
+                - paragraph [ref=f1e483]:
+                  - text: "Repository markdown after Implement:"
+                  - link "Repo Docs" [ref=f1e484] [cursor=pointer]:
+                    - /url: /docs/workflow/repo-docs
+                  - text: —
+                  - code [ref=f1e485]: "@eversis-repo-docs-writer"
+                  - text: (not Word
+                  - code [ref=f1e486]: .docx
+                  - text: ).
+              - generic [ref=f1e487]:
+                - generic [ref=f1e488]: QA workflow
+                - paragraph [ref=f1e493]:
+                  - text: "Manual QA practice (separate from Fine handoff):"
+                  - link "QA Workflow" [ref=f1e494] [cursor=pointer]:
+                    - /url: /docs/workflow/qa-workflow
+                  - text: —
+                  - code [ref=f1e495]: "@eversis-qa-workflow"
+                  - text: .
+              - generic [ref=f1e496]:
+                - generic [ref=f1e497]: Business Manager Docs
+                - paragraph [ref=f1e502]:
+                  - text: Word
+                  - code [ref=f1e503]: .docx
+                  - text: via
+                  - code [ref=f1e504]: eversis-collections
+                  - text: "MCP:"
+                  - link "Business Manager Docs" [ref=f1e505] [cursor=pointer]:
+                    - /url: /docs/workflow/business-manager-docs
+                  - text: .
+              - heading [level=2] [ref=f1e506]:
+                - text: Workflow playbooks
+                - link "Direct link to Workflow playbooks" [ref=f1e507] [cursor=pointer]:
+                  - /url: "#workflow-playbooks"
+                  - text: "#"
+              - list [ref=f1e508]:
+                - listitem [ref=f1e509]:
+                  - link "Standard Flow" [ref=f1e510] [cursor=pointer]:
+                    - /url: /docs/workflow/standard-flow
+                - listitem [ref=f1e511]:
+                  - link "Frontend Flow" [ref=f1e512] [cursor=pointer]:
+                    - /url: /docs/workflow/frontend-flow
+                - listitem [ref=f1e513]:
+                  - link "Workshop Analysis Flow" [ref=f1e514] [cursor=pointer]:
+                    - /url: /docs/workflow/workshop-flow
+                - listitem [ref=f1e515]:
+                  - link "E2E Testing Flow" [ref=f1e516] [cursor=pointer]:
+                    - /url: /docs/workflow/e2e-flow
+                - listitem [ref=f1e517]:
+                  - link "Business Manager Docs" [ref=f1e518] [cursor=pointer]:
+                    - /url: /docs/workflow/business-manager-docs
+                - listitem [ref=f1e519]:
+                  - link "Repo Docs" [ref=f1e520] [cursor=pointer]:
+                    - /url: /docs/workflow/repo-docs
+                - listitem [ref=f1e521]:
+                  - link "QA Workflow" [ref=f1e522] [cursor=pointer]:
+                    - /url: /docs/workflow/qa-workflow
+          - navigation "Docs pages" [ref=f1e523]:
+            - link "Previous « Isolation and context reduction" [ref=f1e524] [cursor=pointer]:
+              - /url: /docs/isolation
+              - generic [ref=f1e525]: Previous
+              - generic [ref=f1e526]: « Isolation and context reduction
+            - link "Next Standard Flow »" [ref=f1e527] [cursor=pointer]:
+              - /url: /docs/workflow/standard-flow
+              - generic [ref=f1e528]: Next
+              - generic [ref=f1e529]: Standard Flow »
+        - list [ref=f1e532]:
+          - listitem [ref=f1e533]:
+            - link "The phases" [ref=f1e534] [cursor=pointer]:
+              - /url: "#the-phases"
+            - list [ref=f1e535]:
+              - listitem [ref=f1e536]:
+                - link "1. Ideate" [ref=f1e537] [cursor=pointer]:
+                  - /url: "#1-ideate"
+              - listitem [ref=f1e538]:
+                - link "2. Implement" [ref=f1e539] [cursor=pointer]:
+                  - /url: "#2-implement"
+                - list [ref=f1e540]:
+                  - listitem [ref=f1e541]:
+                    - link "Flow selection" [ref=f1e542] [cursor=pointer]:
+                      - /url: "#flow-selection"
+              - listitem [ref=f1e543]:
+                - link "3. Review" [ref=f1e544] [cursor=pointer]:
+                  - /url: "#3-review"
+          - listitem [ref=f1e545]:
+            - link "Implement → Review" [ref=f1e546] [cursor=pointer]:
+              - /url: "#implement--review"
+          - listitem [ref=f1e547]:
+            - 'link "Status: Fine — handoff" [ref=f1e548] [cursor=pointer]':
+              - /url: "#status-fine--handoff"
+            - list [ref=f1e549]:
+              - listitem [ref=f1e550]:
+                - link "Domain-knowledge promotion" [ref=f1e551] [cursor=pointer]:
+                  - /url: "#domain-knowledge-promotion"
+          - listitem [ref=f1e552]:
+            - link "Workflow diagram" [ref=f1e553] [cursor=pointer]:
+              - /url: "#workflow-diagram"
+          - listitem [ref=f1e554]:
+            - link "Human review at every step" [ref=f1e555] [cursor=pointer]:
+              - /url: "#human-review-at-every-step"
+          - listitem [ref=f1e556]:
+            - link "Workflow variants" [ref=f1e557] [cursor=pointer]:
+              - /url: "#workflow-variants"
+          - listitem [ref=f1e558]:
+            - link "Workflow playbooks" [ref=f1e559] [cursor=pointer]:
+              - /url: "#workflow-playbooks"
+  - contentinfo [ref=f1e560]:
+    - generic [ref=f1e561]:
+      - list [ref=f1e564]:
+        - listitem [ref=f1e565]:
+          - link [ref=f1e566] [cursor=pointer]:
+            - /url: https://github.com/PiotrNie-Eversis/agent-collections
+            - text: GitHub
+            - img "(opens in new tab)" [ref=f1e567]
+        - listitem [ref=f1e569]:
+          - link "Docs" [ref=f1e570] [cursor=pointer]:
+            - /url: /docs/
+        - listitem [ref=f1e571]:
+          - link "Methodology" [ref=f1e572] [cursor=pointer]:
+            - /url: /docs/workflow/overview
+      - generic [ref=f1e573]: agent-collections · Eversis Agent Collections · MIT licence

@@ -5,7 +5,7 @@ title: Task Extraction
 
 # Task Extraction
 
-**Folder:** `.cursor/skills/eversis-task-extracting/`  
+**Folder:** `.ai/skills/eversis-task-extracting/`  
 **Used by:** Business Analyst via [`eversis-analyze-materials`](../prompts/public/analyze-materials)
 
 Identifies and structures epics and user stories from workshop materials. Produces an **intent brief** (Gate 0), then a business-oriented backlog with **source traceability** and scenario-based acceptance criteria.

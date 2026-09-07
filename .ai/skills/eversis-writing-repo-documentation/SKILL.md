@@ -27,6 +27,16 @@ Owns **repository** documentation (not Word `.docx`): authors clear, accurate, w
 - Write short sentences, plain words, one idea per paragraph, active voice.
 - State purpose and relevance early; end with clear next steps when helpful.
 
+## Writing for a Mixed Audience (`website/docs/`)
+
+`website/docs/` has two readers at once: people who already work with Agent Collections daily, and people who have never worked with an AI agent framework before. Optimize for both, not just the first — a page that only a daily user can follow is not done.
+
+- **Gloss jargon on first use, inline, in one line.** The first time a page uses a framework or AI-agent term (agent, skill, MCP, subtree, orchestration, SSOT, adapter), follow it with a short, plain-language explanation in parentheses — the same pattern already required for QA comments in `eversis-fine-handoff` (`login_required (the user must sign in again)`). Do not build a glossary page instead; gloss where the term is used.
+- **One "why" sentence before the mechanism.** Before describing how something works, state in one plain sentence what problem it solves or why it exists. Lead with action/example where that serves the reader (a command, a concrete instance), but never skip straight from a heading into mechanism with no plain-language anchor for someone seeing the concept for the first time.
+- **One template per repeated element type, applied identically.** When a page lists several instances of the same kind of thing (tools, skills, flags, workflow steps), pick one structure (e.g. heading/link → one-sentence description → optional detail) and repeat it exactly for every instance. Do not vary the structure between instances of the same kind of thing.
+- **Short sections, generous whitespace.** Prefer several short sections (2-4 sentences) over one long one. A reader should be able to tell from a glance whether a section is relevant to them.
+- **Do not rely on an external link to carry a concept the page introduces.** Linking out for *more* detail is fine; linking out because the page itself never explains a term it uses is not — that leaves the newcomer reader stranded.
+
 ## Documentation Targets
 
 | Target | Location | Conventions |

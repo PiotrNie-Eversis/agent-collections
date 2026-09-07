@@ -83,6 +83,14 @@ const useCases: UseCase[] = [
       'Cloud bills keep growing but nobody knows which resources are wasteful. The DevOps Engineer agent performs hybrid audits — analyzing IaC code and validating against live infrastructure via AWS/GCP APIs to identify savings opportunities.',
     time: '~10 min per audit',
   },
+  {
+    track: 'dev',
+    trackLabel: 'Implement',
+    title: 'Business Knowledge That Survives the Task',
+    problem:
+      'Confirmed business rules and codebase conventions get re-explained every session, or buried in a one-off task where nobody else finds them. At Fine, durable facts are captured once into a plain-Markdown domain context store — readable by the next session, in this project or any other repo in the group, instead of rediscovering them from scratch.',
+    time: 'No re-explaining, ever',
+  },
 ];
 
 export default function QuickWins(): React.JSX.Element {

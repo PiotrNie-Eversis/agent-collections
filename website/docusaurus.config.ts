@@ -34,6 +34,55 @@ const config: Config = {
           admonitions: {
             keywords: ["note", "tip", "info", "warning", "danger", "brand"],
           },
+          // Skills sidebar: alphabetical by title instead of sidebar_position —
+          // 48+ entries with no natural reading order, unlike workflow/getting-started.
+          // The generator only runs once at the root ('.') — the "Skills" category
+          // already comes back nested inside `items`, so we walk the tree to find it
+          // (identified by containing the overview doc) rather than matching dirName.
+          sidebarItemsGenerator: async ({
+            defaultSidebarItemsGenerator,
+            ...args
+          }) => {
+            const items = await defaultSidebarItemsGenerator(args);
+            const titleById = new Map(
+              args.docs.map((doc) => [doc.id, doc.title]),
+            );
+
+            type SidebarItem = (typeof items)[number];
+            const isOverview = (item: SidebarItem) =>
+              item.type === "doc" && item.id === "skills/overview";
+            const titleOf = (item: SidebarItem): string => {
+              if (item.type === "doc") {
+                return titleById.get(item.id) ?? item.id;
+              }
+              return "label" in item && typeof item.label === "string"
+                ? item.label
+                : "";
+            };
+
+            const sortSkillsItems = (skillItems: SidebarItem[]) => {
+              const overview = skillItems.filter(isOverview);
+              const rest = [...skillItems.filter((i) => !isOverview(i))].sort(
+                (a, b) => titleOf(a).localeCompare(titleOf(b)),
+              );
+              return [...overview, ...rest];
+            };
+
+            const withSortedSkills = (
+              currentItems: SidebarItem[],
+            ): SidebarItem[] => {
+              if (currentItems.some(isOverview)) {
+                return sortSkillsItems(currentItems);
+              }
+              return currentItems.map((item) =>
+                item.type === "category"
+                  ? { ...item, items: withSortedSkills(item.items) }
+                  : item,
+              );
+            };
+
+            return withSortedSkills(items);
+          },
         },
         blog: false,
         pages: {},

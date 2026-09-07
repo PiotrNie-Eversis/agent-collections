@@ -9,14 +9,14 @@ upstream_agent: "eversis-devops-engineer"
 # eversis-analyze-aws-costs
 
 **Agent:** DevOps Engineer
-**File:** `.cursor/prompts/public/eversis-analyze-aws-costs.md`
+**File:** `.ai/prompts/public/eversis-analyze-aws-costs.md`
 
 Performs a comprehensive AWS cost optimization and tagging compliance audit using a hybrid approach — analyzes IaC code first, then validates against live AWS infrastructure via API.
 
 ## Usage
 
 ```text
-@eversis-analyze-aws-costs
+eversis-analyze-aws-costs
 <AWS Account/Profile, Region, or 'all'> <focus: specific service or 'everything'>
 ```
 
@@ -71,11 +71,11 @@ Before starting, load and follow these skills (in this order):
    - If the user specifies a focus (e.g., "EC2 only"), respect that scope. Otherwise, **audit all services** — compute, storage, databases, networking, serverless, containers, AI/ML, security, and any other active resources.
 
 2. **Load required skills** (MUST complete before any analysis):
-   - **Always load** the `eversis-technical-context-discovering` skill (`read_file` on `.cursor/skills/eversis-technical-context-discovering/SKILL.md`) — follow its process to identify existing IaC patterns, tagging conventions, and project context.
-   - **Always load** the `eversis-codebase-analysing` skill (`read_file` on `.cursor/skills/eversis-codebase-analysing/SKILL.md`) — even if no IaC files are found initially, this skill's Step 7 (infrastructure code) helps identify IaC in unexpected locations, and Step 2 (dependencies) reveals infrastructure-related dependencies in any project.
-   - **Always load** the `eversis-optimizing-cloud-cost` skill (`read_file` on `.cursor/skills/eversis-optimizing-cloud-cost/SKILL.md` and `references/tagging-standards.md`) — use it to establish the "Core 5" Mandatory Tags, Pricing Model Decision table, Storage Tiering Decision table, Process steps, Checklist, and Anti-Patterns. If the skill file cannot be found, use the following hardcoded defaults for the Core 5 Mandatory Tags: `CostCenter`, `Environment`, `Service`, `Owner`, `DataClass`.
-   - **Conditionally load** the `eversis-implementing-terraform-modules` skill (`read_file` on `.cursor/skills/eversis-implementing-terraform-modules/SKILL.md`) — load when Terraform files (`*.tf`, `*.tfvars`, `terragrunt.hcl`) are found. Use it as the reference standard for module structure, naming conventions, provider pinning, and AWS-specific module patterns when evaluating IaC quality and generating Terraform code.
-   - **Conditionally load** the `eversis-managing-secrets` skill (`read_file` on `.cursor/skills/eversis-managing-secrets/SKILL.md`) — load when the audit scope includes security (which is always for a full audit). Use its Security Checklist, Anti-Patterns, and Cloud-Native Detection patterns when evaluating secrets management, KMS keys, and credential handling.
+   - **Always load** the `eversis-technical-context-discovering` skill (`read_file` on `.ai/skills/eversis-technical-context-discovering/SKILL.md`) — follow its process to identify existing IaC patterns, tagging conventions, and project context.
+   - **Always load** the `eversis-codebase-analysing` skill (`read_file` on `.ai/skills/eversis-codebase-analysing/SKILL.md`) — even if no IaC files are found initially, this skill's Step 7 (infrastructure code) helps identify IaC in unexpected locations, and Step 2 (dependencies) reveals infrastructure-related dependencies in any project.
+   - **Always load** the `eversis-optimizing-cloud-cost` skill (`read_file` on `.ai/skills/eversis-optimizing-cloud-cost/SKILL.md` and `references/tagging-standards.md`) — use it to establish the "Core 5" Mandatory Tags, Pricing Model Decision table, Storage Tiering Decision table, Process steps, Checklist, and Anti-Patterns. If the skill file cannot be found, use the following hardcoded defaults for the Core 5 Mandatory Tags: `CostCenter`, `Environment`, `Service`, `Owner`, `DataClass`.
+   - **Conditionally load** the `eversis-implementing-terraform-modules` skill (`read_file` on `.ai/skills/eversis-implementing-terraform-modules/SKILL.md`) — load when Terraform files (`*.tf`, `*.tfvars`, `terragrunt.hcl`) are found. Use it as the reference standard for module structure, naming conventions, provider pinning, and AWS-specific module patterns when evaluating IaC quality and generating Terraform code.
+   - **Conditionally load** the `eversis-managing-secrets` skill (`read_file` on `.ai/skills/eversis-managing-secrets/SKILL.md`) — load when the audit scope includes security (which is always for a full audit). Use its Security Checklist, Anti-Patterns, and Cloud-Native Detection patterns when evaluating secrets management, KMS keys, and credential handling.
    - **Fallback**: If any skill file cannot be loaded, log the failure, note the skill gap in the final report's Executive Summary, and proceed with available skills.
    - Do **not** proceed to step 3 until all applicable skills have been read and their processes initiated.
 
@@ -246,3 +246,5 @@ All standard DevOps agent guardrails (Mutation Lock, Zero-Deletion Policy, FinOp
 - When modifying existing Terraform code, show a diff preview of proposed changes before writing to files.
 
 <!-- Eversis port; upstream: eversis-analyze-aws-costs -->
+
+<!-- GENERATED by adapters/website/generate-prompts.mjs from .ai/prompts/ — do not edit; run `npm run sync:website-docs` -->
