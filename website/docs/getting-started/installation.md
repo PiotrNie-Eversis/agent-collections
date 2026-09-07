@@ -19,7 +19,7 @@ git clone https://gitlab3.eversis.com/eversis-ai/agent-collections.git agent-col
 export AGENT_COLLECTIONS_HOME="$(pwd)/agent-collections"
 ```
 
-You can use any folder name. Paths in [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md) and [`documentation/agent-collection.md`](../framework) are relative to the repo root.
+You can use any folder name. Paths in [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md) and [`documentation/agent-collection.md`](../framework) are relative to the repo root.
 
 **Pin** (lock) consumers to a **SemVer git tag** when you leave local development (see root README versioning).
 
@@ -50,33 +50,33 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
   --profile=fullstack
 ```
 
-Selection is written to **`.agent-collections/install-selection.json`**. Schema: [`docs/architecture/install-selection.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/install-selection.md).
+Selection is written to **`.agent-collections/install-selection.json`**. Schema: [`docs/architecture/install-selection.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/install-selection.md).
 
 ### Vendor modes
 
-| Mode | Flag | Notes |
-|------|------|-------|
-| **Local** (default) | (omit `--vendor`) | Framework stays outside the consumer repo; set `AGENT_COLLECTIONS_HOME` |
-| **Submodule** | `--vendor submodule` | **Common team default** — pin (lock) a specific version tag in `.gitmodules` |
-| **Copy** | `--vendor copy` | Tree under `vendor/agent-collections/` |
+| Mode                | Flag                 | Notes                                                                        |
+| ------------------- | -------------------- | ---------------------------------------------------------------------------- |
+| **Local** (default) | (omit `--vendor`)    | Framework stays outside the consumer repo; set `AGENT_COLLECTIONS_HOME`      |
+| **Submodule**       | `--vendor submodule` | **Common team default** — pin (lock) a specific version tag in `.gitmodules` |
+| **Copy**            | `--vendor copy`      | Tree under `vendor/agent-collections/`                                       |
 
 ### Useful flags
 
-| Flag | Purpose |
-|------|---------|
-| `--build-mcp` | Force rebuild of the `eversis-collections` Docker image (also builds when the image doesn't exist yet). Does **not** gate the interactive MCP server checklist. |
-| `--agents` | `cursor`, `claude`, `opencode` (opencode = placeholder) |
-| `--mcp-servers` | Comma-separated ids; without it + `--non-interactive` → `eversis-collections` only |
-| `--profile` | `frontend` \| `backend` \| `fullstack` |
-| `--link-mode` | `auto` \| `symlink` \| `copy` |
-| `--sync` | Refresh framework-managed surfaces |
-| `--upgrade` | Reuse selection (fail-safe if missing/corrupt) |
-| `--non-interactive` | No prompts — defaults + flags |
-| `--target DIR` | Consumer path when not running from that repo |
-| `--collections-home DIR` | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion) |
-| `--ssot-source URL` | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit on **first** install to start empty). On `--upgrade` / `--sync`, omit to **keep** the URL already in `install-selection.json`; pass `--ssot-source ""` or `--ssot-source=` to **clear** it. |
-| `--ssot-branch NAME` | Branch to pull from `--ssot-source` (default `main`) |
-| `--confluence-space-key KEY` | Records a Confluence space key for later use by `eversis-import-confluence-knowledge` (optional — never calls Confluence itself) |
+| Flag                         | Purpose                                                                                                                                                                                                                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--build-mcp`                | Force rebuild of the `eversis-collections` Docker image (also builds when the image doesn't exist yet). Does **not** gate the interactive MCP server checklist.                                                                                                                     |
+| `--agents`                   | `cursor`, `claude`, `opencode` (opencode = placeholder)                                                                                                                                                                                                                             |
+| `--mcp-servers`              | Comma-separated ids; without it + `--non-interactive` → `eversis-collections` only                                                                                                                                                                                                  |
+| `--profile`                  | `frontend` \| `backend` \| `fullstack`                                                                                                                                                                                                                                              |
+| `--link-mode`                | `auto` \| `symlink` \| `copy`                                                                                                                                                                                                                                                       |
+| `--sync`                     | Refresh framework-managed surfaces                                                                                                                                                                                                                                                  |
+| `--upgrade`                  | Reuse selection (fail-safe if missing/corrupt)                                                                                                                                                                                                                                      |
+| `--non-interactive`          | No prompts — defaults + flags                                                                                                                                                                                                                                                       |
+| `--target DIR`               | Consumer path when not running from that repo                                                                                                                                                                                                                                       |
+| `--collections-home DIR`     | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion)                                                                                                                                                                                        |
+| `--ssot-source URL`          | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit on **first** install to start empty). On `--upgrade` / `--sync`, omit to **keep** the URL already in `install-selection.json`; pass `--ssot-source ""` or `--ssot-source=` to **clear** it. |
+| `--ssot-branch NAME`         | Branch to pull from `--ssot-source` (default `main`)                                                                                                                                                                                                                                |
+| `--confluence-space-key KEY` | Records a Confluence space key for later use by `eversis-import-confluence-knowledge` (optional — never calls Confluence itself)                                                                                                                                                    |
 
 Interactive runs (TTY, without `--non-interactive`) prompt for agents × domain profile × MCP servers. `--build-mcp` is optional on interactive installs. Re-runs are idempotent; partial failures list completed vs failed steps.
 
@@ -88,13 +88,13 @@ When the consumer uses `--vendor submodule`, teammates clone the app repo then:
 git submodule update --init --recursive
 ```
 
-Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains at `.agent-collections/install-selection.json` (see [install-selection.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/docs/architecture/install-selection.md)).
+Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains at `.agent-collections/install-selection.json` (see [install-selection.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/install-selection.md)).
 
 ### Customising stack (Cursor vs Claude)
 
-| Channel | Customise |
-|---------|-----------|
-| Cursor | `.cursor/rules/eversis-project-stack.mdc` |
+| Channel     | Customise                                                                                                                                 |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Cursor      | `.cursor/rules/eversis-project-stack.mdc`                                                                                                 |
 | Claude Code | `.claude/CLAUDE.md` (seeded once, never overwritten — do not hand-edit generated `CLAUDE.md`; Claude Code does not auto-read `AGENTS.md`) |
 
 ## 4. Skills and prompts (MVP)
@@ -117,12 +117,12 @@ If your team vendors the framework as a **Git submodule**, `--upgrade --sync` on
 
 ### Keeping consumers aligned
 
-| Install mode | After framework update |
-|--------------|------------------------|
-| Local + symlink | Pull or check out the new version tag → `docker compose build eversis-collections` → re-run setup |
-| Local + copy | Pull + re-run with `--sync` |
-| Vendor submodule | Usually a **manual** pin bump — see [Advanced](#advanced-keeping-a-team-submodule-in-sync) |
-| Vendor copy | Re-run with `--vendor copy --build-mcp` |
+| Install mode     | After framework update                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| Local + symlink  | Pull or check out the new version tag → `docker compose build eversis-collections` → re-run setup |
+| Local + copy     | Pull + re-run with `--sync`                                                                       |
+| Vendor submodule | Usually a **manual** pin bump — see [Advanced](#advanced-keeping-a-team-submodule-in-sync)        |
+| Vendor copy      | Re-run with `--vendor copy --build-mcp`                                                           |
 
 ## Advanced: keeping a team submodule in sync
 

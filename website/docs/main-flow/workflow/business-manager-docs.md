@@ -36,12 +36,12 @@ Document guidelines are loaded dynamically from **Confluence** (not baked into a
 
 ## Architecture (High Level)
 
-| Piece | Role |
-| ----- | ---- |
-| **Atlassian MCP** | Read **Confluence** pages for documentation rules; pull **Jira** issues for the named release or scope. |
-| **`eversis-collections` MCP** | **`.docx` tools**: `generate_summary_map`, `read_chapter`, `update_chapter`, and `upload_to_sharepoint` (see server docs under `mcp/eversis-collections-mcp/`). Enable this server after a local build — see [MCP setup](../../getting-started/mcp-setup) and [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md). |
-| **`summary.md`** | Navigation map for the physical `.docx` (structure / chapter identifiers for agents). Each section entry now includes `hasTables` and `hasImages` flags so the Planner can mark chapters that require special handling. |
-| **`docs-update-plan.md`** | Planner output: which chapters change, what to change, and flags such as `[REQUIRES_GRAPHICS_UPDATE]` where diagrams need a human pass. Sections detected as `hasTables: true` should be labelled `TABLE-CONTAINS` to signal the Writer to use read-first / append rather than full replace. |
+| Piece                         | Role                                                                                                                                                                                                                                                                                                                                                         |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Atlassian MCP**             | Read **Confluence** pages for documentation rules; pull **Jira** issues for the named release or scope.                                                                                                                                                                                                                                                      |
+| **`eversis-collections` MCP** | **`.docx` tools**: `generate_summary_map`, `read_chapter`, `update_chapter`, and `upload_to_sharepoint` (see server docs under `mcp/eversis-collections-mcp/`). Enable this server after a local build — see [MCP setup](../../getting-started/mcp-setup) and [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md). |
+| **`summary.md`**              | Navigation map for the physical `.docx` (structure / chapter identifiers for agents). Each section entry now includes `hasTables` and `hasImages` flags so the Planner can mark chapters that require special handling.                                                                                                                                      |
+| **`docs-update-plan.md`**     | Planner output: which chapters change, what to change, and flags such as `[REQUIRES_GRAPHICS_UPDATE]` where diagrams need a human pass. Sections detected as `hasTables: true` should be labelled `TABLE-CONTAINS` to signal the Writer to use read-first / append rather than full replace.                                                                 |
 
 ### Document format compatibility
 
@@ -65,16 +65,16 @@ Following **Agent Collections** convention, we separate:
 - **Public prompt** — **`.ai/prompts/public/eversis-*.md`**: **executable workflow** content (SSOT; optional Docusaurus copies under `website/docs/prompts/`). In Cursor, use **`/eversis-ba-docs-planner`** or load-by-id / **`@`** when the SSOT or generated slash shim is surfaced.
 - **Role rule** — **`.cursor/rules/eversis-*.mdc`** when emitted by the adapter: **who the agent is**, boundaries, MCP tool behavior; attach on demand. **BA Docs `.mdc` rules are not shipped in MVP** — prompts + skills + slash commands carry the workflow.
 
-In practice for this workflow the **prompt + skills** are normative; attach **`/eversis-ba-docs-planner`** then **`/eversis-ba-docs-writer`**. See [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md) for channel notes.
+In practice for this workflow the **prompt + skills** are normative; attach **`/eversis-ba-docs-planner`** then **`/eversis-ba-docs-writer`**. See [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md) for channel notes.
 
 ## Documentation channels (Word vs Repo)
 
 Agent Collections has **two separate documentation playbooks** — do not mix them:
 
-| Channel | Prompts | Format | Typical trigger |
-| ------- | ------- | ------ | ---------------- |
-| **BA Docs (Word)** | `@eversis-ba-docs-planner` → `@eversis-ba-docs-writer` | `.docx` | Jira release + Confluence rules |
-| **Repo Docs** | `@eversis-repo-docs-writer` | README, CHANGELOG, `website/docs`, `docs/` | Documentation task from `@eversis-implement` plan |
+| Channel            | Prompts                                                | Format                                     | Typical trigger                                   |
+| ------------------ | ------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------- |
+| **BA Docs (Word)** | `@eversis-ba-docs-planner` → `@eversis-ba-docs-writer` | `.docx`                                    | Jira release + Confluence rules                   |
+| **Repo Docs**      | `@eversis-repo-docs-writer`                            | README, CHANGELOG, `website/docs`, `docs/` | Documentation task from `@eversis-implement` plan |
 
 This page documents **BA Docs (Word)** only.
 

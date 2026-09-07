@@ -17,11 +17,11 @@ Build **role behavior rules** under **`.ai/rules/`** (SSOT — the Cursor adapte
 
 ## Rule structure (typical)
 
-| Layer           | Purpose                                                              |
-| --------------- | -------------------------------------------------------------------- |
-| **Frontmatter** | `description`, `globs` or `alwaysApply`                              |
-| **Role**        | Responsibilities, tone, when to stop for human review                |
-| **Skills**      | Which `eversis-*` skills apply by name (references only)                 |
+| Layer           | Purpose                                                                                 |
+| --------------- | --------------------------------------------------------------------------------------- |
+| **Frontmatter** | `description`, `globs` or `alwaysApply`                                                 |
+| **Role**        | Responsibilities, tone, when to stop for human review                                   |
+| **Skills**      | Which `eversis-*` skills apply by name (references only)                                |
 | **Tools**       | Behavioral guidance for MCP / terminal (not a declarative tool manifest in frontmatter) |
 
 ## Validation
@@ -31,4 +31,4 @@ Build **role behavior rules** under **`.ai/rules/`** (SSOT — the Cursor adapte
 
 ## See also
 
-- [Framework reference](../../framework) — packaging and mappings (source: `documentation/agent-collection.md` on [GitHub](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/documentation/agent-collection.md))
+- [Framework reference](../../framework) — packaging and mappings (source: `documentation/agent-collection.md` on [GitHub](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/documentation/agent-collection.md))

@@ -21,11 +21,11 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 
 ### Skill classes (framework)
 
-| Class | Load default | Examples |
-| ----- | ------------ | -------- |
-| Universal | When task-relevant | `eversis-fine-handoff`, `eversis-code-reviewing` |
-| Stack | When stack rule + task match | `eversis-implementing-frontend`, `eversis-implementing-backend` |
-| Domain / optional | Only when stack policy or plan requires | `eversis-implementing-filters`, `eversis-ba-docs-*` |
+| Class             | Load default                            | Examples                                                        |
+| ----------------- | --------------------------------------- | --------------------------------------------------------------- |
+| Universal         | When task-relevant                      | `eversis-fine-handoff`, `eversis-code-reviewing`                |
+| Stack             | When stack rule + task match            | `eversis-implementing-frontend`, `eversis-implementing-backend` |
+| Domain / optional | Only when stack policy or plan requires | `eversis-implementing-filters`, `eversis-ba-docs-*`             |
 
 ## Available Skills
 
@@ -41,15 +41,15 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 - **[eversis-ba-docs-planner](./ba-docs-planner)** — plans Word `.docx` chapter updates from a Jira release.
 - **[eversis-ba-docs-writer](./ba-docs-writer)** — applies an approved docs-update-plan to a Word `.docx` file.
 
-| Skill                                                | Description                                            | Used By                        |
-| ---------------------------------------------------- | ------------------------------------------------------ | ------------------------------ |
-| [eversis-task-analysing](./task-analysis)                | Task context gathering and research                    | Context Engineer, E2E Engineer |
-| [eversis-transcript-processing](./transcript-processing) | Workshop transcript cleaning and structuring           | Business Analyst               |
-| [eversis-task-extracting](./task-extraction)             | Epic and user story extraction from workshop materials | Business Analyst               |
-| [eversis-task-quality-reviewing](./task-quality-review)  | Quality analysis for extracted task lists              | Business Analyst               |
-| [eversis-jira-task-formatting](./jira-task-formatting)   | Jira-ready task formatting and import/push management  | Business Analyst               |
-| [eversis-ba-docs-planner](./ba-docs-planner)             | Plan Word `.docx` chapter updates from a Jira release + Confluence rules | Business Analyst |
-| [eversis-ba-docs-writer](./ba-docs-writer)               | Apply an approved docs-update-plan.md to a Word `.docx` file | Business Analyst |
+| Skill                                                    | Description                                                              | Used By                        |
+| -------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------ |
+| [eversis-task-analysing](./task-analysis)                | Task context gathering and research                                      | Context Engineer, E2E Engineer |
+| [eversis-transcript-processing](./transcript-processing) | Workshop transcript cleaning and structuring                             | Business Analyst               |
+| [eversis-task-extracting](./task-extraction)             | Epic and user story extraction from workshop materials                   | Business Analyst               |
+| [eversis-task-quality-reviewing](./task-quality-review)  | Quality analysis for extracted task lists                                | Business Analyst               |
+| [eversis-jira-task-formatting](./jira-task-formatting)   | Jira-ready task formatting and import/push management                    | Business Analyst               |
+| [eversis-ba-docs-planner](./ba-docs-planner)             | Plan Word `.docx` chapter updates from a Jira release + Confluence rules | Business Analyst               |
+| [eversis-ba-docs-writer](./ba-docs-writer)               | Apply an approved docs-update-plan.md to a Word `.docx` file             | Business Analyst               |
 
 ### 🛠 Implement skills
 
@@ -72,26 +72,26 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 - **[eversis-import-confluence-knowledge](./import-confluence-knowledge)** — seeds `docs/context/` from a Confluence AS-IS Pack.
 - **[eversis-audit-domain-knowledge](./audit-domain-knowledge)** — periodically reviews `docs/context/` for drift.
 
-| Skill                                                              | Description                                                   | Used By                    |
-| ------------------------------------------------------------------ | ------------------------------------------------------------- | -------------------------- |
-| [eversis-orchestrating-implementation](./orchestrating-implementation) | Implement-phase orchestration: Quick vs Full, routing, gates, Fine handoff | Engineering Manager |
-| [eversis-architecture-designing](./architecture-design)                | Solution architecture design | Architect                  |
-| [eversis-creating-implementation-plans](./creating-implementation-plans) | Plan template, WIG, Technical Context, phased tasks, DoD rules | Architect, Plan Reviewer |
-| [eversis-technical-context-discovering](./technical-context-discovery) | Project conventions and pattern discovery                     | Architect, CR, SE, E2E, CE |
-| [eversis-implementing-frontend](./frontend-implementation)             | UI component patterns, composition, design tokens             | Software Engineer          |
-| [eversis-implementing-filters](./implementing-filters)               | URL-synced filter lists (Next + REST); stack policy required    | Software Engineer          |
-| [eversis-implementing-forms](./implementing-forms)                     | Form architecture, schema validation, multi-step flows        | Software Engineer          |
-| [eversis-writing-hooks](./writing-hooks)                               | Custom hook/composable patterns, lifecycle, testing           | Software Engineer          |
-| [eversis-ensuring-accessibility](./ensuring-accessibility)             | WCAG 2.1 AA compliance, semantic HTML, ARIA, keyboard nav     | Software Engineer          |
-| [eversis-optimizing-frontend](./optimizing-frontend)                   | Rendering optimization, code splitting, bundle size           | Software Engineer          |
-| [eversis-implementation-gap-analysing](./implementation-gap-analysis)  | Gap analysis between plan and current state                   | Architect, CR, SE          |
-| [eversis-sql-and-database-understanding](./sql-and-database)           | Database engineering standards and ORM integration            | Architect, CR, SE          |
-| [eversis-codebase-analysing](./codebase-analysis)                      | Deep codebase analysis and dependency mapping                 | Architect, BA, CE, SE      |
-| [eversis-writing-repo-documentation](./writing-repo-documentation) | Repository docs: README, CHANGELOG, docs site | Repo Docs writer, EM delegate |
-| [eversis-engineering-prompts](./prompt-engineering)                    | LLM prompt design, optimization, security, and evaluation     | PE, SE, Architect, CR      |
-| [eversis-promote-domain-knowledge](./promote-domain-knowledge)         | Optional Fine-turn draft promoting durable cross-task facts to `docs/context/` | Engineering Manager |
-| [eversis-import-confluence-knowledge](./import-confluence-knowledge)   | One-time seed of `docs/context/<project>/` from a Confluence AS-IS Pack page | Business Analyst, Context Engineer |
-| [eversis-audit-domain-knowledge](./audit-domain-knowledge)             | Periodic Keep/Update/Consolidate/Replace/Delete review of `docs/context/` | Anyone (scheduled) |
+| Skill                                                                    | Description                                                                    | Used By                            |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ---------------------------------- |
+| [eversis-orchestrating-implementation](./orchestrating-implementation)   | Implement-phase orchestration: Quick vs Full, routing, gates, Fine handoff     | Engineering Manager                |
+| [eversis-architecture-designing](./architecture-design)                  | Solution architecture design                                                   | Architect                          |
+| [eversis-creating-implementation-plans](./creating-implementation-plans) | Plan template, WIG, Technical Context, phased tasks, DoD rules                 | Architect, Plan Reviewer           |
+| [eversis-technical-context-discovering](./technical-context-discovery)   | Project conventions and pattern discovery                                      | Architect, CR, SE, E2E, CE         |
+| [eversis-implementing-frontend](./frontend-implementation)               | UI component patterns, composition, design tokens                              | Software Engineer                  |
+| [eversis-implementing-filters](./implementing-filters)                   | URL-synced filter lists (Next + REST); stack policy required                   | Software Engineer                  |
+| [eversis-implementing-forms](./implementing-forms)                       | Form architecture, schema validation, multi-step flows                         | Software Engineer                  |
+| [eversis-writing-hooks](./writing-hooks)                                 | Custom hook/composable patterns, lifecycle, testing                            | Software Engineer                  |
+| [eversis-ensuring-accessibility](./ensuring-accessibility)               | WCAG 2.1 AA compliance, semantic HTML, ARIA, keyboard nav                      | Software Engineer                  |
+| [eversis-optimizing-frontend](./optimizing-frontend)                     | Rendering optimization, code splitting, bundle size                            | Software Engineer                  |
+| [eversis-implementation-gap-analysing](./implementation-gap-analysis)    | Gap analysis between plan and current state                                    | Architect, CR, SE                  |
+| [eversis-sql-and-database-understanding](./sql-and-database)             | Database engineering standards and ORM integration                             | Architect, CR, SE                  |
+| [eversis-codebase-analysing](./codebase-analysis)                        | Deep codebase analysis and dependency mapping                                  | Architect, BA, CE, SE              |
+| [eversis-writing-repo-documentation](./writing-repo-documentation)       | Repository docs: README, CHANGELOG, docs site                                  | Repo Docs writer, EM delegate      |
+| [eversis-engineering-prompts](./prompt-engineering)                      | LLM prompt design, optimization, security, and evaluation                      | PE, SE, Architect, CR              |
+| [eversis-promote-domain-knowledge](./promote-domain-knowledge)           | Optional Fine-turn draft promoting durable cross-task facts to `docs/context/` | Engineering Manager                |
+| [eversis-import-confluence-knowledge](./import-confluence-knowledge)     | One-time seed of `docs/context/<project>/` from a Confluence AS-IS Pack page   | Business Analyst, Context Engineer |
+| [eversis-audit-domain-knowledge](./audit-domain-knowledge)               | Periodic Keep/Update/Consolidate/Replace/Delete review of `docs/context/`      | Anyone (scheduled)                 |
 
 ### ☁️ Cloud & Infrastructure Skills
 
@@ -103,8 +103,8 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 - **[eversis-optimizing-cloud-cost](./cloud-cost-optimization)** — finds cloud cost savings via rightsizing and tagging.
 - **[eversis-designing-multi-cloud-architecture](./multi-cloud-architecture)** — designs architecture across AWS, Azure, GCP.
 
-| Skill                                                                | Description                                                                       | Used By                    |
-| -------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------- |
+| Skill                                                                    | Description                                                                       | Used By                    |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | -------------------------- |
 | [eversis-implementing-ci-cd](./ci-cd-implementation)                     | CI/CD pipeline design patterns and deployment strategies                          | DevOps Engineer            |
 | [eversis-implementing-kubernetes](./kubernetes-implementation)           | Kubernetes deployment patterns, Helm charts, and cluster management               | DevOps Engineer            |
 | [eversis-implementing-terraform-modules](./terraform-modules)            | Reusable Terraform modules for AWS, Azure, and GCP infrastructure                 | DevOps Engineer            |
@@ -128,20 +128,20 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 - **[eversis-accessibility-auditing](./accessibility-auditing)** — runs WCAG 2.2 AA audit reports.
 - **[eversis-functional-testing](./functional-testing)** — provides shared QA templates and severity matrix.
 
-| Skill                                          | Description                                                  | Used By         |
-| ---------------------------------------------- | ------------------------------------------------------------ | --------------- |
-| [eversis-code-reviewing](./code-review)            | Structured code review process                               | Code Reviewer   |
-| [eversis-reviewing-frontend](./reviewing-frontend) | Frontend-specific review: components, hooks, rendering, a11y | Code Reviewer   |
-| [eversis-ui-verifying](./ui-verification)          | Figma vs implementation verification criteria                | UI Reviewer, SE |
-| [eversis-e2e-testing](./e2e-testing)               | Playwright E2E testing patterns and verification             | E2E Engineer    |
-| [eversis-fine-handoff](./fine-handoff)                 | Mandatory QA comment draft after Fine (Implement handoff); human approves before Jira post | Anyone (post-implement) |
-| [QA practice overview](./qa-workflow)            | `@eversis-qa-workflow` — test plans, regression, AC verify, quality health | QA / anyone     |
-| [eversis-planning-tests](./planning-tests)       | Test plans and test cases from acceptance criteria           | QA workflow     |
-| [eversis-analyzing-regression-risk](./analyzing-regression-risk) | Regression scope and suites from change context    | QA workflow     |
-| [eversis-verifying-acceptance-criteria](./verifying-acceptance-criteria) | AC gap table vs implementation           | QA workflow     |
-| [eversis-analyzing-bugs](./analyzing-bugs)       | Quality health dashboards from Jira defect history           | QA workflow     |
-| [eversis-accessibility-auditing](./accessibility-auditing) | WCAG 2.2 AA audit reports (manual QA)              | QA workflow     |
-| [eversis-functional-testing](./functional-testing) | Shared QA templates and severity matrix                    | QA workflow     |
+| Skill                                                                    | Description                                                                                | Used By                 |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ----------------------- |
+| [eversis-code-reviewing](./code-review)                                  | Structured code review process                                                             | Code Reviewer           |
+| [eversis-reviewing-frontend](./reviewing-frontend)                       | Frontend-specific review: components, hooks, rendering, a11y                               | Code Reviewer           |
+| [eversis-ui-verifying](./ui-verification)                                | Figma vs implementation verification criteria                                              | UI Reviewer, SE         |
+| [eversis-e2e-testing](./e2e-testing)                                     | Playwright E2E testing patterns and verification                                           | E2E Engineer            |
+| [eversis-fine-handoff](./fine-handoff)                                   | Mandatory QA comment draft after Fine (Implement handoff); human approves before Jira post | Anyone (post-implement) |
+| [QA practice overview](./qa-workflow)                                    | `@eversis-qa-workflow` — test plans, regression, AC verify, quality health                 | QA / anyone             |
+| [eversis-planning-tests](./planning-tests)                               | Test plans and test cases from acceptance criteria                                         | QA workflow             |
+| [eversis-analyzing-regression-risk](./analyzing-regression-risk)         | Regression scope and suites from change context                                            | QA workflow             |
+| [eversis-verifying-acceptance-criteria](./verifying-acceptance-criteria) | AC gap table vs implementation                                                             | QA workflow             |
+| [eversis-analyzing-bugs](./analyzing-bugs)                               | Quality health dashboards from Jira defect history                                         | QA workflow             |
+| [eversis-accessibility-auditing](./accessibility-auditing)               | WCAG 2.2 AA audit reports (manual QA)                                                      | QA workflow             |
+| [eversis-functional-testing](./functional-testing)                       | Shared QA templates and severity matrix                                                    | QA workflow             |
 
 ### ⚙️ Framework customization skills
 
@@ -150,8 +150,8 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 - **[eversis-creating-prompts](./creating-prompts)** — creates attachable repo prompts.
 - **[eversis-creating-instructions](./creating-instructions)** — writes project instructions (`AGENTS.md`, rules).
 
-| Skill                                                | Description                                  | Used By              |
-| ---------------------------------------------------- | -------------------------------------------- | -------------------- |
+| Skill                                                    | Description                                  | Used By              |
+| -------------------------------------------------------- | -------------------------------------------- | -------------------- |
 | [eversis-creating-agents](./creating-agents)             | Creating Cursor rules (`.mdc`) and role docs | Framework maintainer |
 | [eversis-creating-skills](./creating-skills)             | Creating custom skills (SKILL.md)            | Framework maintainer |
 | [eversis-creating-prompts](./creating-prompts)           | Creating attachable repo prompts (Markdown)  | Framework maintainer |
@@ -159,13 +159,13 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 
 ## Agent–Skill Matrix
 
-| Skill                                  | BA  | CE  | Architect | SE  | PE  | CR  | UI Reviewer | E2E | DevOps | Customize |
-| -------------------------------------- | --- | --- | --------- | --- | --- | --- | ----------- | --- | ------ | --------- |
+| Skill                                      | BA  | CE  | Architect | SE  | PE  | CR  | UI Reviewer | E2E | DevOps | Customize |
+| ------------------------------------------ | --- | --- | --------- | --- | --- | --- | ----------- | --- | ------ | --------- |
 | eversis-architecture-designing             |     |     | ✅        |     |     |     |             |     |        |           |
 | eversis-audit-domain-knowledge             |     |     |           |     |     |     |             |     |        |           |
 | eversis-ba-docs-planner                    | ✅  |     |           |     |     |     |             |     |        |           |
 | eversis-ba-docs-writer                     | ✅  |     |           |     |     |     |             |     |        |           |
-| eversis-creating-implementation-plans        |     |     | ✅        |     |     |     |             |     |        |           |
+| eversis-creating-implementation-plans      |     |     | ✅        |     |     |     |             |     |        |           |
 | eversis-code-reviewing                     |     |     |           |     | ✅  | ✅  |             |     |        |           |
 | eversis-codebase-analysing                 | ✅  | ✅  | ✅        | ✅  |     |     |             |     | ✅     | ✅        |
 | eversis-creating-agents                    |     |     |           |     |     |     |             |     |        | ✅        |
@@ -189,7 +189,7 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 | eversis-managing-secrets                   |     |     | ✅        |     |     |     |             |     | ✅     |           |
 | eversis-optimizing-cloud-cost              |     |     | ✅        |     |     |     |             |     | ✅     |           |
 | eversis-optimizing-frontend                |     |     |           | ✅  |     |     |             |     |        |           |
-| eversis-fine-handoff                         |     |     |           | ✅  |     | ✅  |             | ✅  |        |           |
+| eversis-fine-handoff                       |     |     |           | ✅  |     | ✅  |             | ✅  |        |           |
 | eversis-promote-domain-knowledge           |     |     |           |     |     |     |             |     |        |           |
 | eversis-planning-tests                     |     |     |           |     |     |     |             |     |        |           |
 | eversis-analyzing-regression-risk          |     |     |           |     |     |     |             |     |        |           |
@@ -211,7 +211,7 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 
 Skills follow a strict priority hierarchy:
 
-1. **Project constitution** — [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md) and **`.ai/rules/`** (SSOT; the Cursor adapter emits **`.cursor/rules/*.mdc`**, the Claude Code adapter generates **`CLAUDE.md`**) — highest priority for behavior.
+1. **Project constitution** — [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md) and **`.ai/rules/`** (SSOT; the Cursor adapter emits **`.cursor/rules/*.mdc`**, the Claude Code adapter generates **`CLAUDE.md`**) — highest priority for behavior.
 2. **Existing codebase patterns** — replicate established conventions.
 3. **Skill guidelines** — domain best practices and templates.
 4. **External documentation** — framework docs, OWASP, industry standards.
