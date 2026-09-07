@@ -157,7 +157,7 @@ function rewriteCrossTreeLinks(body) {
     .replace(/\(\.\.\/\.\.\/\.\.\/(?!website\/docs\/agents)([^)]+)\)/g, (_m, target) => {
       const kind = target.endsWith("/") ? "tree" : "blob";
       const cleanTarget = target.endsWith("/") ? target.slice(0, -1) : target;
-      return `(${GITHUB_REPO_BASE}/-/${kind}/main/${cleanTarget})`;
+      return `(${GITHUB_REPO_BASE}/-/${kind}/master/${cleanTarget})`;
     });
 }
 

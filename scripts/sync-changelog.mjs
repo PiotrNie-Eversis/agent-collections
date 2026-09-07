@@ -16,7 +16,7 @@ const src = path.join(root, "CHANGELOG.md");
 const dest = path.join(root, "website/src/pages/changelog.md");
 
 const GITHUB_BLOB =
-  "https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main";
+  "https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master";
 
 const checkOnly = process.argv.includes("--check");
 
