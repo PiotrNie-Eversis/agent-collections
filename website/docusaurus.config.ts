@@ -1,38 +1,38 @@
-import type { Config, Plugin, ConfigureWebpackUtils } from "@docusaurus/types";
-import type * as Preset from "@docusaurus/preset-classic";
-import type { Compilation, Configuration, WebpackError } from "webpack";
-import type { ConfigureWebpackResult } from "@docusaurus/types/src/plugin";
+import type { Config, Plugin, ConfigureWebpackUtils } from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
+import type { Compilation, Configuration, WebpackError } from 'webpack';
+import type { ConfigureWebpackResult } from '@docusaurus/types/src/plugin';
 
 const config: Config = {
-  title: "Agent Collections",
+  title: 'Agent Collections',
   tagline:
-    "Vendor-neutral multi-agent product engineering framework — Ideate → Implement → Review → Fine",
+    'Vendor-neutral multi-agent product engineering framework — Ideate → Implement → Review → Fine',
 
   // Public hosting deferred (Wave D Q3). Local / preview placeholder only — not a production docs URL.
-  url: "http://localhost:3000",
-  baseUrl: "/",
+  url: 'http://localhost:3000',
+  baseUrl: '/',
 
-  onBrokenLinks: "throw",
+  onBrokenLinks: 'throw',
 
   markdown: {
     mermaid: true,
   },
 
   i18n: {
-    defaultLocale: "en",
-    locales: ["en"],
+    defaultLocale: 'en',
+    locales: ['en'],
   },
 
   presets: [
     [
-      "classic",
+      'classic',
       {
         docs: {
-          sidebarPath: "./sidebars.ts",
-          routeBasePath: "docs",
+          sidebarPath: './sidebars.ts',
+          routeBasePath: 'docs',
           breadcrumbs: true,
           admonitions: {
-            keywords: ["note", "tip", "info", "warning", "danger", "brand"],
+            keywords: ['note', 'tip', 'info', 'warning', 'danger', 'brand'],
           },
           // Skills sidebar: alphabetical by title instead of sidebar_position —
           // 48+ entries with no natural reading order, unlike workflow/getting-started.
@@ -50,14 +50,14 @@ const config: Config = {
 
             type SidebarItem = (typeof items)[number];
             const isOverview = (item: SidebarItem) =>
-              item.type === "doc" && item.id === "skills/overview";
+              item.type === 'doc' && item.id === 'skills/overview';
             const titleOf = (item: SidebarItem): string => {
-              if (item.type === "doc") {
+              if (item.type === 'doc') {
                 return titleById.get(item.id) ?? item.id;
               }
-              return "label" in item && typeof item.label === "string"
+              return 'label' in item && typeof item.label === 'string'
                 ? item.label
-                : "";
+                : '';
             };
 
             const sortSkillsItems = (skillItems: SidebarItem[]) => {
@@ -75,7 +75,7 @@ const config: Config = {
                 return sortSkillsItems(currentItems);
               }
               return currentItems.map((item) =>
-                item.type === "category"
+                item.type === 'category'
                   ? { ...item, items: withSortedSkills(item.items) }
                   : item,
               );
@@ -87,7 +87,7 @@ const config: Config = {
         blog: false,
         pages: {},
         theme: {
-          customCss: "./src/css/custom.css",
+          customCss: './src/css/custom.css',
         },
       } satisfies Preset.Options,
     ],
@@ -96,7 +96,7 @@ const config: Config = {
   plugins: [
     function webpackWarningFilter(): Plugin {
       return {
-        name: "webpack-warning-filter",
+        name: 'webpack-warning-filter',
         configureWebpack(
           _config: Configuration,
           _isServer: boolean,
@@ -107,7 +107,7 @@ const config: Config = {
             ignoreWarnings: [
               (warning: Error, compilation: Compilation) =>
                 warning.message?.includes(
-                  "Critical dependency: require function is used",
+                  'Critical dependency: require function is used',
                 ) === true,
             ],
           };
@@ -117,9 +117,9 @@ const config: Config = {
   ],
 
   themes: [
-    "@docusaurus/theme-mermaid",
+    '@docusaurus/theme-mermaid',
     [
-      "@easyops-cn/docusaurus-search-local",
+      '@easyops-cn/docusaurus-search-local',
       {
         hashed: true,
         indexBlog: false,
@@ -129,93 +129,93 @@ const config: Config = {
 
   headTags: [
     {
-      tagName: "link",
+      tagName: 'link',
       attributes: {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
       },
     },
     {
-      tagName: "link",
+      tagName: 'link',
       attributes: {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossorigin: "anonymous",
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: 'anonymous',
       },
     },
     {
-      tagName: "link",
+      tagName: 'link',
       attributes: {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
       },
     },
   ],
 
   themeConfig: {
-    image: "img/opengraph.png",
+    image: 'img/opengraph.png',
     metadata: [
       {
-        property: "og:type",
-        content: "website",
+        property: 'og:type',
+        content: 'website',
       },
       {
-        property: "og:image:width",
-        content: "1200",
+        property: 'og:image:width',
+        content: '1200',
       },
       {
-        property: "og:image:height",
-        content: "630",
+        property: 'og:image:height',
+        content: '630',
       },
       {
-        property: "og:image:alt",
+        property: 'og:image:alt',
         content:
-          "Agent Collections documentation — vendor-neutral multi-agent product engineering.",
+          'Agent Collections documentation — vendor-neutral multi-agent product engineering.',
       },
       {
-        name: "twitter:image:alt",
+        name: 'twitter:image:alt',
         content:
-          "Agent Collections documentation — vendor-neutral multi-agent product engineering.",
+          'Agent Collections documentation — vendor-neutral multi-agent product engineering.',
       },
     ],
     navbar: {
-      title: "Agent Collections",
+      title: 'Agent Collections',
       items: [
         {
-          type: "docSidebar",
-          sidebarId: "tutorialSidebar",
-          position: "left",
-          label: "Docs",
+          type: 'docSidebar',
+          sidebarId: 'tutorialSidebar',
+          position: 'left',
+          label: 'Docs',
         },
         {
-          to: "/docs/getting-started/start-here",
-          label: "Get started",
-          position: "left",
+          to: '/docs/getting-started/start-here/',
+          label: 'Get started',
+          position: 'left',
         },
         {
-          to: "/docs/main-flow",
-          label: "The Main Flow",
-          position: "left",
+          to: '/docs/main-flow/',
+          label: 'The Main Flow',
+          position: 'left',
         },
         {
-          to: "/docs/reference",
-          label: "Reference",
-          position: "left",
+          to: '/docs/reference/',
+          label: 'Reference',
+          position: 'left',
         },
         {
-          to: "/docs/advanced",
-          label: "Advanced / CTO",
-          position: "left",
-          className: "navbar__link--cto",
+          to: '/docs/advanced/',
+          label: 'Advanced / CTO',
+          position: 'left',
+          className: 'navbar__link--cto',
         },
         {
-          to: "/changelog",
-          label: "Changelog",
-          position: "right",
-          className: "navbar__link--meta",
+          to: '/changelog/',
+          label: 'Changelog',
+          position: 'right',
+          className: 'navbar__link--meta',
         },
         {
-          href: "https://gitlab3.eversis.com/eversis-ai/agent-collections",
+          href: 'https://gitlab3.eversis.com/eversis-ai/agent-collections',
           html: `
             <span class="navbar__github-content">
               <span class="navbar__github-wordmark">GitLab</span>
@@ -224,24 +224,24 @@ const config: Config = {
               </svg>
             </span>
           `,
-          position: "right",
-          className: "navbar__link--github",
+          position: 'right',
+          className: 'navbar__link--github',
         },
       ],
     },
     footer: {
-      style: "light",
+      style: 'light',
       copyright: `Eversis Agent Collections · MIT licence`,
       links: [
         {
-          title: " ",
+          title: ' ',
           items: [
             {
-              href: "https://gitlab3.eversis.com/eversis-ai/agent-collections",
-              label: "GitLab",
+              href: 'https://gitlab3.eversis.com/eversis-ai/agent-collections',
+              label: 'GitLab',
             },
-            { label: "Docs", to: "/docs/" },
-            { label: "Methodology", to: "/docs/main-flow/workflow/overview" },
+            { label: 'Docs', to: '/docs/' },
+            { label: 'Methodology', to: '/docs/main-flow/workflow/overview' },
           ],
         },
       ],
@@ -251,7 +251,7 @@ const config: Config = {
       maxHeadingLevel: 4,
     },
     colorMode: {
-      defaultMode: "light",
+      defaultMode: 'light',
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
