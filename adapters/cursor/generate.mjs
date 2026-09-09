@@ -51,8 +51,29 @@ function findRepoRoot(startDir) {
   }
 }
 
+/**
+ * --framework-prefix is applied only to the generated `**SSOT:**` pointer in
+ * each .cursor/commands/*.md file — never to .cursor/rules/*.mdc rule body
+ * content copied verbatim from .ai/rules/**, which may itself contain
+ * unprefixed `.ai/...` mentions (shared with the Claude adapter's equally
+ * unprefixed CLAUDE.md body content — a pre-existing, out-of-scope pattern,
+ * not something this flag is meant to fix). See
+ * docs/specs/promote-skill-cursor-packaging/promote-skill-cursor-packaging.plan.md
+ * Open Question 2.
+ */
+function assertSafeFrameworkPrefix(value) {
+  if (value.startsWith("/")) {
+    fail(`--framework-prefix must not be an absolute path: ${value}`);
+  }
+  if (value.split("/").some((segment) => segment === "..")) {
+    fail(`--framework-prefix must not escape the target root: ${value}`);
+  }
+  return value.replace(/\/+$/, "");
+}
+
 function parseArgs(argv) {
   let outRoot = null;
+  let frameworkPrefix = "";
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--out") {
@@ -64,17 +85,30 @@ function parseArgs(argv) {
       i++;
       continue;
     }
+    if (arg === "--framework-prefix") {
+      const next = argv[i + 1];
+      if (!next || next.startsWith("-")) {
+        fail("--framework-prefix requires a value");
+      }
+      frameworkPrefix = assertSafeFrameworkPrefix(next);
+      i++;
+      continue;
+    }
     if (arg === "--help" || arg === "-h") {
       console.log(
-        "Usage: node adapters/cursor/generate.mjs [--out <dir>]\n" +
+        "Usage: node adapters/cursor/generate.mjs [--out <dir>] [--framework-prefix <path>]\n" +
           "  Default: write rule-map outputs and .cursor/commands/ (repo-relative).\n" +
-          "  --out: write under <dir>, preserving .cursor/rules/… and .cursor/commands/… tails.",
+          "  --out: write under <dir>, preserving .cursor/rules/… and .cursor/commands/… tails.\n" +
+          "  --framework-prefix: prepend <path> to the SSOT pointer in each generated\n" +
+          "    .cursor/commands/*.md file (e.g. vendor/agent-collections, or the literal\n" +
+          "    token ${AGENT_COLLECTIONS_HOME} in local vendor mode). Empty = self-host.\n" +
+          "    Does not affect .cursor/rules/*.mdc body content.",
       );
       process.exit(0);
     }
     fail(`unknown argument: ${arg}`);
   }
-  return { outRoot };
+  return { outRoot, frameworkPrefix };
 }
 
 function stripQuotes(value) {
@@ -403,12 +437,15 @@ function extractPromptMeta(body) {
  * Cursor slash UI often shows the first plain paragraph after the title as the
  * command summary — do not put GENERATED HTML comments there.
  */
-function buildCommandContent(prompt, sourceBody) {
+function buildCommandContent(prompt, sourceBody, frameworkPrefix) {
   const meta = extractPromptMeta(sourceBody);
   const summary =
     (meta.prompt_description && String(meta.prompt_description).trim()) ||
     (meta.title && String(meta.title).trim()) ||
     `Run Agent Collections prompt ${prompt.id}`;
+  const ssotPath = frameworkPrefix
+    ? `${frameworkPrefix}/${prompt.sourceRel}`
+    : prompt.sourceRel;
 
   const lines = [
     `# ${prompt.id}`,
@@ -417,7 +454,7 @@ function buildCommandContent(prompt, sourceBody) {
     "",
     `**Stable id:** \`${prompt.id}\`  `,
     `**Audience:** ${prompt.audience}  `,
-    `**SSOT:** \`${prompt.sourceRel}\``,
+    `**SSOT:** \`${ssotPath}\``,
     "",
     "Load and follow the Agent Collections prompt at the SSOT path above.",
     "Prefer that file over any docs-site copy under `website/docs/prompts/`.",
@@ -438,13 +475,13 @@ function buildCommandContent(prompt, sourceBody) {
   return lines.join("\n");
 }
 
-function writeCommand(repoRoot, outRoot, prompt) {
+function writeCommand(repoRoot, outRoot, prompt, frameworkPrefix) {
   const sourceAbs = path.join(repoRoot, prompt.sourceRel);
   if (!fs.existsSync(sourceAbs)) {
     fail(`prompt source not found for ${prompt.id}: ${prompt.sourceRel}`);
   }
   const body = fs.readFileSync(sourceAbs, "utf8").replace(/^\uFEFF/, "");
-  const content = buildCommandContent(prompt, body);
+  const content = buildCommandContent(prompt, body, frameworkPrefix);
   const outputRel = path.posix.join(COMMANDS_DIR_REL, `${prompt.id}.md`);
   const destAbs = resolveOutputPath(repoRoot, outRoot, outputRel);
 
@@ -483,7 +520,7 @@ function cleanupOrphanCommands(repoRoot, outRoot, keepIds) {
   return removed;
 }
 
-function generateCommands(repoRoot, outRoot) {
+function generateCommands(repoRoot, outRoot, frameworkPrefix) {
   const deny = loadCommandDeny();
   const prompts = discoverPromptCommands(repoRoot, deny);
   const written = [];
@@ -491,7 +528,7 @@ function generateCommands(repoRoot, outRoot) {
 
   for (const prompt of prompts) {
     keepIds.add(prompt.id);
-    written.push(writeCommand(repoRoot, outRoot, prompt));
+    written.push(writeCommand(repoRoot, outRoot, prompt, frameworkPrefix));
   }
 
   const removed = cleanupOrphanCommands(repoRoot, outRoot, keepIds);
@@ -499,7 +536,7 @@ function generateCommands(repoRoot, outRoot) {
 }
 
 function main() {
-  const { outRoot } = parseArgs(process.argv.slice(2));
+  const { outRoot, frameworkPrefix } = parseArgs(process.argv.slice(2));
   const repoRoot = findRepoRoot(process.cwd());
 
   if (!fs.existsSync(MAP_PATH)) {
@@ -529,6 +566,7 @@ function main() {
   const { written: writtenCmds, removed, denied } = generateCommands(
     repoRoot,
     outRoot,
+    frameworkPrefix,
   );
   console.log(`generated ${writtenCmds.length} Cursor slash command(s):`);
   for (const { destAbs } of writtenCmds) {

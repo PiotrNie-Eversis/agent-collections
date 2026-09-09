@@ -46,8 +46,8 @@ Before broad implementation (after plan approval), check whether a skill package
 1. **Read the consumer project stack policy** (project-owned stack / skills policy document) — respect **Do not load** rows; prefer **Load when** rows over keyword guessing.
 2. **Read `docs/context/*.md`** when present — project patterns override generic skill defaults.
 3. **Prefer** the **`eversis-collections` MCP** tools (`eversis_skills_list` / `eversis_skills_get`) when the server is running — only for skills allowed by the stack policy and the approved plan.
-4. **Otherwise** read the matching `SKILL.md` directly (file read or tool-native attachment) for domain-specific work.
-5. Skill packages belong under **`.ai/skills/eversis-<topic>/`**. Do **not** register the skills folder as a vendor-specific “Agent Skills” UI path unless the adapter docs say so.
+4. **Otherwise** read the matching `SKILL.md` directly (file read or tool-native attachment) for domain-specific work — in a consumer install, both Claude Code (`.claude/skills/<id>/SKILL.md`) and Cursor (`.cursor/skills/<id>/SKILL.md`) get a real, install-time local mirror of every `.ai/skills/eversis-*` package (symlink or copy, kept in sync by the installer), so this fallback works without MCP for either host.
+5. Skill packages belong under **`.ai/skills/eversis-<topic>/`**. The per-host mirrors above are a plain local-file fallback, not a vendor-specific “Agent Skills” UI registration — do **not** register the skills folder as that kind of UI path unless the adapter docs say so.
 
 **Do not** load a domain skill solely because the user message mentions a related keyword (e.g. "filter", "list", "search"). Confirm stack policy, plan Technical Context, or explicit task scope first.
 

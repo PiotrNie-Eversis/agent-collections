@@ -111,9 +111,10 @@ function parseArgs(argv) {
           "  --out: pass through to generators (write or compare under <dir>).\n" +
           "  --agents: only run selected adapters (default: cursor,claude).\n" +
           "            opencode is placeholder-only (copies opencode.jsonc when present).\n" +
-          "  --framework-prefix: pass through to the Claude generator only — prepends\n" +
-          "            <path> to .ai/... references in CLAUDE.md's How-to section for\n" +
-          "            vendored consumer installs (empty = self-host, unprefixed).\n" +
+          "  --framework-prefix: pass through to both generators — prepends <path> to\n" +
+          "            .ai/... references in CLAUDE.md's How-to section and .cursor/commands/\n" +
+          "            SSOT pointers, for vendored consumer installs (empty = self-host,\n" +
+          "            unprefixed). Does not affect .cursor/rules/*.mdc body content.\n" +
           "\n" +
           "npm: npm run sync:adapters | npm run sync:adapters:check",
       );
@@ -338,16 +339,16 @@ function runCheck(repoRoot, outRoot, frameworkPrefix) {
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "agent-collections-sync-"));
   try {
-    runGenerator(CURSOR_GENERATE, tmp, "Cursor");
-    const claudeExtraArgs = frameworkPrefix
+    const frameworkPrefixArgs = frameworkPrefix
       ? ["--framework-prefix", frameworkPrefix]
       : [];
-    runGenerator(CLAUDE_GENERATE, tmp, "Claude", claudeExtraArgs);
+    runGenerator(CURSOR_GENERATE, tmp, "Cursor", frameworkPrefixArgs);
+    runGenerator(CLAUDE_GENERATE, tmp, "Claude", frameworkPrefixArgs);
     runGenerator(
       CLAUDE_COMMANDS_GENERATE,
       tmp,
       "Claude commands",
-      claudeExtraArgs,
+      frameworkPrefixArgs,
     );
 
     const compareRoot = resolveCompareRoot(repoRoot, outRoot);
@@ -534,21 +535,21 @@ function runOpenCodePlaceholder(repoRoot, outRoot) {
 
 function runWrite(repoRoot, outRoot, agents, frameworkPrefix) {
   const selected = agents ?? new Set(["cursor", "claude"]);
+  const frameworkPrefixArgs = frameworkPrefix
+    ? ["--framework-prefix", frameworkPrefix]
+    : [];
   if (selected.has("cursor")) {
     console.log("adapter sync: regenerating Cursor…");
-    runGenerator(CURSOR_GENERATE, outRoot, "Cursor");
+    runGenerator(CURSOR_GENERATE, outRoot, "Cursor", frameworkPrefixArgs);
   }
   if (selected.has("claude")) {
     console.log("adapter sync: regenerating Claude…");
-    const claudeExtraArgs = frameworkPrefix
-      ? ["--framework-prefix", frameworkPrefix]
-      : [];
-    runGenerator(CLAUDE_GENERATE, outRoot, "Claude", claudeExtraArgs);
+    runGenerator(CLAUDE_GENERATE, outRoot, "Claude", frameworkPrefixArgs);
     runGenerator(
       CLAUDE_COMMANDS_GENERATE,
       outRoot,
       "Claude commands",
-      claudeExtraArgs,
+      frameworkPrefixArgs,
     );
   }
   if (selected.has("opencode")) {

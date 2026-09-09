@@ -57,6 +57,17 @@ grep -q 'frontend-scope' "${TARGET}/.agent-collections/area-profile.txt"
 [[ -f "${TARGET}/docs/context/README.md" ]] || { echo "FAIL: missing docs/context/README.md"; exit 1; }
 [[ -f "${TARGET}/docs/plans/README.md" ]] || { echo "FAIL: missing docs/plans/README.md"; exit 1; }
 
+# .cursor/skills/ — content parity with .ai/skills/ SSOT (same guarantee
+# .claude/skills/ already has), including for the specific skill reported
+# unreachable in docs/specs/promote-skill-cursor-packaging/.
+CURSOR_SKILL_SRC="${ROOT}/.ai/skills/eversis-promote-domain-knowledge/SKILL.md"
+CURSOR_SKILL_DST="${TARGET}/.cursor/skills/eversis-promote-domain-knowledge/SKILL.md"
+[[ -f "$CURSOR_SKILL_DST" ]] || { echo "FAIL: missing .cursor/skills/eversis-promote-domain-knowledge/SKILL.md"; exit 1; }
+cmp -s "$CURSOR_SKILL_SRC" "$CURSOR_SKILL_DST" \
+  || { echo "FAIL: .cursor/skills/.../SKILL.md content diverges from .ai/skills/ SSOT"; exit 1; }
+grep -qF 'user-invocable: false' "$CURSOR_SKILL_DST" \
+  || { echo "FAIL: .cursor/skills/.../SKILL.md lost user-invocable: false"; exit 1; }
+
 EXPECTED_HOME="$(cd "$ROOT" && pwd)"
 HOME_MARKER="${TARGET}/.agent-collections/framework-home.txt"
 [[ -f "$HOME_MARKER" ]] \
@@ -172,6 +183,54 @@ shopt -u nullglob
 # convention as .cursor/mcp.json when Cursor is deselected. Only the
 # per-server *contents* are pruned by mcp-merge.mjs's "kept" logic, not the
 # host config file; deleting host config files on deselect is out of scope.
+
+# --agents=cursor, vendored (--vendor=copy) — the exact scenario reported in
+# docs/specs/promote-skill-cursor-packaging/: a Cursor-only, vendored consumer
+# install. Regression coverage for both halves of that fix: (A) .cursor/commands/
+# SSOT pointers must resolve under the vendored .ai/ prefix, not the dangling
+# bare .ai/... paths; (B) .cursor/skills/ must mirror .ai/skills/, matching
+# .claude/skills/'s existing guarantee.
+TARGET_CURSOR_VENDORED="${TMP}/consumer-cursor-vendored"
+mkdir -p "$TARGET_CURSOR_VENDORED"
+(cd "$TARGET_CURSOR_VENDORED" && git init -q)
+
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_CURSOR_VENDORED" \
+  --non-interactive \
+  --vendor=copy \
+  --agents=cursor \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy
+
+grep -qF 'vendor/agent-collections/.ai/prompts/public/' "${TARGET_CURSOR_VENDORED}/.cursor/commands/eversis-implement.md" \
+  || { echo "FAIL: .cursor/commands/eversis-implement.md SSOT is not vendor-prefixed (fix regression)"; exit 1; }
+grep -qF '**SSOT:** `.ai/prompts/public/eversis-implement.md`' "${TARGET_CURSOR_VENDORED}/.cursor/commands/eversis-implement.md" \
+  && { echo "FAIL: .cursor/commands/eversis-implement.md still has the dangling unprefixed SSOT path"; exit 1; }
+
+CURSOR_VENDORED_SKILL_DST="${TARGET_CURSOR_VENDORED}/.cursor/skills/eversis-promote-domain-knowledge/SKILL.md"
+[[ -f "$CURSOR_VENDORED_SKILL_DST" ]] \
+  || { echo "FAIL: missing .cursor/skills/eversis-promote-domain-knowledge/SKILL.md in vendored cursor-only install"; exit 1; }
+cmp -s "${ROOT}/.ai/skills/eversis-promote-domain-knowledge/SKILL.md" "$CURSOR_VENDORED_SKILL_DST" \
+  || { echo "FAIL: vendored .cursor/skills/.../SKILL.md content diverges from .ai/skills/ SSOT"; exit 1; }
+
+# Deselecting Cursor on re-run must prune .cursor/skills/eversis-* — same
+# guarantee .claude/skills/ already has for a Claude deselect.
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_CURSOR_VENDORED" \
+  --non-interactive \
+  --agents=claude \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy
+
+shopt -s nullglob
+LEFTOVER_CURSOR_SKILLS=("${TARGET_CURSOR_VENDORED}/.cursor/skills/"eversis-*)
+shopt -u nullglob
+[[ ${#LEFTOVER_CURSOR_SKILLS[@]} -eq 0 ]] \
+  || { echo "FAIL: .cursor/skills/eversis-* survived deselecting Cursor: ${LEFTOVER_CURSOR_SKILLS[*]}"; exit 1; }
 
 # Cursor User MCP overlap (warn-only). Isolate from the real ~/.cursor/mcp.json.
 TARGET_OVERLAP="${TMP}/consumer-overlap"
