@@ -11,7 +11,7 @@ prompt_description: "Create or extend project instructions for Cursor: AGENTS.md
 **Role:** [Cursor customization orchestrator](../../agents/cursor-customization-orchestrator)  
 **File:** `.ai/prompts/public/eversis-create-custom-instructions.md`
 
-Helps the user encode **project-wide instructions** for Agent Collections: primarily **[AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/main/AGENTS.md)** and **`.ai/rules/`** (the Cursor adapter may additionally emit **`.cursor/rules/*.mdc`**; the Claude Code adapter generates **`CLAUDE.md`**). Optional: scoped **`RULE.md`** in subfolders. **Do not** target GitHub Copilot `copilot-instructions.md` — this framework is vendor-neutral (no Copilot channel), not Cursor-only.
+Helps the user encode **project-wide instructions** for Agent Collections: primarily **[AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md)** and **`.ai/rules/`** (the Cursor adapter may additionally emit **`.cursor/rules/*.mdc`**; the Claude Code adapter generates **`CLAUDE.md`**). Optional: scoped **`RULE.md`** in subfolders. **Do not** target GitHub Copilot `copilot-instructions.md` — this framework is vendor-neutral (no Copilot channel), not Cursor-only.
 
 ## Usage
 
