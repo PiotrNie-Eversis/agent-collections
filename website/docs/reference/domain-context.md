@@ -111,6 +111,8 @@ This is a workaround for today's one-session-per-repo design, not a documented "
 
 An agent doing Research reads `docs/context/<project>/INDEX.md` first, matches the task's topic to **one** listed component, and reads only that component's file — never the whole `docs/context/` tree by default. Full procedure: [Orchestrating Implementation](./reference/skills/orchestrating-implementation).
 
+Looking further, into `docs/specs/` task history, splits into two different costs: **discovery** (checking whether prior work on a topic exists — a filename or topic grep across `docs/specs/**`) is always cheap and always allowed, since it loads no file content; **consumption** (reading a matched file's full content) is capped at 1-2 files total, whether the match came from the component's own `related_specs` or from discovery. The budget is on reading content, not on checking what exists.
+
 ## Tools and skills
 
 Agents forget facts between tasks. **MCP tools** (functions the assistant calls on the `eversis-collections` server) **read** the store. **Skills** (written procedures the assistant follows) **write or clean** it. A human approves every write.

@@ -31,7 +31,7 @@ This audit reviews files that already exist. It does not, by itself, guarantee d
 
 1. For each `docs/context/<project>/<component>/index.md`:
    - Check `last_consulted` (maintained automatically by `eversis_context_get` — see `mcp/eversis-collections-mcp/src/context.ts`). No value, or a very old one relative to the component's `related_specs` activity, is a signal toward `Replace`/`Delete`, not proof by itself — confirm before deleting.
-   - Check whether every path in `code_paths` still exists in the repo. Any that don't are a strong signal toward `Update` (if some paths are gone) or `Delete` (if all are gone).
+   - Check whether every path in `code_paths` still exists in the repo. Any that don't are a strong signal toward `Update` (if some paths are gone) or `Delete` (if all are gone). **Exception:** an empty or absent `code_paths` on a `source: confluence` component means the import has not been mapped to code yet, not that its code is gone — signal `Update` (populate `code_paths`), never `Delete`, for this case.
    - Skim `related_specs`/`changelog.md` for repeated, near-identical entries — a `Consolidate` candidate.
    - Otherwise, read the description against the current code briefly to confirm `Keep` vs. `Replace`.
 2. Record the outcome and, for anything other than `Keep`, apply the action directly (this is normal file editing, not a promotion — no GitLab API round-trip is needed for a project-level audit fix, since it is a plain commit to the current repo like any other change).

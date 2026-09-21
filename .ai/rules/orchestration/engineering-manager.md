@@ -10,7 +10,7 @@ Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `evers
 
 Follow **`agent-core.md`**: approve research, plan, and plan validation before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
 
-On the **first response** of every Implement run (`eversis-implement`), output the **exact four-line** Implement readiness block as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
+On the **first response** of every Implement run (`eversis-implement`), output the Implement readiness block (four required lines, plus any optional lines that apply) as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
 
 ```text
 ## Implement readiness
@@ -20,12 +20,15 @@ On the **first response** of every Implement run (`eversis-implement`), output t
 - **Next gate:** Awaiting approval before code | Awaiting approval before plan | Proceeding (<one-line reason>)
 ```
 
-Optional fifth line: `- **Reason:** …`
+Optional additional lines, any subset, appended after the four required lines in this order when present:
+- `- **Resume:** CHECKPOINT <date>` (or omit when not resuming) — present when a fresh session recognizes a `CHECKPOINT:` entry in the plan's `Changelog` (see `eversis-orchestrating-implementation`, Execution rules and gates) and is picking up a zero-compaction handoff. This is independent of `Flow` — `Flow` still states the governing flow (e.g. `Full`) exactly as it did before the checkpoint; resuming never loses that declaration.
+- `- **Context:** <N> components indexed` (or `0 components indexed`) — `docs/context/<project>/INDEX.md`'s component count via `eversis_context_list`. `0` is a visible, non-blocking signal, not a gate.
+- `- **Reason:** …` — why this Flow / Research decision.
 
 **Self-check before sending the first message:**
 
 1. Inspected `docs/specs/<issue>/` and any attached research/plan paths.
-2. First content is `## Implement readiness` with Flow, Research, Plan, Next gate (optional `Reason:`).
+2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Reason`).
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.

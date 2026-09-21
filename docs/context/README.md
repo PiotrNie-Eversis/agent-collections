@@ -2,6 +2,8 @@
 
 Internal knowledge for this project: architecture notes, ADRs, wiki sync exports, onboarding. Use clear filenames under `docs/context/<project>/`.
 
+**`docs/context/<project>/INDEX.md` is the one mandatory router** an agent reads first, before any component file — one line per component, exactly two columns (`| component | one-line summary |`; a third column is silently dropped by the tooling that reads it, so per-component metadata belongs in that component's own file, not a new column). Each row's component name links to its own `docs/context/<project>/<component>/index.md`. Create `INDEX.md` when scaffolding this directory, even before any component exists.
+
 **Task baseline (workshop continuity):** `docs/context/<project>/task-baseline.md` — optional epic/story index refreshed after a successful Jira push from prompt `eversis-analyze-materials`.
 
 Referenced by research/plan steps. Attach it by path in your tool (e.g. Cursor `@docs/context/<project>/`).
