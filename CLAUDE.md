@@ -47,7 +47,7 @@ When acting as Engineering Manager or running the **Implement** prompt (`eversis
    When reading `docs/context/` for domain knowledge (distinct from `docs/specs/` task history), read in this order — smallest sufficient read first, never the whole tree by default. There is exactly **one** in-repo router — `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` when the topic is not local) — never `docs/plan/INDEX.md` or `docs/plans/INDEX.md`:
    1. `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` only if the topic is not covered locally) — bounded, cheap, always safe to read.
    2. Match the task's topic to **one** component listed there.
-   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies.
+   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies. If `status` is `deprecated` or `superseded`, the body is not current truth and the task must not be based on it; if `superseded_by` names a component, read that one successor file instead; do not remove the index row.
    4. Follow `related_specs`/`confluence_url` from that file only if it signals a real gap (missing recent history, missing business context) — 1-2 most recent links, not all of them.
 
    `docs/specs/` history is governed by two distinct costs, not one merged fallback:
@@ -138,12 +138,13 @@ On the **first response** of every Implement run (`eversis-implement`), output t
 Optional additional lines, any subset, appended after the four required lines in this order when present:
 - `- **Resume:** CHECKPOINT <date>` (or omit when not resuming) — present when a fresh session recognizes an **unconsumed** `CHECKPOINT:` entry in the plan's `Changelog` (scan defined in `eversis-orchestrating-implementation` Step 1: a later `RESUMED:` row or a later row that records that same task complete consumes it; other later rows do not) and is picking up a zero-compaction handoff. This is independent of `Flow` — `Flow` still states the governing flow (e.g. `Full`) exactly as it did before the checkpoint; resuming never loses that declaration.
 - `- **Context:** <N> components indexed` (or `0 components indexed`) — `docs/context/<project>/INDEX.md`'s component count via `eversis_context_list`. `0` is a visible, non-blocking signal, not a gate.
+- `- **Audit:** …` — The agent reads `docs/context/<project>/INDEX.md` frontmatter directly. It does not call MCP for this line. It does not compute the count from git history or from `eversis_context_list`. Omit the line when the index has 0 components. When there is at least one component and `last_audit` is absent: `Audit: never`. Otherwise: `Audit: N since YYYY-MM-DD`, and append `due` when `N >= audit_due_after` (the integer stored in frontmatter; `5` only when that key is absent). The line is not a gate. It is not a fifth required line. It is not a `Next gate` value. `Flow` stays `Quick | Full | QA follow-up`.
 - `- **Reason:** …` — why this Flow / Research decision.
 
 **Self-check before sending the first message:**
 
 1. Inspected `docs/specs/<issue>/` and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
-2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Reason`).
+2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Audit`, `Reason`).
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.

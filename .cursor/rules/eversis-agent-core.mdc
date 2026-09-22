@@ -38,7 +38,7 @@ When acting as Engineering Manager or running the **Implement** prompt (`eversis
    When reading `docs/context/` for domain knowledge (distinct from `docs/specs/` task history), read in this order — smallest sufficient read first, never the whole tree by default. There is exactly **one** in-repo router — `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` when the topic is not local) — never `docs/plan/INDEX.md` or `docs/plans/INDEX.md`:
    1. `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` only if the topic is not covered locally) — bounded, cheap, always safe to read.
    2. Match the task's topic to **one** component listed there.
-   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies.
+   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies. If `status` is `deprecated` or `superseded`, the body is not current truth and the task must not be based on it; if `superseded_by` names a component, read that one successor file instead; do not remove the index row.
    4. Follow `related_specs`/`confluence_url` from that file only if it signals a real gap (missing recent history, missing business context) — 1-2 most recent links, not all of them.
 
    `docs/specs/` history is governed by two distinct costs, not one merged fallback:

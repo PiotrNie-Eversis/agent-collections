@@ -94,7 +94,8 @@ Before creating artifacts, delegating, or writing product code, inspect `docs/sp
 - The **first content** in the first assistant message MUST be the readiness block — no other heading, Jira recap, or analysis before it.
 - Use heading exactly: `## Implement readiness` (no issue key or suffix on the heading line).
 - Include the **four required lines** (each a bullet): Flow, Research, Plan, Next gate — in that order.
-- Optional additional lines, any subset, in this order when present after the four required lines: `- **Resume:** CHECKPOINT <date>` (present only when resuming a zero-compaction handoff — see Execution rules and gates, rule 14; `Flow` keeps stating the governing flow, e.g. `Full`, exactly as before the checkpoint — resuming is independent of `Flow`, never a substitute value for it), `- **Context:** <N> components indexed` (or `0 components indexed`) — `docs/context/<project>/INDEX.md`'s component count via `eversis_context_list`, a visible non-blocking signal, never a gate — and `- **Reason:** …` (one line: why this Flow / Research decision).
+- Optional additional lines, any subset, in this order when present after the four required lines: `- **Resume:** CHECKPOINT <date>` (present only when resuming a zero-compaction handoff — see Execution rules and gates, rule 14; `Flow` keeps stating the governing flow, e.g. `Full`, exactly as before the checkpoint — resuming is independent of `Flow`, never a substitute value for it), `- **Context:** <N> components indexed` (or `0 components indexed`) — `docs/context/<project>/INDEX.md`'s component count via `eversis_context_list`, a visible non-blocking signal, never a gate —, `- **Audit:** …` (see below), and `- **Reason:** …` (one line: why this Flow / Research decision).
+- **Audit line:** The agent reads `docs/context/<project>/INDEX.md` frontmatter directly. It does not call MCP for this line. It does not compute the count from git history or from `eversis_context_list`. Omit the line when the index has 0 components. When there is at least one component and `last_audit` is absent: `Audit: never`. Otherwise: `Audit: N since YYYY-MM-DD`, and append `due` when `N >= audit_due_after` (the integer stored in frontmatter; `5` only when that key is absent). The line is not a gate. It is not a fifth required line. It is not a `Next gate` value. `Flow` stays `Quick | Full | QA follow-up`.
 - Do **not** substitute a narrative summary or A/B/C option menu for the block.
 
 #### Gate-closing rule (hard)
@@ -259,6 +260,8 @@ When all validation and review gates pass:
 2. In the **same response**, produce the QA comment draft following **`eversis-fine-handoff`** (MCP `eversis_skills_get` or `.ai/skills/eversis-fine-handoff/SKILL.md`).
 3. Label: `**Draft QA comment — review before posting to Jira**`.
 4. Do **not** post to Jira in this turn. Only use Atlassian MCP after explicit human approval.
+
+Also upsert the `tasks_since_audit` counter per the Audit counter procedure in `eversis-fine-handoff`.
 
 ## Connected Skills
 

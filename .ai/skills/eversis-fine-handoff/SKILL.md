@@ -17,6 +17,10 @@ This skill covers **Implement handoff only** (one Jira comment draft). For full 
 
 Prefer loading this skill via the **`eversis-collections` MCP** (`eversis_skills_get`) when the server is running; otherwise follow this file directly.
 
+## Audit counter (INDEX.md frontmatter)
+
+When Fine is declared for a completed task, if `docs/context/<project>/INDEX.md` has at least one component row, upsert frontmatter: if `tasks_since_audit` is absent, set it to `1`; otherwise add `1`. If `audit_due_after` is absent, set it to `5`. Do not set `last_audit`. Do this whether or not a promotion draft exists. If the index file is missing or has no component rows, do nothing — do not create `INDEX.md`. Do not run this on import. Do not start an audit run.
+
 ## Two-phase human gate
 
 ### Phase 1 — Draft output (Fine turn)

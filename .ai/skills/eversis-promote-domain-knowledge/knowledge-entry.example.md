@@ -6,6 +6,7 @@
 ---
 scope: project
 source: agent-discovered
+status: approved
 last_updated: "2026-08-25"
 tags: [checkout, payments]
 code_paths: ["src/checkout/**", "src/payments/providers/**"]
@@ -43,6 +44,7 @@ the same pattern:
 ---
 scope: project
 source: agent-discovered
+status: approved
 last_updated: "2026-11-10"
 tags: [checkout, payments, validation]
 code_paths: ["src/checkout/**", "src/payments/providers/**"]

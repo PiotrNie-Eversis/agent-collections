@@ -18,6 +18,7 @@ A hypothetical project `proj` with a populated As-Is Pack covering most modules,
 ---
 scope: project
 source: confluence
+status: approved
 confluence_url: "https://example.atlassian.net/wiki/spaces/PROJ/pages/123456/As-is+Pack#Authentication"
 last_updated: "2026-09-21"
 tags: [auth, sso]
@@ -45,6 +46,7 @@ touched (Step 4).
 ---
 scope: project
 source: confluence
+status: approved
 confluence_url: "https://example.atlassian.net/wiki/spaces/PROJ/pages/123456/As-is+Pack#FAQ"
 last_updated: "2026-09-21"
 tags: [faq, content]
@@ -69,6 +71,7 @@ The As-Is Pack's module map marks "Dashboard" as `‚ùå brak` (no documentation) ‚
 ---
 scope: project
 source: docs-specs-cluster
+status: approved
 confluence_url: null
 last_updated: "2026-09-21"
 tags: [dashboard, metrics]
