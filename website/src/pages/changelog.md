@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Fine can draft an inline As-Is Pack comment when a promotion candidate has `confluence_url`.
 - **Add a domain fact without closing a ticket** — `eversis-add-domain-knowledge` (`user-invocable: true`) drafts one durable project-knowledge fact and writes `docs/context/<project>/` locally only after the person approves that draft. The person commits. Close-out promotion stays `user-invocable: false`.
 - **Docs changelog sync** — Root `CHANGELOG.md` is the single editable SSOT (SemVer + prior history); `website/src/pages/changelog.md` is generated via `scripts/sync-changelog.mjs` (`prestart`/`prebuild`); `--check` drift gate; `vercel.json` for docs deploy
 - **TASK-515 close-out** — Q6 hygiene: retarget `.ai/` deep-links from `cursor-collections` to Agent Collections paths; `docs/context/agent-collections/delivery-index.md` traceability (CQ2 waiver); installer Claude deselect prune for generated `CLAUDE.md` / `.claudeignore`; area profiles drop generic `charts/**` exclude (consumer overlay for true infra); targeted website SSOT wording (`.ai/prompts`, slash commands)

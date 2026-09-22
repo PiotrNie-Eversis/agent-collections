@@ -261,6 +261,8 @@ When all validation and review gates pass:
 3. Label: `**Draft QA comment — review before posting to Jira**`.
 4. Do **not** post to Jira in this turn. Only use Atlassian MCP after explicit human approval.
 
+When `eversis-fine-handoff` requires the As-Is Pack draft, include it in the same Fine turn, with its own approval.
+
 Also upsert the `tasks_since_audit` counter per the Audit counter procedure in `eversis-fine-handoff`.
 
 ## Connected Skills

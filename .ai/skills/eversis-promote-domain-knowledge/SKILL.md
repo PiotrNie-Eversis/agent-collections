@@ -73,6 +73,7 @@ Followed by a short, current-state description (what it is, how it works today) 
 - Overwrite the descriptive body with the current, accurate state (never accumulate old and new descriptions side by side).
 - Append `docs/specs/<task-kebab>/` to `related_specs` (a growing list, one line per task — never remove or reorder prior entries here).
 - If `related_specs` now exceeds ~15-20 entries, move all but the most recent 5-10 into `<component>/changelog.md` (create it if absent), leaving one line in `index.md`: "Starsza historia: zobacz `changelog.md`." Reuse this repo's own `CHANGELOG.md` idiom (append-only, never rewritten) — do not invent a different format.
+- Copy an existing `confluence_url` into the draft and leave it unchanged; do not replace a null or missing URL with a guessed Pack link.
 - Update the component's one-line row in `docs/context/<project>/INDEX.md` if the summary changed; add a new row if this is a new component.
 - Set `status: approved` on the committed file. Do not write `draft` or `proposed`.
 

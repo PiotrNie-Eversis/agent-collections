@@ -56,3 +56,4 @@ Do not skip **UI verification** items tracked in the plan before handoff to code
 - When you reach **Fine**, **always** produce the QA comment draft **in the same turn** per **`fine-handoff.md`** / skill `eversis-fine-handoff` (orchestration skill Step 5).
 - Label: `**Draft QA comment — review before posting to Jira**`
 - **Do not** publish to the issue tracker until the human explicitly approves.
+- When `eversis-fine-handoff` requires the As-Is Pack draft, output it in the same Fine turn, with its own approval.

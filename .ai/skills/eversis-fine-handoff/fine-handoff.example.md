@@ -79,3 +79,27 @@ session creation — see `POST /api/v1/auth/mfa/verify`.
 ```
 
 This draft is approved separately from the QA draft — approving one has no effect on the other. Had this convention not already been confirmed a second time in an unrelated task (see the "second occurrence" heuristic in `eversis-promote-domain-knowledge`), this draft would not have appeared at all, and the Fine turn would have ended with just the QA comment draft above.
+
+## Example — third draft (As-Is Pack comment)
+
+When the promotion candidate has a non-null `confluence_url` and the heading is on the page, a third draft follows in the same Fine turn.
+
+**Draft: As-Is Pack comment — approve before posting to Confluence**
+
+- Page: `https://example.atlassian.net/wiki/spaces/PROJ/pages/123456/As-is+Pack#Authentication`
+- Heading: Authentication
+- Owner: Ada Owner
+- Comment: Login challenges the user for an email code whenever MFA is enabled in account settings. The check happens after password verification, before session creation.
+
+This draft has its own approval. Approving the QA draft or the promotion draft does not publish this comment.
+
+### Same heading, no section owner
+
+When the page has no `Właściciel sekcji:` line under Authentication, the owner field is empty and the draft still appears.
+
+**Draft: As-Is Pack comment — approve before posting to Confluence**
+
+- Page: `https://example.atlassian.net/wiki/spaces/PROJ/pages/123456/As-is+Pack#Authentication`
+- Heading: Authentication
+- Owner:
+- Comment: Login challenges the user for an email code whenever MFA is enabled in account settings. The check happens after password verification, before session creation.

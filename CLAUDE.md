@@ -171,6 +171,7 @@ Do not skip **UI verification** items tracked in the plan before handoff to code
 - When you reach **Fine**, **always** produce the QA comment draft **in the same turn** per **`fine-handoff.md`** / skill `eversis-fine-handoff` (orchestration skill Step 5).
 - Label: `**Draft QA comment — review before posting to Jira**`
 - **Do not** publish to the issue tracker until the human explicitly approves.
+- When `eversis-fine-handoff` requires the As-Is Pack draft, output it in the same Fine turn, with its own approval.
 
 ## eversis-code-reviewer
 
@@ -232,6 +233,28 @@ When `eversis-promote-domain-knowledge` (see that skill) determines the task pro
 - This draft has its **own** approval — approving or rejecting the QA comment draft has no effect on this one, and vice versa. Only write to `docs/context/<project>/` after this specific draft is explicitly approved.
 - If `eversis-promote-domain-knowledge` finds nothing worth promoting for this task, do not add this draft at all — the QA comment draft alone is a complete, valid Fine turn (this is the common case, not an exception).
 - Publication mechanism once approved: GitLab REST API (Branches → Commits with multiple file actions → Merge Requests), never a local checkout of `domain-context` (see `eversis-promote-domain-knowledge`).
+
+## Optional third draft — As-Is Pack comment
+
+When the Fine turn already includes a domain-knowledge promotion draft, and that candidate has a non-null `confluence_url`, add a **third, independent draft** in the same turn. If the promotion draft omits `confluence_url`, read the field from the existing component file. Skip this draft when any of the following is true:
+
+- there is no promotion draft
+- `confluence_url` is null or missing
+- the Confluence page cannot be read
+- the heading taken from the URL fragment is not on the page
+
+A write under `docs/decisions/` does **not** create this draft. A missing `ssot.confluenceSpaceKey` is not a separate search: the URL is the map.
+
+Fetch the page **read-only** (for example `getConfluencePage`) to resolve the heading and the owner. The heading is the URL fragment after `#`, decoded. The owner is the person named on the `Właściciel sekcji:` line directly under that heading. When that line is absent or names nobody, leave the owner empty and still show the draft. Do **not** guess an owner and do **not** look up a Confluence account.
+
+- Header (exact): `**Draft: As-Is Pack comment — approve before posting to Confluence**`
+- Name the page URL, the section heading, the section owner (or empty), and a short current-state comment copied from the promotion text. The comment is that current-state paragraph — not a diff and not a replacement of the page section.
+- This draft has its **own** approval — approving the QA draft or the promotion draft does **not** publish this comment.
+- Do **not** call Confluence write tools in the Fine turn.
+
+### Publishing this draft (later turn, explicit only)
+
+Publishing is a **later turn**, and only after the human explicitly approves this draft. Fetch the page again and call `createConfluenceInlineComment`. Set `inlineCommentProperties.textSelection` to the heading text, `textSelectionMatchCount` to how many times that heading text appears on the page, and `textSelectionMatchIndex` to the zero-based occurrence the URL fragment identifies. Do **not** edit the page body. Do **not** use a footer comment (`createConfluenceFooterComment`).
 
 ## Readability rules
 

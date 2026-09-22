@@ -44,7 +44,7 @@ The Engineering Manager is bound to the public prompt **`@eversis-implement`**. 
 
 Attach **`@eversis-implement`**, optionally **`@.cursor/rules/eversis-engineering-manager.mdc`**, plus ticket text and `@docs/specs/` / `@docs/context/` as needed. In the IDE, internal delegates live under `.cursor/prompts/internal/`; on the docs site see [Research](../prompts/internal/research), [Plan](../prompts/internal/plan), [Implement UI](../prompts/internal/implement-ui), and related implement prompts.
 
-See also the [Implement](../prompts/public/implement) workflow documentation page. On **Fine**, produce a QA comment draft per [eversis-fine-handoff](../skills/fine-handoff) — plus a second, independently-approved domain-knowledge promotion draft when the task surfaced a durable, cross-task fact (see [Workflow Overview](../../main-flow/workflow/overview#status-fine--handoff)).
+See also the [Implement](../prompts/public/implement) workflow documentation page. On **Fine**, produce a QA comment draft per [eversis-fine-handoff](../skills/fine-handoff) — plus a domain-knowledge promotion draft when there is a candidate, and an As-Is Pack comment when that candidate has `confluence_url` (see [Workflow Overview](../../main-flow/workflow/overview#status-fine--handoff)).
 
 ## Tool Access
 

@@ -72,7 +72,7 @@ If `.research.md` and `.plan.md` exist **and pass the adequacy checklist** for t
 :::
 
 :::note Mandatory QA comment draft after Fine
-When the Engineering Manager declares **Fine**, it **always produces a QA comment draft in the same response** following the **[Fine Handoff](../../reference/skills/fine-handoff)** skill (`eversis-fine-handoff`). Review the draft, edit if needed, then paste it into Jira or ask the agent to post it via Atlassian MCP. If the task also surfaced a durable, cross-task fact, Fine adds a second, independently-approved draft proposing to record it in `docs/context/<project>/` — see [Workflow Overview](./overview#status-fine--handoff) for the full process and both approval gates.
+When the Engineering Manager declares **Fine**, it **always produces a QA comment draft in the same response** following the **[Fine Handoff](../../reference/skills/fine-handoff)** skill (`eversis-fine-handoff`). Review the draft, edit if needed, then paste it into Jira or ask the agent to post it via Atlassian MCP. When there is a promotion candidate, Fine also drafts a domain-knowledge promotion for `docs/context/<project>/`, and when that candidate has `confluence_url`, an As-Is Pack comment as well — see [Workflow Overview](./overview#status-fine--handoff) for the full set.
 :::
 
 ### 2. Review
