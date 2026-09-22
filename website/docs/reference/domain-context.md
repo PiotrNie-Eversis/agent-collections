@@ -55,7 +55,7 @@ For a group with several consumer repos (frontend, backend, a portal, …), the 
 
 Step-by-step:
 
-1. **Create the `domain-context` project once**, at the group level. It can start empty — content grows when a **group-wide** fact is published into it ([Tools and skills](#tools-and-skills), step 5), not on every Fine.
+1. **Create the `domain-context` project once**, at the group level. It can start empty — content grows when a **group-wide** fact is published into it ([Tools and skills](#tools-and-skills), step 6), not on every Fine.
 2. **Install (or re-install) each consumer**, pointing it at that project:
    ```bash
    bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
@@ -123,25 +123,31 @@ Tool inventory: [eversis-collections — Domain context](./reference/integration
 
 1. **Read** during Research: `eversis_context_list` → pick **one** name → `eversis_context_get` (or open that one file). Do not scan all of `docs/context/`.
 2. **Do the task** as usual.
-3. **Promote** at Fine, if a _future different task_ would need this fact (a named convention, a durable business rule, or a reusable pattern): follow [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge). Most tasks produce **no** draft.
-4. **Approve that draft** separately from the QA comment. The write goes to **this repo**: `docs/context/<project>/`.
-5. **Share with other repos** (optional, later): only if the fact is true across the GitLab group. Publish into the shared `domain-context` project, then each consumer runs `eversis_context_sync`. Not the same Fine turn — see [Publishing to the global layer](#publishing-to-the-global-layer).
-6. **Seed from Confluence once** (optional): [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) when `ssot.confluenceSpaceKey` is set **and** there is **one AS-IS Pack page** (a single Confluence page split into topics). Not the installer. Not a whole space. Skip empty template sections.
-7. **Clean the project layer** (optional, on a team cadence such as quarterly): [`eversis-audit-domain-knowledge`](./reference/skills/audit-domain-knowledge). Never edit `docs/context/global/` in place — the next sync overwrites it.
+3. **Add a known fact** when no ticket is closing: the person starts `eversis-add-domain-knowledge` for a durable fact they already know (a team convention, a confirmed business rule, or a reusable pattern). The agent shows a draft first and writes nothing until that draft is approved. The write is a local edit of `docs/context/<project>/`; the person commits. This is not close-out promotion — close-out promotion (`eversis-promote-domain-knowledge`) remains the Fine procedure.
+4. **Promote** at Fine, if a _future different task_ would need this fact (a named convention, a durable business rule, or a reusable pattern): follow [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge). Most tasks produce **no** draft.
+5. **Approve that draft** separately from the QA comment. The write goes to **this repo**: `docs/context/<project>/`.
+6. **Share with other repos** (optional, later): only if the fact is true across the GitLab group. Publish into the shared `domain-context` project, then each consumer runs `eversis_context_sync`. Not the same Fine turn — see [Publishing to the global layer](#publishing-to-the-global-layer).
+7. **Seed from Confluence once** (optional): [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) when `ssot.confluenceSpaceKey` is set **and** there is **one AS-IS Pack page** (a single Confluence page split into topics). Not the installer. Not a whole space. Skip empty template sections.
+8. **Clean the project layer** (optional, on a team cadence such as quarterly): [`eversis-audit-domain-knowledge`](./reference/skills/audit-domain-knowledge). Never edit `docs/context/global/` in place — the next sync overwrites it.
 
 ### What to use
 
-| You want to…                         | Use                                                                                     | Writes to                                | When                                   |
-| ------------------------------------ | --------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------- |
-| See what knowledge exists            | `eversis_context_list`                                                                  | nowhere (read)                           | Research                               |
-| Read one topic                       | `eversis_context_get`                                                                   | `last_consulted` only                    | Research                               |
-| Refresh the shared copy in this repo | `eversis_context_sync`                                                                  | `docs/context/global/` (pull)            | After someone updated `domain-context` |
-| Save a fact from this task           | [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge)       | `docs/context/<project>/` after draft OK | Fine; skip if not durable              |
-| Share that fact with other repos     | same GitLab publish, targeting `domain-context`                                         | the shared GitLab project                | Later, explicit; then others sync      |
-| Seed from Confluence once            | [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) | `docs/context/<project>/`                | Human asks; one pack page              |
-| Clean old project files              | [`eversis-audit-domain-knowledge`](./reference/skills/audit-domain-knowledge)           | `docs/context/<project>/`                | Team cadence (for example quarterly)   |
+| You want to…                                    | Use                                                                                     | Writes to                                           | When                                      |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------- |
+| See what knowledge exists                       | `eversis_context_list`                                                                  | nowhere (read)                                      | Research                                  |
+| Read one topic                                  | `eversis_context_get`                                                                   | `last_consulted` only                               | Research                                  |
+| Refresh the shared copy in this repo            | `eversis_context_sync`                                                                  | `docs/context/global/` (pull)                       | After someone updated `domain-context`    |
+| Record a durable fact you already know, without closing a ticket | `eversis-add-domain-knowledge`                                         | `docs/context/<project>/` after that draft is approved | Person starts it; local file edit; the person commits |
+| Save a fact from this task                      | [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge)       | `docs/context/<project>/` after draft OK            | Fine; skip if not durable                 |
+| Share that fact with other repos                | same GitLab publish, targeting `domain-context`                                         | the shared GitLab project                           | Later, explicit; then others sync         |
+| Seed from Confluence once                       | [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) | `docs/context/<project>/`                           | Human asks; one pack page                 |
+| Clean old project files                         | [`eversis-audit-domain-knowledge`](./reference/skills/audit-domain-knowledge)           | `docs/context/<project>/`                           | Team cadence (for example quarterly)      |
 
-### The three write skills
+### The four write skills
+
+You can still hand-edit the knowledge files under `docs/context/<project>/` yourself; these skills do not replace that.
+
+**`eversis-add-domain-knowledge`** — Person starts it when they already know a durable fact and no ticket is closing. Draft first; nothing is written until that specific draft is approved. The write is a local working-tree edit of `docs/context/<project>/`; the person commits. **Do not** treat this as Fine close-out promotion — that remains `eversis-promote-domain-knowledge`.
 
 **[Promote](./reference/skills/promote-domain-knowledge)** — Optional Fine draft for a durable fact. **Do not** invent a new approval gate, and **do not** emit a draft when nothing is durable.
 
@@ -151,7 +157,7 @@ Tool inventory: [eversis-collections — Domain context](./reference/integration
 
 ## Publishing to the global layer
 
-Everyday Fine writes stay in `docs/context/<project>/` (step 4 above). Publishing to `domain-context` is **step 5**: only facts that remain true in other repos in the same GitLab group.
+Everyday Fine writes stay in `docs/context/<project>/` (step 5 above). Publishing to `domain-context` is **step 6**: only facts that remain true in other repos in the same GitLab group.
 
 That publish uses the GitLab REST API (branch + commit + merge request), never a local checkout of `domain-context`. It uses the same two-phase human gate as the QA comment: a labeled draft first, then explicit approval. It needs a `GITLAB_TOKEN` with write access from the agent's environment — the installer never generates, stores, or requests this token (see [Install Selection Schema](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/install-selection.md)).
 
