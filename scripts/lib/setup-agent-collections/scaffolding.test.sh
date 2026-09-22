@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scaffolding.test.sh — unit tests for scaffold_project()'s docs-triad README scaffolding.
+# scaffolding.test.sh — unit tests for scaffold_project()'s docs deliverables README scaffolding.
 #
 # Usage (from repo root):
 #   bash scripts/lib/setup-agent-collections/scaffolding.test.sh
@@ -34,15 +34,17 @@ _reset_target() {
 echo "scaffolding.sh unit tests"
 echo ""
 
-# Case 1: fresh scaffold creates all 3 triad READMEs
+# Case 1: fresh scaffold creates triad READMEs plus decisions catalog
 _reset_target
 scaffold_project
 if [[ -s "${TARGET_DIR}/docs/context/README.md" ]] && \
    [[ -s "${TARGET_DIR}/docs/plans/README.md" ]] && \
-   [[ -s "${TARGET_DIR}/docs/specs/README.md" ]]; then
-  _pass "fresh scaffold creates docs/context, docs/plans, docs/specs README.md"
+   [[ -s "${TARGET_DIR}/docs/specs/README.md" ]] && \
+   [[ -s "${TARGET_DIR}/docs/decisions/README.md" ]] && \
+   [[ -f "${TARGET_DIR}/docs/decisions/INDEX.md" ]]; then
+  _pass "fresh scaffold creates docs/context, docs/plans, docs/specs README.md and docs/decisions README+INDEX"
 else
-  _fail "fresh scaffold creates docs/context, docs/plans, docs/specs README.md"
+  _fail "fresh scaffold creates docs/context, docs/plans, docs/specs README.md and docs/decisions README+INDEX"
 fi
 
 # Case 2: backfill — pre-existing dirs without README get the README on re-run
@@ -70,9 +72,19 @@ fi
 # Case 4: idempotent — calling scaffold_project twice does not error or change content
 _reset_target
 scaffold_project
-CHECKSUM_1="$(cat "${TARGET_DIR}/docs/specs/README.md" "${TARGET_DIR}/docs/context/README.md" "${TARGET_DIR}/docs/plans/README.md" | shasum)"
+CHECKSUM_1="$(cat \
+  "${TARGET_DIR}/docs/specs/README.md" \
+  "${TARGET_DIR}/docs/context/README.md" \
+  "${TARGET_DIR}/docs/plans/README.md" \
+  "${TARGET_DIR}/docs/decisions/README.md" \
+  "${TARGET_DIR}/docs/decisions/INDEX.md" | shasum)"
 scaffold_project
-CHECKSUM_2="$(cat "${TARGET_DIR}/docs/specs/README.md" "${TARGET_DIR}/docs/context/README.md" "${TARGET_DIR}/docs/plans/README.md" | shasum)"
+CHECKSUM_2="$(cat \
+  "${TARGET_DIR}/docs/specs/README.md" \
+  "${TARGET_DIR}/docs/context/README.md" \
+  "${TARGET_DIR}/docs/plans/README.md" \
+  "${TARGET_DIR}/docs/decisions/README.md" \
+  "${TARGET_DIR}/docs/decisions/INDEX.md" | shasum)"
 if [[ "$CHECKSUM_1" == "$CHECKSUM_2" ]]; then
   _pass "calling scaffold_project twice is idempotent"
 else

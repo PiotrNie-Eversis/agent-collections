@@ -23,6 +23,7 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 | [`docs/context/`](./docs/context/) | Internal knowledge, task baselines |
 | [`docs/plans/`](./docs/plans/) | Optional flat plans; prefer specs for Implement |
 | [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<issue-kebab>/`; `task-*` local-only / gitignored in this repo) |
+| [`docs/decisions/`](./docs/decisions/) | Architecture decisions — one file per decision plus `INDEX.md` |
 
 ## Monorepo / Areas
 

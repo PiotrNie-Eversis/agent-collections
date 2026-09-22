@@ -14,13 +14,14 @@ This consumer project uses **Agent Collections**.
 
 ## Project deliverables
 
-Use these folders for agent/project artifacts (same triad as cursor-collections):
+Use these folders for agent/project artifacts:
 
 | Path | Role |
 |------|------|
 | `docs/context/` | Internal knowledge, architecture notes, task baselines |
 | `docs/plans/` | Optional flat plans; prefer specs for Implement workflow |
 | `docs/specs/` | SDD research / plan / plan-review (`docs/specs/<issue-kebab>/`) |
+| `docs/decisions/` | Architecture decisions — one file per decision plus `INDEX.md` |
 
 ## Monorepo / Areas
 

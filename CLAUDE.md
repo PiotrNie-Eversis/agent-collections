@@ -53,6 +53,11 @@ When acting as Engineering Manager or running the **Implement** prompt (`eversis
    `docs/specs/` history is governed by two distinct costs, not one merged fallback:
    - **Discovery** — grep/glob across `docs/specs/**` for filenames or topic matches. Always allowed, cheap, loads no file content. Use this freely to check whether prior work on a topic exists, even when the component already has an `INDEX.md` entry.
    - **Consumption** — loading the full content of a matched file, or of a `related_specs`/`confluence_url` entry. Capped at **1-2 files total**, regardless of whether the match came from step 4 above or from discovery. Never loop through every discovery match loading its full content — that reintroduces the window-filling read this budget exists to prevent.
+
+   Architecture decisions live under `docs/decisions/`, beside this domain-knowledge router (not inside it). `docs/context/<project>/INDEX.md` remains the **only** router for reference / domain knowledge.
+   1. `docs/decisions/INDEX.md` — bounded, one line per decision, always safe to read.
+   2. Then load at most **1–2** full decision files (`docs/decisions/<id>.md`). This cap is **separate** from the `docs/specs/` consumption cap of 1–2.
+   When a human asks to record an architecture decision during delivery (research, plan, or Implement), follow skill `eversis-record-decision`. Do **not** wait for Fine. Do **not** file it as domain knowledge via `eversis-promote-domain-knowledge`.
 2. **Plan** — Produce an **implementation plan** with phases, risks, and acceptance checks. Run the **adequacy checklist** before `Plan: SKIP` when `*.plan.md` exists. When readiness shows **REFRESH** or **CREATE**, update or write the plan in the **same session** before broad code changes. **Stop** for human approval before execution.
 3. **Implement** — Make focused edits; run the repo's lint/test/typecheck commands after substantive changes (see `testing-and-terminal.md` in this folder).
 4. **Review** — In the **same session**, load and execute the **Review** prompt (`eversis-review`) with PASS / BLOCKER / SUGGESTION structure. Do **not** end the turn solely to wait for the human to attach `/eversis-review`, unless the user opted out with **`pause before review`** or **`review later`**.

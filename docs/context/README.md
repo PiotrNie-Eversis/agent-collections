@@ -1,6 +1,6 @@
 # context
 
-Internal knowledge for this project: architecture notes, ADRs, wiki sync exports, onboarding. Use clear filenames under `docs/context/<project>/`.
+Internal knowledge for this project: architecture notes, wiki sync exports, onboarding. Use clear filenames under `docs/context/<project>/`. Architecture decisions live under [`docs/decisions/`](../decisions/), not here.
 
 **`docs/context/<project>/INDEX.md` is the one mandatory router** an agent reads first, before any component file — one line per component, exactly two columns (`| component | one-line summary |`; a third column is silently dropped by the tooling that reads it, so per-component metadata belongs in that component's own file, not a new column). Each row's component name links to its own `docs/context/<project>/<component>/index.md`. Create `INDEX.md` when scaffolding this directory, even before any component exists.
 
@@ -8,7 +8,7 @@ Internal knowledge for this project: architecture notes, ADRs, wiki sync exports
 
 Referenced by research/plan steps. Attach it by path in your tool (e.g. Cursor `@docs/context/<project>/`).
 
-Part of the project deliverables triad with [`docs/plans/`](../plans/) and [`docs/specs/`](../specs/).
+Part of the project deliverables with [`docs/plans/`](../plans/), [`docs/specs/`](../specs/), and [`docs/decisions/`](../decisions/).
 
 By default this folder is committed like any other project doc. Projects installed with `--gitignore-agent-artifacts` gitignore `docs/context/*/` subfolders instead (local baselines/exports stay off git); only this `README.md` stays tracked in that mode.
 
