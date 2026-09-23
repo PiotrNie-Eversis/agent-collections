@@ -14,5 +14,5 @@ Maps wildly important functional (WF) and non-functional (WNF) goals for Agent C
 
 ## Notes
 
-- Docs site public URL / hosting: **deferred** (Wave D Q3) — local `website` build only.
+- Docs site public URL: https://agent-collections.vercel.app
 - Consumer-specific area names map via overlay; framework keeps abstract `apps/web` / `apps/api`.

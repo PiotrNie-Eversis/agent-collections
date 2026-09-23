@@ -8,8 +8,8 @@ const config: Config = {
   tagline:
     'Vendor-neutral multi-agent product engineering framework — Ideate → Implement → Review → Fine',
 
-  // Public hosting deferred (Wave D Q3). Local / preview placeholder only — not a production docs URL.
-  url: 'http://localhost:3000',
+  // Canonical origin baked into metadata (canonical, Open Graph, Twitter image, hreflang, sitemap).
+  url: 'https://agent-collections.vercel.app',
   baseUrl: '/',
 
   onBrokenLinks: 'throw',
