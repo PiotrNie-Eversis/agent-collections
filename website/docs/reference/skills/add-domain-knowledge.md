@@ -8,7 +8,7 @@ title: Adding domain knowledge
 **Folder:** `.ai/skills/eversis-add-domain-knowledge/`  
 **Used by:** the person, on purpose, when they already know a durable fact and no ticket is closing. Not the Fine turn.
 
-Person-started draft of one durable fact into `docs/context/<project>/`. Show the draft first. After that draft is approved, write a local working-tree edit; the person commits. The agent does not open a merge request and does not run `git commit`. This is not close-out promotion.
+Person-started draft of one durable fact into `docs/context/<project>/`. Show the draft first. Nothing is written until that specific draft is approved. After approval, the write is a local working-tree edit of `docs/context/<project>/` that also updates a row in `docs/context/<project>/INDEX.md` when the summary is new or changed; the person commits. The agent does not open a merge request and does not run `git commit`. **Do not** treat this as Fine close-out promotion — that remains [Promoting domain knowledge](./promote-domain-knowledge).
 
 ## Principles
 
