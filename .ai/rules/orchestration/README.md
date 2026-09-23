@@ -23,7 +23,7 @@ Compared to legacy Cursor Collections orchestration, the core **must** preserve:
 1. Ideate → Research → Plan → Implement → Review lifecycle (SDD); drafts until human approves — see `spec-driven-development.md`
 2. Research artifact + human approve before plan (when Full / required)
 3. Plan artifact + human approve before broad execution
-4. Implement readiness four-line block as first content on Implement entry
+4. Implement readiness block (four required lines plus optional signals) as first content on Implement entry
 5. Adequacy checklist before Research/Plan SKIP
 6. Post-change lint/typecheck/tests discipline
 7. Review with PASS / BLOCKER / SUGGESTION (review step not dropped)

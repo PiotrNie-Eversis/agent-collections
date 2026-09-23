@@ -81,7 +81,7 @@ Primary entry = stable prompt id / file under `.ai/prompts/`. The Cursor `@` lin
 
 When running **Implement** (`eversis-implement`):
 
-1. Output the **Implement readiness** four-line block first (see `engineering-manager.md`).
+1. Output the **Implement readiness** block (four required lines plus optional signals) first (see `engineering-manager.md`).
 2. Run the **adequacy checklist** before any `Research: SKIP` or `Plan: SKIP` when artifacts already exist — owned by skill `eversis-orchestrating-implementation` (do not duplicate the full checklist here).
 
 ## Related

@@ -77,7 +77,7 @@ Recommend Quick Flow or Full Flow in chat with a short reason, and allow the use
 
 #### Implement readiness (mandatory first output)
 
-Before creating artifacts, delegating, or writing product code, inspect `docs/specs/<issue>/` and any `@`-attached plan/research paths. Then **output at the start of the first response** the readiness block below (including Quick Flow and QA follow-ups). Do not skip it when continuing a summarized or handoff thread.
+Before creating artifacts, delegating, or writing product code, inspect `docs/specs/<issue>/` and any `@`-attached plan/research paths — **including a Changelog scan for an unconsumed checkpoint** (see rule 14). Walk the plan's `Changelog` rows from the newest backward and take the latest row whose Change Description starts with `CHECKPOINT:`. If none exists, this is not a resume. If a later row's Change Description starts with `RESUMED:` or records that the same task is complete, the checkpoint is consumed and this is not a resume. Any other later row, including a rule-12 solution note, does not consume it. When the checkpoint is unconsumed, emit `- **Resume:** CHECKPOINT <date>` using that checkpoint row's date, instead of treating the thread as new. Then **output at the start of the first response** the readiness block below (including Quick Flow and QA follow-ups). Do not skip it when continuing a summarized or handoff thread.
 
 **Note for maintainers:** “output at the start of the first response” means the block is the **first content** in the assistant message — not physical printing.
 
@@ -93,8 +93,9 @@ Before creating artifacts, delegating, or writing product code, inspect `docs/sp
 
 - The **first content** in the first assistant message MUST be the readiness block — no other heading, Jira recap, or analysis before it.
 - Use heading exactly: `## Implement readiness` (no issue key or suffix on the heading line).
-- Include **exactly four** bullet lines: Flow, Research, Plan, Next gate — in that order.
-- Optional fifth line after the block: `- **Reason:** …` (one line: why this Flow / Research decision).
+- Include the **four required lines** (each a bullet): Flow, Research, Plan, Next gate — in that order.
+- Optional additional lines, any subset, in this order when present after the four required lines: `- **Resume:** CHECKPOINT <date>` (present only when resuming a zero-compaction handoff — see Execution rules and gates, rule 14; `Flow` keeps stating the governing flow, e.g. `Full`, exactly as before the checkpoint — resuming is independent of `Flow`, never a substitute value for it), `- **Context:** <N> components indexed` (or `0 components indexed`) — `docs/context/<project>/INDEX.md`'s component count via `eversis_context_list`, a visible non-blocking signal, never a gate —, `- **Audit:** …` (see below), and `- **Reason:** …` (one line: why this Flow / Research decision).
+- **Audit line:** The agent reads `docs/context/<project>/INDEX.md` frontmatter directly. It does not call MCP for this line. It does not compute the count from git history or from `eversis_context_list`. Omit the line when the index has 0 components. When there is at least one component and `last_audit` is absent: `Audit: never`. Otherwise: `Audit: N since YYYY-MM-DD`, and append `due` when `N >= audit_due_after` (the integer stored in frontmatter; `5` only when that key is absent). The line is not a gate. It is not a fifth required line. It is not a `Next gate` value. `Flow` stays `Quick | Full | QA follow-up`.
 - Do **not** substitute a narrative summary or A/B/C option menu for the block.
 
 #### Gate-closing rule (hard)
@@ -249,6 +250,7 @@ Process tasks in plan order. Consult the todo list before each task and update t
 11. **Treat direct implementation as a workflow violation** — If the orchestrator starts writing product code directly, stop and return to delegated execution.
 12. **Record solution changes in the plan Changelog** — When the approved solution changes during implementation, document it in the plan file's Changelog with timestamps after confirmation.
 13. **Proceed to Fine on PASS** — When review passes — per the PASS definition in Continuity (default) above — execute Step 5 in the same turn (unless Continuity opt-out).
+14. **Checkpoint handoff note (session continues)** — One agent-observable trigger: the current plan task has reached a completed-and-tested state **while further tasks remain in the plan**, and the session is not already in Review or Fine. Do not count prompt/response exchanges. Context-window fill is not a trigger — do not write `CHECKPOINT:` or end the session because the window looks partly full. When the trigger fires, write a `CHECKPOINT:`-prefixed entry to the plan's `Changelog` — a single row whose Change Description cell starts with `CHECKPOINT:` followed by a short state summary, the changed-files list, and the next step, distinguishable from rule 12's ordinary solution-change entries. In that same turn write the next Changelog row whose Change Description starts with `RESUMED:` and states that this session continues. Do not tell the person to open a new session. Do not end the turn. Continue the remaining plan tasks, including Review and Fine, unless the person explicitly asks to stop. **Precedence:** if the session is already in Review or Fine, do not write `CHECKPOINT:` and do not end the session — finish the review and the QA comment. When the completed-and-tested task is the plan's **last** task, rule 13 governs instead — proceed to Fine in the same turn; do not end the session on a checkpoint. A non-last task that is completed and tested before Review has started still checkpoints. A fresh session recognizes an unconsumed checkpoint by the scan in “Implement readiness (mandatory first output)”: the latest `CHECKPOINT:` row that is not followed by a later `RESUMED:` row or a later row that records that same task complete. Emit it as `- **Resume:** CHECKPOINT <date>` using that row's date (`engineering-manager.md`) — independent of `Flow`, which keeps stating the governing flow (e.g. `Full`) unchanged — and resume from that entry instead of restarting the task from scratch. Agent-tool-based role delegation (EM → Architect → Software Engineer) already gives each delegated call its own fresh, stateless context — no separate multi-process coordinator/worker architecture is needed to get that same "ephemeral, stateless subagent" property here.
 
 ### Step 5 - Declare Fine and produce QA comment draft
 
@@ -258,6 +260,10 @@ When all validation and review gates pass:
 2. In the **same response**, produce the QA comment draft following **`eversis-fine-handoff`** (MCP `eversis_skills_get` or `.ai/skills/eversis-fine-handoff/SKILL.md`).
 3. Label: `**Draft QA comment — review before posting to Jira**`.
 4. Do **not** post to Jira in this turn. Only use Atlassian MCP after explicit human approval.
+
+When `eversis-fine-handoff` requires the As-Is Pack draft, include it in the same Fine turn, with its own approval.
+
+Also upsert the `tasks_since_audit` counter per the Audit counter procedure in `eversis-fine-handoff`.
 
 ## Connected Skills
 

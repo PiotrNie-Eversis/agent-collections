@@ -72,6 +72,12 @@ So that a durable fact learned during one task (a confirmed business rule, a reu
 
 This second draft is labeled **`Draft: domain-knowledge promotion to docs/context/<project>/ — approve before writing`** and has its **own** approval: accepting or rejecting the QA comment draft has no effect on it, and vice versa. Once approved, it is written to **this repo** (`docs/context/<project>/`). Sharing the same fact with other repos (the group `domain-context` GitLab project) is a **later, optional** step — see [Domain Context — Tools and skills](../../domain-context#tools-and-skills).
 
+### As-Is Pack comment
+
+When that promotion targets a component whose frontmatter has `confluence_url`, Fine also drafts an **inline comment** on the matching As-Is Pack heading (a Confluence section that maps the component to documented as-is state). The section owner comes from the `Właściciel sekcji:` line directly under that heading; if the line or the person is missing, the owner field is empty. Publishing is a **later, separate approval** and does **not** edit the page body.
+
+This draft is labeled **`Draft: As-Is Pack comment — approve before posting to Confluence`**. Without a promotion candidate, or when `confluence_url` is null, Fine stays on the QA draft alone or QA plus promotion — it does not take the Pack-comment branch.
+
 ```mermaid
 flowchart TD
     review["Review\n(PASS)"] --> fine["Fine\n(work marked ready for QA)"]
@@ -85,10 +91,18 @@ flowchart TD
     promo --> gate2{"Human approves\npromotion draft?\n(separate decision)"}
     gate2 -->|"yes"| project["Write docs/context/<project>/\nin this repo"]
 
+    promo --> packcheck{"Promotion target has\nconfluence_url?"}
+    packcheck -->|"No / null"| nopack["QA + promotion only\n(no Pack comment)"]
+    packcheck -->|"Yes"| pack["+ As-Is Pack comment draft\n(inline on Pack heading)"]
+    pack --> gate3{"Human approves\nPack comment?\n(separate decision)"}
+    gate3 -->|"yes"| confluence["Post inline comment\nto Confluence\n(page body unchanged)"]
+
     style qa fill:#FFF9C4
     style promo fill:#BBDEFB
+    style pack fill:#E1BEE7
     style jira fill:#C8E6C9
     style project fill:#C8E6C9
+    style confluence fill:#C8E6C9
 ```
 
 ## Workflow diagram

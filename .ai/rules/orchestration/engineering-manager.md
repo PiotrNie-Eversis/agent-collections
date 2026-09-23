@@ -10,7 +10,7 @@ Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `evers
 
 Follow **`agent-core.md`**: approve research, plan, and plan validation before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
 
-On the **first response** of every Implement run (`eversis-implement`), output the **exact four-line** Implement readiness block as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
+On the **first response** of every Implement run (`eversis-implement`), output the Implement readiness block (four required lines, plus any optional lines that apply) as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
 
 ```text
 ## Implement readiness
@@ -20,12 +20,16 @@ On the **first response** of every Implement run (`eversis-implement`), output t
 - **Next gate:** Awaiting approval before code | Awaiting approval before plan | Proceeding (<one-line reason>)
 ```
 
-Optional fifth line: `- **Reason:** …`
+Optional additional lines, any subset, appended after the four required lines in this order when present:
+- `- **Resume:** CHECKPOINT <date>` (or omit when not resuming) — present when a fresh session recognizes an **unconsumed** `CHECKPOINT:` entry in the plan's `Changelog` (scan defined in `eversis-orchestrating-implementation` Step 1: a later `RESUMED:` row or a later row that records that same task complete consumes it; other later rows do not) and is picking up a zero-compaction handoff. Writing `CHECKPOINT:` does not end the session that wrote it. That session also writes a `RESUMED:` row in the same turn and continues. `Resume` on a later session applies only while that checkpoint stays unconsumed. This is independent of `Flow` — `Flow` still states the governing flow (e.g. `Full`) exactly as it did before the checkpoint; resuming never loses that declaration.
+- `- **Context:** <N> components indexed` (or `0 components indexed`) — `docs/context/<project>/INDEX.md`'s component count via `eversis_context_list`. `0` is a visible, non-blocking signal, not a gate.
+- `- **Audit:** …` — The agent reads `docs/context/<project>/INDEX.md` frontmatter directly. It does not call MCP for this line. It does not compute the count from git history or from `eversis_context_list`. Omit the line when the index has 0 components. When there is at least one component and `last_audit` is absent: `Audit: never`. Otherwise: `Audit: N since YYYY-MM-DD`, and append `due` when `N >= audit_due_after` (the integer stored in frontmatter; `5` only when that key is absent). The line is not a gate. It is not a fifth required line. It is not a `Next gate` value. `Flow` stays `Quick | Full | QA follow-up`.
+- `- **Reason:** …` — why this Flow / Research decision.
 
 **Self-check before sending the first message:**
 
-1. Inspected `docs/specs/<issue>/` and any attached research/plan paths.
-2. First content is `## Implement readiness` with Flow, Research, Plan, Next gate (optional `Reason:`).
+1. Inspected `docs/specs/<issue>/` and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
+2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Audit`, `Reason`).
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.
@@ -52,3 +56,4 @@ Do not skip **UI verification** items tracked in the plan before handoff to code
 - When you reach **Fine**, **always** produce the QA comment draft **in the same turn** per **`fine-handoff.md`** / skill `eversis-fine-handoff` (orchestration skill Step 5).
 - Label: `**Draft QA comment — review before posting to Jira**`
 - **Do not** publish to the issue tracker until the human explicitly approves.
+- When `eversis-fine-handoff` requires the As-Is Pack draft, output it in the same Fine turn, with its own approval.

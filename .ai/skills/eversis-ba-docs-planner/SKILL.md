@@ -13,6 +13,10 @@ Load this skill before starting any planning run that involves `.docx` documenta
 
 ## Workflow
 
+### Docx path contract
+
+Pass a **project-relative** `docx_path` under the consumer project root (container `/workspace`), e.g. `.playwright-mcp/backups/file.docx`. Absolute container paths under `/workspace` are accepted; host absolute paths such as `/Users/...` are not visible to the MCP. `/workspace` is treated as the consumer project only when `.agent-collections/install-selection.json` is present (same rule as domain context). Without that file, resolution falls back to the image cwd and relative paths still fail — ensure `CONSUMER_PROJECT_ROOT` points at the consumer mount with install-selection present.
+
 ### Step 1 — Pre-flight: inspect document (when `.docx` path is available)
 
 Call `inspect_document(docx_path)`.
@@ -94,7 +98,7 @@ Do **not** invoke the Writer agent in this turn.
 ```markdown
 ---
 plan_status: VERIFIED | UNVERIFIED
-docx_path: /path/to/file.docx   # omit if UNVERIFIED
+docx_path: .playwright-mcp/backups/file.docx   # omit if UNVERIFIED
 sections_count: 196             # from inspect_document
 generated: 2026-06-03
 ---

@@ -56,6 +56,7 @@ grep -q 'AGENT_COLLECTIONS_HOME' "${TARGET}/.cursor/mcp.json" \
 grep -q 'frontend-scope' "${TARGET}/.agent-collections/area-profile.txt"
 [[ -f "${TARGET}/docs/context/README.md" ]] || { echo "FAIL: missing docs/context/README.md"; exit 1; }
 [[ -f "${TARGET}/docs/plans/README.md" ]] || { echo "FAIL: missing docs/plans/README.md"; exit 1; }
+[[ -f "${TARGET}/docs/decisions/INDEX.md" ]] || { echo "FAIL: missing docs/decisions/INDEX.md"; exit 1; }
 
 # .cursor/skills/ — content parity with .ai/skills/ SSOT (same guarantee
 # .claude/skills/ already has), including for the specific skill reported

@@ -5,7 +5,7 @@ title: Skills Overview
 
 # Skills Overview
 
-Agent Collections includes **48 reusable skills** — knowledge modules that provide specialized domain expertise, structured processes, and quality templates. They encode tested best practices for every phase of the product lifecycle. Skills are stored under **`.ai/skills/`** (SSOT). At install time, the setup script mirrors every skill package into a local, host-native path for **both** supported adapters — `.claude/skills/<id>/SKILL.md` for Claude Code and `.cursor/skills/<id>/SKILL.md` for Cursor (symlink or copy, kept in sync on re-run) — so a direct file read works for either host without MCP. Prefer the **`eversis-collections` MCP** server (**`eversis_skills_list`**, **`eversis_skills_get`**, **`eversis_skill_run_script`** for allowlisted per-skill scripts, and related tools) when it's running, after building [`mcp/eversis-collections-mcp/`](../integrations/overview) — the per-host mirror is a plain local-file fallback, not a registration of the folder as Cursor's or Claude Code's native **Agent Skills** UI path.
+Agent Collections includes **50 reusable skills** — knowledge modules that provide specialized domain expertise, structured processes, and quality templates. They encode tested best practices for every phase of the product lifecycle. Skills are stored under **`.ai/skills/`** (SSOT). At install time, the setup script mirrors every skill package into a local, host-native path for **both** supported adapters — `.claude/skills/<id>/SKILL.md` for Claude Code and `.cursor/skills/<id>/SKILL.md` for Cursor (symlink or copy, kept in sync on re-run) — so a direct file read works for either host without MCP. Prefer the **`eversis-collections` MCP** server (**`eversis_skills_list`**, **`eversis_skills_get`**, **`eversis_skill_run_script`** for allowlisted per-skill scripts, and related tools) when it's running, after building [`mcp/eversis-collections-mcp/`](../integrations/overview) — the per-host mirror is a plain local-file fallback, not a registration of the folder as Cursor's or Claude Code's native **Agent Skills** UI path.
 
 ## How Skills Work
 
@@ -55,6 +55,7 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 
 - **[eversis-orchestrating-implementation](./orchestrating-implementation)** — orchestrates the Implement phase end to end.
 - **[eversis-architecture-designing](./architecture-design)** — designs solution architecture.
+- **eversis-record-decision** — writes one architecture decision under `docs/decisions/` when a person asks during research, plan, or Implement.
 - **[eversis-creating-implementation-plans](./creating-implementation-plans)** — structures a designed solution into a phased plan.
 - **[eversis-technical-context-discovering](./technical-context-discovery)** — discovers project conventions and patterns.
 - **[eversis-implementing-frontend](./frontend-implementation)** — applies UI component and design-token patterns.
@@ -71,6 +72,7 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 - **[eversis-promote-domain-knowledge](./promote-domain-knowledge)** — drafts durable facts into `docs/context/` at Fine.
 - **[eversis-import-confluence-knowledge](./import-confluence-knowledge)** — seeds `docs/context/` from a Confluence AS-IS Pack.
 - **[eversis-audit-domain-knowledge](./audit-domain-knowledge)** — periodically reviews `docs/context/` for drift.
+- **[eversis-add-domain-knowledge](./add-domain-knowledge)** — drafts one durable project-knowledge fact when no ticket is closing; writes locally only after that draft is approved.
 
 | Skill                                                                    | Description                                                                    | Used By                            |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ---------------------------------- |
@@ -92,6 +94,8 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 | [eversis-promote-domain-knowledge](./promote-domain-knowledge)           | Optional Fine-turn draft promoting durable cross-task facts to `docs/context/` | Engineering Manager                |
 | [eversis-import-confluence-knowledge](./import-confluence-knowledge)     | One-time seed of `docs/context/<project>/` from a Confluence AS-IS Pack page   | Business Analyst, Context Engineer |
 | [eversis-audit-domain-knowledge](./audit-domain-knowledge)               | Periodic Keep/Update/Consolidate/Replace/Delete review of `docs/context/`      | Anyone (scheduled)                 |
+| [eversis-add-domain-knowledge](./add-domain-knowledge)                   | Person-started draft of one durable fact into `docs/context/<project>/` when no ticket is closing; local write after approval | the person (on request)            |
+| eversis-record-decision                                                  | Writes one local architecture decision under `docs/decisions/` when a person asks | anyone during research, plan, or Implement |
 
 ### ☁️ Cloud & Infrastructure Skills
 
@@ -191,11 +195,13 @@ When an agent needs specialized procedures, it can pull **`SKILL.md` content** v
 | eversis-optimizing-frontend                |     |     |           | ✅  |     |     |             |     |        |           |
 | eversis-fine-handoff                       |     |     |           | ✅  |     | ✅  |             | ✅  |        |           |
 | eversis-promote-domain-knowledge           |     |     |           |     |     |     |             |     |        |           |
+| eversis-record-decision                    |     |     |           |     |     |     |             |     |        |           |
 | eversis-planning-tests                     |     |     |           |     |     |     |             |     |        |           |
 | eversis-analyzing-regression-risk          |     |     |           |     |     |     |             |     |        |           |
 | eversis-verifying-acceptance-criteria      |     |     |           |     |     |     |             |     |        |           |
 | eversis-analyzing-bugs                     |     |     |           |     |     |     |             |     |        |           |
 | eversis-accessibility-auditing             |     |     |           |     |     |     |             |     |        |           |
+| eversis-add-domain-knowledge             |     |     |           |     |     |     |             |     |        |           |
 | eversis-functional-testing                 |     |     |           |     |     |     |             |     |        |           |
 | eversis-reviewing-frontend                 |     |     |           |     |     | ✅  |             |     |        |           |
 | eversis-sql-and-database-understanding     |     |     | ✅        | ✅  |     | ✅  |             |     |        |           |

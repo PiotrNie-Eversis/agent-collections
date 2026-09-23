@@ -44,11 +44,20 @@ When acting as Engineering Manager or running the **Implement** prompt (`eversis
 
 1. **Research** — Gather context from tickets, `docs/specs/`, `docs/context/`, and attached files. Produce a **research artifact** (`*.research.md`). Run the **adequacy checklist** (orchestration skill `eversis-orchestrating-implementation`) before `Research: SKIP` when a file already exists. When readiness shows **CREATE** or **DELTA**, the research file MUST be written or updated in the **same session** before ending the turn. **Stop** for human approval before planning.
 
-   When reading `docs/context/` for domain knowledge (distinct from `docs/specs/` task history), read in this order — smallest sufficient read first, never the whole tree by default:
+   When reading `docs/context/` for domain knowledge (distinct from `docs/specs/` task history), read in this order — smallest sufficient read first, never the whole tree by default. There is exactly **one** in-repo router — `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` when the topic is not local) — never `docs/plan/INDEX.md` or `docs/plans/INDEX.md`:
    1. `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` only if the topic is not covered locally) — bounded, cheap, always safe to read.
    2. Match the task's topic to **one** component listed there.
-   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies.
-   4. Follow `related_specs`/`confluence_url` from that file only if it signals a real gap (missing recent history, missing business context) — 1-2 most recent links, not all of them. Fall back to searching `docs/specs/`/the codebase directly only when the component has no entry yet in `INDEX.md`.
+   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies. If `status` is `deprecated` or `superseded`, the body is not current truth and the task must not be based on it; if `superseded_by` names a component, read that one successor file instead; do not remove the index row.
+   4. Follow `related_specs`/`confluence_url` from that file only if it signals a real gap (missing recent history, missing business context) — 1-2 most recent links, not all of them.
+
+   `docs/specs/` history is governed by two distinct costs, not one merged fallback:
+   - **Discovery** — grep/glob across `docs/specs/**` for filenames or topic matches. Always allowed, cheap, loads no file content. Use this freely to check whether prior work on a topic exists, even when the component already has an `INDEX.md` entry.
+   - **Consumption** — loading the full content of a matched file, or of a `related_specs`/`confluence_url` entry. Capped at **1-2 files total**, regardless of whether the match came from step 4 above or from discovery. Never loop through every discovery match loading its full content — that reintroduces the window-filling read this budget exists to prevent.
+
+   Architecture decisions live under `docs/decisions/`, beside this domain-knowledge router (not inside it). `docs/context/<project>/INDEX.md` remains the **only** router for reference / domain knowledge.
+   1. `docs/decisions/INDEX.md` — bounded, one line per decision, always safe to read.
+   2. Then load at most **1–2** full decision files (`docs/decisions/<id>.md`). This cap is **separate** from the `docs/specs/` consumption cap of 1–2.
+   When a human asks to record an architecture decision during delivery (research, plan, or Implement), follow skill `eversis-record-decision`. Do **not** wait for Fine. Do **not** file it as domain knowledge via `eversis-promote-domain-knowledge`.
 2. **Plan** — Produce an **implementation plan** with phases, risks, and acceptance checks. Run the **adequacy checklist** before `Plan: SKIP` when `*.plan.md` exists. When readiness shows **REFRESH** or **CREATE**, update or write the plan in the **same session** before broad code changes. **Stop** for human approval before execution.
 3. **Implement** — Make focused edits; run the repo's lint/test/typecheck commands after substantive changes (see `testing-and-terminal.md` in this folder).
 4. **Review** — In the **same session**, load and execute the **Review** prompt (`eversis-review`) with PASS / BLOCKER / SUGGESTION structure. Do **not** end the turn solely to wait for the human to attach `/eversis-review`, unless the user opted out with **`pause before review`** or **`review later`**.
@@ -116,7 +125,7 @@ Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `evers
 
 Follow **`agent-core.md`**: approve research, plan, and plan validation before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
 
-On the **first response** of every Implement run (`eversis-implement`), output the **exact four-line** Implement readiness block as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
+On the **first response** of every Implement run (`eversis-implement`), output the Implement readiness block (four required lines, plus any optional lines that apply) as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
 
 ```text
 ## Implement readiness
@@ -126,12 +135,16 @@ On the **first response** of every Implement run (`eversis-implement`), output t
 - **Next gate:** Awaiting approval before code | Awaiting approval before plan | Proceeding (<one-line reason>)
 ```
 
-Optional fifth line: `- **Reason:** …`
+Optional additional lines, any subset, appended after the four required lines in this order when present:
+- `- **Resume:** CHECKPOINT <date>` (or omit when not resuming) — present when a fresh session recognizes an **unconsumed** `CHECKPOINT:` entry in the plan's `Changelog` (scan defined in `eversis-orchestrating-implementation` Step 1: a later `RESUMED:` row or a later row that records that same task complete consumes it; other later rows do not) and is picking up a zero-compaction handoff. Writing `CHECKPOINT:` does not end the session that wrote it. That session also writes a `RESUMED:` row in the same turn and continues. `Resume` on a later session applies only while that checkpoint stays unconsumed. This is independent of `Flow` — `Flow` still states the governing flow (e.g. `Full`) exactly as it did before the checkpoint; resuming never loses that declaration.
+- `- **Context:** <N> components indexed` (or `0 components indexed`) — `docs/context/<project>/INDEX.md`'s component count via `eversis_context_list`. `0` is a visible, non-blocking signal, not a gate.
+- `- **Audit:** …` — The agent reads `docs/context/<project>/INDEX.md` frontmatter directly. It does not call MCP for this line. It does not compute the count from git history or from `eversis_context_list`. Omit the line when the index has 0 components. When there is at least one component and `last_audit` is absent: `Audit: never`. Otherwise: `Audit: N since YYYY-MM-DD`, and append `due` when `N >= audit_due_after` (the integer stored in frontmatter; `5` only when that key is absent). The line is not a gate. It is not a fifth required line. It is not a `Next gate` value. `Flow` stays `Quick | Full | QA follow-up`.
+- `- **Reason:** …` — why this Flow / Research decision.
 
 **Self-check before sending the first message:**
 
-1. Inspected `docs/specs/<issue>/` and any attached research/plan paths.
-2. First content is `## Implement readiness` with Flow, Research, Plan, Next gate (optional `Reason:`).
+1. Inspected `docs/specs/<issue>/` and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
+2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Audit`, `Reason`).
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.
@@ -158,6 +171,7 @@ Do not skip **UI verification** items tracked in the plan before handoff to code
 - When you reach **Fine**, **always** produce the QA comment draft **in the same turn** per **`fine-handoff.md`** / skill `eversis-fine-handoff` (orchestration skill Step 5).
 - Label: `**Draft QA comment — review before posting to Jira**`
 - **Do not** publish to the issue tracker until the human explicitly approves.
+- When `eversis-fine-handoff` requires the As-Is Pack draft, output it in the same Fine turn, with its own approval.
 
 ## eversis-code-reviewer
 
@@ -219,6 +233,28 @@ When `eversis-promote-domain-knowledge` (see that skill) determines the task pro
 - This draft has its **own** approval — approving or rejecting the QA comment draft has no effect on this one, and vice versa. Only write to `docs/context/<project>/` after this specific draft is explicitly approved.
 - If `eversis-promote-domain-knowledge` finds nothing worth promoting for this task, do not add this draft at all — the QA comment draft alone is a complete, valid Fine turn (this is the common case, not an exception).
 - Publication mechanism once approved: GitLab REST API (Branches → Commits with multiple file actions → Merge Requests), never a local checkout of `domain-context` (see `eversis-promote-domain-knowledge`).
+
+## Optional third draft — As-Is Pack comment
+
+When the Fine turn already includes a domain-knowledge promotion draft, and that candidate has a non-null `confluence_url`, add a **third, independent draft** in the same turn. If the promotion draft omits `confluence_url`, read the field from the existing component file. Skip this draft when any of the following is true:
+
+- there is no promotion draft
+- `confluence_url` is null or missing
+- the Confluence page cannot be read
+- the heading taken from the URL fragment is not on the page
+
+A write under `docs/decisions/` does **not** create this draft. A missing `ssot.confluenceSpaceKey` is not a separate search: the URL is the map.
+
+Fetch the page **read-only** (for example `getConfluencePage`) to resolve the heading and the owner. The heading is the URL fragment after `#`, decoded. The owner is the person named on the `Właściciel sekcji:` line directly under that heading. When that line is absent or names nobody, leave the owner empty and still show the draft. Do **not** guess an owner and do **not** look up a Confluence account.
+
+- Header (exact): `**Draft: As-Is Pack comment — approve before posting to Confluence**`
+- Name the page URL, the section heading, the section owner (or empty), and a short current-state comment copied from the promotion text. The comment is that current-state paragraph — not a diff and not a replacement of the page section.
+- This draft has its **own** approval — approving the QA draft or the promotion draft does **not** publish this comment.
+- Do **not** call Confluence write tools in the Fine turn.
+
+### Publishing this draft (later turn, explicit only)
+
+Publishing is a **later turn**, and only after the human explicitly approves this draft. Fetch the page again and call `createConfluenceInlineComment`. Set `inlineCommentProperties.textSelection` to the heading text, `textSelectionMatchCount` to how many times that heading text appears on the page, and `textSelectionMatchIndex` to the zero-based occurrence the URL fragment identifies. Do **not** edit the page body. Do **not** use a footer comment (`createConfluenceFooterComment`).
 
 ## Readability rules
 
@@ -346,7 +382,7 @@ Primary entry = stable prompt id / file under `.ai/prompts/`. The Cursor `@` lin
 
 When running **Implement** (`eversis-implement`):
 
-1. Output the **Implement readiness** four-line block first (see `engineering-manager.md`).
+1. Output the **Implement readiness** block (four required lines plus optional signals) first (see `engineering-manager.md`).
 2. Run the **adequacy checklist** before any `Research: SKIP` or `Plan: SKIP` when artifacts already exist — owned by skill `eversis-orchestrating-implementation` (do not duplicate the full checklist here).
 
 ## Related

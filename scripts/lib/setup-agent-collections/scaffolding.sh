@@ -53,13 +53,13 @@ README_EOF
     cat > "$context_readme" <<'README_EOF'
 # context
 
-Internal knowledge for this project: architecture notes, ADRs, wiki sync exports, onboarding. Use clear filenames under `docs/context/<project>/`.
+Internal knowledge for this project: architecture notes, wiki sync exports, onboarding. Use clear filenames under `docs/context/<project>/`. Architecture decisions live under [`docs/decisions/`](../decisions/), not here.
 
 **Task baseline (workshop continuity):** `docs/context/<project>/task-baseline.md` — optional epic/story index refreshed after a successful Jira push from prompt `eversis-analyze-materials`.
 
 Referenced by research/plan steps. Attach it by path in your tool (e.g. Cursor `@docs/context/<project>/`).
 
-Part of the project deliverables triad with [`docs/plans/`](../plans/) and [`docs/specs/`](../specs/).
+Part of the project deliverables with [`docs/plans/`](../plans/), [`docs/specs/`](../specs/), and [`docs/decisions/`](../decisions/).
 
 By default this folder is committed like any other project doc. Projects installed with `--gitignore-agent-artifacts` gitignore `docs/context/*/` subfolders instead (local baselines/exports stay off git); only this `README.md` stays tracked in that mode.
 README_EOF
@@ -80,6 +80,44 @@ Prefer the Implement workflow under `docs/specs/<issue-kebab>/*.plan.md` (with `
 Use `docs/plans/` only for legacy or ad-hoc flat plans when the team chooses not to use a specs folder.
 README_EOF
     log_ok "Created docs/plans/README.md."
+  fi
+
+  local decisions_dir="${target}/docs/decisions"
+  local decisions_readme="${decisions_dir}/README.md"
+  local decisions_index="${decisions_dir}/INDEX.md"
+  mkdir -p "$decisions_dir"
+  if [[ ! -f "$decisions_readme" ]]; then
+    cat > "$decisions_readme" <<'README_EOF'
+# decisions
+
+Catalog of architecture decisions for this repository. One markdown file per decision; the index lists them in two columns (`id`, `title`).
+
+## Record fields
+
+Each decision file uses these fields (no `status` field):
+
+| Field | Meaning |
+| ----- | ------- |
+| `id` | Stable lowercase kebab-case identifier (also the filename stem) |
+| `title` | One-sentence summary shown in the index |
+| `date` | When the decision was recorded (ISO date) |
+| `context` | Why a choice was needed |
+| `decision` | What was chosen |
+| `who` | Who made or confirmed the decision |
+| `source` | Where the decision was agreed (spec, ticket, conversation) |
+
+## Index
+
+[`INDEX.md`](./INDEX.md) is the bounded entry point: two columns only (`id`, `title`). A later Implement run reads the index, then at most 1–2 full decision files.
+README_EOF
+    log_ok "Created docs/decisions/README.md."
+  fi
+  if [[ ! -f "$decisions_index" ]]; then
+    cat > "$decisions_index" <<'INDEX_EOF'
+| id | title |
+| --- | --- |
+INDEX_EOF
+    log_ok "Created docs/decisions/INDEX.md."
   fi
 
   _seed_claude_project_md "$target" "$agents_dst"

@@ -45,7 +45,7 @@ Before research, planning, or code, inspect `docs/specs/<issue>/` (or paths atta
 | User asks to **research**, **analyze**, **przeanalizuj**, **bug analysis**, **last QA comment** (via `/eversis-implement`) | **Flow: Full**; **Research: CREATE \| DELTA**; **Plan: SKIP (analysis-only — plan after research approval)**; **Next gate: Awaiting approval before plan**; write/update `*.research.md` in same session; no A/B/C menu |
 | Narrow fix, obvious solution, ≤3 files, plan/context ready, adequacy pass | Quick Flow allowed (orchestration skill Step 1) |
 
-**First response (mandatory):** Output the **exact four-line** Implement readiness block from orchestration skill Step 1 as the **first content** before any artifact creation or code. Never skip it — even in Quick Flow or when continuing a thread. See **Readiness output contract** in the skill.
+**First response (mandatory):** Output the Implement readiness block (four required lines plus optional signals) from orchestration skill Step 1 as the **first content** before any artifact creation or code. Never skip it — even in Quick Flow or when continuing a thread. See **Readiness output contract** in the skill.
 
 <!-- Eversis port; upstream: eversis-implement:v2 + eversis-orchestrating-implementation -->
 

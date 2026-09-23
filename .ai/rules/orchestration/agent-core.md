@@ -29,11 +29,20 @@ When acting as Engineering Manager or running the **Implement** prompt (`eversis
 
 1. **Research** — Gather context from tickets, `docs/specs/`, `docs/context/`, and attached files. Produce a **research artifact** (`*.research.md`). Run the **adequacy checklist** (orchestration skill `eversis-orchestrating-implementation`) before `Research: SKIP` when a file already exists. When readiness shows **CREATE** or **DELTA**, the research file MUST be written or updated in the **same session** before ending the turn. **Stop** for human approval before planning.
 
-   When reading `docs/context/` for domain knowledge (distinct from `docs/specs/` task history), read in this order — smallest sufficient read first, never the whole tree by default:
+   When reading `docs/context/` for domain knowledge (distinct from `docs/specs/` task history), read in this order — smallest sufficient read first, never the whole tree by default. There is exactly **one** in-repo router — `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` when the topic is not local) — never `docs/plan/INDEX.md` or `docs/plans/INDEX.md`:
    1. `docs/context/<project>/INDEX.md` (and `docs/context/global/INDEX.md` only if the topic is not covered locally) — bounded, cheap, always safe to read.
    2. Match the task's topic to **one** component listed there.
-   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies.
-   4. Follow `related_specs`/`confluence_url` from that file only if it signals a real gap (missing recent history, missing business context) — 1-2 most recent links, not all of them. Fall back to searching `docs/specs/`/the codebase directly only when the component has no entry yet in `INDEX.md`.
+   3. Read only that **one** component's file — never the whole `docs/context/` directory, never `docs/specs/` history, unless step 4 applies. If `status` is `deprecated` or `superseded`, the body is not current truth and the task must not be based on it; if `superseded_by` names a component, read that one successor file instead; do not remove the index row.
+   4. Follow `related_specs`/`confluence_url` from that file only if it signals a real gap (missing recent history, missing business context) — 1-2 most recent links, not all of them.
+
+   `docs/specs/` history is governed by two distinct costs, not one merged fallback:
+   - **Discovery** — grep/glob across `docs/specs/**` for filenames or topic matches. Always allowed, cheap, loads no file content. Use this freely to check whether prior work on a topic exists, even when the component already has an `INDEX.md` entry.
+   - **Consumption** — loading the full content of a matched file, or of a `related_specs`/`confluence_url` entry. Capped at **1-2 files total**, regardless of whether the match came from step 4 above or from discovery. Never loop through every discovery match loading its full content — that reintroduces the window-filling read this budget exists to prevent.
+
+   Architecture decisions live under `docs/decisions/`, beside this domain-knowledge router (not inside it). `docs/context/<project>/INDEX.md` remains the **only** router for reference / domain knowledge.
+   1. `docs/decisions/INDEX.md` — bounded, one line per decision, always safe to read.
+   2. Then load at most **1–2** full decision files (`docs/decisions/<id>.md`). This cap is **separate** from the `docs/specs/` consumption cap of 1–2.
+   When a human asks to record an architecture decision during delivery (research, plan, or Implement), follow skill `eversis-record-decision`. Do **not** wait for Fine. Do **not** file it as domain knowledge via `eversis-promote-domain-knowledge`.
 2. **Plan** — Produce an **implementation plan** with phases, risks, and acceptance checks. Run the **adequacy checklist** before `Plan: SKIP` when `*.plan.md` exists. When readiness shows **REFRESH** or **CREATE**, update or write the plan in the **same session** before broad code changes. **Stop** for human approval before execution.
 3. **Implement** — Make focused edits; run the repo's lint/test/typecheck commands after substantive changes (see `testing-and-terminal.md` in this folder).
 4. **Review** — In the **same session**, load and execute the **Review** prompt (`eversis-review`) with PASS / BLOCKER / SUGGESTION structure. Do **not** end the turn solely to wait for the human to attach `/eversis-review`, unless the user opted out with **`pause before review`** or **`review later`**.

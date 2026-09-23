@@ -44,7 +44,7 @@ The Engineering Manager is bound to the public prompt **`@eversis-implement`**. 
 
 Attach **`@eversis-implement`**, optionally **`@.cursor/rules/eversis-engineering-manager.mdc`**, plus ticket text and `@docs/specs/` / `@docs/context/` as needed. In the IDE, internal delegates live under `.cursor/prompts/internal/`; on the docs site see [Research](../prompts/internal/research), [Plan](../prompts/internal/plan), [Implement UI](../prompts/internal/implement-ui), and related implement prompts.
 
-See also the [Implement](../prompts/public/implement) workflow documentation page. On **Fine**, produce a QA comment draft per [eversis-fine-handoff](../skills/fine-handoff) — plus a second, independently-approved domain-knowledge promotion draft when the task surfaced a durable, cross-task fact (see [Workflow Overview](../../main-flow/workflow/overview#status-fine--handoff)).
+See also the [Implement](../prompts/public/implement) workflow documentation page. On **Fine**, produce a QA comment draft per [eversis-fine-handoff](../skills/fine-handoff) — plus a domain-knowledge promotion draft when there is a candidate, and an As-Is Pack comment when that candidate has `confluence_url` (see [Workflow Overview](../../main-flow/workflow/overview#status-fine--handoff)).
 
 ## Tool Access
 
@@ -65,7 +65,7 @@ See also the [Implement](../prompts/public/implement) workflow documentation pag
 - **Uses Technical Context from the plan** — Skips redundant codebase discovery when the plan's Technical Context section is thorough.
 - **Runs codebase analysis when needed** — Invokes the [Architect](./architect) when Technical Context is incomplete.
 - **Respects human gates** — Stops for approval after research, after planning, and after plan validation before broad code changes (`eversis-agent-core.mdc`).
-- **Outputs Implement readiness first** — On every `@eversis-implement` / `/eversis-implement` run, the **exact four-line** readiness block is the **first content** (Flow / Research / Plan / Next gate; optional Reason) before artifacts or code. Runs **adequacy checklist** before Research SKIP when artifacts exist (orchestration skill Step 1).
+- **Outputs Implement readiness first** — On every `@eversis-implement` / `/eversis-implement` run, the readiness block is the **first content** — four required lines (Flow / Research / Plan / Next gate) plus optional `Resume`, `Context`, and `Reason` (the orchestration skill is the norm for any further optional line, including `Audit`) — before artifacts or code. Runs **adequacy checklist** before Research SKIP when artifacts exist (orchestration skill Step 1).
 - **Auto-triggers Code Reviewer** — Automatically runs the Code Reviewer at the end of implementation if no review phase is defined in the plan.
 - **Tracks progress** — Updates plan checkboxes after each completed task.
 - **Asks before deviating** — Requests user confirmation before deviating from the implementation plan.

@@ -22,14 +22,14 @@ Every `AGENTS.md` produced from this standard (template, install seed, or refere
 |---|---------|----------|---------|
 | 1 | Title + intro | Yes | Heading **Agent instructions** (no tool name in the title). 1–2 sentences: orientation map for agents. |
 | 2 | Framework | Yes | Pointers to `.ai/` (rules, skills, prompts), adapters, sync entry, MCP server id `eversis-collections`, primary prompt ids, SDD / orchestration entry. |
-| 3 | Project deliverables | Yes | Triad: `docs/context/`, `docs/plans/`, `docs/specs/` (see below). |
+| 3 | Project deliverables | Yes | Four paths: `docs/context/`, `docs/plans/`, `docs/specs/`, `docs/decisions/` (see below). |
 | 4 | Monorepo / Areas | Yes | Table or list: area → path → note. Use HTML comment placeholders until filled. |
 | 5 | Role matrix | Yes | Framework **agent** roles only (see Role matrix). One line per role: purpose + entry (prompt/rule id). |
 | 6 | Delivery Standard | Recommended | Short pointer to `docs/specs/<issue-kebab>/` and Research → Plan → Implement → Review → Fine gates. |
 | 7 | Project specifics | Yes | Consumer-owned overrides; start empty with HTML comment placeholders. |
 | 8 | Channel notes (Cursor) | Optional appendix | Cursor-only UX (`/` commands, `@` attach). Must not be required to understand the map. |
 
-## Project deliverables triad
+## Project deliverables
 
 When working with the framework in **any** repository, agent/project deliverables use the same folders as cursor-collections:
 
@@ -38,6 +38,7 @@ When working with the framework in **any** repository, agent/project deliverable
 | `docs/context/` | Internal knowledge, architecture notes, task baselines (`docs/context/<project>/…`) |
 | `docs/plans/` | Legacy/flat plans if used; prefer `docs/specs/<issue>/` for Implement workflow plans |
 | `docs/specs/` | SDD research / plan / plan-review artifacts (`docs/specs/<issue-kebab>/`) |
+| `docs/decisions/` | Architecture decisions — one file per decision plus `INDEX.md` |
 
 **Framework repository note:** all `docs/specs/*/` subfolders are **gitignored** (local-only story work on the framework itself), regardless of naming. They are not the published product surface. Committed standards and templates live elsewhere (this file, `templates/`).
 
@@ -99,7 +100,7 @@ For future installer / bootstrap (Work Stream 5; **not implemented in this stand
 | Destination | consumer repo root `AGENTS.md` |
 | Semantics | **Create if absent**; **never overwrite** an existing `AGENTS.md` without explicit consumer opt-in |
 | Placeholders | HTML comments `<!-- … -->` for Areas and Project specifics; consumers fill locally |
-| Also scaffold | Prefer creating `docs/context/`, `docs/plans/`, `docs/specs/` (with README scaffolds) when missing — same triad |
+| Also scaffold | Prefer creating `docs/context/`, `docs/plans/`, `docs/specs/` (with README scaffolds) when missing, and `docs/decisions/` (README + `INDEX.md`) when missing |
 
 Verification of this story’s AC #3 is by **documented contract + template file**, not by running an installer CLI.
 

@@ -83,7 +83,7 @@ Load prompts by stable id under `.ai/prompts/`. Optional Cursor `@` attach when 
 
 Skills are the reusable procedures an agent loads on demand rather than keeping in its base instructions.
 
-Skills live under `.ai/skills/eversis-*/`. Prefer MCP server **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`). Respect the consumer **project stack** skills policy. Includes 3 domain-context skills: `eversis-promote-domain-knowledge`, `eversis-import-confluence-knowledge`, `eversis-audit-domain-knowledge`.
+Skills live under `.ai/skills/eversis-*/`. Prefer MCP server **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`). Respect the consumer **project stack** skills policy. Includes 4 domain-context skills: `eversis-add-domain-knowledge`, `eversis-promote-domain-knowledge`, `eversis-import-confluence-knowledge`, `eversis-audit-domain-knowledge`.
 
 MVP does **not** ship a full `.cursor/skills` mirror.
 
