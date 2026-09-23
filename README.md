@@ -185,7 +185,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 | **Submodule** | `--vendor submodule` | **TASK / team default** — teammates: `git submodule update --init --recursive` |
 | **Copy** | `--vendor copy` | Vendors tree under `vendor/agent-collections/` |
 
-Useful flags: `--collections-home`, `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`, `--build-mcp` (force MCP rebuild), `--ssot-source URL` / `--ssot-branch NAME` (seed `docs/context/global/` from a shared domain-context repo, best-effort — never blocks install), `--confluence-space-key KEY` (optional, one-time AS-IS import — see `eversis-import-confluence-knowledge`).
+Useful flags: `--collections-home`, `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`, `--build-mcp` (force MCP rebuild), `--ssot-source URL` / `--ssot-branch NAME` (seed `docs/context/global/` from a shared domain-context repo, best-effort — never blocks install), `--confluence-space-key KEY` (optional — records the key; a person runs `eversis-import-confluence-knowledge` later).
 
 Interactive wizard (TTY) prompts for agents × domain profile × MCP servers — **no `--build-mcp` required** for the MCP checklist. Re-runs are idempotent; partial failures list completed vs failed steps with recovery hints.
 

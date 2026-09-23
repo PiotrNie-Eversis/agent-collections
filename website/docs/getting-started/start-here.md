@@ -27,7 +27,7 @@ Complete these steps on a **sample consumer project** (empty folder or small rep
 6. Open the consumer project in your agent tool and attach **`@eversis-implement`** (or load prompt id `eversis-implement`) with a short task — or read `.ai/skills/*/SKILL.md` via MCP.
 7. **Done** when: installer exited 0, MCP skills list works (or skills readable from `.ai/skills/`), and a first Implement readiness block appears in chat.
 
-That is a **first successful install**. Optional next steps: [Quick wins](./quick-wins), [Migration from Cursor Collections](../advanced/migration-from-cursor-collections), [Workflow overview](../main-flow/workflow/overview).
+That is a **first successful install**. Optional next steps: [Quick wins](./quick-wins), [Migration from Cursor Collections](../advanced/migration-from-cursor-collections), [Workflow overview](../main-flow/workflow/overview). If the project already has a Confluence As-Is Pack or a `docs/specs/` history, see [Seed existing project knowledge](./installation#seed-existing-project-knowledge-optional) after MCP setup.
 
 ## Setup checklist (maintainers)
 

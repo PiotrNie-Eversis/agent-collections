@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Installation seed step** — the getting-started installation page tells a consumer with a Confluence As-Is Pack or a `docs/specs/` history to run `eversis-import-confluence-knowledge` after MCP setup. `--confluence-space-key` still only records the key; the installer does not call Confluence.
 - Fine can draft an inline As-Is Pack comment when a promotion candidate has `confluence_url`.
 - **Add a domain fact without closing a ticket** — `eversis-add-domain-knowledge` (`user-invocable: true`) drafts one durable project-knowledge fact and writes `docs/context/<project>/` locally only after the person approves that draft. The person commits. Close-out promotion stays `user-invocable: false`.
 - **Docs changelog sync** — Root `CHANGELOG.md` is the single editable SSOT (SemVer + prior history); `website/src/pages/changelog.md` is generated via `scripts/sync-changelog.mjs` (`prestart`/`prebuild`); `--check` drift gate; `vercel.json` for docs deploy
