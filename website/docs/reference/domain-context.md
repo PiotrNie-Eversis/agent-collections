@@ -183,7 +183,7 @@ flowchart TD
 
 #### Implement
 
-A checkpoint is a row in the plan changelog when this task is done and tested and later tasks remain. It does not update the project index, and it does not continue into Review in the same session.
+A checkpoint is a row in the plan changelog when this task is done and tested and later tasks remain. The same turn writes RESUMED and this session continues through the remaining tasks, Review, and Fine, unless the person asks to stop. The checkpoint does not update the project index.
 
 ```mermaid
 %%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
@@ -191,12 +191,14 @@ flowchart TD
     i0{"This task completed and tested?"}
     i0 -->|no| iWork["Keep working. No checkpoint. No index write."]
     i0 -->|yes| iMore{"Further plan tasks remain?"}
-    iMore -->|yes| iCkpt["CHECKPOINT row in the plan Changelog. Does not update the project index."]
     iMore -->|no| iLast["Last task: no checkpoint. Continue to Review."]
+    iMore -->|yes| iCkpt["CHECKPOINT row, then RESUMED in the same turn. This session continues. No index write."]
+    iCkpt --> iGo["Remaining tasks, then Review and Fine, unless the person asks to stop."]
 
     style iWork fill:#ECEFF1
     style iCkpt fill:#ECEFF1
     style iLast fill:#ECEFF1
+    style iGo fill:#ECEFF1
 ```
 
 #### Review
@@ -293,7 +295,7 @@ flowchart TD
     style dFile fill:#ECEFF1
 ```
 
-**Legend:** green updates the project index (a row, or `tasks_since_audit` in the file header); blue is a read of that index; gray does not update it. The Implement checkpoint is a completed-and-tested task while further plan tasks remain; that checkpoint does not continue to Review in the same session, and it is not a window-fill check and not an exchange-count check.
+**Legend:** green updates the project index (a row, or `tasks_since_audit` in the file header); blue is a read of that index; gray does not update it. The Implement checkpoint is a completed-and-tested task while further plan tasks remain. The same turn writes RESUMED and the session continues. It does not update the project index, and it is not a window-fill check and not an exchange-count check.
 
 ## Tools and skills
 
