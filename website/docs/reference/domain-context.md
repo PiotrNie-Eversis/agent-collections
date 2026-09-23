@@ -117,17 +117,17 @@ Looking further, into `docs/specs/` task history, splits into two different cost
 
 Several finished pieces of work touch domain knowledge. Only some of them change a row in `docs/context/<project>/INDEX.md` (the project's table of known topics).
 
-**Promote and import (AC-2)** — A durable fact from a closed task, or a topic seeded from Confluence, needs a lasting home in this repo. Promote and import update a row in that index and write the component file (the Markdown file for that topic).
+**Promote and import** — A durable fact from a closed task, or a topic seeded from Confluence, needs a lasting home in this repo. Promote and import update a row in that index and write the component file (the Markdown file for that topic).
 
-**Add-a-fact (AC-22)** — Sometimes you already know a durable fact and no ticket is closing. `eversis-add-domain-knowledge` updates that row when the summary is new or changed.
+**Add-a-fact** — Sometimes you already know a durable fact and no ticket is closing. `eversis-add-domain-knowledge` updates that row when the summary is new or changed.
 
-**Audit count (AC-18)** — Teams need a lightweight signal that stored knowledge is due for review. The audit count lives on that index file. Fine (the delivery close-out step) increments it even when promotion writes nothing. Topic status is not a column of the index.
+**Audit count** — Teams need a lightweight signal that stored knowledge is due for review. The audit count lives on that index file. Fine (the delivery close-out step) increments it even when promotion writes nothing. Topic status is not a column of the index.
 
-**Architecture decisions (AC-16)** — Choosing how the system is built is separate from storing a domain fact. Decisions use `docs/decisions/INDEX.md`. A decision is not a row in the project knowledge index.
+**Architecture decisions** — Choosing how the system is built is separate from storing a domain fact. Decisions use `docs/decisions/INDEX.md`. A decision is not a row in the project knowledge index.
 
-**As-Is Pack comment (AC-17)** — At Fine, a draft may note what the product looked like before the change. That comment is a draft on the Pack page — see [Workflow Overview](./main-flow/workflow/overview#status-fine--handoff). It does not update that index file. Separate from import, which does write the index row.
+**As-Is Pack comment** — At Fine, a draft may note what the product looked like before the change. That comment is a draft on the Pack page — see [Workflow Overview](./main-flow/workflow/overview#status-fine--handoff). It does not update that index file. Separate from import, which does write the index row.
 
-**Session checkpoint (AC-19)** — A long Implement session needs a resume marker without rewriting knowledge files. The checkpoint is a row in the plan changelog — see [Orchestrating Implementation](./reference/skills/orchestrating-implementation). It does not update that index file.
+**Session checkpoint** — A checkpoint is a row in the plan changelog when this task is done and tested and later tasks remain. The same turn writes RESUMED and this session continues through the remaining tasks, Review, and Fine, unless the person asks to stop. The checkpoint does not update that index file — see [Orchestrating Implementation](./reference/skills/orchestrating-implementation).
 
 Full-text, semantic, or graph retrieval over the store (Phase 6) is not built yet.
 
@@ -316,16 +316,16 @@ Tool inventory: [eversis-collections — Domain context](./reference/integration
 
 ### What to use
 
-| You want to…                                    | Use                                                                                     | Writes to                                           | When                                      |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------- |
-| See what knowledge exists                       | `eversis_context_list`                                                                  | nowhere (read)                                      | Research                                  |
-| Read one topic                                  | `eversis_context_get`                                                                   | `last_consulted` only                               | Research                                  |
-| Refresh the shared copy in this repo            | `eversis_context_sync`                                                                  | `docs/context/global/` (pull)                       | After someone updated `domain-context`    |
-| Record a durable fact you already know, without closing a ticket | `eversis-add-domain-knowledge`                                         | `docs/context/<project>/`, including a row in `docs/context/<project>/INDEX.md` when the summary is new or changed, after that draft is approved | Person starts it; local file edit; the person commits |
-| Save a fact from this task                      | [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge)       | `docs/context/<project>/` after draft OK            | Fine; skip if not durable                 |
-| Share that fact with other repos                | same GitLab publish, targeting `domain-context`                                         | the shared GitLab project                           | Later, explicit; then others sync         |
-| Seed from Confluence once                       | [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) | `docs/context/<project>/`                           | Human asks; one pack page                 |
-| Clean old project files                         | [`eversis-audit-domain-knowledge`](./reference/skills/audit-domain-knowledge)           | `docs/context/<project>/`                           | Team cadence (for example quarterly)      |
+| You want to…                                                     | Use                                                                                     | Writes to                                                                                                                                        | When                                                  |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| See what knowledge exists                                        | `eversis_context_list`                                                                  | nowhere (read)                                                                                                                                   | Research                                              |
+| Read one topic                                                   | `eversis_context_get`                                                                   | `last_consulted` only                                                                                                                            | Research                                              |
+| Refresh the shared copy in this repo                             | `eversis_context_sync`                                                                  | `docs/context/global/` (pull)                                                                                                                    | After someone updated `domain-context`                |
+| Record a durable fact you already know, without closing a ticket | `eversis-add-domain-knowledge`                                                          | `docs/context/<project>/`, including a row in `docs/context/<project>/INDEX.md` when the summary is new or changed, after that draft is approved | Person starts it; local file edit; the person commits |
+| Save a fact from this task                                       | [`eversis-promote-domain-knowledge`](./reference/skills/promote-domain-knowledge)       | `docs/context/<project>/` after draft OK                                                                                                         | Fine; skip if not durable                             |
+| Share that fact with other repos                                 | same GitLab publish, targeting `domain-context`                                         | the shared GitLab project                                                                                                                        | Later, explicit; then others sync                     |
+| Seed from Confluence once                                        | [`eversis-import-confluence-knowledge`](./reference/skills/import-confluence-knowledge) | `docs/context/<project>/`                                                                                                                        | Human asks; one pack page                             |
+| Clean old project files                                          | [`eversis-audit-domain-knowledge`](./reference/skills/audit-domain-knowledge)           | `docs/context/<project>/`                                                                                                                        | Team cadence (for example quarterly)                  |
 
 ### The four write skills
 
