@@ -9,7 +9,7 @@ The standard workflow is used for backend and fullstack tasks. The Engineering M
 
 ## Quick Flow vs Full Flow
 
-At the start of `@eversis-implement`, the Engineering Manager inspects existing specs and outputs the **exact four-line** **Implement readiness** block as the **first content** (Flow / Research / Plan / Next gate), then assesses complexity and **recommends Quick or Full in chat**. You may override the recommendation.
+At the start of `@eversis-implement`, the Engineering Manager inspects existing specs and outputs the **Implement readiness** block as the **first content** — four required lines (Flow / Research / Plan / Next gate) plus optional `Resume`, `Context`, and `Reason` (the orchestration skill is the norm for any further optional line, including `Audit`) — then assesses complexity and **recommends Quick or Full in chat**. You may override the recommendation.
 
 Attach **`@docs/specs/<issue>/*.plan.md`** when research and plan already exist **and pass the adequacy checklist** — the EM skips recreating them and enters the **implement phase**. If scope changed (new QA comment, new AC), use **DELTA** / **REFRESH**.
 

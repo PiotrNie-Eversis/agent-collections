@@ -37,7 +37,7 @@ Before creating artifacts, delegating, or writing product code, inspect `docs/sp
 
 - First content in the message MUST be the readiness block — no other heading or analysis before it.
 - Heading exactly: `## Implement readiness` (no issue key suffix).
-- Exactly four bullet lines: Flow, Research, Plan, Next gate — optional fifth `Reason:` line.
+- Four required lines: Flow, Research, Plan, Next gate — plus optional `Resume`, `Context`, and `Reason`; the skill file is the norm for any further optional line, including `Audit`.
 - Do not substitute narrative summaries or A/B/C menus for the block.
 
 Normative detail lives in **`.ai/skills/eversis-orchestrating-implementation/SKILL.md`** — do not duplicate the full contract here.
