@@ -105,6 +105,8 @@ Read, list, and refresh **domain context** — durable, cross-task knowledge (a 
 
 ### Word (Business Manager Docs)
 
+**Docx paths:** Pass a **project-relative** path under the consumer project (container `/workspace`), e.g. `.playwright-mcp/backups/file.docx`. Host absolute paths (`/Users/...`) are not visible inside the MCP container. `/workspace` is the consumer project only when `.agent-collections/install-selection.json` is present (same rule as domain context); without it, resolution falls back to the image cwd. Set host MCP `env.CONSUMER_PROJECT_ROOT` so Compose mounts the right tree.
+
 #### `generate_summary_map`
 
 - **Focus:** Map `.docx` headings to stable `chapter_id` values (`sec-0`, `sec-1`, …).

@@ -17,6 +17,10 @@ Do **not** start writing until the BA has explicitly approved the plan (the Plan
 
 ## Workflow
 
+### Docx path contract
+
+Pass a **project-relative** `docx_path` under the consumer project root (container `/workspace`), e.g. `.playwright-mcp/backups/file.docx`. Absolute container paths under `/workspace` are accepted; host absolute paths such as `/Users/...` are not visible to the MCP. `/workspace` is treated as the consumer project only when `.agent-collections/install-selection.json` is present (same rule as domain context). Without that file, resolution falls back to the image cwd and relative paths still fail — ensure `CONSUMER_PROJECT_ROOT` points at the consumer mount with install-selection present.
+
 ### Step 0 — Backup (MANDATORY — no exceptions)
 
 ```

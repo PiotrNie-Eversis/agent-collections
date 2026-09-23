@@ -1,9 +1,11 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 import type { Document as XmlDocument, Element as XmlElement } from "@xmldom/xmldom";
 import JSZip from "jszip";
+import { resolveWorkspaceRoot } from "../context.js";
 import { getBody, listBodyParagraphs, buildStyleMap } from "./chapters.js";
+import { resolveDocxPath } from "./paths.js";
 import { assertWordCompatibleDocumentXml } from "./validate.js";
 
 export interface LoadedDocx {
@@ -28,8 +30,12 @@ function parseXml(xml: string): XmlDocument {
   return new DOMParser().parseFromString(clean, "application/xml") as XmlDocument;
 }
 
-export async function loadDocx(docxPath: string): Promise<LoadedDocx> {
-  const abs = path.resolve(docxPath);
+export async function loadDocx(
+  docxPath: string,
+  workspaceRoot?: string
+): Promise<LoadedDocx> {
+  const root = workspaceRoot ?? resolveWorkspaceRoot();
+  const abs = resolveDocxPath(docxPath, root);
   let buf: Buffer;
   try {
     buf = await readFile(abs);
@@ -77,4 +83,33 @@ export async function saveDocx(loaded: LoadedDocx): Promise<void> {
   zip.file("word/document.xml", `${decl}\n${out}`);
   const buf = await zip.generateAsync({ type: "nodebuffer" });
   await writeFile(abs, buf);
+}
+
+/**
+ * Timestamped binary backup of a .docx. Relative paths resolve against the
+ * consumer workspace root (same rule as loadDocx).
+ */
+export async function backupDocxFile(
+  docxPath: string,
+  backupDir?: string,
+  workspaceRoot?: string
+): Promise<string> {
+  const root = workspaceRoot ?? resolveWorkspaceRoot();
+  const abs = resolveDocxPath(docxPath, root);
+  const ext = path.extname(abs);
+  const base = path.basename(abs, ext);
+  const dir = backupDir
+    ? resolveDocxPath(backupDir, root)
+    : path.join(path.dirname(abs), "backups");
+  await mkdir(dir, { recursive: true });
+  // Format: YYYY-MM-DD-HHmmss
+  const now = new Date();
+  const ts = now
+    .toISOString()
+    .replace("T", "-")
+    .replace(/:/g, "")
+    .slice(0, 17);
+  const dest = path.join(dir, `${base}.backup-${ts}${ext}`);
+  await copyFile(abs, dest);
+  return dest;
 }

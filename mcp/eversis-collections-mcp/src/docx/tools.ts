@@ -1,7 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import * as z from "zod";
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { resolveWorkspaceRoot } from "../context.js";
 import {
   appendSectionBody,
   buildSections,
@@ -13,7 +14,8 @@ import {
   updateTableCell,
   type Section,
 } from "./chapters.js";
-import { loadDocx, saveDocx } from "./docx-io.js";
+import { backupDocxFile, loadDocx, saveDocx } from "./docx-io.js";
+import { resolveDocxPath, resolveSummaryOutputPath } from "./paths.js";
 import { validateDocxFile } from "./validate.js";
 
 const GRAPHICS_PLACEHOLDER =
@@ -48,12 +50,11 @@ export function registerDocxTools(server: McpServer): void {
     },
     async ({ docx_path, output_md_path }) => {
       try {
+        const workspaceRoot = resolveWorkspaceRoot();
         const loaded = await loadDocx(docx_path);
         const sections = buildSections(loaded.paragraphs, loaded.body, loaded.styleMap);
         const md = renderSummaryMd(sections, path.basename(loaded.abs));
-        const out = output_md_path
-          ? path.resolve(output_md_path)
-          : loaded.abs.replace(/\.docx$/i, ".summary.md");
+        const out = resolveSummaryOutputPath(output_md_path, loaded.abs, workspaceRoot);
         await mkdir(path.dirname(out), { recursive: true });
         await writeFile(out, md, "utf8");
         return textResult(`Wrote summary map to ${out} (${sections.length} sections).`);
@@ -409,11 +410,17 @@ export function registerDocxTools(server: McpServer): void {
         const result = await validateDocxFile(docx_path);
         return textResult(JSON.stringify(result, null, 2));
       } catch (e) {
+        let failPath = docx_path;
+        try {
+          failPath = resolveDocxPath(docx_path, resolveWorkspaceRoot());
+        } catch {
+          // keep raw input when escape throws before resolve
+        }
         return textResult(
           JSON.stringify(
             {
               status: "FAIL",
-              path: path.resolve(docx_path),
+              path: failPath,
               entry_count: 0,
               document_xml_bytes: 0,
               reasons: [String(e)],
@@ -445,22 +452,7 @@ export function registerDocxTools(server: McpServer): void {
     },
     async ({ docx_path, backup_dir }) => {
       try {
-        const abs = path.resolve(docx_path);
-        const ext = path.extname(abs);
-        const base = path.basename(abs, ext);
-        const dir = backup_dir
-          ? path.resolve(backup_dir)
-          : path.join(path.dirname(abs), "backups");
-        await mkdir(dir, { recursive: true });
-        // Format: YYYY-MM-DD-HHmmss
-        const now = new Date();
-        const ts = now
-          .toISOString()
-          .replace("T", "-")
-          .replace(/:/g, "")
-          .slice(0, 17);
-        const dest = path.join(dir, `${base}.backup-${ts}${ext}`);
-        await copyFile(abs, dest);
+        const dest = await backupDocxFile(docx_path, backup_dir);
         return textResult(`Backup created: ${dest}`);
       } catch (e) {
         return textResult(JSON.stringify({ error: String(e) }, null, 2));

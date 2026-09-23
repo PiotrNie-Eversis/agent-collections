@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
-import path from "node:path";
+import { resolveWorkspaceRoot } from "../context.js";
 import JSZip from "jszip";
+import { resolveDocxPath } from "./paths.js";
 
 export type DocxValidateStatus = "PASS" | "FAIL";
 
@@ -73,8 +74,12 @@ export function assertWordCompatibleDocumentXml(serializedRootXml: string): void
   }
 }
 
-export async function validateDocxFile(docxPath: string): Promise<DocxValidateResult> {
-  const abs = path.resolve(docxPath);
+export async function validateDocxFile(
+  docxPath: string,
+  workspaceRoot?: string
+): Promise<DocxValidateResult> {
+  const root = workspaceRoot ?? resolveWorkspaceRoot();
+  const abs = resolveDocxPath(docxPath, root);
   const reasons: string[] = [];
   const warnings: string[] = [];
   let entryCount = 0;
