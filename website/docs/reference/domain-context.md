@@ -131,6 +131,170 @@ Several finished pieces of work touch domain knowledge. Only some of them change
 
 Full-text, semantic, or graph retrieval over the store (Phase 6) is not built yet.
 
+### During one delivery
+
+Decisions about the project index from Research through Fine. Each phase is its own chart.
+
+#### Research
+
+The agent reads the project index first, then one matching component. Discovery of older task files is always allowed. This phase does not write the index.
+
+```mermaid
+%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
+flowchart TD
+    r0{"Domain knowledge needed?"}
+    r0 -->|no| rNo["Do not scan docs/context/. No index write."]
+    r0 -->|yes| rRead["Read INDEX.md, then one component"]
+    rRead --> rSpec{"Need history from docs/specs?"}
+    rSpec -->|names only| rDisc["Discovery is always allowed. File bodies stay unloaded."]
+    rSpec -->|full file| rCap["At most 1-2 files"]
+    rRead --> rSearch{"Full-text, semantic, or graph search?"}
+    rSearch -->|yes| rP6["Phase 6 is not built. The index read stays."]
+    rDisc --> rExit["Research does not write the project index"]
+    rCap --> rExit
+    rP6 --> rExit
+    rNo --> rExit
+
+    style rRead fill:#BBDEFB
+    style rNo fill:#ECEFF1
+    style rExit fill:#ECEFF1
+    style rDisc fill:#ECEFF1
+    style rCap fill:#ECEFF1
+    style rP6 fill:#ECEFF1
+```
+
+#### Plan
+
+The project index stays unchanged. Implementation starts only after both research and the plan are approved.
+
+```mermaid
+%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
+flowchart TD
+    p0{"Research approved?"}
+    p0 -->|no| pStop["Stop. No code. No index write."]
+    p0 -->|yes| p1{"Plan approved?"}
+    p1 -->|no| pWait["Wait. Project index unchanged."]
+    p1 -->|yes| pGo["Start Implement. The plan does not write the project index."]
+
+    style pStop fill:#ECEFF1
+    style pWait fill:#ECEFF1
+    style pGo fill:#ECEFF1
+```
+
+#### Implement
+
+A checkpoint is a row in the plan changelog when this task is done and tested and later tasks remain. It does not update the project index, and it does not continue into Review in the same session.
+
+```mermaid
+%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
+flowchart TD
+    i0{"This task completed and tested?"}
+    i0 -->|no| iWork["Keep working. No checkpoint. No index write."]
+    i0 -->|yes| iMore{"Further plan tasks remain?"}
+    iMore -->|yes| iCkpt["CHECKPOINT row in the plan Changelog. Does not update the project index."]
+    iMore -->|no| iLast["Last task: no checkpoint. Continue to Review."]
+
+    style iWork fill:#ECEFF1
+    style iCkpt fill:#ECEFF1
+    style iLast fill:#ECEFF1
+```
+
+#### Review
+
+A blocker sends the work back for a fix. A pass moves on to Fine. Neither writes the project index.
+
+```mermaid
+%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
+flowchart TD
+    v0{"Verdict?"}
+    v0 -->|BLOCKER| vFix["Fix and review again. No index write."]
+    v0 -->|PASS| vPass["Review does not write the project index. Continue to Fine."]
+
+    style vFix fill:#ECEFF1
+    style vPass fill:#ECEFF1
+```
+
+#### Fine — durable fact
+
+A new index row is written only when a future task would need this fact and the promotion draft is approved. Sharing it with the whole GitLab group is a later step and does not change this index.
+
+```mermaid
+%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
+flowchart TD
+    fFact{"Durable fact for a future task?"}
+    fFact -->|no| fNoRow["No new row"]
+    fFact -->|yes| fDraft{"Promotion draft approved?"}
+    fDraft -->|no| fHold["No write yet"]
+    fDraft -->|yes| fRow["Updates a project-index row"]
+    fRow --> fGroup{"True for the whole GitLab group?"}
+    fGroup -->|no| fLocal["Stays in this repo project index"]
+    fGroup -->|yes| fGlobal["Later publish to docs/context/global/. That step does not update the project index."]
+
+    style fRow fill:#C8E6C9
+    style fNoRow fill:#ECEFF1
+    style fHold fill:#ECEFF1
+    style fLocal fill:#ECEFF1
+    style fGlobal fill:#ECEFF1
+```
+
+#### Fine — audit count
+
+When the index already lists a component, Fine adds 1 to the audit count in the file header, even if no new row was written. An empty or missing index is left alone.
+
+```mermaid
+%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
+flowchart TD
+    fCount{"INDEX.md already has a component row?"}
+    fCount -->|yes| fInc["Add 1 to tasks_since_audit in the file header. Even when no new row was written. Not a column. Does not start an audit."]
+    fCount -->|no| fSkip["Do nothing. Do not create INDEX.md."]
+
+    style fInc fill:#C8E6C9
+    style fSkip fill:#ECEFF1
+```
+
+#### Fine — As-Is Pack comment
+
+This is a separate close-out note about the product as it is now. It does not update the project index.
+
+```mermaid
+%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
+flowchart TD
+    fPack{"Promotion draft has a confluence_url?"}
+    fPack -->|yes| fAsis["As-Is Pack comment: a separate draft. Does not update the project index."]
+    fPack -->|no| fNoPack["No As-Is Pack comment"]
+
+    style fAsis fill:#ECEFF1
+    style fNoPack fill:#ECEFF1
+```
+
+### Outside one ticket
+
+Add-a-fact, import, and architecture decisions. These are not a phase of one delivery.
+
+```mermaid
+%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
+flowchart TD
+    a0{"Add-a-fact: a known durable fact, and no ticket is closing?"}
+    a0 -->|yes| a1{"Summary new or changed?"}
+    a1 -->|yes| aRow["Updates a project-index row"]
+    a1 -->|no| aSame["Row unchanged"]
+
+    m0{"Import: a person asks to seed one As-Is Pack page?"}
+    m0 -->|yes| mRow["Updates a row and writes the component file"]
+    m0 -->|no| mNo["Import does not run"]
+
+    d0{"Recording how the system is built?"}
+    d0 -->|yes| dFile["docs/decisions/INDEX.md. Not a project-index row."]
+
+    style aRow fill:#C8E6C9
+    style mRow fill:#C8E6C9
+    style aSame fill:#ECEFF1
+    style mNo fill:#ECEFF1
+    style dFile fill:#ECEFF1
+```
+
+**Legend:** green updates the project index (a row, or `tasks_since_audit` in the file header); blue is a read of that index; gray does not update it. The Implement checkpoint is a completed-and-tested task while further plan tasks remain; that checkpoint does not continue to Review in the same session, and it is not a window-fill check and not an exchange-count check.
+
 ## Tools and skills
 
 Agents forget facts between tasks. **MCP tools** (functions the assistant calls on the `eversis-collections` server) **read** the store. **Skills** (written procedures the assistant follows) **write or clean** it. A human approves every write.

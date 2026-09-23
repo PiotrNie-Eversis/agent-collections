@@ -255,7 +255,17 @@ const config: Config = {
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
-  } satisfies Preset.ThemeConfig,
+    mermaid: {
+      theme: {
+        light: 'default',
+        dark: 'default',
+      },
+    },
+  } satisfies Preset.ThemeConfig & {
+    mermaid: {
+      theme: { light: 'default'; dark: 'default' };
+    };
+  },
 };
 
 export default config;

@@ -998,3 +998,11 @@ html.docs-doc-page[data-theme='dark'] .footer__link-item:hover {
   font-size: 0.9rem;
   margin-top: 0.75rem;
 }
+
+/* Mermaid keeps dark text. In dark mode the page behind a transparent
+   diagram is near-black, so give every diagram one white surface. */
+html[data-theme='dark'] .docusaurus-mermaid-container {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1rem 0.75rem;
+}
