@@ -70,12 +70,16 @@ If `eversis_context_get/list/sync` fail with `install-selection.json not found`,
 The `eversis-collections` container mounts two separate **volumes** (folders shared between your machine and the container):
 
 - *`./repo`* — the framework checkout. Always available. Skills (`eversis_skills_*`) read from here.
-- *`/workspace`* — your consumer project (the repo that has `.agent-collections/install-selection.json` and `docs/context/`). Compose binds `${CONSUMER_PROJECT_ROOT:-${PWD}}`. The installer writes `CONSUMER_PROJECT_ROOT` into the MCP server `env` (`${workspaceFolder}` in Cursor, `${CLAUDE_PROJECT_DIR:-.}` in Claude Code) so the mount is the IDE project, not the vendor tree. `${PWD}` is only a fallback.
+- *`/workspace`* — your consumer project (the repo that has `.agent-collections/install-selection.json` and `docs/context/`). Compose binds `${CONSUMER_PROJECT_ROOT:-${PWD}}`. How that root is set depends on the host and install mode:
+  - **Cursor** — the installer writes `CONSUMER_PROJECT_ROOT` into MCP `env` as `${workspaceFolder}`.
+  - **Vendored Claude Code** (copy or submodule under `vendor/` — a copy of the framework inside your repo) — `.mcp.json` starts `bash -c`, which execs `scripts/run-eversis-collections-mcp.sh`. That script sets `CONSUMER_PROJECT_ROOT` from its own location (the parent of `scripts/`), so the mount is your consumer root, not the vendor tree.
+  - **Absolute (non-vendored) Claude Code** — still writes `CONSUMER_PROJECT_ROOT` to `${CLAUDE_PROJECT_DIR:-.}` in MCP `env` (not covered by the vendored wrapper fix).
+  `${PWD}` is only a fallback.
 
 Domain-context tools read and write `docs/context/` through `/workspace`, never `/repo`. They use `/workspace` only when that directory contains `install-selection.json`.
 
 :::caution Wrong directory is an error, not empty results
-If Compose still interpolates the vendor checkout (no host `CONSUMER_PROJECT_ROOT`, and `PWD` is the compose-file directory), domain-context tools error with `install-selection.json not found` rather than listing the wrong tree. Fix: re-run the installer with `--upgrade --sync`, or set `CONSUMER_PROJECT_ROOT` on the `eversis-collections` MCP entry to your consumer project root. This also means one session can never cover more than one repo — see [Working across the whole group yourself](../domain-context#working-across-the-whole-group-yourself) if you operate across several repos in the same GitLab group.
+If Compose still interpolates the vendor checkout (no host `CONSUMER_PROJECT_ROOT`, and `PWD` is the compose-file directory), domain-context tools error with `install-selection.json not found` rather than listing the wrong tree. Fix: re-run the installer with `--upgrade --sync`. On Cursor you can also set `CONSUMER_PROJECT_ROOT` on the `eversis-collections` MCP entry to `${workspaceFolder}`. Vendored Claude should rely on the wrapper script, not a hand-edited `${CLAUDE_PROJECT_DIR:-.}` env value. This also means one session can never cover more than one repo — see [Working across the whole group yourself](../domain-context#working-across-the-whole-group-yourself) if you operate across several repos in the same GitLab group.
 :::
 
 ### Verify
@@ -100,7 +104,12 @@ Keep User MCP for personal tools only. Do not merge `templates/mcp.json` into Us
 
 ## Claude Code note
 
-Claude Code has MCP config parity with Cursor: the installer writes a root **`.mcp.json`** with the same servers, using Claude-native syntax (`${VAR}` / `${VAR:-default}`, no `${env:...}`). The **`eversis-collections`** entry runs `docker compose ... run --rm -T eversis-collections`, not a bare `node` process — Docker is required, Node.js is not. Skills additionally resolve **natively** via `.claude/skills/` (linked by the installer), not only through MCP. Document which MCP servers your team enables in `.claude/CLAUDE.md`.
+Claude Code has MCP config parity with Cursor: the installer writes a root **`.mcp.json`** with the same servers, using Claude-native syntax (`${VAR}` / `${VAR:-default}`, no `${env:...}`). Docker is required; Node.js is not. How **`eversis-collections`** starts depends on install mode:
+
+- **Vendored** (`--vendor copy` or `--vendor submodule`) — the entry is `bash -c` with a locator that execs `scripts/run-eversis-collections-mcp.sh`. The script sets `CONSUMER_PROJECT_ROOT` to the parent of `scripts/` and runs Compose against `vendor/agent-collections/docker-compose.yml`.
+- **Absolute** (framework outside the consumer repo) — the entry still runs `docker compose` directly, with `CONSUMER_PROJECT_ROOT` set to `${CLAUDE_PROJECT_DIR:-.}` and a baked `AGENT_COLLECTIONS_HOME` fallback on the `-f` path.
+
+Skills additionally resolve **natively** via `.claude/skills/` (linked by the installer), not only through MCP. Document which MCP servers your team enables in `.claude/CLAUDE.md`.
 
 ## Next
 

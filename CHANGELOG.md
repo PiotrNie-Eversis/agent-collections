@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Migration
 
-- **Domain-context `/workspace` mount** — existing consumers whose `.cursor/mcp.json` / `.mcp.json` was generated before this fix still omit `env.CONSUMER_PROJECT_ROOT`. Re-run `setup-agent-collections.sh --upgrade --sync` (or add `env.CONSUMER_PROJECT_ROOT` to the `eversis-collections` MCP entry: Cursor `${workspaceFolder}`, Claude Code `${CLAUDE_PROJECT_DIR:-.}`). Until then Compose falls back to `${PWD}`, which is often the vendor tree when `-f` points at `vendor/agent-collections/docker-compose.yml`.
+- **Domain-context `/workspace` mount** — existing consumers whose `.cursor/mcp.json` / `.mcp.json` was generated before this fix may still mount the wrong tree. Re-run `setup-agent-collections.sh --upgrade --sync`. **Cursor:** that refresh writes `env.CONSUMER_PROJECT_ROOT` `${workspaceFolder}` (or add that env value by hand). **Vendored Claude Code** (copy/submodule): the same `--upgrade --sync` replaces the old docker entry with a `bash -c` locator and installs `scripts/run-eversis-collections-mcp.sh` — do not hand-set `${CLAUDE_PROJECT_DIR:-.}` as the portable fix. Until then Compose falls back to `${PWD}`, which is often the vendor tree when `-f` points at `vendor/agent-collections/docker-compose.yml`.
 
 ### Fixed
 

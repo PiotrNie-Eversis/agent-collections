@@ -1006,3 +1006,7 @@ html[data-theme='dark'] .docusaurus-mermaid-container {
   border-radius: 8px;
   padding: 1rem 0.75rem;
 }
+
+.blog-post-list-cta {
+  margin-top: 2.5rem;
+}

@@ -116,10 +116,22 @@ grep -qF '.claude/skills/' "$CLAUDE_INSTALL_LOG" \
 [[ -f "${TARGET_CLAUDE}/.cursor/mcp.json" ]] && { echo "FAIL: .cursor/mcp.json should not exist for --agents=claude"; exit 1; }
 grep -qF '${env:' "${TARGET_CLAUDE}/.mcp.json" \
   && { echo "FAIL: .mcp.json still contains \${env:...} (Claude Code can't expand it)"; exit 1; }
-grep -qF '"command": "docker"' "${TARGET_CLAUDE}/.mcp.json" \
-  || { echo "FAIL: .mcp.json eversis-collections entry is not docker-based"; exit 1; }
-grep -qF '${CLAUDE_PROJECT_DIR:-.}/vendor/agent-collections/docker-compose.yml' "${TARGET_CLAUDE}/.mcp.json" \
-  || { echo "FAIL: .mcp.json eversis-collections -f path is not the vendored docker-compose.yml"; exit 1; }
+grep -qF '"command": "bash"' "${TARGET_CLAUDE}/.mcp.json" \
+  || { echo "FAIL: .mcp.json eversis-collections command is not bash"; exit 1; }
+node -e '
+  const fs = require("fs");
+  const j = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  const e = j.mcpServers["eversis-collections"];
+  if (!e || e.command !== "bash" || !e.args || e.args[0] !== "-c") process.exit(1);
+  const locator = e.args[1] || "";
+  if (!locator.includes("$CLAUDE_PROJECT_DIR")) process.exit(2);
+  if (locator.includes("${CLAUDE_PROJECT_DIR")) process.exit(3);
+' "${TARGET_CLAUDE}/.mcp.json" \
+  || { echo "FAIL: .mcp.json -c locator missing bare \$CLAUDE_PROJECT_DIR or still has \${CLAUDE_PROJECT_DIR"; exit 1; }
+grep -qF '${CLAUDE_PROJECT_DIR' "${TARGET_CLAUDE}/.mcp.json" \
+  && { echo "FAIL: .mcp.json still contains \${CLAUDE_PROJECT_DIR brace form"; exit 1; }
+[[ -f "${TARGET_CLAUDE}/scripts/run-eversis-collections-mcp.sh" ]] \
+  || { echo "FAIL: missing scripts/run-eversis-collections-mcp.sh for vendored Claude"; exit 1; }
 grep -qF 'dist/index.js' "${TARGET_CLAUDE}/.mcp.json" \
   && { echo "FAIL: .mcp.json still references the pre-Docker dist/index.js entry"; exit 1; }
 grep -qF 'vendor/agent-collections/.ai/prompts/public/' "${TARGET_CLAUDE}/CLAUDE.md" \

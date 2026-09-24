@@ -45,6 +45,32 @@ merge_mcp_json() {
   warn_user_mcp_catalog_overlap
 }
 
+# Prefer the checkout that is actually executing this installer. A vendored
+# submodule pin lags that checkout until the consumer bumps it.
+_resolve_wrapper_template() {
+  local candidate=""
+  if [[ -n "${INSTALLER_FRAMEWORK_HOME:-}" ]]; then
+    candidate="${INSTALLER_FRAMEWORK_HOME}/templates/run-eversis-collections-mcp.sh"
+    if [[ -f "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  fi
+  if [[ -n "${SETUP_SCRIPT_DIR:-}" ]]; then
+    candidate="$(cd "${SETUP_SCRIPT_DIR}/.." && pwd)/templates/run-eversis-collections-mcp.sh"
+    if [[ -f "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  fi
+  candidate="${COLLECTIONS_HOME}/templates/run-eversis-collections-mcp.sh"
+  if [[ -f "$candidate" ]]; then
+    printf '%s\n' "$candidate"
+    return 0
+  fi
+  return 1
+}
+
 _merge_mcp_json_for_host() {
   local host="$1" mcp_file="$2" use_relative="$3" template_path="$4" \
         server_list="$5" merge_mjs="$6" dist_index="$7"
@@ -76,4 +102,20 @@ _merge_mcp_json_for_host() {
   echo "$merged" > "$mcp_file"
   export MCP_CONFIGURED_SERVERS="${MCP_SELECTED_IDS:-eversis-collections}"
   log_ok "Wrote ${mcp_file} (servers: ${MCP_SELECTED_IDS:-eversis-collections})"
+
+  # Vendored Claude: commit a BASH_SOURCE-based wrapper next to .mcp.json so
+  # the bash -c locator can exec a path that does not depend on cwd.
+  # Submodule upgrades repoint COLLECTIONS_HOME at the pinned vendor tree,
+  # which does not contain this template until that pin moves. The running
+  # installer (INSTALLER_FRAMEWORK_HOME / this script's repo) does.
+  if [[ "$host" == "claude" ]] && [[ "$use_relative" == "true" ]]; then
+    local wrapper_src=""
+    if ! wrapper_src="$(_resolve_wrapper_template)"; then
+      die "Wrapper template not found. Looked in INSTALLER_FRAMEWORK_HOME (${INSTALLER_FRAMEWORK_HOME:-unset}), the setup script tree, and COLLECTIONS_HOME (${COLLECTIONS_HOME})."
+    fi
+    mkdir -p "${TARGET_DIR}/scripts"
+    cp "$wrapper_src" "${TARGET_DIR}/scripts/run-eversis-collections-mcp.sh"
+    chmod +x "${TARGET_DIR}/scripts/run-eversis-collections-mcp.sh"
+    log_ok "Wrote ${TARGET_DIR}/scripts/run-eversis-collections-mcp.sh"
+  fi
 }

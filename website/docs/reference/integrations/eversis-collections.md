@@ -9,7 +9,7 @@ title: Agent Collections MCP
 **Type:** stdio  
 **Package:** [`mcp/eversis-collections-mcp/`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/main/mcp/eversis-collections-mcp) — **not published to npm**; build from a clone.
 
-The **local first-party MCP bridge** for Agent Collections. It connects **Cursor Agent** to procedural **skills** (`.cursor/skills/eversis-*/SKILL.md`), **Word `.docx` chapter tools** (Business Manager Docs), and **allowlisted repository scripts** — in one server alongside third-party MCPs in [`.cursor/mcp.json`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/.cursor/mcp.json).
+The **local first-party MCP (Model Context Protocol) bridge** for Agent Collections. It connects **Cursor Agent** to procedural **skills** (`.cursor/skills/eversis-*/SKILL.md`), **Word `.docx` chapter tools** (Business Manager Docs), and **allowlisted repository scripts** — in one server alongside third-party MCPs in [`.cursor/mcp.json`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/.cursor/mcp.json).
 
 Unlike third-party servers that run via `npx`, this server **must be built** before Agent can call its tools.
 
@@ -105,7 +105,7 @@ Read, list, and refresh **domain context** — durable, cross-task knowledge (a 
 
 ### Word (Business Manager Docs)
 
-**Docx paths:** Pass a **project-relative** path under the consumer project (container `/workspace`), e.g. `.playwright-mcp/backups/file.docx`. Host absolute paths (`/Users/...`) are not visible inside the MCP container. `/workspace` is the consumer project only when `.agent-collections/install-selection.json` is present (same rule as domain context); without it, resolution falls back to the image cwd. Set host MCP `env.CONSUMER_PROJECT_ROOT` so Compose mounts the right tree.
+**Docx paths:** Pass a **project-relative** path under the consumer project (container `/workspace`), e.g. `.playwright-mcp/backups/file.docx`. Host absolute paths (`/Users/...`) are not visible inside the MCP container. `/workspace` is the consumer project only when `.agent-collections/install-selection.json` is present (same rule as domain context); without it, resolution falls back to the image cwd. Cursor sets host MCP `env.CONSUMER_PROJECT_ROOT`; vendored Claude Code relies on `scripts/run-eversis-collections-mcp.sh` for the same mount.
 
 #### `generate_summary_map`
 
@@ -221,7 +221,13 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 }
 ```
 
-`docker-compose.yml` bind-mounts **two** separate volumes: `.:/repo` (the framework checkout, resolved relative to `docker-compose.yml`'s own directory — the `-f` path is what points Compose at that file) and `${CONSUMER_PROJECT_ROOT:-${PWD}}:/workspace` (your consumer project). The installer writes `CONSUMER_PROJECT_ROOT` on the MCP server `env` so Compose interpolates the IDE project folder, not the vendor tree (`PWD` is often the compose-file directory when `-f` is `vendor/agent-collections/docker-compose.yml`). Domain-context tools read `docs/context/` through `/workspace`, not `/repo`, and only treat `/workspace` as the project when `install-selection.json` is there. See [Domain Context (SSOT)](../../domain-context) and [MCP Setup](../../getting-started/mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume).
+`docker-compose.yml` bind-mounts **two** separate volumes: `.:/repo` (the framework checkout, resolved relative to `docker-compose.yml`'s own directory — the `-f` path is what points Compose at that file) and `${CONSUMER_PROJECT_ROOT:-${PWD}}:/workspace` (your consumer project). How `CONSUMER_PROJECT_ROOT` is set depends on the host:
+
+- **Cursor** — the installer writes it into MCP `env` as `${workspaceFolder}`.
+- **Vendored Claude Code** (copy or submodule under `vendor/` — a copy of the framework inside your repo) — `.mcp.json` starts `bash -c`, which execs `scripts/run-eversis-collections-mcp.sh`. That script sets `CONSUMER_PROJECT_ROOT` from its own location (the parent of `scripts/`) and points Compose at `vendor/agent-collections/docker-compose.yml`. Do not treat `${CLAUDE_PROJECT_DIR:-.}` as the portable vendored fix.
+- **Absolute (non-vendored) Claude Code** — still uses MCP `env` `${CLAUDE_PROJECT_DIR:-.}` and a baked `AGENT_COLLECTIONS_HOME` fallback on the `-f` path.
+
+`${PWD}` is only a fallback (`PWD` is often the compose-file directory when `-f` is `vendor/agent-collections/docker-compose.yml`). Domain-context tools read `docs/context/` through `/workspace`, not `/repo`, and only treat `/workspace` as the project when `install-selection.json` is there. See [Domain Context (SSOT)](../../domain-context) and [MCP Setup](../../getting-started/mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume).
 
 ### Consumer project (framework outside workspace)
 
@@ -229,7 +235,7 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 2. Bootstrap with `setup-agent-collections.sh --build-mcp` — see [Installation §4](../../getting-started/installation).
 3. Enable **`eversis-collections`** in Cursor MCP settings and restart.
 
-The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. The second volume uses host `CONSUMER_PROJECT_ROOT` (installer sets it to `${workspaceFolder}` in Cursor / `${CLAUDE_PROJECT_DIR:-.}` in Claude Code), with `${PWD}` only as fallback. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../../getting-started/installation).
+The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. For Cursor, the second volume uses host `CONSUMER_PROJECT_ROOT` `${workspaceFolder}`. Absolute (non-vendored) Claude Code still uses `${CLAUDE_PROJECT_DIR:-.}` in MCP `env`. Vendored Claude uses the wrapper above, not an env token. `${PWD}` is only a fallback. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../../getting-started/installation).
 
 ## Do not register skills as Agent Skills
 

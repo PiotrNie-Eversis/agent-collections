@@ -285,7 +285,7 @@ docker compose build eversis-collections
 Enable **`eversis-collections`** in Settings → MCP and restart the agent tool.
 
 - **Skills** — `eversis_skills_list` / `eversis_skills_get` load `.ai/skills/`
-- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the consumer project mounted as `/workspace` via `CONSUMER_PROJECT_ROOT` (installer writes this into MCP `env`; Compose falls back to `${PWD}`), not just `AGENT_COLLECTIONS_HOME`
+- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the consumer project mounted as `/workspace` via `CONSUMER_PROJECT_ROOT`, not just `AGENT_COLLECTIONS_HOME`. Cursor: the installer writes `${workspaceFolder}` into MCP `env`. Vendored Claude Code: committed `scripts/run-eversis-collections-mcp.sh` sets `CONSUMER_PROJECT_ROOT` from the script location (parent of `scripts/`). Absolute (non-vendored) Claude Code still uses MCP `env` `${CLAUDE_PROJECT_DIR:-.}`. Compose falls back to `${PWD}` only when that root is unset
 - **Word tools** — used by BA docs prompts when that workflow is in scope
 - Tool reference: [`mcp/eversis-collections-mcp/README.md`](./mcp/eversis-collections-mcp/README.md)
 
