@@ -35,7 +35,7 @@ Optional additional lines, any subset, appended after the four required lines in
 
 **Self-check before sending the first message:**
 
-1. Inspected `docs/specs/<issue>/` and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
+1. Resolved the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `ac-20` is not a hit for `ac-2`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask), inspected that folder and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
 2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Audit`, `Reason`).
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.

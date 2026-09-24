@@ -23,7 +23,7 @@ Canonical workflow owner for the Implement phase. The public **`@eversis-impleme
 
 ## Implement readiness (mandatory first output)
 
-Before creating artifacts, delegating, or writing product code, inspect `docs/specs/<issue>/` and any `@`-attached plan/research paths. **Output at the start of the first response** the readiness block below (including Quick Flow, QA follow-ups, and handoff continuations):
+Before creating artifacts, delegating, or writing product code, resolve the spec folder with **Spec folder lookup** in the orchestration skill, then inspect that folder and any `@`-attached plan/research paths. Exact `docs/specs/<key>/` wins; otherwise a hit is a directory named `<key>` or starting with `<key>-` (example `ac-2-context-management`); `ac-20` is not a hit for `ac-2`; one topic-folder hit is used and `docs/specs/<key>/` is not created; two or more topic folders with no exact folder stop and ask which one. Full steps live in the skill's Spec folder lookup. **Output at the start of the first response** the readiness block below (including Quick Flow, QA follow-ups, and handoff continuations):
 
 ```text
 ## Implement readiness

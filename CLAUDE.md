@@ -143,7 +143,7 @@ Optional additional lines, any subset, appended after the four required lines in
 
 **Self-check before sending the first message:**
 
-1. Inspected `docs/specs/<issue>/` and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
+1. Resolved the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `ac-20` is not a hit for `ac-2`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask), inspected that folder and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
 2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Audit`, `Reason`).
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
@@ -345,10 +345,12 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 
 | Item | Convention |
 |------|------------|
-| Folder | `docs/specs/<issue-kebab>/` (e.g. `docs/specs/task-522/`) |
-| Research | `<issue-kebab>.research.md` — before plan when Full / SDD applies |
-| Plan | `<issue-kebab>.plan.md` — before implementation when Full / SDD applies |
+| Folder | `docs/specs/<key>-<topic>/` — ticket key, then at most three hyphen-separated topic words (e.g. `docs/specs/ac-2-context-management/`) |
+| Research | `ac-2-context-management.research.md` — before plan when Full / SDD applies |
+| Plan | `ac-2-context-management.plan.md` — before implementation when Full / SDD applies |
 | Optional | `*.plan-review.md`, manifests, inventory notes as the story requires |
+
+The topic after the key is at most three hyphen-separated words. Research and plan file names repeat the folder name. A name that puts the topic before the key is not the pattern.
 
 Do **not** start implementation without approved research and plan artifacts when this Delivery Standard applies.
 
@@ -364,9 +366,9 @@ Do **not** start implementation without approved research and plan artifacts whe
 
 This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
 
-* Spec folder: docs/specs/<issue-kebab>/
-* Research: <issue-kebab>.research.md — required before plan
-* Plan: <issue-kebab>.plan.md — required before implementation
+* Spec folder: docs/specs/ac-2-context-management/
+* Research: ac-2-context-management.research.md — required before plan
+* Plan: ac-2-context-management.plan.md — required before implementation
 * Implement: load eversis-implement (approved plan attached)
 * Review: runs inside the Implement session by default (eversis-review); standalone /eversis-review is optional
 * Fine: QA comment draft per eversis-fine-handoff (same turn as Fine); publish to tracker only with explicit human OK

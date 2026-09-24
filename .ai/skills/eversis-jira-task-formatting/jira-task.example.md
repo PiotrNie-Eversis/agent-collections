@@ -84,9 +84,9 @@ h2. Delivery Standard
 
 This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
 
-* Spec folder: docs/specs/<issue-kebab>/
-* Research: <issue-kebab>.research.md — required before plan
-* Plan: <issue-kebab>.plan.md — required before implementation
+* Spec folder: docs/specs/ac-2-context-management/
+* Research: ac-2-context-management.research.md — required before plan
+* Plan: ac-2-context-management.plan.md — required before implementation
 * Implement: load eversis-implement (approved plan attached)
 * Review: load eversis-review before Done
 * Fine: QA comment draft per eversis-fine-handoff

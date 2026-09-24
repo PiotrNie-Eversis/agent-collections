@@ -60,7 +60,7 @@ Based on the gathered information and task description, look for ambiguities or 
 
 **Step 4: Based on the answers and gathered information finalize the research report**
 
-Generate a report following the `./research.example.md` structure. Make sure to provide all necessary information that you gathered, all findings and all answered questions.
+Generate a report following the `./research.example.md` structure. The H1 template is `# <KEY> <topic words> - Analysis Result`: topic words are the folder suffix with spaces instead of hyphens (a label, not a sentence); use a short sentence in the heading only when three path words are not enough to judge the file; the mark before `Analysis Result` is the template hyphen `-`, not an em dash. Do not rewrite existing research headings. Make sure to provide all necessary information that you gathered, all findings and all answered questions.
 
 Don't add or remove any sections from the template. Follow the structure and naming conventions strictly to ensure clarity and consistency.
 

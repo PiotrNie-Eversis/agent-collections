@@ -37,10 +37,12 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 
 | Item | Convention |
 |------|------------|
-| Folder | `docs/specs/<issue-kebab>/` (e.g. `docs/specs/task-522/`) |
-| Research | `<issue-kebab>.research.md` — before plan when Full / SDD applies |
-| Plan | `<issue-kebab>.plan.md` — before implementation when Full / SDD applies |
+| Folder | `docs/specs/<key>-<topic>/` — ticket key, then at most three hyphen-separated topic words (e.g. `docs/specs/ac-2-context-management/`) |
+| Research | `ac-2-context-management.research.md` — before plan when Full / SDD applies |
+| Plan | `ac-2-context-management.plan.md` — before implementation when Full / SDD applies |
 | Optional | `*.plan-review.md`, manifests, inventory notes as the story requires |
+
+The topic after the key is at most three hyphen-separated words. Research and plan file names repeat the folder name. A name that puts the topic before the key is not the pattern.
 
 Do **not** start implementation without approved research and plan artifacts when this Delivery Standard applies.
 
@@ -56,9 +58,9 @@ Do **not** start implementation without approved research and plan artifacts whe
 
 This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
 
-* Spec folder: docs/specs/<issue-kebab>/
-* Research: <issue-kebab>.research.md — required before plan
-* Plan: <issue-kebab>.plan.md — required before implementation
+* Spec folder: docs/specs/ac-2-context-management/
+* Research: ac-2-context-management.research.md — required before plan
+* Plan: ac-2-context-management.plan.md — required before implementation
 * Implement: load eversis-implement (approved plan attached)
 * Review: runs inside the Implement session by default (eversis-review); standalone /eversis-review is optional
 * Fine: QA comment draft per eversis-fine-handoff (same turn as Fine); publish to tracker only with explicit human OK

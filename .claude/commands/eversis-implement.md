@@ -24,7 +24,7 @@ Start implementation delivery for a feature based on a task description, Jira it
 
 **Input:** Provide at least one of: task description, Jira ID, or `*.plan.md`. Include `*.research.md` when available. You do **not** need to type “Research” — the agent inspects existing artifacts and decides automatically (see **Entry signals** below).
 
-**Artifacts:** Create `*.research.md`, `*.plan.md`, and `*.plan-review.md` only when a gap exists — not on every run. Existing files in `docs/specs/<issue-or-task-kebab>/` may satisfy readiness.
+**Artifacts:** Create `*.research.md`, `*.plan.md`, and `*.plan-review.md` only when a gap exists — not on every run. Existing files in the folder resolved by **Spec folder lookup** in `eversis-orchestrating-implementation` may satisfy readiness (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `ac-20` is not a hit for `ac-2`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask).
 
 **Workflow:** Start at Step 0 in `eversis-orchestrating-implementation` and follow that skill through Step 5 (Fine + `eversis-fine-handoff` in the same response). Do not duplicate orchestration steps in this prompt.
 
@@ -32,7 +32,7 @@ Start implementation delivery for a feature based on a task description, Jira it
 
 ### Entry signals (automatic — no extra keywords required)
 
-Before research, planning, or code, inspect `docs/specs/<issue>/` (or paths attached with `@`):
+Before research, planning, or code, resolve the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (or use paths attached with `@`): exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `ac-20` is not a hit for `ac-2`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask.
 
 | Signal | Default |
 | --- | --- |
