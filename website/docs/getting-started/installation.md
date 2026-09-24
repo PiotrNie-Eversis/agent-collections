@@ -103,6 +103,7 @@ Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains
 - **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced.
 - This MVP does **not** ship a full mirror under `.cursor/skills` or `.cursor/prompts` — Cursor's skills stay MCP-only. Both adapters **do** generate thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`).
 - **Domain context** (durable, cross-task knowledge — see [Domain Context (SSOT)](../domain-context)) is scaffolded on **every** install: `docs/context/<project>/INDEX.md` is created if missing. If `--ssot-source` is reachable, the installer also best-effort seeds `docs/context/global/` from it — this step never blocks or fails the install; an unreachable source just logs a warning with the manual recovery command.
+- A project that already has history can fill that index after install — see [Seed existing project knowledge](#seed-existing-project-knowledge-optional).
 
 ## 5. Upgrade
 
@@ -158,3 +159,15 @@ test -f .agent-collections/install-selection.json && echo "OK: first successful 
 ```
 
 Next: [MCP setup](./mcp-setup) → enable tools in the IDE → [Start here](./start-here) checklist item 6.
+
+## Seed existing project knowledge (optional)
+
+Skip this on a new project and on the sample install above. An empty `docs/context/<project>/INDEX.md` is the right result there.
+
+Use this only when the consumer already has history: a Confluence **As-Is Pack** (one page that describes the system as it works today) or a `docs/specs/` backlog of past tasks. The installer never runs this import.
+
+1. If you have a Confluence space key, pass `--confluence-space-key KEY` on the bootstrap command in [section 3](#3-bootstrap-a-consumer-project). That only records the key in `.agent-collections/install-selection.json`. It does not call Confluence and it does not import pages.
+2. Finish [MCP setup](./mcp-setup) and connect the [Atlassian](../reference/integrations/atlassian.md) server. The import reads Confluence through that connection.
+3. Open the consumer project and ask the agent to run [`eversis-import-confluence-knowledge`](../reference/skills/import-confluence-knowledge.md).
+4. Review the draft. Nothing is written under `docs/context/<project>/` until you approve it. [Domain Context (SSOT)](../domain-context) describes what those files contain.
+5. If you have no space key, you can still ask the agent to draft from `docs/specs/` history alone. Confluence is not required.

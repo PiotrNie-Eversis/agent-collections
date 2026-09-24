@@ -8,7 +8,7 @@ title: Importing Confluence knowledge
 **Folder:** `.ai/skills/eversis-import-confluence-knowledge/`  
 **Used by:** Business Analyst, Context Engineer (one-time seeding)
 
-One-time import of a Confluence AS-IS Pack page into `docs/context/<project>/` topic files, one file per section, via the already-connected `atlassian` MCP. Use when a project has a `confluenceSpaceKey` recorded in `install-selection.json` and wants to seed domain knowledge from an existing Confluence page rather than starting empty.
+One-time import of a Confluence AS-IS Pack page into `docs/context/<project>/` topic files, one file per component, via the already-connected `atlassian` MCP. Use when a project has a `confluenceSpaceKey` recorded in `install-selection.json` and wants to seed domain knowledge from an existing Confluence page rather than starting empty.
 
 ## Principles
 
