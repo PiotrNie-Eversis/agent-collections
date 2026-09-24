@@ -1,0 +1,13 @@
+.title {
+  font-size: 2rem;
+}
+
+.postTitle {
+  font-size: 2rem;
+}
+
+@media (max-width: 576px) {
+  .title {
+    font-size: 2rem;
+  }
+}

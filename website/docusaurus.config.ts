@@ -84,7 +84,13 @@ const config: Config = {
             return withSortedSkills(items);
           },
         },
-        blog: false,
+        blog: {
+          routeBasePath: 'blog',
+          onInlineAuthors: 'ignore',
+          feedOptions: {
+            type: null,
+          },
+        },
         pages: {},
         theme: {
           customCss: './src/css/custom.css',
@@ -122,7 +128,7 @@ const config: Config = {
       '@easyops-cn/docusaurus-search-local',
       {
         hashed: true,
-        indexBlog: false,
+        indexBlog: true,
       },
     ],
   ],
@@ -207,6 +213,12 @@ const config: Config = {
           label: 'Advanced / CTO',
           position: 'left',
           className: 'navbar__link--cto',
+        },
+        {
+          to: '/blog',
+          label: 'Blog',
+          position: 'right',
+          className: 'navbar__link--meta',
         },
         {
           to: '/changelog/',
