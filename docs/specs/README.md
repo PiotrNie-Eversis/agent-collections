@@ -8,12 +8,12 @@ Canonical rule: [`.ai/rules/orchestration/spec-driven-development.md`](../../.ai
 
 ## Naming convention
 
-`docs/specs/<issue-kebab>/`
+`docs/specs/<key>-<topic>/` — ticket key, then at most three hyphen-separated topic words (e.g. `docs/specs/ac-2-context-management/`). Research and plan file names repeat the folder name.
 
 ```text
-docs/specs/my-feature/
-  my-feature.research.md
-  my-feature.plan.md
+docs/specs/ac-2-context-management/
+  ac-2-context-management.research.md
+  ac-2-context-management.plan.md
 ```
 
 | Artifact | When |
@@ -32,4 +32,4 @@ All `docs/specs/*/` subfolders are **gitignored** (local-only MVP), regardless o
 
 ## Consumer projects
 
-Use the same `docs/specs/<issue-kebab>/` convention. Whether those folders are committed or gitignored is a **project choice** — document it in your stack / AGENTS if needed.
+Use the same `docs/specs/<key>-<topic>/` convention (e.g. `docs/specs/ac-2-context-management/`). Whether those folders are committed or gitignored is a **project choice** — document it in your stack / AGENTS if needed.

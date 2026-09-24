@@ -75,9 +75,21 @@ Use the following decision rules before any delegation.
 
 Recommend Quick Flow or Full Flow in chat with a short reason, and allow the user to override the recommendation.
 
+#### Spec folder lookup
+
+When Implement or research starts from a ticket key, lowercase the key first (`AC-2` becomes `ac-2`) and resolve the spec folder as follows.
+
+1. If `docs/specs/<key>/` exists, use it. Sibling folders named `<key>-*` do not raise a question and do not cause a second folder to be created.
+2. Otherwise a hit is a directory whose name equals `<key>` or starts with `<key>-`. `ac-20` is not a hit for `ac-2`.
+3. One hit: use that folder. Do not create `docs/specs/<key>/`.
+4. Two or more hits: stop and ask which folder. Do not pick in silence and do not create a third folder.
+5. Zero hits: create `docs/specs/<key>-<topic>/`. `<topic>` is at most three hyphen-separated words. Research and plan file names repeat the folder name.
+
+The canonical example is `docs/specs/ac-2-context-management/` with `ac-2-context-management.research.md` and `ac-2-context-management.plan.md`. A name that puts the topic before the key is not the pattern.
+
 #### Implement readiness (mandatory first output)
 
-Before creating artifacts, delegating, or writing product code, inspect `docs/specs/<issue>/` and any `@`-attached plan/research paths — **including a Changelog scan for an unconsumed checkpoint** (see rule 14). Walk the plan's `Changelog` rows from the newest backward and take the latest row whose Change Description starts with `CHECKPOINT:`. If none exists, this is not a resume. If a later row's Change Description starts with `RESUMED:` or records that the same task is complete, the checkpoint is consumed and this is not a resume. Any other later row, including a rule-12 solution note, does not consume it. When the checkpoint is unconsumed, emit `- **Resume:** CHECKPOINT <date>` using that checkpoint row's date, instead of treating the thread as new. Then **output at the start of the first response** the readiness block below (including Quick Flow and QA follow-ups). Do not skip it when continuing a summarized or handoff thread.
+Before creating artifacts, delegating, or writing product code, resolve the folder with **Spec folder lookup** above, then inspect that folder and any `@`-attached plan/research paths — **including a Changelog scan for an unconsumed checkpoint** (see rule 14). Walk the plan's `Changelog` rows from the newest backward and take the latest row whose Change Description starts with `CHECKPOINT:`. If none exists, this is not a resume. If a later row's Change Description starts with `RESUMED:` or records that the same task is complete, the checkpoint is consumed and this is not a resume. Any other later row, including a rule-12 solution note, does not consume it. When the checkpoint is unconsumed, emit `- **Resume:** CHECKPOINT <date>` using that checkpoint row's date, instead of treating the thread as new. Then **output at the start of the first response** the readiness block below (including Quick Flow and QA follow-ups). Do not skip it when continuing a summarized or handoff thread.
 
 **Note for maintainers:** “output at the start of the first response” means the block is the **first content** in the assistant message — not physical printing.
 
