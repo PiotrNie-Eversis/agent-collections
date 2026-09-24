@@ -59,38 +59,59 @@ for (const id of selected) {
 
 if (picked['eversis-collections']) {
   const composeFile = 'docker-compose.yml';
-  let cmdPath;
-  if (host === 'claude') {
-    // Claude Code only expands ${VAR} / ${VAR:-default} — no ${env:X}. The
-    // compose file hardcodes AGENT_COLLECTIONS_HOME=/repo inside the
-    // container; CONSUMER_PROJECT_ROOT is a separate host env (below).
-    // The *host-side* -f path in absolute mode still needs a value for
-    // ${AGENT_COLLECTIONS_HOME} — GUI-launched hosts don't reliably inherit
-    // shell profile exports, so the value already resolved by the installer
-    // (`collections`) is baked in as the `${VAR:-default}` fallback.
-    if (useRelative) {
-      cmdPath = `\${CLAUDE_PROJECT_DIR:-.}/vendor/agent-collections/${composeFile}`;
-    } else {
-      cmdPath = `\${AGENT_COLLECTIONS_HOME:-${collections}}/${composeFile}`;
-    }
-  } else if (useRelative) {
-    cmdPath = `\${workspaceFolder}/vendor/agent-collections/${composeFile}`;
+  // Vendored Claude: do not put ${CLAUDE_PROJECT_DIR:-.} in committed JSON —
+  // config-time ${VAR} expansion leaves it empty on the VS Code extension.
+  // Use bash -c with a bare $CLAUDE_PROJECT_DIR token (no braces) plus an
+  // upward walk so the spawn env / cwd can still find the wrapper script.
+  if (host === 'claude' && useRelative) {
+    const locator = [
+      'if [ -n "$CLAUDE_PROJECT_DIR" ] && [ -f "$CLAUDE_PROJECT_DIR/scripts/run-eversis-collections-mcp.sh" ]; then',
+      'exec "$CLAUDE_PROJECT_DIR/scripts/run-eversis-collections-mcp.sh";',
+      'fi;',
+      'd="$PWD";',
+      'for _ in 1 2 3 4 5 6 7 8; do',
+      'if [ -f "$d/scripts/run-eversis-collections-mcp.sh" ] && [ -f "$d/vendor/agent-collections/docker-compose.yml" ]; then',
+      'exec "$d/scripts/run-eversis-collections-mcp.sh";',
+      'fi;',
+      'd="$(dirname "$d")";',
+      'done;',
+      'exit 1',
+    ].join(' ');
+    picked['eversis-collections'] = {
+      command: 'bash',
+      args: ['-c', locator],
+      type: 'stdio',
+    };
   } else {
-    cmdPath = `\${env:AGENT_COLLECTIONS_HOME}/${composeFile}`;
+    let cmdPath;
+    if (host === 'claude') {
+      // Claude Code only expands ${VAR} / ${VAR:-default} — no ${env:X}. The
+      // compose file hardcodes AGENT_COLLECTIONS_HOME=/repo inside the
+      // container; CONSUMER_PROJECT_ROOT is a separate host env (below).
+      // The *host-side* -f path in absolute mode still needs a value for
+      // ${AGENT_COLLECTIONS_HOME} — GUI-launched hosts don't reliably inherit
+      // shell profile exports, so the value already resolved by the installer
+      // (`collections`) is baked in as the `${VAR:-default}` fallback.
+      cmdPath = `\${AGENT_COLLECTIONS_HOME:-${collections}}/${composeFile}`;
+    } else if (useRelative) {
+      cmdPath = `\${workspaceFolder}/vendor/agent-collections/${composeFile}`;
+    } else {
+      cmdPath = `\${env:AGENT_COLLECTIONS_HOME}/${composeFile}`;
+    }
+    // CONSUMER_PROJECT_ROOT is interpolated by Compose on the host for the
+    // /workspace bind. AGENT_COLLECTIONS_HOME stays hardcoded as /repo inside
+    // the container. Cursor expands ${workspaceFolder}; Claude absolute mode
+    // expands ${CLAUDE_PROJECT_DIR:-.} (no ${workspaceFolder}, no ${env:X}).
+    const consumerRoot = host === 'claude' ? '${CLAUDE_PROJECT_DIR:-.}' : '${workspaceFolder}';
+    picked['eversis-collections'] = {
+      command: 'docker',
+      args: ['compose', '-f', cmdPath, 'run', '--rm', '-T', 'eversis-collections'],
+      type: 'stdio',
+      env: {
+        CONSUMER_PROJECT_ROOT: consumerRoot,
+      },
+    };
   }
-  // CONSUMER_PROJECT_ROOT is interpolated by Compose on the host for the
-  // /workspace bind. AGENT_COLLECTIONS_HOME stays hardcoded as /repo inside
-  // the container. Cursor expands ${workspaceFolder}; Claude expands
-  // ${CLAUDE_PROJECT_DIR:-.} (no ${workspaceFolder}, no ${env:X}).
-  const consumerRoot = host === 'claude' ? '${CLAUDE_PROJECT_DIR:-.}' : '${workspaceFolder}';
-  picked['eversis-collections'] = {
-    command: 'docker',
-    args: ['compose', '-f', cmdPath, 'run', '--rm', '-T', 'eversis-collections'],
-    type: 'stdio',
-    env: {
-      CONSUMER_PROJECT_ROOT: consumerRoot,
-    },
-  };
 }
 
 if (host === 'claude') {

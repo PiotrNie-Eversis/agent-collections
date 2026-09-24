@@ -76,4 +76,15 @@ _merge_mcp_json_for_host() {
   echo "$merged" > "$mcp_file"
   export MCP_CONFIGURED_SERVERS="${MCP_SELECTED_IDS:-eversis-collections}"
   log_ok "Wrote ${mcp_file} (servers: ${MCP_SELECTED_IDS:-eversis-collections})"
+
+  # Vendored Claude: commit a BASH_SOURCE-based wrapper next to .mcp.json so
+  # the bash -c locator can exec a path that does not depend on cwd.
+  if [[ "$host" == "claude" ]] && [[ "$use_relative" == "true" ]]; then
+    local wrapper_src="${COLLECTIONS_HOME}/templates/run-eversis-collections-mcp.sh"
+    [[ -f "$wrapper_src" ]] || die "Wrapper template not found: ${wrapper_src}"
+    mkdir -p "${TARGET_DIR}/scripts"
+    cp "$wrapper_src" "${TARGET_DIR}/scripts/run-eversis-collections-mcp.sh"
+    chmod +x "${TARGET_DIR}/scripts/run-eversis-collections-mcp.sh"
+    log_ok "Wrote ${TARGET_DIR}/scripts/run-eversis-collections-mcp.sh"
+  fi
 }
