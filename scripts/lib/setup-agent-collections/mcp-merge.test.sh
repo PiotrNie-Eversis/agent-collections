@@ -216,6 +216,29 @@ _assert_claude_vendor_wrapper "${TARGET_DIR}/.mcp.json" \
 _assert_wrapper_script_copied "$TARGET_DIR" \
   "cursor,claude+copy copies the wrapper script once for Claude"
 
+# Case 4b: submodule pin lacks the wrapper template. The running installer
+# still has it (INSTALLER_FRAMEWORK_HOME). COLLECTIONS_HOME is only the pin.
+_pinned="$(mktemp -d)"
+mkdir -p "${_pinned}/templates"
+cp "${REPO_ROOT}/templates/mcp.json" "${_pinned}/templates/mcp.json"
+_saved_home="$COLLECTIONS_HOME"
+COLLECTIONS_HOME="$_pinned"
+INSTALLER_FRAMEWORK_HOME="$REPO_ROOT"
+export INSTALLER_FRAMEWORK_HOME
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/scripts"
+SELECTED_AGENTS="claude"
+VENDOR_MODE="submodule"
+unset MCP_SELECTED_IDS
+merge_mcp_json
+_assert_claude_vendor_wrapper "${TARGET_DIR}/.mcp.json" \
+  "claude+submodule with a stale pin still emits the bash -c wrapper"
+_assert_wrapper_script_copied "$TARGET_DIR" \
+  "claude+submodule with a stale pin copies the wrapper from INSTALLER_FRAMEWORK_HOME"
+COLLECTIONS_HOME="$_saved_home"
+unset INSTALLER_FRAMEWORK_HOME
+rm -rf "$_pinned"
+unset _pinned _saved_home
+
 # Case 5: AWS API pins MCP Python SDK < 2; AWS docs requires SDK 2 (do not pin).
 rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json"
 unset SELECTED_AGENTS VENDOR_MODE
