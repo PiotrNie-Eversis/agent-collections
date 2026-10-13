@@ -32,6 +32,8 @@ Load two inputs:
 - The **benchmark template** (`./jira-task.example.md`) which defines the expected structure and fields for Jira epics and stories
 - The **extracted tasks document** (`extracted-tasks.md`) produced by the `eversis-task-extracting` skill
 
+Before choosing Jira issue types or pushing issues (Steps 8–9), load **project-specific backlog rules** from domain context using the same router as Implement Research: read `docs/context/<project>/INDEX.md`, match the workshop topic to **one** listed component, then read only that component file (`docs/context/global/INDEX.md` when the topic is not local). Do not copy those rules into this skill.
+
 Review the benchmark template to understand:
 - Required fields for epics and stories
 - Formatting conventions
