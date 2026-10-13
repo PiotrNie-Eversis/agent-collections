@@ -326,6 +326,137 @@ function resolveCompareRoot(repoRoot, outRoot) {
   return outRoot || repoRoot;
 }
 
+/**
+ * True when sync writes/checks this framework checkout (not a consumer --out).
+ * Consumer skill mirrors are owned by the installer, not this relative self-host step.
+ */
+function isFrameworkRootTarget(repoRoot, outRoot) {
+  if (!outRoot) return true;
+  return path.resolve(outRoot) === path.resolve(repoRoot);
+}
+
+function listSkillPackageNames(repoRoot) {
+  const skillsRoot = path.join(repoRoot, ".ai", "skills");
+  if (!fs.existsSync(skillsRoot)) {
+    return [];
+  }
+  return fs
+    .readdirSync(skillsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("eversis-"))
+    .map((entry) => entry.name)
+    .sort();
+}
+
+/** Relative target from .cursor/skills/<name> or .claude/skills/<name> to SSOT. */
+function skillMirrorRelativeTarget(name) {
+  return path.posix.join("..", "..", ".ai", "skills", name);
+}
+
+function expectedSkillMirrorTarget(repoRoot, name) {
+  return path.resolve(repoRoot, ".ai", "skills", name);
+}
+
+function refreshSkillsMirror(repoRoot, hostDirRel) {
+  const names = listSkillPackageNames(repoRoot);
+  const mirrorRoot = path.join(repoRoot, ...hostDirRel.split("/"));
+  fs.mkdirSync(mirrorRoot, { recursive: true });
+
+  const keep = new Set(names);
+  const relativeTarget = (name) => skillMirrorRelativeTarget(name);
+
+  for (const name of names) {
+    const dst = path.join(mirrorRoot, name);
+    const target = relativeTarget(name);
+    try {
+      if (fs.lstatSync(dst).isSymbolicLink()) {
+        const current = fs.readlinkSync(dst);
+        if (current === target) {
+          continue;
+        }
+      }
+      fs.rmSync(dst, { recursive: true, force: true });
+    } catch (err) {
+      if (err && err.code !== "ENOENT") {
+        throw err;
+      }
+    }
+    fs.symlinkSync(target, dst);
+  }
+
+  if (fs.existsSync(mirrorRoot)) {
+    for (const entry of fs.readdirSync(mirrorRoot, { withFileTypes: true })) {
+      if (!entry.name.startsWith("eversis-")) continue;
+      if (keep.has(entry.name)) continue;
+      fs.rmSync(path.join(mirrorRoot, entry.name), {
+        recursive: true,
+        force: true,
+      });
+    }
+  }
+
+  return names.length;
+}
+
+function checkSkillsMirror(repoRoot, hostDirRel, label) {
+  const names = listSkillPackageNames(repoRoot);
+  const mirrorRoot = path.join(repoRoot, ...hostDirRel.split("/"));
+  const drifts = [];
+  const expectedRel = (name) => skillMirrorRelativeTarget(name);
+  const seen = new Set();
+
+  for (const name of names) {
+    const dst = path.join(mirrorRoot, name);
+    seen.add(name);
+    let st;
+    try {
+      st = fs.lstatSync(dst);
+    } catch {
+      drifts.push(
+        `${label}:${name}: missing symlink: ${path.join(hostDirRel, name)}`,
+      );
+      continue;
+    }
+    if (!st.isSymbolicLink()) {
+      drifts.push(
+        `${label}:${name}: not a symlink: ${path.join(hostDirRel, name)}`,
+      );
+      continue;
+    }
+    const link = fs.readlinkSync(dst);
+    if (link !== expectedRel(name)) {
+      drifts.push(
+        `${label}:${name}: wrong target (got ${link}, expected ${expectedRel(name)})`,
+      );
+      continue;
+    }
+    const resolved = path.resolve(path.dirname(dst), link);
+    if (resolved !== expectedSkillMirrorTarget(repoRoot, name)) {
+      drifts.push(
+        `${label}:${name}: resolves outside .ai/skills/${name}: ${resolved}`,
+      );
+      continue;
+    }
+    const skillMd = path.join(dst, "SKILL.md");
+    if (!fs.existsSync(skillMd)) {
+      drifts.push(
+        `${label}:${name}: SKILL.md not readable through symlink`,
+      );
+    }
+  }
+
+  if (fs.existsSync(mirrorRoot)) {
+    for (const entry of fs.readdirSync(mirrorRoot, { withFileTypes: true })) {
+      if (!entry.name.startsWith("eversis-")) continue;
+      if (seen.has(entry.name)) continue;
+      drifts.push(
+        `${label}:${entry.name}: unexpected eversis-* entry (no .ai/skills match): ${path.join(hostDirRel, entry.name)}`,
+      );
+    }
+  }
+
+  return drifts;
+}
+
 function runCheck(repoRoot, outRoot, frameworkPrefix) {
   const cursorMap = loadRuleMap(CURSOR_MAP, "Cursor");
   const claudeMap = loadRuleMap(CLAUDE_MAP, "Claude");
@@ -499,6 +630,11 @@ function runCheck(repoRoot, outRoot, frameworkPrefix) {
       if (err) drifts.push(err);
     }
 
+    if (isFrameworkRootTarget(repoRoot, outRoot)) {
+      drifts.push(...checkSkillsMirror(repoRoot, ".cursor/skills", "cursor-skill"));
+      drifts.push(...checkSkillsMirror(repoRoot, ".claude/skills", "claude-skill"));
+    }
+
     if (drifts.length > 0) {
       console.error("error: adapter drift detected:");
       for (const d of drifts) {
@@ -554,6 +690,13 @@ function runWrite(repoRoot, outRoot, agents, frameworkPrefix) {
   }
   if (selected.has("opencode")) {
     runOpenCodePlaceholder(repoRoot, outRoot);
+  }
+  if (isFrameworkRootTarget(repoRoot, outRoot)) {
+    const cursorCount = refreshSkillsMirror(repoRoot, ".cursor/skills");
+    const claudeCount = refreshSkillsMirror(repoRoot, ".claude/skills");
+    console.log(
+      `adapter sync: framework skills mirror — .cursor/skills (${cursorCount}), .claude/skills (${claudeCount})`,
+    );
   }
   console.log("adapter sync: done");
 }
