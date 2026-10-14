@@ -112,7 +112,7 @@ SemVer tags on this repository cover core + adapters + installer + MCP together.
 | Start here | `website/docs/getting-started/start-here.md` |
 | Prerequisites | `website/docs/getting-started/prerequisites.md` |
 | Installation | `website/docs/getting-started/installation.md` |
-| MCP setup | `website/docs/getting-started/mcp-setup.md` |
+| MCP setup | `website/docs/getting-started/mcp-setup.mdx` |
 | Quick wins | `website/docs/getting-started/quick-wins.md` |
 | Migration | `website/docs/getting-started/migration-from-cursor-collections.md` |
 

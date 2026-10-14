@@ -1,0 +1,237 @@
+---
+sidebar_position: 3
+title: MCP Setup
+toc_max_heading_level: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# MCP Setup
+
+Configure **Model Context Protocol (MCP)** — the connection that lets your AI editor call project tools, skill packages, and (later) optional services such as Jira or Figma. This page gets you to a first successful **`eversis-collections`** connection. Optional servers come after that.
+
+:::tip What is MCP in plain language?
+Think of MCP as giving your AI editor **hands** for this project: it can use framework skills, read durable project knowledge, and (when you choose) talk to other tools. The core skills server runs **on your computer** (usually via Docker) and connects to Cursor or Claude Code. It is **not** a separate cloud product you must buy.
+:::
+
+## Choose your path by role
+
+| Role | Recommended editor | What you need for first success | Difficulty |
+| ---- | ------------------ | -------------------------------- | ---------- |
+| **QA / BA / PO** | **Cursor** (desktop app) | Core **`eversis-collections`** server only | Low |
+| **Developer / tech QA** | Cursor and/or **Claude Code** | Core server first; optional Jira/Figma/Playwright **later** | Medium |
+| **Framework maintainer** | Either | Same core path; advanced non-Docker / Node paths are **advanced** and not required here | Advanced |
+
+You do **not** need every MCP server or every IDE on day one. Optional integrations are listed later and are clearly optional.
+
+:::warning Before Step 1
+Finish [Prerequisites](./prerequisites) first. **Docker Engine must be running** (Docker Desktop or an IT-approved Compose-compatible runtime). If `docker` is missing or the engine is stopped, fix that on Prerequisites — then return here.
+:::
+
+## Step 1 — Prepare the core local server
+
+Goal: build the **`eversis-collections`** image so your editor can start the skills server. You do **not** need Jira, Figma, or other API tokens for this step.
+
+Pick your OS once — set the framework home, then build the image (Docker Engine must already be running):
+
+<Tabs groupId="mcp-os">
+<TabItem value="macos" label="macOS / Linux" default>
+
+```bash
+export AGENT_COLLECTIONS_HOME=/path/to/agent-collections
+```
+
+Add that line to your shell profile if you want it every session. Use only **`AGENT_COLLECTIONS_HOME`** for a clean setup (see [Advanced: env cutover](#advanced-env-cutover-from-cursor-collections) if you are migrating).
+
+```bash
+cd "$AGENT_COLLECTIONS_HOME"
+docker compose build eversis-collections
+```
+
+</TabItem>
+<TabItem value="windows" label="Windows">
+
+In **PowerShell**:
+
+```powershell
+$env:AGENT_COLLECTIONS_HOME = "C:\path\to\agent-collections"
+```
+
+For a persistent user env var, use Windows Settings → System → About → Advanced system settings → Environment Variables, or set it in your PowerShell profile. Prefer forward slashes or escaped paths in JSON later if you edit config by hand.
+
+```powershell
+cd $env:AGENT_COLLECTIONS_HOME
+docker compose build eversis-collections
+```
+
+If `docker` is not recognized, start Docker Desktop and wait until the engine is ready — see [Prerequisites — Common problems](./prerequisites#common-problems).
+
+</TabItem>
+</Tabs>
+
+The installer normally writes the MCP entry for you. The Compose-based shape looks like this (Cursor uses `${env:…}` syntax; Claude Code uses `${VAR}` / `${VAR:-default}` — the installer translates per host):
+
+```json
+"eversis-collections": {
+  "command": "docker",
+  "args": [
+    "compose",
+    "-f",
+    "${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml",
+    "run",
+    "--rm",
+    "-T",
+    "eversis-collections"
+  ]
+}
+```
+
+If you already ran [Installation](./installation) with `--build-mcp`, you usually only need to **enable** the existing project entry in Step 2 — do not add a second copy by hand.
+
+Optional: re-run the installer merge when you need to refresh MCP config:
+
+```bash
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+  --build-mcp --non-interactive \
+  --mcp-servers=eversis-collections
+```
+
+Allowed server ids match the installer allowlist (`scripts/setup-agent-collections.sh --help` and `templates/mcp.json`). Add optional ids later — not required for first success.
+
+## Step 2 — Connect your editor
+
+Follow **only** the tab for the editor you use. You do not need to configure both.
+
+Claude Desktop is not a supported Getting Started path yet.
+
+<Tabs groupId="mcp-client">
+<TabItem value="cursor" label="Cursor" default>
+
+**Cursor** is the recommended path for QA, BA, and PO.
+
+1. Open your **consumer project** (the repo you work in) in Cursor — not a random subfolder.
+2. Open **Settings → MCP** (or Command Palette → search for MCP).
+3. If [Installation](./installation) already wrote **`.cursor/mcp.json`**, find **`eversis-collections`** in the **project** list and **enable** it. Prefer this entry over creating a new one.
+4. Only if the installer was **not** used: add a server using the Compose shape from Step 1, with `AGENT_COLLECTIONS_HOME` set for the Cursor process (terminal launch that exports the env, or a system env var).
+5. Restart the agent / reload the window if tools do not appear.
+
+:::caution Do not duplicate User and project entries
+Cursor loads **both** `~/.cursor/mcp.json` (badge **User**) and the project `.cursor/mcp.json`. The installer writes the **project** file. If the same server id also exists under User, you get two `eversis-collections` entries and the wrong tree may start.
+
+Keep User MCP for personal tools only. Do **not** paste `templates/mcp.json` into User config when the project file already has the catalog. To remove duplicates: Command Palette → **MCP: Open User Configuration** and delete the overlapping ids. The installer warns on overlap and does **not** edit `~/.cursor/mcp.json`.
+:::
+
+</TabItem>
+<TabItem value="claude-code" label="Claude Code">
+
+**Claude Code** uses a project root **`.mcp.json`**. Docker is required; Node.js is not required just to run the skills server in Docker.
+
+1. Open a terminal in your **consumer project root**.
+2. If Installation already wrote **`.mcp.json`**, open that file (or follow your Claude Code trust/enable flow for project servers) and confirm **`eversis-collections`** is present — do not add a second entry. Optional: when your Claude Code version supports it, you can also run `claude mcp list` as a secondary check.
+3. How the server starts depends on install mode:
+   - **Vendored** (`--vendor copy` or `--vendor submodule`) — entry uses `bash -c` to run `scripts/run-eversis-collections-mcp.sh`, which sets the consumer root and Compose file under `vendor/agent-collections/`.
+   - **Absolute** (framework outside the consumer repo) — entry runs `docker compose` with `CONSUMER_PROJECT_ROOT` / `AGENT_COLLECTIONS_HOME` as written by the installer.
+4. Skills also resolve via **`.claude/skills/`** (linked by the installer), not only through MCP. Note team-enabled servers in `.claude/CLAUDE.md` if your team documents that.
+
+Only add a manual Compose entry if the installer was not used. Prefer the project `.mcp.json` over a conflicting global config.
+
+</TabItem>
+</Tabs>
+
+## Step 3 — Verify
+
+**Success looks like:**
+
+- MCP status for **`eversis-collections`** is connected / healthy (green or equivalent in your editor).
+- Tools such as **`eversis_skills_list`** (and, when domain context is set up, **`eversis_context_list`**) appear for that server.
+
+**Smoke check in chat** (after tools are listed):
+
+> List available Agent Collections skills using the MCP tools, or list domain-context components for this project.
+
+Expect the assistant to call a core tool (`eversis_skills_list` and/or `eversis_context_list`) and confirm it can see this project.
+
+**If verification fails:** go to [Troubleshooting](#troubleshooting) — do not skip ahead to Quick Wins until the core server connects.
+
+**When verification succeeds**, continue Getting Started:
+
+- [Quick wins](./quick-wins)
+- [Start here](./start-here)
+- [Installation](./installation) (if you still need to finish bootstrap)
+
+## Open the right project folder
+
+Domain-context tools (names starting with `eversis_context_`) need your **consumer project root** — the repo that contains `.agent-collections/install-selection.json` and usually `docs/context/`.
+
+Open that folder as the workspace in Cursor (or work from that root in Claude Code). Do **not** rely on a random subfolder, and do not expect context tools to work if only the framework checkout is open when your real work lives in another repo.
+
+You do not need to understand Docker volumes for this rule. If context tools fail with path / `install-selection.json` errors, see [Troubleshooting](#troubleshooting) and the [advanced volume note](#domain-context-needs-the-project-volume-not-just-the-framework-volume).
+
+## Optional integrations (not required)
+
+:::info Skip this for first success
+Jira, Figma, Playwright, and similar MCP servers are **optional**. They are useful later; they are **not** required to start using framework skills. You do not need their API tokens to finish this page.
+:::
+
+**Required for skills on this path**
+
+- **`eversis-collections`** — list/get/validate skills from `.ai/skills/`; domain context from the consumer project’s `docs/context/`; optional Word `.docx` tools when BA Docs is in scope. See [eversis-collections](../reference/integrations/eversis-collections).
+
+**Optional later** (short overview — details live under Reference)
+
+- **Atlassian** — Jira and Confluence — [Atlassian](../reference/integrations/atlassian)
+- **Figma** — design context for UI work — [Figma](../reference/integrations/figma)
+- **Context7** — up-to-date library documentation — [Context7](../reference/integrations/context7)
+- **Playwright** — browser interactions — [Playwright](../reference/integrations/playwright)
+- **Sequential Thinking** — structured reasoning — [Sequential Thinking](../reference/integrations/sequential-thinking)
+- **PDF Reader** — workshop PDFs — [PDF Reader](../reference/integrations/pdf-reader)
+- **AWS / GCP MCPs** — cloud APIs (optional) — see [Integrations overview](../reference/integrations/overview)
+
+When you are ready, add optional ids via the installer `--mcp-servers=…` list or your editor’s MCP UI.
+
+## Troubleshooting
+
+| Symptom | Likely cause | What to do |
+| ------- | ------------ | ---------- |
+| MCP shows disconnected / red for `eversis-collections` | Docker Engine not running | Start Docker Desktop (or your IT-approved runtime) and wait until the engine is ready. See [Prerequisites](./prerequisites) and [Common problems](./prerequisites#common-problems). Then reload the editor. |
+| `docker` not found in the terminal or IDE | Docker not installed, not on `PATH`, or IDE launched without Docker in its environment | Install/start Docker per Prerequisites; fully quit and reopen the editor so it inherits `PATH`. |
+| Image missing / tools never appear | Image not built or stale | From the framework checkout: `docker compose build eversis-collections`. Re-run installer with `--build-mcp` if needed. Confirm `AGENT_COLLECTIONS_HOME` points at that checkout. |
+| Context tools fail (`install-selection.json not found`) or wrong/empty project | Wrong folder open, or consumer root not passed into the server | Open the **consumer project root** in the editor. Re-run installer with `--upgrade --sync`. On Cursor, ensure project MCP env can resolve the workspace folder. See [project volume details](#domain-context-needs-the-project-volume-not-just-the-framework-volume). |
+| Two `eversis-collections` entries, flaky disconnect, or wrong tree | Duplicate User **and** project MCP config | Keep the **installer/project** entry; remove the duplicate from User MCP (`MCP: Open User Configuration` in Cursor). Do not merge `templates/mcp.json` into User when the project file already has the catalog. |
+| Windows: virtualization / WSL / engine will not start | Desktop engine or platform prerequisites | Follow [Prerequisites — Common problems](./prerequisites#common-problems) and your IT guidance. This page does not replace enterprise Docker setup. |
+
+### Advanced: env cutover from Cursor Collections
+
+| Legacy (Cursor Collections) | Agent Collections |
+| --------------------------- | ----------------- |
+| `CURSOR_COLLECTIONS_HOME` | **`AGENT_COLLECTIONS_HOME`** |
+| Path into `cursor-collections/mcp/...` | Path into **`agent-collections/mcp/...`** |
+
+Do not keep both env vars pointing at different frameworks for the same skills server unless you intentionally dual-channel (**advanced**). For a clean cutover, export only `AGENT_COLLECTIONS_HOME`.
+
+### Domain context needs the project volume, not just the framework volume {#domain-context-needs-the-project-volume-not-just-the-framework-volume}
+
+If `eversis_context_get` / `list` / `sync` fail with `install-selection.json not found`, check this section after the plain-language [project folder](#open-the-right-project-folder) note.
+
+The `eversis-collections` container mounts two folders:
+
+- **Framework checkout** (skills live here) — always available for `eversis_skills_*`.
+- **Your consumer project** (the repo with `.agent-collections/install-selection.json` and `docs/context/`) — Compose binds `${CONSUMER_PROJECT_ROOT:-${PWD}}`. How that root is set:
+  - **Cursor** — installer writes `CONSUMER_PROJECT_ROOT` into MCP `env` as `${workspaceFolder}`.
+  - **Vendored Claude Code** (copy or submodule under `vendor/`) — wrapper script sets `CONSUMER_PROJECT_ROOT` to the parent of `scripts/` (consumer root, not the vendor tree).
+  - **Absolute (non-vendored) Claude Code** — installer writes `CONSUMER_PROJECT_ROOT` to `${CLAUDE_PROJECT_DIR:-.}` in MCP `env`.
+  - `${PWD}` is only a fallback.
+
+Domain-context tools read and write `docs/context/` through the consumer mount, not the framework-only mount. They treat the mount as the project only when `install-selection.json` is present.
+
+:::caution Wrong directory is an error, not empty results
+If Compose still resolves the vendor checkout (no host `CONSUMER_PROJECT_ROOT`, and `PWD` is the compose-file directory), domain-context tools error with `install-selection.json not found` rather than listing the wrong tree. Fix: re-run the installer with `--upgrade --sync`. On Cursor you can set `CONSUMER_PROJECT_ROOT` on the `eversis-collections` MCP entry to `${workspaceFolder}`. Vendored Claude should rely on the wrapper script, not a hand-edited `${CLAUDE_PROJECT_DIR:-.}` env value. One session covers one repo — see [Working across the whole group yourself](../domain-context#working-across-the-whole-group-yourself) if you operate across several repos in the same GitLab group.
+:::
+
+## Next
+
+- [Quick wins](./quick-wins) — try a short guided task after MCP works
+- [Start here](./start-here) — role map for the rest of Getting Started
+- [Installation](./installation) — installer flags and bootstrap
+- [Prerequisites](./prerequisites) — Docker Engine and editor install recovery
