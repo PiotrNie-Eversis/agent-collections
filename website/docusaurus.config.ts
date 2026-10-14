@@ -8,6 +8,8 @@ const config: Config = {
   tagline:
     'Vendor-neutral multi-agent product engineering framework — Ideate → Implement → Review → Fine',
 
+  favicon: 'img/favicon.ico',
+
   // Canonical origin baked into metadata (canonical, Open Graph, Twitter image, hreflang, sitemap).
   url: 'https://agent-collections.vercel.app',
   baseUrl: '/',
