@@ -232,7 +232,7 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 ### Consumer project (framework outside workspace)
 
 1. Clone the framework once and set **`AGENT_COLLECTIONS_HOME`** to that checkout (must contain `.cursor/skills` and `docker-compose.yml`).
-2. Bootstrap with `setup-agent-collections.sh --build-mcp` — see [Installation §4](../../getting-started/installation).
+2. Bootstrap with `setup-agent-collections.sh --build-mcp` — see [Installation — Step 2](../../getting-started/installation#step-2--install-into-your-project).
 3. Enable **`eversis-collections`** in Cursor MCP settings and restart.
 
 The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. For Cursor, the second volume uses host `CONSUMER_PROJECT_ROOT` `${workspaceFolder}`. Absolute (non-vendored) Claude Code still uses `${CLAUDE_PROJECT_DIR:-.}` in MCP `env`. Vendored Claude uses the wrapper above, not an env token. `${PWD}` is only a fallback. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../../getting-started/installation).

@@ -158,7 +158,7 @@ npm run sync:adapters:check
 
 6. Try a short task: load **`eversis-implement`** with a ticket id or a sentence describing the work.
 
-**MVP note:** This distribution does **not** ship a full mirror of skills/prompts under `.cursor/skills` or `.cursor/prompts`. The Cursor adapter **does** generate thin slash shims under `.cursor/commands/` from `.ai/prompts` (stable id remains SSOT). Prefer MCP + load-by-id; optional `@` attach or `/eversis-*` on Cursor.
+**Skills UX:** Prefer MCP **`eversis-collections`** + load-by-id under `.ai/skills/` / `.ai/prompts/`. Both adapters also mirror skill packages under `.cursor/skills/eversis-*` and `.claude/skills/eversis-*` (framework sync / installer) for direct file read or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. The Cursor adapter generates thin `/eversis-*` slash shims under `.cursor/commands/` from `.ai/prompts` (stable id remains SSOT).
 
 First successful install checklist: [Start here](./website/docs/getting-started/start-here.md).
 
@@ -175,6 +175,7 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
   --mcp-servers=eversis-collections \
   --profile=fullstack
 # Optional: --build-mcp to force MCP package rebuild (also builds when dist is missing)
+# Guided path (Cursor+Claude, OS tabs, verify): website/docs/getting-started/installation.mdx
 ```
 
 ### Vendor modes
@@ -192,7 +193,7 @@ Interactive wizard (TTY) prompts for agents × domain profile × MCP servers —
 Selection is recorded at `.agent-collections/install-selection.json` (schema: [`docs/architecture/install-selection.md`](./docs/architecture/install-selection.md)) — required for `--upgrade`.
 
 **Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `AGENTS.md` (do not hand-edit generated `CLAUDE.md`).
-Full install guide (including Windows): [Installation](./website/docs/getting-started/installation.md).
+Full install guide (including Windows): [Installation](./website/docs/getting-started/installation.mdx).
 
 Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`): [Migration guide](./website/docs/advanced/migration-from-cursor-collections.md).
 
@@ -408,7 +409,7 @@ Grouped the same way the docs site itself is now organized — by what you're tr
 | -------- | ------- |
 | [Start here](./website/docs/getting-started/start-here.md) | First successful install checklist |
 | [Prerequisites](./website/docs/getting-started/prerequisites.md) | Tooling requirements |
-| [Installation](./website/docs/getting-started/installation.md) | Consumer install (incl. Windows) |
+| [Installation](./website/docs/getting-started/installation.mdx) | Consumer install (incl. Windows) |
 | [MCP setup](./website/docs/getting-started/mcp-setup.mdx) | Workspace vs user MCP |
 | [Quick wins](./website/docs/getting-started/quick-wins.md) | Short practical scenarios |
 

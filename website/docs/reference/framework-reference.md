@@ -85,7 +85,7 @@ Skills are the reusable procedures an agent loads on demand rather than keeping 
 
 Skills live under `.ai/skills/eversis-*/`. Prefer MCP server **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`). Respect the consumer **project stack** skills policy. Includes 4 domain-context skills: `eversis-add-domain-knowledge`, `eversis-promote-domain-knowledge`, `eversis-import-confluence-knowledge`, `eversis-audit-domain-knowledge`.
 
-MVP does **not** ship a full `.cursor/skills` mirror.
+Both adapters mirror skill packages under `.cursor/skills/eversis-*` and `.claude/skills/eversis-*` (framework sync / installer) for load-by-path or `@` attach. Prefer MCP for discovery; do **not** register `.cursor/skills` as Cursor **Agent Skills** UI.
 
 The same MCP server also exposes a separate tool group, `eversis_context_*`, for reading and syncing **domain context** — see [Domain Context (SSOT)](./domain-context) and the [full tool inventory](./reference/integrations/eversis-collections#domain-context).
 
@@ -95,7 +95,7 @@ The same MCP server also exposes a separate tool group, `eversis_context_*`, for
 
 Each supported tool packages the same core content differently:
 
-- **Cursor** — generated `.cursor/rules/*.mdc` + `.cursor/commands/*.md`; skills via MCP.
+- **Cursor** — generated `.cursor/rules/*.mdc` + `.cursor/commands/*.md`; skills via MCP (preferred) plus `.cursor/skills/` mirror for file/`@` attach (not Agent Skills UI).
 - **Claude Code** — root `CLAUDE.md` + `.claude/rules/*.md` (glob-scoped) + `.claude/commands/*.md`; skills **natively** via `.claude/skills/` (linked by the installer). Project-specific notes go in `.claude/CLAUDE.md` (seeded once, never overwritten) — Claude Code does not auto-read `AGENTS.md`.
 - **OpenCode** — placeholder only.
 

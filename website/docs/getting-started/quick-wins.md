@@ -6,7 +6,7 @@ title: Quick Wins
 # Quick Wins
 
 :::tip From theory to practice
-Each scenario maps a real need to prompts and skills. Prefer MCP **`eversis_skills_get`** (or read `.ai/skills/*/SKILL.md`) — this MVP does not ship a full `.cursor/skills` mirror for Cursor. Claude Code is the exception: it gets a native `.claude/skills/` mirror from the installer, so no MCP call is required there.
+Each scenario maps a real need to prompts and skills. Prefer MCP **`eversis_skills_get`** (or read `.ai/skills/*/SKILL.md`). Both adapters also mirror skills under `.cursor/skills/` and `.claude/skills/` for direct file read — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Claude Code can use its native `.claude/skills/` mirror without MCP.
 :::
 
 ---
