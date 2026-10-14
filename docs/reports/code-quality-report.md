@@ -6,114 +6,104 @@
 |---|---|
 | Repository | agent-collections |
 | Repository Type | Framework monorepo (`.ai/`, `adapters/`, `mcp/`, `website/`, `scripts/`) |
-| Date | 2026-10-13 |
-| Layers/Apps Analyzed | **Focused delivery audit:** Epic [AC-36](https://eversis.atlassian.net/browse/AC-36) (Prerequisites clarity) vs live docs — not a full-repo dead-code sweep |
-| Prompt | `/eversis-review-codebase` with user focus: *sprawdź czy epic AC-36 został w pełni wdrożony* |
+| Date | 2026-10-14 |
+| Layers/Apps Analyzed | **Focused delivery audit:** Story [AC-35](https://eversis.atlassian.net/browse/AC-35) (Prerequisites UX overhaul) and live follow-up content on the same page (AC-36 / AC-37 / AC-38 leaf tasks) |
+| Prompt | `/eversis-review-codebase` with user focus: *AC-35 — przeanalizuj wdrożenie; jeśli OK — QA summary per zadanie* |
 
 ## Executive Summary
 
-**Verdict: content for AC-36 is fully implemented in the docs; the Jira epic/tasks are not closed.**
+**Verdict: AC-35 implementation is OK (PASS).** The public Prerequisites page meets the original six acceptance criteria. `npm run website:build` exits **0** (verified 2026-10-14). Legacy `prerequisites.md` is gone; the route is served by `prerequisites.mdx`.
 
-All four active child **Tasks** under AC-36 (AC-47, AC-48, AC-49, AC-46) plus the post-implement **VS Code delta** are present on `website/docs/getting-started/prerequisites.mdx`. Plan acceptance criteria in `docs/specs/ac-36-prerequisites-clarity/` are checked. `npm run website:build` previously passed for this work.
+Post-deploy follow-ups from the AC-35 workshop are already present on the same page: GUI/CLI clarity and accounts (AC-36 / AC-46–49), TOC + troubleshooting (AC-37 / AC-50–51), and enterprise Docker warning (AC-38 / AC-52). Leaf Tasks for those follow-ups are **Done** in Jira. **AC-35 itself remains Backlog** despite delivered content — board hygiene gap only.
 
-**Caveats (not missing Prerequisites copy):**
-
-1. **Jira hygiene** — Epic AC-36 and Tasks AC-46–AC-49 remain **Backlog** while superseded Stories AC-39–AC-42 are **Done**. Board state does not reflect delivery.
-2. **Start here alignment** — AC-36 originally lengthened Start here step 1 (Node / VS Code / accounts). Epic [AC-56](https://eversis.atlassian.net/browse/AC-56) later **intentionally shortened** Start here into a role map and pushed detail back to Prerequisites. That is by design for AC-56, not a regression of Prerequisites itself. Start here no longer repeats the full AC-36 VS Code / Node essay (Developer tab still points readers to Prerequisites for Node notes).
-
-Out of AC-36 scope and **not** claimed done: AC-37 (Docker enterprise), AC-38 (TOC / troubleshooting).
+No critical dead code, no duplications that block shipping, and no scope creep into installer/MCP runtime. Remaining items are process (close AC-35; optionally close epics AC-37 / AC-38 whose children are Done) and optional polish (replace illustrative screenshots with org-branded captures later).
 
 ---
 
 ## Findings by Layer/App
 
-### AC-36 delivery audit (`website/docs/getting-started/`, Jira AC)
+### Website docs — Prerequisites (`website/docs/getting-started/`)
 
 #### Dead Code
 
 | # | Severity | Type | Location | Description |
 |---|---|---|---|---|
-| — | — | — | — | No dead-code pass for this focused audit. |
+| 1 | 🟢 | Orphan file | (absent) `website/docs/getting-started/prerequisites.md` | Legacy markdown correctly removed after MDX cutover — no duplicate doc ID risk. |
+| 2 | 🟢 | Static assets | `website/static/img/getting-started/prerequisites/.DS_Store` | macOS metadata file in static image folder; not referenced by docs. | Remove from VCS / add ignore if it keeps reappearing. |
 
 #### Duplications
 
 | # | Severity | Type | Locations | Description | Recommendation |
 |---|---|---|---|---|---|
-| 1 | 🟢 | Docs overlap (historical) | `prerequisites.mdx`, former Start here step 1 | AC-36 briefly duplicated Prerequisites detail on Start here; AC-56 removed that duplication. | Keep Prerequisites as SSOT for tool detail; keep Start here as map (current AC-56 shape). |
+| 1 | 🟢 | Docs overlap (by design) | `prerequisites.mdx`, `start-here.mdx` | Start here (AC-56) short-points to Prerequisites for tool detail; Prerequisites remains SSOT. | Keep this split; do not re-expand Start here with full AC-35 matrix. |
+| 2 | 🟢 | Repeated vendor links | Matrix + OS tabs in `prerequisites.mdx` | Official Cursor / Claude / Docker / Git links appear in matrix and again in tab steps. | Acceptable for onboarding UX; no merge needed. |
 
 #### Improvement Opportunities
 
 | # | Severity | Category | Location | Description | Recommendation |
 |---|---|---|---|---|---|
-| 1 | 🟡 | Process / Jira | AC-36, AC-46–AC-49 | Content delivered; epic and active Tasks still **Backlog**. | Transition Tasks → Done (or verify then Done) and close Epic AC-36 when children are Done. |
-| 2 | 🟢 | Traceability | `ac-36-prerequisites-clarity.plan.md` | Plan AC “Start here step 1 matches Node/Claude / VS Code” is stale relative to AC-56 rewrite. | Add Changelog note on AC-36 plan: Start here alignment **superseded by AC-56** (detail stays on Prerequisites). |
-| 3 | 🟢 | Docs | `start-here.mdx` QA/BA tab | Short Prerequisites step names AI editor, Docker, Git but not VS Code (AC-56 intent). | No change required for AC-36 if Prerequisites remains SSOT; optional one-line “Claude Code path: see VS Code on Prerequisites” only if product wants it on the map. |
+| 1 | 🟡 | Process / Jira | AC-35 | Content and build gate met; Story still **Backlog**. | Transition AC-35 → Done after QA accepts the draft below. |
+| 2 | 🟡 | Process / Jira | AC-37, AC-38 | Child Tasks AC-50–52 are **Done**; epics still **Backlog**. | Close epics when product agrees children complete the epic DoD. |
+| 3 | 🟢 | Docs polish | Common problems screenshots | Illustrative / schematic images (plan-allowed). | Optional later: replace with org-branded captures. |
+| 4 | 🟢 | Docs | `prerequisites.mdx` matrix | Wide table (6 columns) may wrap heavily on mobile. | Monitor in browser; split “Account” into a subsection only if QA reports scanability issues. |
 
 ---
 
-## AC matrix (epic scope)
+## AC-35 acceptance matrix
 
-| Source requirement | Evidence | Status |
+| Acceptance criterion | Evidence | Status |
 |---|---|---|
-| Cursor = GUI; Claude Code = CLI | `prerequisites.mdx` L21–22 (`How you use it` column) | ✅ Met |
-| Recommend Cursor first if uncomfortable with terminal | Tip L13–14 | ✅ Met |
-| Cursor-only: Node not required; Claude Code may need Node LTS | Node `:::info` L104–109; Claude Code install steps L45–46, L79–80 | ✅ Met |
-| MCP developer Node requirement intact | L109 | ✅ Met |
-| Cursor + Anthropic account / Tech Lead or IT | Table L21–22 (`Account before install`) | ✅ Met |
-| Open Terminal / PowerShell before verification | L114–133 | ✅ Met |
-| VS Code recommended for Claude Code QA path + official extension docs | Table L23; tip L14; macOS/Windows steps L48, L81; link `code.claude.com/docs/en/vs-code` | ✅ Met (delta) |
-| Start here aligned with Node/Claude/VS Code messaging | `start-here.mdx` — short pointer + Developer tab “Node.js notes if you use Claude Code”; detail on Prerequisites | ⚠️ **Superseded by AC-56** (intentional shorten) |
-| `npm run website:build` | Plan DoD / prior Implement session | ✅ Previously verified |
+| Quick matrix: official links for Cursor, Claude Code, Docker Desktop, Git, Node.js | `prerequisites.mdx` Quick requirements table (also adds VS Code for Claude Code path — additive, not a gap) | ✅ Met |
+| macOS / Windows tabs with GUI-first steps; Apple Silicon/Intel; WSL2 warning | OS `<Tabs groupId="operating-system">`; Docker Mac chip choice; Windows WSL `:::warning` | ✅ Met |
+| Role tip + Node section: Node not required for typical QA/BA (Cursor-only) | Tip L14–16; Node `:::info` L115–121 | ✅ Met |
+| Verification: commands + example outputs + Installation CTA | Check your setup table + link to Installation | ✅ Met |
+| Framework depth (domain-context, Compose) below main path | Framework notes after Common problems; MCP setup links | ✅ Met |
+| `npm run website:build` | Exit 0 on 2026-10-14 | ✅ Met |
+| Start here aligned (Node not peer-required for all roles) | `start-here.mdx` role tabs; Node only on Developer / Claude notes | ✅ Met (shape owned by AC-56; detail SSOT on Prerequisites) |
 
-### Jira children under AC-36
+### Related leaf tasks (same page; already Done)
 
-| Key | Type | Summary | Jira status | Content in repo |
-|---|---|---|---|---|
-| AC-47 | Task (active) | GUI vs CLI | Backlog | ✅ Implemented |
-| AC-48 | Task (active) | Node vs Cursor/Claude | Backlog | ✅ Implemented |
-| AC-49 | Task (active) | AI accounts | Backlog | ✅ Implemented |
-| AC-46 | Task (active) | Open terminal | Backlog | ✅ Implemented |
-| AC-40 / AC-39 / AC-41 / AC-42 | Story (superseded) | Same scope as above | Done | N/A (duplicates) |
-| AC-36 | Epic | Non-technical reader clarity | Backlog | Content ✅ / board ❌ |
+| Key | Summary | Jira | Content |
+|---|---|---|---|
+| AC-47 | Cursor GUI vs Claude Code CLI | Done | ✅ |
+| AC-48 | Node vs Cursor / Claude paths | Done | ✅ |
+| AC-49 | Cursor / Anthropic accounts | Done | ✅ |
+| AC-46 | Open Terminal / PowerShell | Done | ✅ |
+| AC-50 | Clean TOC | Done | ✅ (`toc_max_heading_level: 2` + bold in-tab labels) |
+| AC-51 | Common problems + screenshots | Done | ✅ (3 scenarios + 3 webp assets) |
+| AC-52 | Docker admin / license / IT alternatives | Done | ✅ |
 
 ---
 
 ## Architecture Observations
 
-- Prerequisites MDX is the correct SSOT for install detail after AC-56.
-- AC-36 and AC-56 are correctly related in product terms (Relates in Jira); closing AC-36 should not wait on AC-56 unless the team wants Start here essay alignment as part of AC-36 DoD — workshop/AC-56 explicitly reversed that.
+- Docs-only change on the Docusaurus site; first-class MDX Tabs usage is appropriate and build-safe.
+- Prerequisites is the onboarding SSOT; Start here is a role map (AC-56) — healthy separation of concerns.
+- No circular dependencies or new npm packages introduced by AC-35.
+- Out of scope correctly respected: no installer, MCP image, or Linux tab changes.
 
 ## Summary
 
 | Category | 🔴 Critical | 🟡 Important | 🟢 Nice to Have | Total |
 |---|---|---|---|---|
-| Dead Code | 0 | 0 | 0 | 0 |
-| Duplications | 0 | 0 | 1 | 1 |
-| Improvements | 0 | 1 | 2 | 3 |
-| **Total** | **0** | **1** | **3** | **4** |
+| Dead Code | 0 | 0 | 2 | 2 |
+| Duplications | 0 | 0 | 2 | 2 |
+| Improvements | 0 | 2 | 2 | 4 |
+| **Total** | **0** | **2** | **6** | **8** |
 
 ## Recommended Action Plan
 
 ### Immediate (Critical)
 
-None for docs content.
+1. None.
 
 ### Short-term (Important)
 
-1. ~~**Close Jira for AC-36**~~ — done 2026-10-14: AC-46–49 + AC-36 → Done.
-2. ~~Comment on AC-36~~ — posted (docs shipped; Start here → AC-56).
+1. Post QA drafts (below) after human review; move **AC-35** to Done.
+2. Close epics **AC-37** and **AC-38** if child Tasks satisfy epic DoD.
 
 ### Long-term (Nice to Have)
 
-1. Changelog note on `ac-36-prerequisites-clarity.plan.md` that Start here ACs were superseded by AC-56.
-2. Continue AC-37 / AC-38 for remaining Prerequisites workshop gaps (Docker enterprise, TOC/troubleshooting).
-
----
-
-## Bottom line
-
-| Question | Answer |
-|---|---|
-| Czy **treść** epika AC-36 jest w pełni wdrożona? | **Tak** — Prerequisites (+ delta VS Code). |
-| Czy **Jira** pokazuje epik jako ukończony? | **Tak** (od 2026-10-14) — AC-36 i taski AC-46–49 → Done. |
-| Czy Start here nadal zawiera pełny esej z AC-36? | **Nie** — celowo skrócone w AC-56; szczegóły na Prerequisites. |
+1. Drop `.DS_Store` from the prerequisites image folder if tracked.
+2. Optionally refresh troubleshooting screenshots with branded captures.
+3. Revisit matrix width on small viewports only if QA flags it.

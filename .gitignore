@@ -10,6 +10,9 @@ docs/specs/*/
 # Agent context subfolders — local only (README stays tracked)
 docs/context/*/
 
+# Agent reports subfolders — local only (README stays tracked)
+docs/reports/*/
+
 # MCP package
 mcp/eversis-collections-mcp/node_modules/
 mcp/eversis-collections-mcp/dist/
