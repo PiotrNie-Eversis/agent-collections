@@ -76,7 +76,7 @@ All findings are prioritized:
 
 ## Output
 
-A `code-quality-report.md` file saved to the repository root, containing:
+A `docs/reports/code-quality-report.md` file (create `docs/reports/` if needed), containing:
 
 - Executive summary of overall code health.
 - Findings organized by layer/app.
@@ -166,7 +166,7 @@ Use the Architect perspective to evaluate:
    - 🔴 **Critical** — Must be fixed; causes bugs, security issues, or significant maintenance burden
    - 🟡 **Important** — Should be fixed; improves quality, readability, or maintainability
    - 🟢 **Nice to Have** — Optional improvements; polish and optimization
-4. Save the report as `code-quality-report.md` in the repository root.
+4. Save the report as `docs/reports/code-quality-report.md` (create the `docs/reports/` directory if it does not exist). Do **not** write this file outside `docs/reports/`.
 
 ## Report Structure
 

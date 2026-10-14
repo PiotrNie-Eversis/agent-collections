@@ -1,0 +1,224 @@
+---
+sidebar_position: 1
+title: Prerequisites
+toc_max_heading_level: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Prerequisites
+
+Install the tools below on your computer before you follow [Installation](./installation). This page focuses on what **QA, business analysis, and product** roles need day to day. You do not need to understand framework internals to complete this checklist.
+
+:::tip Who needs what?
+If you work in **QA, business analysis, or product**, you need an **AI editor** (Cursor and/or Claude Code), **Docker Desktop**, and **Git**. You do **not** need Node.js if you use **Cursor only** and run the MCP server in Docker. If you are **not comfortable with the terminal**, start with **Cursor** (a desktop app) before you try **Claude Code** (a command-line tool). If you choose **Claude Code**, plan to install **VS Code** as well and follow [Use Claude Code in VS Code](https://code.claude.com/docs/en/vs-code) for the extension, so you can work in a desktop editor instead of living only in the terminal.
+:::
+
+## Quick requirements
+
+| Tool                                                                     | How you use it                                                                                                                                  | Required for (roles)                                                            | Purpose                                                                               | Account before install                                                                                                                                                                                        | Official link                                                                                                 |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [Cursor](https://cursor.com/)                                            | **Graphical (GUI) desktop editor** — you open it like any other app                                                                             | QA, BA, PO, developers                                                          | AI-assisted editor with Agent Collections adapters                                    | A **Cursor account** (free trial, Pro, or organization-provided access). If your company blocks personal subscriptions, ask your **Tech Lead or IT** for a seat or API key policy.                            | [cursor.com](https://cursor.com/)                                                                             |
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code/quickstart) | **Command-line (CLI) tool** — you run it in Terminal or PowerShell; there is no Claude Code icon on your desktop                                | QA, BA, PO, developers                                                          | AI-assisted coding in the terminal or supported editors                               | An **Anthropic account** with a plan that includes Claude Code (for example Pro, Team, or Enterprise) or **API billing**, per your organization. Ask **Tech Lead or IT** if you need a corporate seat or key. | [Claude Code quickstart](https://docs.anthropic.com/en/docs/claude-code/quickstart)                           |
+| [VS Code](https://code.visualstudio.com/)                                | **Graphical (GUI) desktop editor** — recommended host for Claude Code with the [Claude Code extension](https://code.claude.com/docs/en/vs-code) | **Recommended for QA/BA on the Claude Code path**; not required for Cursor-only | Gives Claude Code a desktop window so you do not work only in the terminal            | Usually free; your org may require a signed-in Microsoft account. Ask **IT** if the VS Code installer is blocked. Sign in with your **Anthropic / Claude** account when you open the extension.               | [VS Code](https://code.visualstudio.com/) · [Claude Code in VS Code](https://code.claude.com/docs/en/vs-code) |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/)        | **Graphical (GUI) app** with a background engine                                                                                                | QA, BA, PO, developers                                                          | Runs the local **eversis-collections** skills server                                  | Docker Hub sign-in may be required; on corporate laptops confirm **admin rights and license with IT** (see the warning under [Install by operating system](#install-by-operating-system)).                    | [Docker Desktop](https://www.docker.com/products/docker-desktop/)                                             |
+| [Git](https://git-scm.com/)                                              | **CLI** (with optional GUI helpers)                                                                                                             | QA, BA, PO, developers                                                          | Clone repositories and track framework versions                                       | Usually no paid account; use your work email if your org hosts Git internally.                                                                                                                                | [git-scm.com](https://git-scm.com/)                                                                           |
+| [Node.js LTS](https://nodejs.org/)                                       | **CLI runtime** (installed once on your machine)                                                                                                | MCP developers; **may** be required for Claude Code install                     | Build and test the MCP package outside Docker; some Claude Code install paths use npm | Not applicable for typical QA/BA Cursor-only setup.                                                                                                                                                           | [nodejs.org](https://nodejs.org/)                                                                             |
+
+You need **at least one** AI editor (Cursor or Claude Code). Many teams use both on the same project. **Cursor alone** is enough to complete Prerequisites and Installation without installing Claude Code, VS Code, or Node.js. On the **Claude Code** path, install **VS Code**, then follow [Use Claude Code in VS Code](https://code.claude.com/docs/en/vs-code) to add the extension (recommended desktop workflow for QA). Install the [standalone CLI](https://docs.anthropic.com/en/docs/claude-code/quickstart) as well when you need `claude` in the terminal or when Agent Collections docs ask you to verify with `claude --version`.
+
+## Install by operating system
+
+Follow the tab for your computer. These steps prefer **installers and graphical apps**. Command-line shortcuts are listed under **Optional (advanced)** in each tab.
+
+:::warning Docker Desktop on corporate laptops
+Installing **Docker Desktop** usually needs **administrator rights** on both **Windows** and **macOS**. On a company-managed laptop, ask **IT** before you install.
+
+For company use, Docker Desktop may require a **paid subscription** once your organization reaches Docker’s commercial thresholds. Confirm **license and policy with IT** rather than assuming a personal free install is allowed. See Docker’s [subscription and pricing](https://www.docker.com/pricing/) documentation for current rules.
+
+If IT blocks Docker Desktop, ask them for an approved container runtime that still supports **`docker compose`** (required for Agent Collections MCP setup). Examples some organizations use include **[Rancher Desktop](https://rancherdesktop.io/)**, **[Podman Desktop](https://podman-desktop.io/)**, and **[OrbStack](https://orbstack.dev/)** on Mac. These are **examples only**—not a support matrix. Your team must confirm IT approval and Compose compatibility before you rely on them.
+
+The install tabs below keep **Docker Desktop** as the primary documented path.
+:::
+
+<Tabs groupId="operating-system">
+<TabItem value="macos" label="macOS" default>
+
+**Cursor**
+
+1. Open [cursor.com](https://cursor.com/) and download the **macOS** `.dmg` installer.
+2. Open the disk image and drag Cursor into your Applications folder.
+3. Launch Cursor and sign in with the Cursor account your team approved.
+
+**Claude Code**
+
+1. Open the [Claude Code quickstart](https://docs.anthropic.com/en/docs/claude-code/quickstart) and follow the **macOS or Linux** install instructions.
+2. The quickstart or npm-based install **may require [Node.js LTS](https://nodejs.org/)** even if you are not an MCP developer. Install Node.js first when the guide asks for it.
+3. When the install finishes, open a terminal and confirm the CLI responds (see [Check your setup](#check-your-setup) below).
+4. **Recommended for QA:** install [VS Code for macOS](https://code.visualstudio.com/), then follow [Use Claude Code in VS Code](https://code.claude.com/docs/en/vs-code) to install the **Claude Code** extension and sign in. Keep the CLI from the steps above when you need the terminal or verification commands.
+
+**Optional (advanced):** run the install script from the quickstart in Terminal if you prefer a one-line install over reading the full guide.
+
+**Docker Desktop**
+
+1. Open [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/).
+2. Choose the download for your chip: **Apple Silicon (M1/M2/M3)** or **Intel**.
+3. Run the installer and start Docker Desktop from Applications.
+4. Wait until Docker reports that the engine is running (whale icon in the menu bar).
+
+**Git**
+
+1. Open [Git for macOS](https://git-scm.com/download/mac) and download the installer, **or** install Xcode Command Line Tools when macOS prompts you during a Git command.
+2. Open Terminal and run `git --version`. If macOS offers to install developer tools, accept and retry after installation completes.
+
+**Optional (advanced):** install Git with Homebrew (`brew install git`) if you already use Homebrew for other tools.
+
+</TabItem>
+<TabItem value="windows" label="Windows">
+
+**Cursor**
+
+1. Open [cursor.com](https://cursor.com/) and download the **Windows** `.exe` installer.
+2. Run the installer and follow the prompts.
+3. Launch Cursor and sign in with the Cursor account your team approved.
+
+**Claude Code**
+
+1. Open the [Claude Code quickstart](https://docs.anthropic.com/en/docs/claude-code/quickstart).
+2. Follow the **Windows** section and run the documented **PowerShell** install command in an elevated or user PowerShell window, as the guide describes.
+3. The quickstart or npm-based install **may require [Node.js LTS](https://nodejs.org/)** even if you are not an MCP developer. Install Node.js first when the guide asks for it.
+4. When the install finishes, open a new terminal and confirm the CLI responds (see [Check your setup](#check-your-setup) below).
+5. **Recommended for QA:** install [VS Code for Windows](https://code.visualstudio.com/), then follow [Use Claude Code in VS Code](https://code.claude.com/docs/en/vs-code) to install the **Claude Code** extension and sign in. Keep the CLI from the steps above when you need the terminal or verification commands.
+
+**Docker Desktop**
+
+1. Open [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/).
+2. Run the installer and enable **Use WSL 2 instead of Hyper-V** when the installer asks.
+3. Start Docker Desktop and wait until it reports that the engine is running.
+
+:::warning WSL 2 on Windows
+Docker Desktop on Windows relies on **WSL 2**. If Docker asks you to install or update WSL, open **PowerShell as Administrator** and run `wsl --install`, then **restart your computer** when Windows requests it. After reboot, open Docker Desktop again and wait until the engine is ready.
+:::
+
+**Git**
+
+1. Open [Git for Windows](https://git-scm.com/download/win) and download the installer.
+2. Run the installer. The default options are fine for most users.
+3. Open **Git Bash** or PowerShell and run `git --version` to confirm Git is on your path.
+
+</TabItem>
+</Tabs>
+
+## Node.js (optional)
+
+:::info Do QA and BA roles need Node.js?
+**No — Cursor-only path.** If you install **Cursor**, use Docker for the MCP server, and do **not** install Claude Code, you can skip Node.js entirely.
+
+**Maybe — Claude Code path.** If you install **Claude Code** using the Anthropic quickstart or an **npm**-based install, that path **may require Node.js LTS** on your machine even when you are not developing the MCP package. Follow the quickstart; install Node from [nodejs.org](https://nodejs.org/) when it asks you to.
+
+**Yes — MCP developers.** If you develop the MCP package (`mcp/eversis-collections-mcp/`) on your machine—for example to run `npm run mcp:test` or debug the server without Docker—install **Node.js LTS** from [nodejs.org](https://nodejs.org/) and verify with `node --version`.
+:::
+
+## Check your setup
+
+### Open a terminal first
+
+Verification commands run in a **terminal window** (a text window where you type commands). Use the steps for your operating system, then continue to the command table below.
+
+<Tabs groupId="open-terminal">
+<TabItem value="macos-terminal" label="macOS" default>
+
+1. Press **Command (⌘) + Space** to open **Spotlight**.
+2. Type **Terminal** and press **Return**.
+3. A window with a prompt appears. Type verification commands in this window.
+
+</TabItem>
+<TabItem value="windows-terminal" label="Windows">
+
+1. Open the **Start** menu.
+2. Type **PowerShell** and open **Windows PowerShell** (or **Terminal** if your IT team standardizes on it).
+3. Type verification commands in this window. You can also use **Git Bash** after Git for Windows is installed.
+
+</TabItem>
+</Tabs>
+
+Run these commands in the terminal **after** you finish the installs above. Successful output includes a version number; exact patch versions may differ from the examples.
+
+| Check                      | Command            | Example of a good result                         |
+| -------------------------- | ------------------ | ------------------------------------------------ |
+| Docker                     | `docker --version` | `Docker version 27.x.x, build …`                 |
+| Git                        | `git --version`    | `git version 2.x.x`                              |
+| Claude Code (if installed) | `claude --version` | A version string reported by the Claude Code CLI |
+
+If Docker or Git commands are not found, close and reopen your terminal, then confirm the application is installed and running (Docker Desktop must be started on macOS and Windows). See [Common problems](#common-problems) if a command still fails.
+
+When these checks pass, continue to **[Installation](./installation)** on your consumer project.
+
+## Common problems
+
+Use this section when a verification command fails or an installer blocks you. Each scenario includes short steps and an illustrative screenshot (sanitized; your screen may look slightly different).
+
+### Docker says the command is not found (Windows)
+
+**Symptom:** PowerShell or Command Prompt reports that `docker` is not recognized after you installed Docker Desktop.
+
+**What to do:**
+
+1. Open **Docker Desktop** from the Start menu and wait until it reports that the engine is running (status shows ready, not “starting”).
+2. Close your terminal window, open a **new** PowerShell window, and run `docker --version` again.
+3. If it still fails, confirm with IT that Docker Desktop finished installing and that your account can start the service.
+
+![Illustrative Docker Desktop status area showing the engine ready to run.](/img/getting-started/prerequisites/docker-engine-running.webp)
+
+### PowerShell blocks an install script (Windows)
+
+**Symptom:** PowerShell refuses to run a download or install script (for example Claude Code’s documented install command) and mentions an **execution policy**.
+
+**What to do:**
+
+1. Read the official install steps again and use the exact command from the vendor guide.
+2. If the policy still blocks the script, ask **IT** to allow the documented install path for your role, or to run the install for you. Do not disable security policies on a corporate laptop without IT approval.
+3. After IT adjusts policy or completes the install, open a new PowerShell window and continue from [Check your setup](#check-your-setup).
+
+![Illustrative terminal window where install and verification commands are typed.](/img/getting-started/prerequisites/terminal-or-powershell.webp)
+
+### macOS offers a large Xcode download for Git
+
+**Symptom:** The first `git` command prompts you to install developer tools, and the download looks like a full **Xcode** install rather than a small Git package.
+
+**What to do:**
+
+1. Prefer the lightweight **[Git for macOS](https://git-scm.com/download/mac)** installer from the official Git site when you only need Git for Agent Collections.
+2. If macOS already opened the **Command Line Tools** prompt (a small tools package, not the full Xcode app from the App Store), you can accept that prompt instead—it is enough for `git` on many Macs.
+3. Avoid installing the full **Xcode** application from the App Store unless a developer on your team explicitly needs it. After Git is available, run `git --version` again.
+
+![Illustrative choice between a lightweight Git installer and a heavier developer-tools path.](/img/getting-started/prerequisites/macos-git-installer.webp)
+
+## Framework notes (read after setup)
+
+The sections below explain how Agent Collections uses your tools. You can read them after the checklist above; they are not required to download installers.
+
+:::info Docker and the skills server
+Agent Collections uses Docker to **run** the local **`eversis-collections`** MCP server. You will build that image during [Installation](./installation) and [MCP setup](./mcp-setup). You do not need to memorize Compose commands on this page.
+:::
+
+:::warning Domain context and your project folder
+Some MCP tools (for example domain-context tools whose names start with `eversis_context_`) expect the IDE to start the MCP process with its **working directory set to your consumer project root**, not only the framework checkout. See [MCP setup — domain context needs the project volume](./mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume) for the full explanation.
+:::
+
+### Which AI editor?
+
+Agent Collections supports **Cursor** and **Claude Code** with full adapters. **OpenCode** is a placeholder in this repository and is not a complete shipped adapter yet. Use at least one supported editor; teams often use Cursor and Claude Code on the same monorepo with isolation (see [isolation strategy](../isolation)).
+
+### Optional integrations
+
+Jira, Figma, Playwright, and other MCP servers are **optional** but useful for the full integrated workflow. Configure them in [MCP setup](./mcp-setup). The **`eversis-collections`** server is the primary way to load skill packages; Cursor does not ship a full mirror of every skill under `.cursor/skills`.
+
+### Accounts and network
+
+When prompts call external services (Jira, Figma, cloud providers, and similar), you need the **accounts, tokens, and network access** your organization allows.
+
+---
+
+**Not required for Agent Collections:** legacy VS Code Copilot settings such as global `chat.*Locations`, legacy `.github/prompts`, or a second sibling checkout of this repository. That note does **not** mean VS Code is unused — on the **Claude Code** path, VS Code plus the Claude Code extension is still recommended for QA (see [Quick requirements](#quick-requirements)). The framework is self-contained once installed on your consumer project.

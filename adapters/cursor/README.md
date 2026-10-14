@@ -62,7 +62,8 @@ Stable prompt id under `.ai/prompts/` remains SSOT. Claude Code does **not** con
 | Path | Reason |
 |------|--------|
 | `.cursor/rules/eversis-project-stack.mdc` | **Consumer-owned** — never overwrite without opt-in (TASK-521 / README) |
-| `.cursor/skills/`, `.cursor/prompts/` | Outside Cursor emit (no full skill/prompt mirror) |
+| `.cursor/skills/` | Not emitted by this generator — `adapters/sync.mjs` refreshes relative symlinks to `.ai/skills/eversis-*` in the framework root only; consumers use the installer |
+| `.cursor/prompts/` | Outside Cursor emit (no full prompt mirror; commands cover slash UX) |
 | BA Docs role rules (`eversis-ba-docs-*.mdc`) | **Not emitted in MVP** — use `.ai/prompts` + MCP skills + `/eversis-ba-docs-*` slash shims (CQ3 close-out) |
 
 ## Requirements

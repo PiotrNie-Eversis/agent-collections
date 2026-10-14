@@ -24,6 +24,7 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 | [`docs/plans/`](./docs/plans/) | Optional flat plans; prefer specs for Implement |
 | [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<issue-kebab>/`; `task-*` local-only / gitignored in this repo) |
 | [`docs/decisions/`](./docs/decisions/) | Architecture decisions — one file per decision plus `INDEX.md` |
+| [`docs/reports/`](./docs/reports/) | Agent-generated reports (e.g. `code-quality-report.md` from `eversis-review-codebase`) |
 
 ## Monorepo / Areas
 
@@ -68,7 +69,7 @@ Ideate → Research → Plan → Implement → Review → Fine
 
 - This repository is the **framework** product (not a consumer app). Stack policy: [`.cursor/rules/eversis-project-stack.mdc`](./.cursor/rules/eversis-project-stack.mdc).
 - Quality commands: `npm run sync:adapters`, `npm run sync:adapters:check`, `npm run mcp:build`, `npm run mcp:test`, installer smoke `bash scripts/setup-agent-collections.test.sh`, `npm run website:build`, `npm run website:changelog:check`.
-- Skills UX: MCP + `.ai/` load-by-id / `@` attach. Cursor also emits thin `/eversis-*` shims under `.cursor/commands/` (TASK-598); full `.cursor/skills|prompts` mirror is **not** shipped.
+- Skills UX: MCP + `.ai/` load-by-id / `@` attach. This repository commits relative symlinks under `.cursor/skills/` and `.claude/skills/` to `.ai/skills/eversis-*` (refreshed by `npm run sync:adapters`). Cursor also emits thin `/eversis-*` shims under `.cursor/commands/` from `.ai/prompts` (TASK-598). Consumer installs still get their skill mirror from the installer.
 - BA Docs skills: **Do not load** in this framework repo unless a plan explicitly requires them.
 
 ---

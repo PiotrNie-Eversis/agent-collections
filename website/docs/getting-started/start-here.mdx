@@ -1,0 +1,79 @@
+---
+sidebar_position: 0
+title: Start here
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Start here
+
+**Agent Collections** is a **vendor-neutral** multi-agent product engineering framework. Canonical content lives under **`.ai/`**; adapters package it for Cursor, Claude Code, and (placeholder) OpenCode.
+
+> **Ideate → Research → Plan → Implement → Review → Fine**
+
+Each phase produces documented artifacts; the next step waits on **your approval** where the prompts require it.
+
+:::tip New to this framework?
+Pick your role below and follow that path in order. Each step links to the detailed playbook — this page is the map, not the encyclopedia. Prefer a **sample consumer project** (empty folder or small repo) for your first install.
+:::
+
+## Choose your path
+
+<Tabs groupId="start-here-role">
+<TabItem value="qa-ba-po" label="QA / BA / PO" default>
+
+**Recommended:** start with **Cursor** (a desktop app). Open [Prerequisites](/docs/getting-started/prerequisites) for the full tool checklist, then [Installation](/docs/getting-started/installation).
+
+1. **[Prerequisites](/docs/getting-started/prerequisites)** — Install an AI editor (**Cursor** and/or **Claude Code**), **Docker Desktop**, and **Git**. Details and accounts live on that page.
+2. **[Installation](/docs/getting-started/installation)** — Clone the framework and run the installer on your sample project. Follow the on-page steps; you do not need to memorize shell flags here.
+3. Confirm the install left the expected project folders (see [You’re done when…](#youre-done-when) below). Domain knowledge starts at [Domain Context (SSOT)](/docs/domain-context).
+4. Open your project in **Cursor** and attach **`@eversis-implement`** (or load prompt id `eversis-implement`) with a short task.
+
+</TabItem>
+<TabItem value="developer-qa-tech" label="Developer / QA tech">
+
+Use **Cursor** and/or **Claude Code**. Read [Prerequisites](/docs/getting-started/prerequisites) first (including Node.js notes if you use Claude Code), then [Installation](/docs/getting-started/installation).
+
+1. **[Prerequisites](/docs/getting-started/prerequisites)** — Install an AI editor (**Cursor** and/or **Claude Code**), **Docker Desktop**, and **Git**. Details and accounts live on that page.
+2. **[Installation](/docs/getting-started/installation)** — Clone the framework, set `AGENT_COLLECTIONS_HOME` as shown there, and run the installer on a sample consumer project.
+3. Confirm expected folders and [Domain Context (SSOT)](/docs/domain-context) as in [You’re done when…](#youre-done-when).
+4. Optional: [MCP setup](/docs/getting-started/mcp-setup) if you enable the skills server beyond the installer defaults.
+5. Open the consumer project in your agent tool and attach **`@eversis-implement`** with a short task.
+
+</TabItem>
+<TabItem value="maintainer-mcp" label="Maintainer / MCP">
+
+This path is for people who develop or deeply configure the **MCP** package (the local skills server) and framework internals. Expect **Node.js LTS** and [MCP setup](/docs/getting-started/mcp-setup) detail.
+
+1. **[Prerequisites](/docs/getting-started/prerequisites)** — Same base tools, plus Node.js expectations for MCP developers.
+2. **[Installation](/docs/getting-started/installation)** — Framework checkout and consumer bootstrap (local, submodule, or copy modes are documented there).
+3. **[MCP setup](/docs/getting-started/mcp-setup)** — Build and enable **`eversis-collections`** with `AGENT_COLLECTIONS_HOME`.
+4. First prompt — attach **`@eversis-implement`** / load `eversis-implement` with your ticket or task text.
+5. Go deeper — [Workflow overview](/docs/main-flow/workflow/overview), [Framework reference](/docs/framework), [Agents overview](/docs/reference/agents/overview), [Skills overview](/docs/reference/skills/overview).
+
+</TabItem>
+</Tabs>
+
+## You’re done when…
+
+Your first install succeeded when:
+
+- The installer finished **without an error**.
+- The consumer project has **`.agent-collections/`** (including `install-selection.json`) and **`docs/context/<project>/INDEX.md`**.
+- In your AI editor, a first **`@eversis-implement`** (or `eversis-implement`) prompt gets a normal response — for example an Implement readiness block in chat.
+
+## Next steps
+
+- [Quick wins](/docs/getting-started/quick-wins) — short practice tasks after install.
+- [Workflow overview](/docs/main-flow/workflow/overview) — Main Flow variants (standard, UI, workshop, E2E).
+- Optional later: [Migration from Cursor Collections](/docs/advanced/migration-from-cursor-collections), or [seed existing project knowledge](/docs/getting-started/installation#seed-existing-project-knowledge-optional) if you already have Confluence As-Is Pack or `docs/specs/` history.
+
+## Maintainers / canonical references
+
+For deeper framework pointers (not part of the first onboarding path):
+
+- [Framework reference](/docs/framework) — authoritative short guide.
+- Root [README](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/README.md) — install, upgrade, versioning.
+- [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md) — agent entry map.
+- [Requirements traceability](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/requirements-traceability.md) — WF-01…WF-05 and key WNF → docs / stories.

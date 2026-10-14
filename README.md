@@ -262,7 +262,7 @@ Roles are expressed as **rules**, **prompts**, and **skills**, organized by life
 
 ## MCP setup
 
-MCP (Model Context Protocol) unlocks Jira, Figma, library docs, browser automation, and procedural skills. Seed config: [`templates/mcp.json`](./templates/mcp.json). Playbook: [MCP setup](./website/docs/getting-started/mcp-setup.md).
+MCP (Model Context Protocol) unlocks Jira, Figma, library docs, browser automation, and procedural skills. Seed config: [`templates/mcp.json`](./templates/mcp.json). Playbook: [MCP setup](./website/docs/getting-started/mcp-setup.mdx).
 
 ### Default — workspace configuration (installer)
 
@@ -409,7 +409,7 @@ Grouped the same way the docs site itself is now organized — by what you're tr
 | [Start here](./website/docs/getting-started/start-here.md) | First successful install checklist |
 | [Prerequisites](./website/docs/getting-started/prerequisites.md) | Tooling requirements |
 | [Installation](./website/docs/getting-started/installation.md) | Consumer install (incl. Windows) |
-| [MCP setup](./website/docs/getting-started/mcp-setup.md) | Workspace vs user MCP |
+| [MCP setup](./website/docs/getting-started/mcp-setup.mdx) | Workspace vs user MCP |
 | [Quick wins](./website/docs/getting-started/quick-wins.md) | Short practical scenarios |
 
 ### The Main Flow
