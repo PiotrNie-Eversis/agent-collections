@@ -53,7 +53,7 @@ Build this site locally (`cd website && npm run build`). **Public hosting is def
 
 ### Skills and prompts (MVP)
 
-Prefer MCP **`eversis-collections`** and stable prompt ids under `.ai/prompts/`. Both the Cursor and Claude Code adapters generate thin `/eversis-*` shims — `.cursor/commands/` and `.claude/commands/` respectively — from `.ai/prompts` (TASK-598). Claude Code additionally gets a native skills mirror under `.claude/skills/`; Cursor does not ship a full `.cursor/skills` or `.cursor/prompts` mirror in this MVP.
+Prefer MCP **`eversis-collections`** and stable prompt ids under `.ai/prompts/`. Both adapters also get a local skills mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Both adapters generate thin `/eversis-*` shims — `.cursor/commands/` and `.claude/commands/` respectively — from `.ai/prompts` (TASK-598). Claude Code can use its native skills mirror without MCP.
 
 ## Multi-agent and isolation
 

@@ -5,7 +5,7 @@ Maps wildly important functional (WF) and non-functional (WNF) goals for Agent C
 | ID | Intent (summary) | Primary docs | Wave |
 |----|------------------|--------------|------|
 | **WF-01** | Vendor-neutral core (`.ai/`) with tool adapters | [Framework reference](../../documentation/agent-collection.md), [adapter mapping](./adapter-mapping.md), [AGENTS.md](../../AGENTS.md) | Waves A–C; docs + validation |
-| **WF-02** | Consumer install (local / submodule / copy) + selection | [Installation](../../website/docs/getting-started/installation.md), [install-selection](./install-selection.md), README | Wave C; docs + validation |
+| **WF-02** | Consumer install (local / submodule / copy) + selection | [Installation](../../website/docs/getting-started/installation.mdx), [install-selection](./install-selection.md), README | Wave C; docs + validation |
 | **WF-03** | Skills discoverability via MCP + `AGENT_COLLECTIONS_HOME` | [MCP setup](../../website/docs/getting-started/mcp-setup.mdx), MCP package README | Wave C; docs + validation |
 | **WF-04** | Multi-agent packaging (Cursor + Claude MVP; OpenCode placeholder) | [Prerequisites](../../website/docs/getting-started/prerequisites.md), [adapter mapping](./adapter-mapping.md), [migration guide](../../website/docs/getting-started/migration-from-cursor-collections.md) | Waves B–D; multi-agent packaging closeout |
 | **WF-05** | Spec-driven delivery (research → plan → implement → review → Fine) | README Delivery standard, [AGENTS.md](../../AGENTS.md), orchestration rules under `.ai/rules/orchestration/` | Framework-wide; docs + validation |

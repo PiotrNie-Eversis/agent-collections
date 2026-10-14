@@ -1,0 +1,273 @@
+---
+sidebar_position: 2
+title: Installation
+description: Download Agent Collections once, install it into your project, and verify success.
+toc_max_heading_level: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Installation
+
+Install **Agent Collections** into your project in about **three steps**: download the framework once, run one installer command in your project, then verify success. You do not need the full CLI flag table or Git submodule internals for a first install.
+
+:::tip Before you start
+Finish **[Prerequisites](./prerequisites)** first — especially **Docker Desktop** (or an IT-approved Compose-compatible runtime) with the engine **running**. If the installer fails with something like “Cannot connect to the Docker daemon,” start Docker and try again.
+:::
+
+Installation turns on the assistant’s built-in tools and skills for that project — structured research/plan/review workflows and a library of reusable prompts. The **`eversis-collections`** skills server (an MCP server — the connection that lets your editor call those tools) runs in **Docker**, so Docker must be installed and running before you run the installer.
+
+**How the pieces fit together**
+
+1. **Download the toolkit once** on your machine (the `agent-collections` framework checkout). Set **`AGENT_COLLECTIONS_HOME`** (an environment variable that points at that folder) so the installer can find it.
+2. **Go to your business or sample project** (the **consumer project** — the app repo where you want Agent Collections enabled) and run the installer there.
+3. **Check the success artifacts**, then continue to [MCP Setup](./mcp-setup).
+
+:::warning Do not run the installer inside the framework checkout
+Run `setup-agent-collections.sh` from your **consumer project** directory (or pass `--target` to that project). Do **not** `cd` into `agent-collections` and install “into itself.” That mixes the toolkit with the project and is a common mistake for first-time installers.
+:::
+
+Secondary checklist: [Start here](./start-here) (full onboarding path). This page is the install path.
+
+## Step 1 — Download the framework once
+
+Clone the framework **once** into any folder on your computer (for example a projects directory). You can reuse that checkout for every consumer project.
+
+<Tabs groupId="operating-system">
+<TabItem value="macos" label="macOS / Linux" default>
+
+```bash
+cd ~/projects
+git clone https://gitlab3.eversis.com/eversis-ai/agent-collections.git agent-collections
+export AGENT_COLLECTIONS_HOME="$(pwd)/agent-collections"
+```
+
+</TabItem>
+<TabItem value="windows" label="Windows (Git Bash)">
+
+Run these steps in **Git Bash** (installed with [Git for Windows](https://git-scm.com/download/win)). The installer is a Bash script (`setup-agent-collections.sh`), so Git Bash is the supported Windows path.
+
+```bash
+cd /c/projects
+git clone https://gitlab3.eversis.com/eversis-ai/agent-collections.git agent-collections
+export AGENT_COLLECTIONS_HOME="$(pwd)/agent-collections"
+```
+
+**PowerShell (env only):** if you only need to set the home path in PowerShell, use:
+
+```powershell
+$env:AGENT_COLLECTIONS_HOME = "C:\projects\agent-collections"
+```
+
+Still run the installer itself from **Git Bash** in Step 2.
+
+</TabItem>
+</Tabs>
+
+You can use any folder name. Paths in [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md) are relative to the framework repo root. When you leave local development, **pin** (lock) consumers to a **SemVer git tag** (see the root README versioning notes).
+
+## Step 2 — Install into your project
+
+In the terminal, go to **your consumer project** (or create an empty sample folder), not the `agent-collections` checkout. Then run the **recommended** installer command.
+
+:::tip Docker must be running
+Open Docker Desktop and confirm the engine is running (whale icon in the menu bar / system tray). If the command below fails with “Cannot connect to the Docker daemon,” start Docker and retry. Full tooling checklist: [Prerequisites](./prerequisites).
+:::
+
+<Tabs groupId="operating-system">
+<TabItem value="macos" label="macOS / Linux" default>
+
+```bash
+cd ~/projects/my-sample-project
+
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+  --build-mcp --non-interactive \
+  --agents=cursor,claude \
+  --mcp-servers=eversis-collections \
+  --profile=fullstack
+```
+
+</TabItem>
+<TabItem value="windows" label="Windows (Git Bash)">
+
+```bash
+cd /c/projects/my-sample-project
+
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+  --build-mcp --non-interactive \
+  --agents=cursor,claude \
+  --mcp-servers=eversis-collections \
+  --profile=fullstack
+```
+
+</TabItem>
+</Tabs>
+
+:::info What does `--profile` mean?
+- **`fullstack`** (recommended): installs the full set of frontend and backend adapter rules.
+- **`frontend`** or **`backend`**: limits adapters to that part of the stack.
+:::
+
+This is the recommended path for most users (including QA, BA, and PO). You do **not** need `--vendor`, `--ssot-source`, or `--confluence-space-key` for a first successful install. Team submodule / copy modes and the full flag list live under [Advanced options](#advanced-options).
+
+:::tip README shows a smaller sample
+The root **README** install snippet is a **Cursor-only** minimal example (`--agents=cursor`, with `--build-mcp` optional). This page’s recommended command installs **Cursor and Claude Code** and includes `--build-mcp` for a first successful MCP image build. Use this page (including the Windows / Git Bash tabs) for the guided path.
+:::
+
+You can also pass `--target /path/to/your-project` if you prefer not to `cd` into the consumer repo first. Selection is written to **`.agent-collections/install-selection.json`** (schema: [install-selection.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/install-selection.md)).
+
+## Step 3 — Verify installation
+
+Confirm the install worked in your **consumer project** before you leave for MCP Setup.
+
+**Success looks like:**
+
+1. File **`.agent-collections/install-selection.json`** exists in the project root.
+2. Domain-context index **`docs/context/<project>/INDEX.md`** exists (the installer creates it if it was missing).
+3. The installer finished without critical errors (exit code **0** / clean completion message).
+
+**If something is missing**, check this short recovery list before continuing:
+
+- You ran the installer from the **consumer project** folder (not inside `agent-collections`).
+- **`AGENT_COLLECTIONS_HOME`** points at your framework checkout (re-export it in the same shell if needed).
+- **Docker** is running — see [Prerequisites](./prerequisites).
+
+When those checks pass, go to **[MCP Setup](./mcp-setup)** to connect tools in your editor (Cursor or Claude Code).
+
+<details>
+<summary><strong>Optional: try install in a temporary sample folder</strong></summary>
+
+Use this only if you want a throwaway smoke test. The artifact checks above remain the real success criteria for your project.
+
+```bash
+mkdir -p /tmp/ac-sample && cd /tmp/ac-sample && git init
+export AGENT_COLLECTIONS_HOME=/path/to/agent-collections
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+  --build-mcp --non-interactive \
+  --agents=cursor \
+  --mcp-servers=eversis-collections \
+  --profile=fullstack
+test -f .agent-collections/install-selection.json && echo "OK: first successful install"
+```
+
+</details>
+
+## Upgrade & Sync
+
+When the framework gains new prompts or adapters, update an existing consumer install from that project’s directory:
+
+```bash
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+  --upgrade --sync --non-interactive
+```
+
+The installer reuses agents / MCP / profile / vendor / link settings from `.agent-collections/install-selection.json`. It preserves project-owned paths (stack rule, local specs/plans, secrets) where the product already does so. Omit `--ssot-source` to keep a recorded domain-context URL; pass an empty value (`--ssot-source ""` or `--ssot-source=`) to clear it. Missing or corrupt selection **fails** with recovery instructions (it does not invent a full reinstall).
+
+**Keeping consumers aligned after a framework update**
+
+| Install mode | After framework update |
+| --- | --- |
+| Local + symlink | Pull or check out the new version tag → `docker compose build eversis-collections` → re-run setup |
+| Local + copy | Pull + re-run with `--sync` |
+| Vendor submodule | Usually a **manual** pin bump — see [Advanced options](#advanced-options) |
+| Vendor copy | Re-run with `--vendor copy --build-mcp` |
+
+## Advanced options
+
+Skip this section on a first install. Expand only when your team needs vendor modes, full CLI flags, framework-maintainer workflows, or seeding existing project knowledge.
+
+### Vendor modes {#vendor-modes}
+
+| Mode | Flag | Notes |
+| --- | --- | --- |
+| **Local** (default) | (omit `--vendor`) | Framework stays outside the consumer repo; set `AGENT_COLLECTIONS_HOME` |
+| **Submodule** | `--vendor submodule` | Common team default — pin a specific version tag in `.gitmodules` |
+| **Copy** | `--vendor copy` | Tree under `vendor/agent-collections/` |
+
+**After a submodule install (teammates):** clone the app repo, then:
+
+```bash
+git submodule update --init --recursive
+```
+
+Framework SSOT and MCP live under `vendor/agent-collections/`. Selection remains at `.agent-collections/install-selection.json`.
+
+<details>
+<summary><strong>Keeping a team submodule pin in sync</strong></summary>
+
+When the framework is vendored as a submodule, `vendor/agent-collections/` is pinned to one commit (a **SHA**). `--upgrade --sync` does **not** generally bump that pin. It only auto-aligns in a narrow case (vendored `adapters/sync.mjs` would reject a new CLI flag such as `--framework-prefix` on a **clean** vendor worktree). Otherwise bump the pin yourself:
+
+```bash
+cd vendor/agent-collections
+git fetch origin
+git checkout <new-tag-or-commit>
+cd ../..
+git add vendor/agent-collections
+```
+
+Then re-run `--upgrade --sync` (and `--build-mcp` if the MCP server itself changed).
+
+</details>
+
+<details>
+<summary><strong>Full useful installer flags</strong></summary>
+
+| Flag | Purpose |
+| --- | --- |
+| `--build-mcp` | Force rebuild of the `eversis-collections` Docker image (also builds when the image doesn't exist yet). Does **not** gate the interactive MCP server checklist. |
+| `--agents` | `cursor`, `claude`, `opencode` (opencode = placeholder) |
+| `--mcp-servers` | Comma-separated ids; without it + `--non-interactive` → `eversis-collections` only |
+| `--profile` | `frontend` \| `backend` \| `fullstack` |
+| `--link-mode` | `auto` \| `symlink` \| `copy` |
+| `--sync` | Refresh framework-managed surfaces |
+| `--upgrade` | Reuse selection (fail-safe if missing/corrupt) |
+| `--non-interactive` | No prompts — defaults + flags |
+| `--target DIR` | Consumer path when not running from that repo |
+| `--collections-home DIR` | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion) |
+| `--ssot-source URL` | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit on **first** install to start empty). On `--upgrade` / `--sync`, omit to **keep** the URL already in `install-selection.json`; pass `--ssot-source ""` or `--ssot-source=` to **clear** it. |
+| `--ssot-branch NAME` | Branch to pull from `--ssot-source` (default `main`) |
+| `--confluence-space-key KEY` | Records a Confluence space key for later use by `eversis-import-confluence-knowledge` (optional — never calls Confluence itself) |
+
+Interactive runs (TTY, without `--non-interactive`) prompt for agents × domain profile × MCP servers. Re-runs are idempotent; partial failures list completed vs failed steps.
+
+</details>
+
+<details>
+<summary><strong>Skills, prompts, and stack customisation (MVP)</strong></summary>
+
+- **Skills** resolve from **`.ai/skills/`** (SSOT). Prefer MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or read `SKILL.md` directly. Both adapters also get a local mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Claude Code can use its native skills mirror without MCP.
+- **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced. Both adapters generate thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`).
+- **Domain context** (durable, cross-task knowledge — see [Domain Context (SSOT)](../domain-context)) is scaffolded on **every** install: `docs/context/<project>/INDEX.md` is created if missing. If `--ssot-source` is reachable, the installer also best-effort seeds `docs/context/global/` from it — this step never blocks or fails the install.
+
+| Channel | Customise |
+| --- | --- |
+| Cursor | `.cursor/rules/eversis-project-stack.mdc` |
+| Claude Code | `.claude/CLAUDE.md` (seeded once, never overwritten — do not hand-edit generated `CLAUDE.md`; Claude Code does not auto-read `AGENTS.md`) |
+
+</details>
+
+<details>
+<summary><strong>Framework maintainers — open the framework / sync adapters</strong></summary>
+
+Only for people who edit Agent Collections itself:
+
+1. Open the `agent-collections` folder in Cursor or Claude Code.
+2. Read root **`AGENTS.md`** and **`.ai/README.md`**.
+3. After core rule changes, refresh adapters: `npm run sync:adapters`.
+
+This is **not** part of the numbered happy path for installing into a consumer project.
+
+</details>
+
+### Seed existing project knowledge (optional) {#seed-existing-project-knowledge-optional}
+
+Skip this on a new project and on the temporary sample above. An empty `docs/context/<project>/INDEX.md` is the right result there.
+
+Use this only when the consumer already has history: a Confluence **As-Is Pack** (one page that describes the system as it works today) or a `docs/specs/` backlog of past tasks. The installer never runs this import.
+
+1. If you have a Confluence space key, pass `--confluence-space-key KEY` on the [Step 2](#step-2--install-into-your-project) install command. That only records the key in `.agent-collections/install-selection.json`. It does not call Confluence and it does not import pages.
+2. Finish [MCP Setup](./mcp-setup) and connect the [Atlassian](../reference/integrations/atlassian.md) server. The import reads Confluence through that connection.
+3. Open the consumer project and ask the agent to run [`eversis-import-confluence-knowledge`](../reference/skills/import-confluence-knowledge.md).
+4. Review the draft. Nothing is written under `docs/context/<project>/` until you approve it. [Domain Context (SSOT)](../domain-context) describes what those files contain.
+5. If you have no space key, you can still ask the agent to draft from `docs/specs/` history alone. Confluence is not required.
