@@ -49,13 +49,13 @@ The Engineering Manager identifies that no implementation plan exists and delega
 
 ## Output
 
-A `.plan.md` file placed in `docs/specs/<task-name>/` (or `specifications/<task-name>/`):
+A `.plan.md` file placed in `docs/specs/<key>-<topic>/` (or `specifications/<key>-<topic>/`). The topic is at most three hyphen-separated words. The plan file name repeats the folder name:
 
 ```text
 docs/specs/
- user-authentication/
- user-authentication.research.md
- user-authentication.plan.md ← new
+ ac-2-context-management/
+ ac-2-context-management.research.md
+ ac-2-context-management.plan.md ← new
 ```
 
 The plan includes Wildly Important Goal, Technical Context, checklist-style phases, tasks with `[CREATE]`/`[MODIFY]`/`[REUSE]` action types, `Files:` per task, acceptance criteria, and security considerations.
@@ -74,7 +74,7 @@ Analyze the feature context for the provided task or Jira ID and prepare a detai
 
 Use the required skills to understand the feature, design the solution, and author the plan artifact.
 
-The file outcome should be a markdown file named after the task Jira ID in kebab-case format or after task name (if no Jira task provided) with `.plan.md` suffix (e.g., `user-authentication.plan.md`). Place it in `docs/specs/` (or your team's `specifications/` folder) under a folder named after the issue ID or the shortened task name in kebab-case format.
+The file outcome should be a markdown file whose name repeats the folder name with a `.plan.md` suffix (e.g., `ac-2-context-management.plan.md`). Place it in `docs/specs/<key>-<topic>/` (or your team's `specifications/<key>-<topic>/` folder). The topic is at most three hyphen-separated words.
 
 ## Required Skills
 

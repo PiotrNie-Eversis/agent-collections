@@ -39,7 +39,7 @@ Load **`eversis-orchestrating-implementation`** for the full workflow (docs: `we
 
 ## Output
 
-- `*.research.md`, `*.plan.md`, `*.plan-review.md` under `docs/specs/<task-name>/` **when a gap exists** (not required on every run)
+- `*.research.md`, `*.plan.md`, `*.plan-review.md` under `docs/specs/<key>-<topic>/` **when a gap exists** (not required on every run)
 - **Implement readiness** block in the first agent response (Flow / Research / Plan / Next gate)
 - Code changes applied by delegated agents
 - Updated plan checkboxes and Changelog entries

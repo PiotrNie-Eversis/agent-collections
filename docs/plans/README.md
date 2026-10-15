@@ -4,7 +4,7 @@ Optional location for **flat implementation plans** as `*.md` files (scope, rati
 
 ## Agent Collections policy
 
-Prefer the Implement workflow under **`docs/specs/<issue-kebab>/*.plan.md`** (with `*.research.md` / `*.plan-review.md`) — see [`docs/specs/README.md`](../specs/README.md).
+Prefer the Implement workflow under **`docs/specs/<key>-<topic>/<key>-<topic>.plan.md`** (with `<key>-<topic>.research.md` / `<key>-<topic>.plan-review.md`) — see [`docs/specs/README.md`](../specs/README.md).
 
 Use `docs/plans/` only for legacy or ad-hoc flat plans when the team chooses not to use a specs folder.
 

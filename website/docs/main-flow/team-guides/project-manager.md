@@ -16,7 +16,7 @@ title: Project Manager
 
 There's no single command to run. Your first concrete step is a **gate review**, not a prompt:
 
-1. Open the current task's `docs/specs/<task>/*.plan.md` (the implementation plan an agent produced).
+1. Open the current task's `docs/specs/<key>-<topic>/<key>-<topic>.plan.md` (the implementation plan an agent produced).
 2. Check its scope, phases, and acceptance criteria against what you expect to ship.
 3. Approve it, or reply with the specific change needed — the agent won't proceed to broad implementation without your explicit answer.
 
@@ -48,7 +48,7 @@ flowchart LR
 There is no PM-specific slash command. What you read and act on instead:
 
 :::info Reference
-- `*.research.md` — what the agent understood about the problem, under `docs/specs/<task>/`
+- `<key>-<topic>.research.md` — what the agent understood about the problem, under `docs/specs/<key>-<topic>/`
 - `*.plan.md` — the proposed implementation, phased with acceptance checks
 - `*.plan-review.md` — an adversarial stress-test of the plan, produced before you review it
 - **Draft QA comment** — the Fine-stage handoff summary, always produced in plain language before anything is posted to a tracker

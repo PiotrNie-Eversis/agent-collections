@@ -24,7 +24,7 @@ eversis-implement
 <JIRA_ID or task description>
 ```
 
-The Engineering Manager attaches this internal prompt after the Architect creates or updates a `.plan.md` file and the human has reviewed the plan draft. Skip when `{task-name}.plan-review.md` exists with verdict `APPROVED` and the plan file is unchanged since that review.
+The Engineering Manager attaches this internal prompt after the Architect creates or updates a `.plan.md` file and the human has reviewed the plan draft. Skip when `<key>-<topic>.plan-review.md` exists with verdict `APPROVED` and the plan file is unchanged since that review.
 
 ## What It Does
 
@@ -46,13 +46,13 @@ The Engineering Manager attaches this internal prompt after the Architect create
 
 ## Output
 
-A `.plan-review.md` file in `docs/specs/<task-name>/` (or your team's `specifications/<task-name>/`) alongside the plan.
+A `<key>-<topic>.plan-review.md` file in `docs/specs/<key>-<topic>/` (or your team's `specifications/<key>-<topic>/`) alongside the plan. The topic is at most three hyphen-separated words.
 
 ---
 
 ## Executable prompt (attach in Cursor)
 
-Stress-test the implementation plan for the provided task. Assume the architect likely produced a basically correct plan, then look for the strongest reasons it could still fail in implementation, create expensive rework, or give false confidence. The primary deliverable is the full structured review document saved as `{task-name}.plan-review.md` alongside the plan in the same specifications directory (`docs/specs/<task-name>/` or `specifications/<task-name>/`).
+Stress-test the implementation plan for the provided task. Assume the architect likely produced a basically correct plan, then look for the strongest reasons it could still fail in implementation, create expensive rework, or give false confidence. The primary deliverable is the full structured review document saved as `<key>-<topic>.plan-review.md` alongside the plan in the same specifications directory (`docs/specs/<key>-<topic>/` or `specifications/<key>-<topic>/`).
 
 ## Required Skills
 
@@ -96,7 +96,7 @@ You MUST actively probe every domain on every review, even when the conclusion i
 
 9. **Decision-and-revision-history handling** — Always build and maintain a `Decision and Revision History` section as a compact chronological Markdown table (oldest to newest), including on the first review iteration. On later iterations, read the existing `.plan-review.md` first and update the table. Prefer appending new rows; keep cells phrase-length.
 
-10. **Produce the report and binary verdict** — Save the full failure-oriented review report with final verdict (`APPROVED` or `REVISIONS NEEDED`) as `{task-name}.plan-review.md` in the same specifications directory as the plan.
+10. **Produce the report and binary verdict** — Save the full failure-oriented review report with final verdict (`APPROVED` or `REVISIONS NEEDED`) as `<key>-<topic>.plan-review.md` in the same specifications directory as the plan.
 
 ## Review Requirements
 
@@ -109,7 +109,7 @@ You MUST actively probe every domain on every review, even when the conclusion i
 - Never approve a plan with unresolved `BLOCKER` findings or execution-critical open decisions.
 
 <output-specification>
-Save the full structured review report as `{task-name}.plan-review.md` alongside the plan. Structure:
+Save the full structured review report as `<key>-<topic>.plan-review.md` alongside the plan. Structure:
 
 - `# Plan Review: {plan-file-name}`
 - Reviewed plan path, research file path, review date, and verdict (`APPROVED` or `REVISIONS NEEDED`)

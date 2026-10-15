@@ -1,7 +1,7 @@
 # Plan Review: <task-name>.plan.md
 
-**Reviewed plan:** `docs/specs/<task-name>/<task-name>.plan.md`  
-**Research file:** `docs/specs/<task-name>/<task-name>.research.md`  
+**Reviewed plan:** `docs/specs/<key>-<topic>/<key>-<topic>.plan.md`  
+**Research file:** `docs/specs/<key>-<topic>/<key>-<topic>.research.md`  
 **Review date:** <YYYY-MM-DD>  
 **Verdict:** `APPROVED` | `REVISIONS NEEDED`
 
