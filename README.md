@@ -205,6 +205,10 @@ bash scripts/setup-agent-collections.sh --upgrade --sync --non-interactive
 
 Reuses agents / MCP / profile / vendor / link / `ssot.externalSsotRepo` (and `ssot.confluenceSpaceKey`) from selection. Omit `--ssot-source` to keep the recorded domain-context URL; pass an empty value (`--ssot-source ""` or `--ssot-source=`) to clear it. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths are not overwritten without opt-in (see below).
 
+Per-field contract (`--upgrade`, and `--sync` whenever the record exists): an explicit `--agents`, `--mcp-servers`, `--profile`, `--vendor` or `--link-mode` **replaces** the recorded value (spaces in lists are ignored); an omitted flag **keeps** it. An explicit empty `--vendor=` (or `--vendor ""`) also counts as an override and switches a recorded `submodule` / `copy` install to `local` mode. Without `--agents`, adapters whose framework-generated files are already on disk (marker-bearing `CLAUDE.md` / `.claude/commands/eversis-*.md`, `.cursor/commands/eversis-*.md` / `.cursor/rules/eversis-*.mdc`) are kept even if the record lacks them; a hand-written `CLAUDE.md` does not enable Claude.
+
+Without `--mcp-servers` the run is in **preserve mode**: every server already in `.cursor/mcp.json` and `.mcp.json` stays in its own file with its config unchanged (only `eversis-collections` is regenerated, because its command depends on host, vendor mode and framework path); recorded servers missing from a file are added from the template; nothing is removed, and Claude keeps catalog servers found in `.mcp.json` enabled. Preserved-only servers are **not** written back to the record. To re-template servers or deselect them, pass the full list explicitly with `--mcp-servers`. This also applies to entries written by older installers in Cursor-only syntax (`${env:X}`, `${workspaceFolder}`) in `.mcp.json`: preserve mode keeps them as they are, and only an explicit `--mcp-servers` run rewrites them into Claude Code syntax.
+
 ---
 
 ## Public prompts at a glance
@@ -343,14 +347,15 @@ When moving from framework version **N** to **N+1**:
 
 ### Deselection and recovery
 
-Re-run the installer with a **smaller** `--agents` or `--mcp-servers` list (or change selections in the interactive wizard):
+Re-run the installer with a **smaller** `--agents` or `--mcp-servers` list (or change selections in the interactive wizard). Deselection needs the **explicit** flag — `--upgrade` / `--sync` without it keeps what is already installed (see [Upgrade](#upgrade)):
 
 | What changed | Behavior |
 |--------------|----------|
-| **MCP servers** | Framework-managed entries in `.cursor/mcp.json` are **removed** when deselected (consumer-added servers outside the catalog are kept). |
+| **MCP servers** | With an explicit `--mcp-servers`, framework-managed (catalog) entries not in the list are **removed** from `.cursor/mcp.json` and `.mcp.json`, and listed ones are re-templated (consumer-added servers outside the catalog are kept). Without `--mcp-servers` on upgrade / sync, existing entries in both files are kept unchanged. |
 | **Slash commands** | `npm run sync:adapters` / installer adapter sync **removes orphan** generated `eversis-*.md` under `.cursor/commands/`. |
-| **Claude omitted** | Framework-generated **`CLAUDE.md`** and triad **`.claudeignore`** are removed when Claude is not in `--agents` (project-edited files are left in place). |
-| **Cursor rules** | Regenerated for the remaining agents; **`eversis-project-stack.mdc`** is never overwritten without opt-in. |
+| **Claude omitted** | Framework-generated **`CLAUDE.md`** and triad **`.claudeignore`** are removed when Claude is not in `--agents` (project-edited files are left in place). On upgrade / sync without `--agents`, Claude stays selected while generated Claude files exist. |
+| **Hand-written `CLAUDE.md`** | When Claude is enabled and a root `CLAUDE.md` lacks the generator marker, it is copied to **`CLAUDE.md.pre-agent-collections.bak`** (or a timestamped `.bak` if a different backup already exists) before regeneration, with a warning. Move project-specific instructions into `.claude/CLAUDE.md`; do not commit the `.bak`. |
+| **Cursor rules** | Regenerated for the remaining agents; **`eversis-project-stack.mdc`** is never overwritten without opt-in. When Cursor is explicitly omitted from `--agents`, framework-generated `.cursor/rules/eversis-*.mdc` and `.cursor/commands/eversis-*.md` (generator marker) are removed; `eversis-project-stack.mdc` and hand-written files stay. |
 
 If install fails partway, fix the reported step and re-run with the same flags (idempotent).
 

@@ -259,5 +259,165 @@ else
   _fail "AWS API uvx pins mcp<2; AWS docs server stays unpinned"
 fi
 
+# Case 6 (AC-99): preserve mode — upgrade/sync reusing the record without
+# --mcp-servers. Existing entries are kept byte-equal (custom env included),
+# eversis-collections is regenerated, missing selected ids come from the
+# template, nothing is deleted.
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/scripts"
+mkdir -p "${TARGET_DIR}/.cursor"
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{
+  "mcpServers": {
+    "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } },
+    "eversis-collections": { "command": "stale", "args": [] },
+    "my-private-server": { "command": "node", "args": ["./tools/mcp.js"] }
+  },
+  "inputs": [{ "id": "keep-me" }]
+}
+EOF
+_preserve_before="$(cat "${TARGET_DIR}/.cursor/mcp.json")"
+SELECTED_AGENTS="cursor"
+VENDOR_MODE=""
+MCP_SELECTED_IDS="eversis-collections,context7"
+MCP_PRESERVE_EXISTING="true"
+merge_mcp_json 2>/dev/null
+if node -e '
+    const fs = require("fs");
+    const before = JSON.parse(process.argv[1]).mcpServers;
+    const after = JSON.parse(fs.readFileSync(process.argv[2], "utf8")).mcpServers;
+    if (JSON.stringify(after.atlassian) !== JSON.stringify(before.atlassian)) process.exit(1);
+  ' "$_preserve_before" "${TARGET_DIR}/.cursor/mcp.json"; then
+  _pass "preserve: unselected catalog id (atlassian, custom env) kept byte-equal"
+else
+  _fail "preserve: unselected catalog id (atlassian, custom env) kept byte-equal"
+fi
+_assert_docker_entry "${TARGET_DIR}/.cursor/mcp.json" '${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml' \
+  '${workspaceFolder}' \
+  "preserve: eversis-collections is still regenerated"
+if node -e '
+    const fs = require("fs");
+    const j = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    const t = JSON.parse(fs.readFileSync(process.argv[2], "utf8")).mcpServers;
+    if (JSON.stringify(j.mcpServers.context7) !== JSON.stringify(t.context7)) process.exit(1);
+  ' "${TARGET_DIR}/.cursor/mcp.json" "${REPO_ROOT}/templates/mcp.json"; then
+  _pass "preserve: selected id missing from the file (context7) added from template"
+else
+  _fail "preserve: selected id missing from the file (context7) added from template"
+fi
+if node -e '
+    const fs = require("fs");
+    const j = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    if (!j.mcpServers["my-private-server"]) process.exit(1);
+    if (JSON.stringify(j.inputs) !== JSON.stringify([{ id: "keep-me" }])) process.exit(1);
+  ' "${TARGET_DIR}/.cursor/mcp.json"; then
+  _pass "preserve: custom non-catalog server and existing inputs kept"
+else
+  _fail "preserve: custom non-catalog server and existing inputs kept"
+fi
+
+# Case 6b: a recorded (selected) id already in the file is not re-templated.
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{ "mcpServers": { "context7": { "command": "npx", "args": ["-y", "@upstash/context7-mcp@1.0.0"], "env": { "CONTEXT7_API_KEY": "secret" } } } }
+EOF
+_preserve_before="$(cat "${TARGET_DIR}/.cursor/mcp.json")"
+MCP_SELECTED_IDS="eversis-collections,context7"
+MCP_PRESERVE_EXISTING="true"
+merge_mcp_json 2>/dev/null
+if node -e '
+    const fs = require("fs");
+    const before = JSON.parse(process.argv[1]).mcpServers;
+    const after = JSON.parse(fs.readFileSync(process.argv[2], "utf8")).mcpServers;
+    if (JSON.stringify(after.context7) !== JSON.stringify(before.context7)) process.exit(1);
+  ' "$_preserve_before" "${TARGET_DIR}/.cursor/mcp.json"; then
+  _pass "preserve: selected id already in the file keeps its customised config"
+else
+  _fail "preserve: selected id already in the file keeps its customised config"
+fi
+
+# Case 6c: regression guard — preserve false still prunes deselected catalog ids.
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http" }, "my-private-server": { "command": "node" } } }
+EOF
+MCP_SELECTED_IDS="eversis-collections"
+MCP_PRESERVE_EXISTING="false"
+merge_mcp_json
+if node -e '
+    const fs = require("fs");
+    const j = JSON.parse(fs.readFileSync(process.argv[1], "utf8")).mcpServers;
+    if (j.atlassian) process.exit(1);
+    if (!j["my-private-server"] || !j["eversis-collections"]) process.exit(1);
+  ' "${TARGET_DIR}/.cursor/mcp.json"; then
+  _pass "preserve=false: deselected catalog id removed, custom server kept"
+else
+  _fail "preserve=false: deselected catalog id removed, custom server kept"
+fi
+
+# Case 6d: claude host preserve — existing entries are not touched by the
+# Claude syntax rewrite; only template-sourced additions are rewritten.
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/scripts"
+cat > "${TARGET_DIR}/.mcp.json" <<'EOF'
+{ "mcpServers": { "figma": { "url": "https://mcp.figma.com/mcp", "type": "http", "headers": { "X-Root": "${workspaceFolder}", "X-Key": "${env:FIGMA_KEY}" } } } }
+EOF
+_preserve_before="$(cat "${TARGET_DIR}/.mcp.json")"
+SELECTED_AGENTS="claude"
+MCP_SELECTED_IDS="eversis-collections,context7"
+MCP_PRESERVE_EXISTING="true"
+merge_mcp_json 2>/dev/null
+if node -e '
+    const fs = require("fs");
+    const before = JSON.parse(process.argv[1]).mcpServers;
+    const after = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+    if (JSON.stringify(after.mcpServers.figma) !== JSON.stringify(before.figma)) process.exit(1);
+    if (!after.mcpServers.context7 || !after.mcpServers["eversis-collections"]) process.exit(1);
+    if (after.inputs !== undefined) process.exit(1);
+  ' "$_preserve_before" "${TARGET_DIR}/.mcp.json"; then
+  _pass "claude preserve: existing entry not re-written by the Claude syntax rewrite"
+else
+  _fail "claude preserve: existing entry not re-written by the Claude syntax rewrite"
+fi
+_assert_docker_entry "${TARGET_DIR}/.mcp.json" "\${AGENT_COLLECTIONS_HOME:-${REPO_ROOT}}/docker-compose.yml" \
+  '${CLAUDE_PROJECT_DIR:-.}' \
+  "claude preserve: eversis-collections regenerated with Claude-native syntax"
+
+# Case 6e (review S2): preserve mode regenerates an existing eversis-collections
+# entry even when the record does not select it (framework-owned, may be stale
+# after a vendor-mode change), and names it in the preserve log line.
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/scripts"
+mkdir -p "${TARGET_DIR}/.cursor"
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{ "mcpServers": { "eversis-collections": { "command": "docker", "args": ["compose", "-f", "${workspaceFolder}/vendor/agent-collections/docker-compose.yml"] }, "context7": { "command": "npx" } } }
+EOF
+SELECTED_AGENTS="cursor"
+VENDOR_MODE=""
+MCP_SELECTED_IDS="context7"
+MCP_PRESERVE_EXISTING="true"
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
+_assert_docker_entry "${TARGET_DIR}/.cursor/mcp.json" '${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml' \
+  '${workspaceFolder}' \
+  "preserve: unselected existing eversis-collections is regenerated for the current vendor mode"
+if echo "$_preserve_log" | grep -qF 'regenerated: eversis-collections'; then
+  _pass "preserve: log line names the regenerated eversis-collections entry"
+else
+  _fail "preserve: log line names the regenerated eversis-collections entry"
+fi
+
+# Case 6f: preserve mode does not add eversis-collections when it is neither
+# selected nor already in the file.
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{ "mcpServers": { "context7": { "command": "npx" } } }
+EOF
+MCP_SELECTED_IDS="context7"
+MCP_PRESERVE_EXISTING="true"
+merge_mcp_json 2>/dev/null
+if node -e '
+    const j = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers;
+    if (j["eversis-collections"]) process.exit(1);
+  ' "${TARGET_DIR}/.cursor/mcp.json"; then
+  _pass "preserve: eversis-collections not added when unselected and absent"
+else
+  _fail "preserve: eversis-collections not added when unselected and absent"
+fi
+unset MCP_PRESERVE_EXISTING _preserve_before _preserve_log
+
 echo ""
 echo "  ✅  All ${PASS} mcp-merge unit tests passed."

@@ -13,6 +13,10 @@ const existingJson = process.env.MCP_EXISTING_JSON ?? '{}';
 const selectedCsv = process.env.MCP_SELECTED_IDS ?? '';
 const templatePath = process.env.MCP_TEMPLATE_PATH;
 const serverListPath = process.env.MCP_SERVER_LIST_PATH;
+// Set by load_selection_or_fail when an install record is reused without an
+// explicit --mcp-servers (AC-99). Anything but "true" (incl. unset) keeps the
+// replace/prune behaviour that fresh installs and explicit refreshes rely on.
+const preserveExisting = process.env.MCP_PRESERVE_EXISTING === 'true';
 
 function fail(msg) {
   console.error(`[mcp-merge] ${msg}`);
@@ -57,7 +61,14 @@ for (const id of selected) {
   picked[id] = structuredClone(templateServers[id]);
 }
 
-if (picked['eversis-collections']) {
+// eversis-collections is framework-owned: in preserve mode an entry already in
+// this host file is regenerated even when the record does not select it, so
+// it never goes stale after a vendor-mode / COLLECTIONS_HOME change.
+const regenerateEversis =
+  Boolean(picked['eversis-collections']) ||
+  (preserveExisting &&
+    Object.prototype.hasOwnProperty.call(existing?.mcpServers ?? {}, 'eversis-collections'));
+if (regenerateEversis) {
   const composeFile = 'docker-compose.yml';
   // Vendored Claude: do not put ${CLAUDE_PROJECT_DIR:-.} in committed JSON —
   // config-time ${VAR} expansion leaves it empty on the VS Code extension.
@@ -143,16 +154,47 @@ if (host === 'claude') {
 }
 
 const existingServers = existing.mcpServers ?? {};
-// Replace only selected keys; drop previous framework-managed ids that were deselected
-const frameworkManaged = new Set(catalog.servers);
-const kept = {};
-for (const [id, cfg] of Object.entries(existingServers)) {
-  if (frameworkManaged.has(id) && !selected.includes(id)) {
-    continue; // deselection removes unless consumer re-adds manually outside catalog
+let mergedServers;
+if (preserveExisting) {
+  // Preserve mode (upgrade / sync reusing the record): the record may list
+  // fewer servers than this host file has (older installer, a teammate's flag
+  // set, hand-added entries), so nothing already here is deleted or
+  // re-templated — that would drop user env/tokens. Only eversis-collections
+  // is always regenerated (its command depends on host, vendor mode and
+  // COLLECTIONS_HOME); selected ids missing from this file come from the
+  // template. Refresh / deselect stays the explicit --mcp-servers path.
+  mergedServers = { ...existingServers };
+  const keptIds = [];
+  const addedIds = [];
+  for (const id of Object.keys(existingServers)) {
+    if (id !== 'eversis-collections') keptIds.push(id);
   }
-  kept[id] = cfg;
+  for (const [id, cfg] of Object.entries(picked)) {
+    if (id === 'eversis-collections') {
+      mergedServers[id] = cfg;
+    } else if (!Object.prototype.hasOwnProperty.call(existingServers, id)) {
+      mergedServers[id] = cfg;
+      addedIds.push(id);
+    }
+  }
+  // Server ids only — never config values (env may hold tokens).
+  console.error(
+    `[mcp-merge] ${host}: preserve mode — kept existing: ${keptIds.join(', ') || '(none)'}; ` +
+      `added from template: ${addedIds.join(', ') || '(none)'}; ` +
+      `regenerated: ${picked['eversis-collections'] ? 'eversis-collections' : '(none)'}`,
+  );
+} else {
+  // Replace only selected keys; drop previous framework-managed ids that were deselected
+  const frameworkManaged = new Set(catalog.servers);
+  const kept = {};
+  for (const [id, cfg] of Object.entries(existingServers)) {
+    if (frameworkManaged.has(id) && !selected.includes(id)) {
+      continue; // deselection removes unless consumer re-adds manually outside catalog
+    }
+    kept[id] = cfg;
+  }
+  mergedServers = { ...kept, ...picked };
 }
-const mergedServers = { ...kept, ...picked };
 
 const ALLOWED_TOP = new Set(['mcpServers', 'inputs']);
 const cleanedTop = {};

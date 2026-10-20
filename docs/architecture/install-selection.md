@@ -34,5 +34,8 @@ When `ssot.externalSsotRepo` is set, the knowledge-promotion skill (`eversis-pro
 
 - Project-owned-ish: upgrade/sync **reads** this file; does not delete it.
 - `--upgrade` / `--sync` **reuse** `ssot.externalSsotRepo` and `ssot.confluenceSpaceKey` unless the matching CLI flag is passed. Empty `--ssot-source` (`""` or `--ssot-source=`) **clears** `externalSsotRepo` to `null`. Omitting `--ssot-source` must not wipe a recorded URL.
+- The same per-field override applies to `agents`, `mcpServers`, `domainProfile`, `vendorMode` and `linkMode` on `--upgrade`, and on `--sync` whenever this file exists: `--agents` / `--mcp-servers` / `--profile` / `--vendor` / `--link-mode` **replace** the recorded value (list values are space-stripped); an omitted flag **keeps** it. An explicit empty `--vendor=` (or `--vendor ""`) is an override too: it switches a recorded `submodule` / `copy` install to `local` mode.
+- The record is the **explicit choice**, not an inventory of disk. Without `--agents`, adapters with framework-generated (marker-bearing) files already in the project are kept and recorded; a hand-written `CLAUDE.md` is not evidence. Without `--mcp-servers`, MCP entries already present in `.cursor/mcp.json` / `.mcp.json` are **preserved** in place (only `eversis-collections` is regenerated) but are **not** written back to `mcpServers`.
+- Deselection or re-templating of MCP servers requires an explicit `--mcp-servers` list; deselecting an adapter requires an explicit `--agents` list.
 - Missing or corrupt file → upgrade **fails** with wizard instructions (no invented multi-agent install).
 - See README Upgrade contract for operational CLI (`--upgrade` / `--sync`).
