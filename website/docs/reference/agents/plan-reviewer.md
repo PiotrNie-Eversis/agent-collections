@@ -20,7 +20,7 @@ The Plan Reviewer is an internal role that stress-tests implementation plans bef
 ## What It Produces
 
 - A failure-oriented review report with a binary verdict (`APPROVED` or `REVISIONS NEEDED`), top risks, assumptions, rework triggers, and any blocking gaps.
-- The report is saved as `{task-name}.plan-review.md` alongside the plan in `docs/specs/<task-name>/` (or `specifications/<task-name>/`).
+- The report is saved as `<key>-<topic>.plan-review.md` alongside the plan in `docs/specs/<key>-<topic>/` (or `specifications/<key>-<topic>/`).
 
 ## Tool Access
 
@@ -44,7 +44,7 @@ The Plan Reviewer is an internal role that stress-tests implementation plans bef
 - It is not invoked directly by users.
 - The Engineering Manager delegates plan validation via `@eversis-review-plan` after the human reviews the plan draft.
 - If the reviewer returns `REVISIONS NEEDED`, the plan goes back to the Architect and is re-reviewed until approved or escalated (max 3 iterations).
-- Skip validation when `{task-name}.plan-review.md` already has verdict `APPROVED` and the plan file is unchanged.
+- Skip validation when `<key>-<topic>.plan-review.md` already has verdict `APPROVED` and the plan file is unchanged.
 
 ## Handoffs
 

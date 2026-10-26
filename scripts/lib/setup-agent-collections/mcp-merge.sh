@@ -93,6 +93,7 @@ _merge_mcp_json_for_host() {
     MCP_SELECTED_IDS="${MCP_SELECTED_IDS:-eversis-collections}" \
     MCP_TEMPLATE_PATH="$template_path" \
     MCP_SERVER_LIST_PATH="$server_list" \
+    MCP_PRESERVE_EXISTING="${MCP_PRESERVE_EXISTING:-false}" \
     node "$merge_mjs"
   )" || die "Failed to build/merge ${mcp_file}."
 
@@ -100,8 +101,14 @@ _merge_mcp_json_for_host() {
     || die "Merged ${mcp_file} is not valid JSON — aborting."
 
   echo "$merged" > "$mcp_file"
+  # Stays the selection even in preserve mode — preserved-only ids are not
+  # part of the record; claude-settings-merge.mjs unions them for Claude.
   export MCP_CONFIGURED_SERVERS="${MCP_SELECTED_IDS:-eversis-collections}"
-  log_ok "Wrote ${mcp_file} (servers: ${MCP_SELECTED_IDS:-eversis-collections})"
+  if [[ "${MCP_PRESERVE_EXISTING:-false}" == "true" ]]; then
+    log_ok "Wrote ${mcp_file} (selected: ${MCP_SELECTED_IDS:-eversis-collections}; existing entries preserved)"
+  else
+    log_ok "Wrote ${mcp_file} (servers: ${MCP_SELECTED_IDS:-eversis-collections})"
+  fi
 
   # Vendored Claude: commit a BASH_SOURCE-based wrapper next to .mcp.json so
   # the bash -c locator can exec a path that does not depend on cwd.

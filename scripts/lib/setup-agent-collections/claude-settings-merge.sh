@@ -35,6 +35,9 @@ merge_claude_settings() {
     CS_TEMPLATE_PATH="$template_path" \
     CS_CLAUDEIGNORE_PATH="$claudeignore_path" \
     CS_MCP_SERVER_IDS="${MCP_CONFIGURED_SERVERS:-eversis-collections}" \
+    CS_PRESERVE_EXISTING="${MCP_PRESERVE_EXISTING:-false}" \
+    CS_MCP_JSON_PATH="${TARGET_DIR}/.mcp.json" \
+    CS_SERVER_LIST_PATH="${LIB_DIR}/mcp-server-list.json" \
     node "$merge_mjs"
   )" || die "Failed to build/merge ${settings_file}."
 

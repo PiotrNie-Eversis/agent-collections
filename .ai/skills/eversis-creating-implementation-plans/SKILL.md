@@ -53,7 +53,7 @@ Definition of done must not include deployment steps, manual QA steps, or steps 
 
 <plan-content-rules>
 - Capture security considerations relevant to the implementation.
-- Save the plan as `docs/specs/{task-name-or-id}/{task-name}.plan.md` (or `specifications/{task-name-or-id}/{task-name}.plan.md` when that is the team convention).
+- Save the plan as `docs/specs/<key>-<topic>/<key>-<topic>.plan.md` (or `specifications/<key>-<topic>/<key>-<topic>.plan.md` when that is the team convention). The topic is at most three hyphen-separated words.
 - For bug fixes, include reproduction, root-cause analysis, and a fix verified by tests.
 - Plan only the current task. Record prerequisite and follow-up work in `Improvements`.
 - Reuse or modify existing code whenever possible per `Current Implementation Analysis`.

@@ -78,9 +78,11 @@ print_summary() {
   fi
 
   echo ""
-  echo "Deselection: re-run with a smaller --mcp-servers / --agents list to refresh managed"
-  echo "entries. MCP catalog servers are pruned automatically; adapter sync removes orphan"
-  echo "generated slash commands and scoped rules. When Claude is omitted, framework-generated"
+  echo "Deselection: re-run with an explicit, smaller --mcp-servers / --agents list to refresh"
+  echo "managed entries. --upgrade / --sync without those flags keeps what is installed (existing"
+  echo "MCP entries stay unchanged; agents with generated files stay selected). With an explicit"
+  echo "--mcp-servers, unlisted catalog servers are pruned; adapter sync removes orphan generated"
+  echo "slash commands and scoped rules. When Claude is explicitly omitted, framework-generated"
   echo "CLAUDE.md, .claudeignore, .claude/commands/, .claude/rules/, and .claude/skills/ are"
   echo "removed if present. See README upgrade / recovery notes."
   echo ""

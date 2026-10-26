@@ -125,5 +125,49 @@ else
   _pass "no double-slash glob in permissions.deny"
 fi
 
+# Case 6 (AC-99): preserve mode unions catalog ids already in .mcp.json into
+# enabledMcpjsonServers (selection order first); non-catalog ids are ignored.
+cat > "${TARGET_DIR}/.mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "type": "http" }, "eversis-collections": {}, "my-private-server": {} } }
+EOF
+_enabled() {
+  node -e "const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); console.log((j.enabledMcpjsonServers||[]).join(','))" \
+    "${TARGET_DIR}/.claude/settings.json"
+}
+MCP_CONFIGURED_SERVERS="eversis-collections,context7"
+MCP_PRESERVE_EXISTING="true"
+merge_claude_settings
+if [[ "$(_enabled)" == "eversis-collections,context7,atlassian" ]]; then
+  _pass "preserve: enabledMcpjsonServers = selection + catalog ids in .mcp.json"
+else
+  _fail "preserve: enabledMcpjsonServers = selection + catalog ids in .mcp.json (got: $(_enabled))"
+fi
+
+MCP_PRESERVE_EXISTING="false"
+merge_claude_settings
+if [[ "$(_enabled)" == "eversis-collections,context7" ]]; then
+  _pass "preserve=false: enabledMcpjsonServers = selection only"
+else
+  _fail "preserve=false: enabledMcpjsonServers = selection only (got: $(_enabled))"
+fi
+
+# Missing / invalid .mcp.json in preserve mode falls back to the selection.
+echo '{ not json' > "${TARGET_DIR}/.mcp.json"
+MCP_PRESERVE_EXISTING="true"
+merge_claude_settings
+if [[ "$(_enabled)" == "eversis-collections,context7" ]]; then
+  _pass "preserve: invalid .mcp.json falls back to selection only"
+else
+  _fail "preserve: invalid .mcp.json falls back to selection only (got: $(_enabled))"
+fi
+rm -f "${TARGET_DIR}/.mcp.json"
+merge_claude_settings
+if [[ "$(_enabled)" == "eversis-collections,context7" ]]; then
+  _pass "preserve: missing .mcp.json falls back to selection only"
+else
+  _fail "preserve: missing .mcp.json falls back to selection only (got: $(_enabled))"
+fi
+unset MCP_PRESERVE_EXISTING
+
 echo ""
 echo "  ✅  All ${PASS} claude-settings-merge unit tests passed."

@@ -10,6 +10,10 @@
  *    `enabledMcpjsonServers` (from the current MCP selection). Every other
  *    key in an existing file — including `permissions.allow` and anything a
  *    consumer added by hand — is left untouched.
+ *  - Preserve mode (CS_PRESERVE_EXISTING=true, AC-99 upgrade/sync reusing the
+ *    record): `enabledMcpjsonServers` is the selection plus every catalog id
+ *    already present in `.mcp.json` (CS_MCP_JSON_PATH), so servers that
+ *    mcp-merge.mjs kept on disk stay enabled in Claude Code.
  */
 import fs from 'node:fs';
 
@@ -22,6 +26,9 @@ const existingJson = process.env.CS_EXISTING_JSON ?? '';
 const templatePath = process.env.CS_TEMPLATE_PATH;
 const claudeignorePath = process.env.CS_CLAUDEIGNORE_PATH;
 const mcpServersCsv = process.env.CS_MCP_SERVER_IDS ?? '';
+const preserveExisting = process.env.CS_PRESERVE_EXISTING === 'true';
+const mcpJsonPath = process.env.CS_MCP_JSON_PATH ?? '';
+const serverListPath = process.env.CS_SERVER_LIST_PATH ?? '';
 
 if (!templatePath || !claudeignorePath) {
   fail('Missing required environment variables for Claude settings merge.');
@@ -99,9 +106,33 @@ if (result.permissions === undefined) {
 
 result.permissions.deny = denyPatternsFromClaudeignore(claudeignorePath);
 
-result.enabledMcpjsonServers = mcpServersCsv
+/**
+ * Catalog ids present in the consumer's `.mcp.json`, in file order. Any
+ * problem (no path, missing / invalid file or catalog) yields [] so preserve
+ * mode silently falls back to the selection — never a failed install.
+ */
+function catalogIdsInMcpJson(mcpPath, listPath) {
+  if (!mcpPath || !listPath) return [];
+  try {
+    const catalogIds = new Set(JSON.parse(fs.readFileSync(listPath, 'utf8')).servers ?? []);
+    const servers = JSON.parse(fs.readFileSync(mcpPath, 'utf8')).mcpServers;
+    if (!servers || typeof servers !== 'object' || Array.isArray(servers)) return [];
+    return Object.keys(servers).filter((id) => catalogIds.has(id));
+  } catch {
+    return [];
+  }
+}
+
+const enabled = mcpServersCsv
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
+if (preserveExisting) {
+  // Selection order first, then preserved ids not already listed.
+  for (const id of catalogIdsInMcpJson(mcpJsonPath, serverListPath)) {
+    if (!enabled.includes(id)) enabled.push(id);
+  }
+}
+result.enabledMcpjsonServers = enabled;
 
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

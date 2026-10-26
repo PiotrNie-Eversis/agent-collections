@@ -21,8 +21,18 @@
 #   --link-mode auto|symlink|copy
 #                             How to materialise generated adapter outputs.
 #                             auto = symlink on Unix, copy on Windows (default).
-#   --sync                    Re-run and refresh framework-managed surfaces.
+#   --sync                    Re-run and refresh framework-managed surfaces. When
+#                             .agent-collections/install-selection.json exists it is
+#                             reused per field (same contract as --upgrade).
 #   --upgrade                 Reuse .agent-collections/install-selection.json (fail-safe).
+#                             Per field: --agents / --mcp-servers / --profile /
+#                             --vendor / --link-mode replace the recorded value; an
+#                             omitted flag keeps it. Without --mcp-servers, MCP
+#                             entries already in .cursor/mcp.json / .mcp.json are
+#                             kept unchanged (only eversis-collections is
+#                             regenerated); agents with framework-generated files on
+#                             disk are kept. Pass --mcp-servers / --agents to refresh
+#                             or deselect.
 #   --non-interactive         Skip all prompts; use defaults / flags.
 #   --force                   Allow setup even when COLLECTIONS_HOME looks incomplete.
 #   --gitignore-agent-artifacts
@@ -72,7 +82,9 @@ ARG_BUILD_MCP="false"
 ARG_COLLECTIONS_HOME=""
 ARG_TARGET=""
 ARG_VENDOR=""
+ARG_VENDOR_PASSED="false"
 ARG_LINK_MODE="auto"
+ARG_LINK_MODE_PASSED="false"
 ARG_SYNC="false"
 ARG_UPGRADE="false"
 ARG_NON_INTERACTIVE="false"
@@ -86,12 +98,18 @@ ARG_SSOT_SOURCE_PASSED="false"
 ARG_SSOT_BRANCH="main"
 ARG_CONFLUENCE_SPACE_KEY=""
 ARG_CONFLUENCE_SPACE_KEY_PASSED="false"
+# Set to "true" only by load_selection_or_fail (record reused, no --mcp-servers);
+# start from "false" so a stray value in the caller's env never turns a fresh
+# install into preserve mode.
+MCP_PRESERVE_EXISTING="false"
 
-export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_LINK_MODE \
+export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_VENDOR_PASSED \
+       ARG_LINK_MODE ARG_LINK_MODE_PASSED \
        ARG_SYNC ARG_UPGRADE ARG_NON_INTERACTIVE ARG_FORCE \
        ARG_GITIGNORE_AGENT_ARTIFACTS ARG_MCP_SERVERS ARG_AGENTS ARG_PROFILE \
        ARG_SSOT_SOURCE ARG_SSOT_SOURCE_PASSED ARG_SSOT_BRANCH \
        ARG_CONFLUENCE_SPACE_KEY ARG_CONFLUENCE_SPACE_KEY_PASSED \
+       MCP_PRESERVE_EXISTING \
        SETUP_SCRIPT_DIR="${SCRIPT_DIR}" LIB_DIR="${LIB_DIR}"
 
 while [[ $# -gt 0 ]]; do
@@ -106,16 +124,17 @@ while [[ $# -gt 0 ]]; do
       ARG_TARGET="$2"; shift 2 ;;
     --target=*) ARG_TARGET="${1#*=}"; shift ;;
     --vendor)
+      ARG_VENDOR_PASSED="true"
       if [[ $# -ge 2 ]] && [[ "$2" != --* ]]; then
         ARG_VENDOR="$2"; shift 2
       else
         ARG_VENDOR="true"; shift
       fi ;;
-    --vendor=*) ARG_VENDOR="${1#*=}"; shift ;;
+    --vendor=*) ARG_VENDOR="${1#*=}"; ARG_VENDOR_PASSED="true"; shift ;;
     --link-mode)
       [[ $# -lt 2 ]] && { echo "ERROR: --link-mode requires a value" >&2; exit 1; }
-      ARG_LINK_MODE="$2"; shift 2 ;;
-    --link-mode=*) ARG_LINK_MODE="${1#*=}"; shift ;;
+      ARG_LINK_MODE="$2"; ARG_LINK_MODE_PASSED="true"; shift 2 ;;
+    --link-mode=*) ARG_LINK_MODE="${1#*=}"; ARG_LINK_MODE_PASSED="true"; shift ;;
     --sync) ARG_SYNC="true"; shift ;;
     --upgrade) ARG_UPGRADE="true"; shift ;;
     --non-interactive) ARG_NON_INTERACTIVE="true"; shift ;;
@@ -228,12 +247,6 @@ record_fail() { FAILED_STEPS+=("$1"); }
 log_info "Starting agent-collections setup …"
 detect_os
 
-# Upgrade path: load selection first (fail-safe).
-if [[ "$ARG_UPGRADE" == "true" ]] || { [[ "$ARG_SYNC" == "true" ]] && [[ -z "$ARG_AGENTS$ARG_PROFILE$ARG_MCP_SERVERS" ]]; }; then
-  # Resolve target early for selection read when --target given; else after resolve_target_dir.
-  :
-fi
-
 resolve_collections_home
 ensure_framework_checkout
 INSTALLER_FRAMEWORK_HOME="$(cd "${COLLECTIONS_HOME}" && pwd)"
@@ -248,7 +261,10 @@ if [[ "$_resolved_target" == "$_script_repo_root" ]]; then
 fi
 unset _script_repo_root _resolved_target
 
-if [[ "$ARG_UPGRADE" == "true" ]] || { [[ "$ARG_SYNC" == "true" ]] && [[ -f "${TARGET_DIR}/.agent-collections/install-selection.json" ]] && [[ -z "${ARG_AGENTS}" ]] && [[ -z "${ARG_PROFILE}" ]]; }; then
+# Upgrade path: load selection first (fail-safe). --sync reuses an existing
+# record too; explicit --agents / --mcp-servers / --profile override it per
+# field inside load_selection_or_fail (omitted flag = recorded value).
+if [[ "$ARG_UPGRADE" == "true" ]] || { [[ "$ARG_SYNC" == "true" ]] && [[ -f "${TARGET_DIR}/.agent-collections/install-selection.json" ]]; }; then
   load_selection_or_fail
 fi
 

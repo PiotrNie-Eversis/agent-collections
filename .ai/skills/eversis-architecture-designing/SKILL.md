@@ -70,7 +70,7 @@ Do **not** duplicate plan-structure rules here. Load and follow **`eversis-creat
 
 - Wildly Important Goal, Technical Context, phased tasks, `Files:` per task, Stop Rules, and runnable DoD commands
 - Mandatory code review, UI verification, and prompt-engineering cross-cutting tasks
-- Saving the plan with `plan.example.md` under `docs/specs/<task-name>/` (or `specifications/<task-name>/`)
+- Saving the plan with `plan.example.md` under `docs/specs/<key>-<topic>/` (or `specifications/<key>-<topic>/`) as `<key>-<topic>.plan.md`. The topic is at most three hyphen-separated words.
 
 After the plan is saved, it is stress-tested by the Plan Reviewer via [`eversis-review-plan.md`](../../../.ai/prompts/internal/eversis-review-plan.md) before implementation begins.
 
@@ -80,7 +80,7 @@ The Architect role is **design-only**. During architecture design and plan autho
 
 - **Do** use read-only inspection — file search, codebase analysis skills, MCP reads (Jira, Figma, PDF, Context7).
 - **Do not** run build, test, lint, typecheck, or deployment commands from the Architect turn — those belong to implementers and the Code Reviewer per the plan's verification phases.
-- **Do not** edit application source code — only research/plan artifacts under `docs/specs/<task>/` (or `specifications/<task>/`).
+- **Do not** edit application source code — only research/plan artifacts under `docs/specs/<key>-<topic>/` (or `specifications/<key>-<topic>/`).
 - **Do** specify which fast checks and full test suites each plan phase and the final review phase should run; delegate execution to `eversis-implement` and `eversis-review`.
 
 This prevents the Architect from implementing or validating code during planning while still producing runnable DoD commands in the plan.

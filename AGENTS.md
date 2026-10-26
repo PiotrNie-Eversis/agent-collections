@@ -22,7 +22,7 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 |------|------|
 | [`docs/context/`](./docs/context/) | Internal knowledge, task baselines |
 | [`docs/plans/`](./docs/plans/) | Optional flat plans; prefer specs for Implement |
-| [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<issue-kebab>/`; `task-*` local-only / gitignored in this repo) |
+| [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<key>-<topic>/`; `task-*` local-only / gitignored in this repo) |
 | [`docs/decisions/`](./docs/decisions/) | Architecture decisions — one file per decision plus `INDEX.md` |
 | [`docs/reports/`](./docs/reports/) | Agent-generated reports (e.g. `code-quality-report.md` from `eversis-review-codebase`) |
 
@@ -62,7 +62,7 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 Ideate → Research → Plan → Implement → Review → Fine
 ```
 
-- Spec folder: `docs/specs/<issue-kebab>/` — see [`docs/specs/README.md`](./docs/specs/README.md)
+- Spec folder: `docs/specs/<key>-<topic>/` — see [`docs/specs/README.md`](./docs/specs/README.md)
 - Canonical rule: [`.ai/rules/orchestration/spec-driven-development.md`](./.ai/rules/orchestration/spec-driven-development.md)
 
 ## Project specifics

@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Ticket spec folder name** — instructions that create a ticket's research, plan, or plan review now use `docs/specs/<key>-<topic>/`, with file names that repeat the folder name (`<key>-<topic>.research.md`, `<key>-<topic>.plan.md`, `<key>-<topic>.plan-review.md`). Lookup still keeps an existing key-only `docs/specs/<key>/` folder. A new install's specs README teaches the `ac-2-context-management` example.
 - **Docs site metadata origin** — production canonical, Open Graph, Twitter image, hreflang, and sitemap URLs now use `https://agent-collections.vercel.app` instead of `http://localhost:3000`.
 - **Docx tools relative paths** — relative `docx_path` / `output_md_path` / `backup_dir` resolve against the consumer workspace (`/workspace`) via `resolveWorkspaceRoot` (requires `.agent-collections/install-selection.json`; host MCP `env.CONSUMER_PROJECT_ROOT` same as domain-context). Host absolute paths (`/Users/...`) stay unsupported.
 - **Checkpoint no longer ends Implement** — a completed, tested plan task that is not the last one still writes a `CHECKPOINT:` row in the plan changelog, then a `RESUMED:` row in the same turn. The session continues through the remaining tasks, Review, and Fine unless the person asks to stop. The public domain-context Implement diagram matches that contract.

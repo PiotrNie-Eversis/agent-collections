@@ -35,7 +35,7 @@ npm run website:changelog:check
 
 - **Agent entry:** [AGENTS.md](../../AGENTS.md)
 - **Framework SSOT:** `.ai/` — adapters and MCP consume it
-- **Specs / plans:** `docs/specs/<issue-kebab>/` — `*.research.md`, `*.plan.md`
+- **Specs / plans:** `docs/specs/<key>-<topic>/` — `<key>-<topic>.research.md`, `<key>-<topic>.plan.md`
 
 ## Agent skills policy
 

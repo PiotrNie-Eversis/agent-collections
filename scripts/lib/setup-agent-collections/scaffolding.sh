@@ -20,7 +20,7 @@ This project uses Agent Collections (`.ai/` SSOT via `AGENT_COLLECTIONS_HOME` / 
 - Enable MCP server **eversis-collections**.
 - Cursor: customise **`.cursor/rules/eversis-project-stack.mdc`**.
 - Claude Code: customise **`.claude/CLAUDE.md`** (do not hand-edit generated `CLAUDE.md`) — Claude Code does not read this `AGENTS.md` file on its own unless `.claude/CLAUDE.md` imports it with `@AGENTS.md`.
-- Delivery Standard: Research → Plan → Implement → Review → Fine under `docs/specs/<issue-kebab>/`.
+- Delivery Standard: Research → Plan → Implement → Review → Fine under `docs/specs/<key>-<topic>/`.
 AGENTS_EOF
     fi
     log_ok "Created AGENTS.md — review and customise for your project."
@@ -35,12 +35,12 @@ AGENTS_EOF
 
 Feature research and implementation plan artifacts for this project.
 
-Naming convention: `docs/specs/<issue-kebab>/`
+Naming convention: `docs/specs/<key>-<topic>/`
 
 ```
-docs/specs/my-feature/
-  my-feature.research.md
-  my-feature.plan.md
+docs/specs/ac-2-context-management/
+  ac-2-context-management.research.md
+  ac-2-context-management.plan.md
 ```
 README_EOF
     log_ok "Created docs/specs/README.md."
@@ -75,7 +75,7 @@ README_EOF
 
 Optional location for **flat implementation plans** as `*.md` files (scope, rationale, steps, risks).
 
-Prefer the Implement workflow under `docs/specs/<issue-kebab>/*.plan.md` (with `*.research.md` / `*.plan-review.md`) — see [`docs/specs/README.md`](../specs/README.md).
+Prefer the Implement workflow under `docs/specs/<key>-<topic>/<key>-<topic>.plan.md` (with `<key>-<topic>.research.md` / `<key>-<topic>.plan-review.md`) — see [`docs/specs/README.md`](../specs/README.md).
 
 Use `docs/plans/` only for legacy or ad-hoc flat plans when the team chooses not to use a specs folder.
 README_EOF

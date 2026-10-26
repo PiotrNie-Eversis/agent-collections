@@ -20,7 +20,7 @@ Use these folders for agent/project artifacts:
 |------|------|
 | `docs/context/` | Internal knowledge, architecture notes, task baselines |
 | `docs/plans/` | Optional flat plans; prefer specs for Implement workflow |
-| `docs/specs/` | SDD research / plan / plan-review (`docs/specs/<issue-kebab>/`) |
+| `docs/specs/` | SDD research / plan / plan-review (`docs/specs/<key>-<topic>/`) |
 | `docs/decisions/` | Architecture decisions — one file per decision plus `INDEX.md` |
 
 ## Monorepo / Areas
@@ -58,9 +58,9 @@ Mandatory for framework and consumer deliveries that opt into SDD:
 Ideate → Research → Plan → Implement → Review → Fine
 ```
 
-- Spec folder: `docs/specs/<issue-kebab>/`
-- Research: `<issue-kebab>.research.md` (approve before plan)
-- Plan: `<issue-kebab>.plan.md` (approve before implement)
+- Spec folder: `docs/specs/<key>-<topic>/`
+- Research: `<key>-<topic>.research.md` (approve before plan)
+- Plan: `<key>-<topic>.plan.md` (approve before implement)
 - Canonical rule: `$AGENT_COLLECTIONS_HOME/.ai/rules/orchestration/spec-driven-development.md` (or under `vendor/agent-collections/` when vendored)
 
 ## Project specifics

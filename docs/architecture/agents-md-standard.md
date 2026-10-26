@@ -25,7 +25,7 @@ Every `AGENTS.md` produced from this standard (template, install seed, or refere
 | 3 | Project deliverables | Yes | Four paths: `docs/context/`, `docs/plans/`, `docs/specs/`, `docs/decisions/` (see below). |
 | 4 | Monorepo / Areas | Yes | Table or list: area → path → note. Use HTML comment placeholders until filled. |
 | 5 | Role matrix | Yes | Framework **agent** roles only (see Role matrix). One line per role: purpose + entry (prompt/rule id). |
-| 6 | Delivery Standard | Recommended | Short pointer to `docs/specs/<issue-kebab>/` and Research → Plan → Implement → Review → Fine gates. |
+| 6 | Delivery Standard | Recommended | Short pointer to `docs/specs/<key>-<topic>/` and Research → Plan → Implement → Review → Fine gates. |
 | 7 | Project specifics | Yes | Consumer-owned overrides; start empty with HTML comment placeholders. |
 | 8 | Channel notes (Cursor) | Optional appendix | Cursor-only UX (`/` commands, `@` attach). Must not be required to understand the map. |
 
@@ -36,8 +36,8 @@ When working with the framework in **any** repository, agent/project deliverable
 | Path | Role |
 |------|------|
 | `docs/context/` | Internal knowledge, architecture notes, task baselines (`docs/context/<project>/…`) |
-| `docs/plans/` | Legacy/flat plans if used; prefer `docs/specs/<issue>/` for Implement workflow plans |
-| `docs/specs/` | SDD research / plan / plan-review artifacts (`docs/specs/<issue-kebab>/`) |
+| `docs/plans/` | Legacy/flat plans if used; prefer `docs/specs/<key>-<topic>/` for Implement workflow plans |
+| `docs/specs/` | SDD research / plan / plan-review artifacts (`docs/specs/<key>-<topic>/`) |
 | `docs/decisions/` | Architecture decisions — one file per decision plus `INDEX.md` |
 
 **Framework repository note:** all `docs/specs/*/` subfolders are **gitignored** (local-only story work on the framework itself), regardless of naming. They are not the published product surface. Committed standards and templates live elsewhere (this file, `templates/`).

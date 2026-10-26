@@ -43,7 +43,7 @@ TASK-123
 | Step | What happens |
 |------|----------------|
 | Readiness block | Flow / Research / Plan / Next gate |
-| Research → plan | Specs under `docs/specs/<issue-kebab>/` with human gates |
+| Research → plan | Specs under `docs/specs/<key>-<topic>/` with human gates |
 | Implement | Delegated by domain; stack policy governs which skills load |
 | Fine | QA comment **draft** — publish only after human approval |
 
