@@ -60,15 +60,15 @@ Hierarchy (AC rule): Epic → Story AC-92 → Tasks AC-93–AC-98; Epic → Task
 **Source**: S3 (AC-94); S1 ("For each line, if you can't name the failure it prevents, delete it"; shift from rules and repetition to judgment); S2 (90% of files use must/always/never); repo: 37 lines in `CLAUDE.md` use must/never/always/do not.
 
 **Added requirements**:
-6. Each always-on rule kept in `CLAUDE.md` has a recorded reason — the failure it prevents — in the research artifact; a rule with no nameable failure is removed or moved to the skill that needs it.
+6. Each always-on rule kept in `CLAUDE.md` has a recorded reason — the failure it prevents — in a committed file outside `docs/specs/`, next to the Claude generator configuration; a rule with no nameable failure is removed or moved to the skill that needs it.
 7. Strong words (must / never / always / do not) are kept only for the human gates and the three hard limits; other rules use plain directive wording.
 
 **Added Acceptance Criteria**:
-- [ ] GIVEN the condensed `CLAUDE.md` WHEN a reviewer checks the research artifact THEN every always-on rule left in the file has one line naming the failure it prevents
-- [ ] GIVEN a rule for which no failure can be named WHEN the core is condensed THEN the rule is removed from `CLAUDE.md` or moved to the skill or prompt that uses it, and the research artifact records where it went
+- [ ] GIVEN the condensed `CLAUDE.md` WHEN a maintainer opens the repository on a fresh clone THEN a committed file outside `docs/specs/` lists every always-on rule with the failure it prevents, and the generated `CLAUDE.md` does not contain these reasons
+- [ ] GIVEN a rule for which no failure can be named WHEN the core is condensed THEN the rule is removed from `CLAUDE.md` or moved to the skill or prompt that uses it, and the reasons file records where it went
 - [ ] GIVEN the condensed `CLAUDE.md` WHEN a reader scans it THEN must / never / always / do not appear only in human-gate and hard-limit statements
 
-**High-Level Technical Notes**: Reasons live in `ac-92-optimize-claude-md.research.md`, not in `CLAUDE.md` itself (the file must stay short).
+**High-Level Technical Notes**: Reasons live in a committed file next to the Claude generator configuration (research picks the exact location), not in `CLAUDE.md` itself (the file must stay short) and not only in the research artifact (`docs/specs/` is gitignored on `master`). New always-on rules are added together with their reason. *(QR S-01)*
 
 **Priority**: High
 
@@ -109,6 +109,8 @@ Hierarchy (AC rule): Epic → Story AC-92 → Tasks AC-93–AC-98; Epic → Task
 **Added Acceptance Criteria**:
 - [ ] GIVEN a consumer project installed with `--vendor copy` from the local, unpushed framework working tree WHEN the maintainer runs the prompt set in a fresh Claude Code session there THEN readiness block, hard limits and the Fine QA draft behave as in the self-host run, and observed results are recorded for both runs
 - [ ] GIVEN the maintainer docs WHEN a maintainer prepares to push a change to the startup instructions THEN they are told to run the consumer check with `--vendor copy` before pushing (`--vendor submodule` needs pushed commits)
+- [ ] GIVEN a prompt in the set WHEN its observed result differs from the expected result THEN the change is not pushed until the instruction is fixed, or the expected result is updated on purpose with a one-line reason recorded next to it *(QR S-02)*
+- [ ] GIVEN an always-on rule is removed on purpose WHEN the change is prepared THEN the prompts that only checked that rule are removed from the set, or their expected result is updated, in the same change *(QR S-03)*
 - [ ] GIVEN the check is done WHEN a maintainer opens the repository on a fresh clone THEN the prompt set with expected results is present (committed, not under `docs/specs/`)
 - [ ] GIVEN a later change to `CLAUDE.md`, `agent-core.md` or the Claude generator WHEN the maintainer reads the maintainer docs THEN they are told to re-run the prompt set before merging
 - [ ] GIVEN an agent mistake traced to an instruction gap WHEN it is fixed THEN the maintainer docs say to add the triggering prompt and its expected result to the set
@@ -126,7 +128,7 @@ Hierarchy (AC rule): Epic → Story AC-92 → Tasks AC-93–AC-98; Epic → Task
 **Acceptance Criteria**:
 - [ ] GIVEN a Claude Code or framework upgrade WHEN the maintainer opens the maintainer docs THEN a checklist tells them to run the built-in health check and review its token, plugin and skill findings
 - [ ] GIVEN the checklist WHEN the maintainer follows it THEN it asks them to re-read every instruction line that describes state not visible in code (process, CI, merge rules, external services) and confirm it is still true
-- [ ] GIVEN the routine is done WHEN the maintainer records it THEN a dated entry lists what was removed or changed, or "no change"
+- [ ] GIVEN the routine is done WHEN the maintainer records it THEN a dated entry is added to a committed review log next to the rule-reasons file (AC-94), listing what was removed or changed, or "no change" *(QR S-06)*
 - [ ] GIVEN a consumer team reads the upgrade guide WHEN they finish an upgrade THEN the guide points them to the same checklist for their own instruction files
 
 **Additional Acceptance Checks**:
@@ -165,8 +167,9 @@ Hierarchy (AC rule): Epic → Story AC-92 → Tasks AC-93–AC-98; Epic → Task
 - [ ] GIVEN `AGENTS.md` WHEN it is compared with the repository THEN it no longer lists `docs/plans/` as a deliverable and describes `docs/specs/` gitignore scope as it is today
 - [ ] GIVEN `templates/AGENTS.template.md` and `docs/architecture/agents-md-standard.md` WHEN a consumer team builds its own `AGENTS.md` THEN both ask for fenced commands incl. single test, a structure map, and the same two testing boundaries
 - [ ] GIVEN the refreshed files WHEN their length is checked THEN `AGENTS.md` stays at or below its current 89 lines and links to deeper docs instead of repeating them
+- [ ] GIVEN the template changes ship WHEN a consumer reads `CHANGELOG.md` THEN an entry lists what changed in `templates/AGENTS.template.md` (fenced commands incl. single test, the two testing boundaries), says that an existing project `AGENTS.md` is not overwritten, and tells the team how to adopt the changes by hand *(QR S-04)*
 
-**High-Level Technical Notes**: Hard limits (scope, doc comments, dependencies) already live in `agent-core.md`; this Task adds the two testing boundaries to `AGENTS.md` and the template only.
+**High-Level Technical Notes**: Hard limits (scope, doc comments, dependencies) already live in `agent-core.md`; this Task adds the two testing boundaries to `AGENTS.md` and the template only. The installer creates `AGENTS.md` from the template only when missing (`scripts/lib/setup-agent-collections/scaffolding.sh`); consumer `.claude/CLAUDE.md` imports `@../AGENTS.md`, so its length also counts toward every Claude Code session's startup context. *(QR S-04)* Single-test commands are given per test suite (MCP: `node --import tsx/esm --test tests/<file>.test.ts` in `mcp/eversis-collections-mcp/`; generator test from AC-97; installer smoke test runs whole), in a form verified to work in this repo; the test-command section is finalized once AC-97 adds the root test script, the rest of the Task does not wait. *(QR S-05)*
 
 **Priority**: High
 
@@ -201,6 +204,7 @@ Hierarchy (AC rule): Epic → Story AC-92 → Tasks AC-93–AC-98; Epic → Task
 | Task 1.2 (A) | AC-98 | Related to | Routine points to the stored prompt set for re-checks |
 | Task 1.3 (B) | AC-95 | Related to | Both edit `eversis-fine-handoff`; avoid parallel edits |
 | Task 1.4 (C) | AC-3 | Related to | AC-3 deprecates `docs/plans/`; C removes it from `AGENTS.md` |
+| Task 1.4 (C) | AC-97 | Related to | AC-97 adds the root test script that C's single-test command refers to *(QR S-05)* |
 | AC-92 | AC-80 | Related to | Existing link, unchanged |
 | Task 1.5 (D) | AC-92 | Blocked by | Post needs the shipped `CLAUDE.md` numbers and mechanisms |
 | Task 1.5 (D) | AC-31 | Related to | Blog for framework change write-ups |
@@ -209,7 +213,7 @@ Hierarchy (AC rule): Epic → Story AC-92 → Tasks AC-93–AC-98; Epic → Task
 
 | # | Assumption | Confidence | Impact if Wrong |
 |---|-----------|------------|-----------------|
-| 1 | Re-typing AC-93–AC-98 to Task keeps their keys, descriptions and links | High | If Jira cannot convert in place, new Tasks are created and old Sub-tasks closed as duplicates |
+| 1 | ~~Re-typing AC-93–AC-98 to Task keeps their keys~~ — superseded 2026-10-30 at formatting: per `jira-backlog-hierarchy`, AC-93–AC-98 are replaced by new Tasks T1–T6 (parent = Epic, Relates AC-92); old Sub-tasks linked Duplicate, commented, closed Done | — | Keys change; see `jira-tasks.md` |
 | 2 | AC-92 can be re-typed Task → Story in project AC | Medium | If Story is not allowed, AC-92 stays a Task directly under the Epic and AC-93–AC-98 become sibling Tasks under the Epic with "Blocks" links |
 | 3 | `/doctor` remains available in Claude Code | High | Task A names the current health-check command instead |
 
