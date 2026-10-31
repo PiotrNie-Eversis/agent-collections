@@ -17,7 +17,7 @@ Epic (new) "Agent instruction files: lean and accurate"
 Old Sub-tasks AC-93–AC-98 → Duplicate link to T1–T6, comment, close Done
 ```
 
-## Sync summary (Gate 2 preview)
+## Sync summary (Gate 2 approved 2026-10-31 — pushed and verified)
 
 | Action | Items | Count |
 |---|---|---|
@@ -51,8 +51,8 @@ Labels used: `agent-collections`, `claude-code`, `instruction-files`, `token-bud
 ### Epic: Agent instruction files: lean and accurate
 
 **Issue Type**: Epic
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-123
+**Status**: Backlog
 **Priority**: High
 
 **Description**:
@@ -105,8 +105,8 @@ h2. Sources
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates AC-92; Duplicate of → closes AC-93; Blocked by T3
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-124
+**Status**: Backlog
 **Priority**: High
 **Sizing Guidance**: Medium (5-8)
 
@@ -120,8 +120,8 @@ h2. Sources
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates AC-92; Duplicate of → closes AC-94; Blocked by T3
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-125
+**Status**: Backlog
 **Priority**: High
 **Sizing Guidance**: Medium (5-8)
 
@@ -171,8 +171,8 @@ agent-core.md is not edited (option B), so the Claude adapter produces the conde
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates AC-92; Duplicate of → closes AC-95; Blocks T1, T2
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-126
+**Status**: Backlog
 **Priority**: High
 **Sizing Guidance**: Small (1-3)
 
@@ -186,8 +186,8 @@ agent-core.md is not edited (option B), so the Claude adapter produces the conde
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates AC-92; Duplicate of → closes AC-96; Blocked by T1, T2
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-127
+**Status**: Backlog
 **Priority**: High
 **Sizing Guidance**: Medium (5-8)
 
@@ -201,8 +201,8 @@ agent-core.md is not edited (option B), so the Claude adapter produces the conde
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates AC-92; Duplicate of → closes AC-97; Blocked by T1, T2
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-128
+**Status**: Backlog
 **Priority**: Medium
 **Sizing Guidance**: Small (1-3)
 
@@ -216,8 +216,8 @@ agent-core.md is not edited (option B), so the Claude adapter produces the conde
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates AC-92; Duplicate of → closes AC-98; Blocked by T1–T5
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-129
+**Status**: Backlog
 **Priority**: Medium
 **Sizing Guidance**: Medium (5-8)
 
@@ -270,8 +270,8 @@ Manual run; where possible, run the same prompts on the pre-change file for comp
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates T6
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-130
+**Status**: Backlog
 **Priority**: Medium
 **Sizing Guidance**: Small (1-3)
 
@@ -328,8 +328,8 @@ Documentation only; no new tooling. Source: PostHog — /doctor trimmed ~350 tok
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates T3 (both edit eversis-fine-handoff)
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-131
+**Status**: Backlog
 **Priority**: Medium
 **Sizing Guidance**: Small (1-3)
 
@@ -386,8 +386,8 @@ Lives in eversis-fine-handoff; follows the "own approval" pattern of the optiona
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Relates AC-3; Relates T5
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-132
+**Status**: Backlog
 **Priority**: High
 **Sizing Guidance**: Medium (5-8)
 
@@ -446,8 +446,8 @@ Hard limits (scope, doc comments, dependencies) stay in agent-core.md; this Task
 
 **Parent**: Agent instruction files: lean and accurate · **Links**: Blocked by AC-92; Relates AC-31
 **Issue Type**: Task
-**Jira Key**: —
-**Status**: —
+**Jira Key**: AC-133
+**Status**: Backlog
 **Priority**: Low
 **Sizing Guidance**: Small (1-3)
 

@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Project | AC (current) and DHI (historical; was TASK — Jira project re-keyed; TASK-* rows below are stale/unverified against current Jira, kept for history) |
-| Last Refreshed | 2026-10-27 |
+| Last Refreshed | 2026-10-31 |
 | Primary Source of Truth | Jira |
 | Notes | Full backlog under epic TASK-515 (children are Tasks, converted from Story 2026-07-31); spec-driven delivery mandatory; docs of agent-collections and cursor-collections fully separated. TASK-515's live Jira equivalent (DHI-515, "Multi-Agent AI Context Isolation & Standard") is now status **Done** — new epic **DHI-641** was created 2026-09-04 as a sibling, not a child, for follow-on docs UX/UI work. New Agent Collections backlog lives in project **AC**. |
 
@@ -20,6 +20,7 @@
 | AC-63 | Getting Started MCP Setup: guided onboarding and DevEx recovery | Highest | Backlog | `docs/specs/mcp-setup-ux-recovery/` |
 | AC-72 | Getting Started Installation: guided onboarding and DevEx recovery | Highest | Backlog | `docs/specs/installation-ux-recovery/` |
 | AC-91 | Integrations: Optional Chrome DevTools for diagnosis and performance | High | Backlog | `docs/specs/chrome-devtools-mcp/` |
+| AC-123 | Agent instruction files: lean and accurate | High | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
 
 ## Current Tasks
 
@@ -98,6 +99,18 @@
 | AC-88 | AC-83 | Engineer can follow a written split of browser jobs | High | Backlog (Sub-task, assignee: Piotr Niemirski) | `docs/specs/chrome-devtools-mcp/` |
 | AC-89 | AC-84 | Engineer can get a performance trace before optimization advice | Medium | Backlog (Sub-task, assignee: Piotr Niemirski) | `docs/specs/chrome-devtools-mcp/` |
 | AC-90 | AC-84 | Engineer can optimize without a missing Chrome DevTools tool | Medium | Backlog (Sub-task, assignee: Piotr Niemirski) | `docs/specs/chrome-devtools-mcp/` |
+| AC-92 | AC-123 | Claude Code: Thin-root CLAUDE.md with phase rules loaded on demand (Story; groups AC-124–AC-129 via Relates) | High | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-124 | AC-123 (Relates AC-92; replaces AC-93) | Claude Code user starts sessions without phase-only rules loaded | High | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-125 | AC-123 (Relates AC-92; replaces AC-94) | Claude Code user gets the lifecycle, gates and hard limits stated once | High | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-126 | AC-123 (Relates AC-92; replaces AC-95) | Agent finds phase procedures in the skills that run them | High | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-127 | AC-123 (Relates AC-92; replaces AC-96) | Consumer team keeps a working install with the thin root | High | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-128 | AC-123 (Relates AC-92; replaces AC-97) | Maintainer gets an automated guard on the startup file | Medium | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-129 | AC-123 (Relates AC-92; replaces AC-98) | Maintainer can show Claude Code still follows the gates | Medium | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-130 | AC-123 | Maintainer re-checks instruction files after each upgrade | Medium | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-131 | AC-123 | Agent reports instruction friction at Fine | Medium | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-132 | AC-123 | AGENTS.md reads as an operating manual | High | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-133 | AC-123 (blocked by AC-92) | Reader learns why and how the framework slimmed its agent instruction files (blog) | Low | Backlog (assignee: Piotr Niemirski) | `docs/specs/ac-92-optimize-claude-md/` |
+| AC-93 – AC-98 | AC-92 | Former Sub-tasks of AC-92 — replaced by AC-124–AC-129 (Duplicate links) | — | Done (closed as duplicates 2026-10-31) | `docs/specs/ac-92-optimize-claude-md/` |
 
 ## Session Archive Index
 
@@ -114,3 +127,4 @@
 | `docs/specs/mcp-setup-ux-recovery/` | 2026-10-14 — UX audit of `/docs/getting-started/mcp-setup` → Epic AC-63 + Tasks AC-64–AC-71. Gate 0 skipped (unambiguous); Gate 1 locked (no Claude Desktop tab; English-only; new AC epic). Lite QR S-01–S-04 accepted. Post-push verification passed (parent AC-63, Task type, Relates AC-37/AC-38, Blocks AC-66→67→68). |
 | `docs/specs/installation-ux-recovery/` | 2026-10-14 — UX audit of `/docs/getting-started/installation` → Epic AC-72 + Tasks AC-73–AC-79. Gate 0 skipped (unambiguous); Gate 1 locked (new AC epic; Git Bash primary; English-only). Lite QR S-01–S-03 accepted. Post-push verification passed (parent AC-72, Task type, Relates AC-63/AC-37/AC-38/DHI-649, Blocks AC-74+AC-75→AC-76→AC-77). |
 | `docs/specs/chrome-devtools-mcp/` | 2026-10-15 — Optional Chrome DevTools MCP catalog. Epics AC-82–AC-84 and Tasks AC-85–AC-90. Gate 0 approved; Gate 1 all six tasks; Lite QR S-01–S-04 accepted. Issue type Task. Assignee Piotr Niemirski. Post-push verification passed (parents AC-82/83/84, status Backlog, Blocks AC-82→83→84 and AC-86→88→89, Relates AC-85–86, AC-85–87, AC-89–90). |
+| `docs/specs/ac-92-optimize-claude-md/` | 2026-10-30/31 — Analyzed PostHog "Your AGENTS.md is holding you back" and ColdTea AGENTS.md field study against AC-92. Gate 0 approved (extend AC-94/AC-98; new epic; fix hierarchy). New Epic AC-123; AC-92 re-typed Task → Story under AC-123; Sub-tasks AC-93–AC-98 replaced by Tasks AC-124–AC-129 (Relates AC-92, Duplicate links, old closed Done) per `jira-backlog-hierarchy`; new Tasks AC-130 (upkeep after upgrades), AC-131 (Fine friction note), AC-132 (AGENTS.md operating manual), AC-133 (blog). Lite QR S-01–S-06 accepted. Post-push verification passed (types, parents, priorities, status, AC sections, Blocks/Relates/Duplicate links). |
