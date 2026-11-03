@@ -115,6 +115,31 @@ This is the recommended path for most users (including QA, BA, and PO). You do *
 The root **README** install snippet is a **Cursor-only** minimal example (`--agents=cursor`, with `--build-mcp` optional). This page’s recommended command installs **Cursor and Claude Code** and includes `--build-mcp` for a first successful MCP image build. Use this page (including the Windows / Git Bash tabs) for the guided path.
 :::
 
+### Add the Pi coding agent (optional) {#pi-coding-agent}
+
+The [Pi coding agent](https://pi.dev/) (a terminal AI coding agent) is supported as an opt-in third agent. Add `pi` to `--agents` — for example `--agents=cursor,claude,pi`, or `--agents=pi` on its own. In the interactive wizard, tick **`pi — Pi coding agent (pi.dev)`** (numbered menu: `6) Pi only` or `7) Cursor + Claude + Pi`).
+
+With Pi selected, the installer writes a `.pi/` folder in your project:
+
+| Path | What it gives you |
+| --- | --- |
+| `.pi/APPEND_SYSTEM.md` | Always-on framework rules (agent core, testing and terminal, accessibility), plus your customised `.cursor/rules/eversis-project-stack.mdc` once it differs from the template |
+| `.pi/prompts/eversis-*.md` | `/eversis-implement`, `/eversis-review` and the other framework slash commands |
+| `.pi/skills/` | All framework skills (`eversis-*`) plus role-rule skills (`eversis-rule-*`, loaded with `/skill:<name>`) |
+| `.pi/extensions/eversis-context-budget.ts` | Context budget — compacts the session once when context use crosses **50%** of the model window and resumes an interrupted task ([details](#pi-context-budget)) |
+| `.pi/mcp.json` | The `eversis-collections` MCP server — see [MCP Setup](./mcp-setup) |
+| `.pi/settings.json` | Seeded once; yours to edit afterwards |
+
+Then start `pi` in the project root and **grant project trust** when Pi asks — Pi loads `.pi/` only for trusted projects. After any later re-sync, run `/reload` in an open Pi session. Keep a root `AGENTS.md` so Pi does not also load the generated `CLAUDE.md`.
+
+If the `pi` command is not installed yet, the installer still writes `.pi/` and only shows a warning (`npm i -g @earendil-works/pi-coding-agent`). If the Pi part of the install fails, the other agents are still installed, `pi` is left out of `.agent-collections/install-selection.json`, the summary says **`agent-collections setup completed with failures (pi)`**, and the run exits with code 1 — fix the reported cause and re-run with the same `--agents`.
+
+#### Context budget (Pi only) {#pi-context-budget}
+
+Long sessions get slower and less accurate as the context window (the model's working memory) fills up. On Pi, the framework's extension compacts (summarises) the session **once** when context use crosses 50%. The summary keeps the active plan file, the current plan task, the latest `CHECKPOINT:` row and any open approval gate. If the agent was in the middle of a task, it gets one automatic message to resume that task; if it had just finished, asked a question or stopped at a gate, the session is only compacted — nothing is treated as your approval. Change the threshold with `EVERSIS_CONTEXT_BUDGET_PERCENT` (1–95). Cursor and Claude Code do not get this trigger: in those tools a filling window is not a reason to stop or compact.
+
+Pi ignore files, subscription sign-in and an isolated workspace are not part of this release yet. Adapter details: [`adapters/pi/README.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/adapters/pi/README.md).
+
 You can also pass `--target /path/to/your-project` if you prefer not to `cd` into the consumer repo first. Selection is written to **`.agent-collections/install-selection.json`** (schema: [install-selection.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/install-selection.md)).
 
 ## Step 3 — Verify installation
@@ -126,6 +151,7 @@ Confirm the install worked in your **consumer project** before you leave for MCP
 1. File **`.agent-collections/install-selection.json`** exists in the project root.
 2. Domain-context index **`docs/context/<project>/INDEX.md`** exists (the installer creates it if it was missing).
 3. The installer finished without critical errors (exit code **0** / clean completion message).
+4. **Pi only** (when you selected it): `.pi/APPEND_SYSTEM.md` and `.pi/prompts/eversis-implement.md` exist.
 
 **If something is missing**, check this short recovery list before continuing:
 
@@ -133,7 +159,7 @@ Confirm the install worked in your **consumer project** before you leave for MCP
 - **`AGENT_COLLECTIONS_HOME`** points at your framework checkout (re-export it in the same shell if needed).
 - **Docker** is running — see [Prerequisites](./prerequisites).
 
-When those checks pass, go to **[MCP Setup](./mcp-setup)** to connect tools in your editor (Cursor or Claude Code).
+When those checks pass, go to **[MCP Setup](./mcp-setup)** to connect tools in your editor (Cursor, Claude Code, or Pi).
 
 <details>
 <summary><strong>Optional: try install in a temporary sample folder</strong></summary>
@@ -216,7 +242,7 @@ Then re-run `--upgrade --sync` (and `--build-mcp` if the MCP server itself chang
 | Flag | Purpose |
 | --- | --- |
 | `--build-mcp` | Force rebuild of the `eversis-collections` Docker image (also builds when the image doesn't exist yet). Does **not** gate the interactive MCP server checklist. |
-| `--agents` | `cursor`, `claude`, `opencode` (opencode = placeholder) |
+| `--agents` | `cursor`, `claude`, `pi`, `opencode` (opencode = placeholder; pi = [Pi coding agent](#pi-coding-agent)) |
 | `--mcp-servers` | Comma-separated ids; without it + `--non-interactive` → `eversis-collections` only |
 | `--profile` | `frontend` \| `backend` \| `fullstack` |
 | `--link-mode` | `auto` \| `symlink` \| `copy` |
@@ -236,14 +262,15 @@ Interactive runs (TTY, without `--non-interactive`) prompt for agents × domain 
 <details>
 <summary><strong>Skills, prompts, and stack customisation (MVP)</strong></summary>
 
-- **Skills** resolve from **`.ai/skills/`** (SSOT). Prefer MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or read `SKILL.md` directly. Both adapters also get a local mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Claude Code can use its native skills mirror without MCP.
-- **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced. Both adapters generate thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`).
+- **Skills** resolve from **`.ai/skills/`** (SSOT). Prefer MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or read `SKILL.md` directly. Both adapters also get a local mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Claude Code can use its native skills mirror without MCP. Pi gets the same mirror under `.pi/skills/eversis-*/` when selected.
+- **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced. Both adapters generate thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`). Pi gets prompt templates under `.pi/prompts/` (installer with `--agents=…,pi`).
 - **Domain context** (durable, cross-task knowledge — see [Domain Context (SSOT)](../domain-context)) is scaffolded on **every** install: `docs/context/<project>/INDEX.md` is created if missing. If `--ssot-source` is reachable, the installer also best-effort seeds `docs/context/global/` from it — this step never blocks or fails the install.
 
 | Channel | Customise |
 | --- | --- |
 | Cursor | `.cursor/rules/eversis-project-stack.mdc` |
 | Claude Code | `.claude/CLAUDE.md` (seeded once, never overwritten — do not hand-edit generated `CLAUDE.md`; Claude Code does not auto-read `AGENTS.md`) |
+| Pi | `.cursor/rules/eversis-project-stack.mdc` — appended to `.pi/APPEND_SYSTEM.md` on the next sync once it differs from the template |
 
 </details>
 

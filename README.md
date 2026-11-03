@@ -51,7 +51,7 @@ Canonical content lives under **`.ai/`**. Adapters, the installer, and MCP **con
 
 ### Infrastructure
 
-- **Adapters** — Cursor, Claude Code, and OpenCode (placeholder) under `adapters/`.
+- **Adapters** — Cursor, Claude Code, Pi (opt-in), and OpenCode (placeholder) under `adapters/`.
 - **MCP** — local **`eversis-collections`** skills server plus optional Atlassian, Figma, Context7, Playwright, and related integrations.
 - **Installer** — `scripts/setup-agent-collections.sh` (local / submodule / copy).
 
@@ -61,7 +61,7 @@ Canonical content lives under **`.ai/`**. Adapters, the installer, and MCP **con
 
 ## Prerequisites
 
-- **Agent tool:** [Cursor](https://cursor.com/) and/or Claude Code (OpenCode packaging is placeholder only).
+- **Agent tool:** [Cursor](https://cursor.com/), Claude Code and/or the [Pi coding agent](https://pi.dev/) (`npm i -g @earendil-works/pi-coding-agent`) (OpenCode packaging is placeholder only).
 - **Docker Engine + Compose v2** — to **run** the local **`eversis-collections`** MCP server.
 - **Node.js** ≥ 18 — needed only to **develop** the **`eversis-collections`** MCP package itself, not to run it.
 - **Git** — clone and consumer install.
@@ -158,7 +158,7 @@ npm run sync:adapters:check
 
 6. Try a short task: load **`eversis-implement`** with a ticket id or a sentence describing the work.
 
-**Skills UX:** Prefer MCP **`eversis-collections`** + load-by-id under `.ai/skills/` / `.ai/prompts/`. Both adapters also mirror skill packages under `.cursor/skills/eversis-*` and `.claude/skills/eversis-*` (framework sync / installer) for direct file read or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. The Cursor adapter generates thin `/eversis-*` slash shims under `.cursor/commands/` from `.ai/prompts` (stable id remains SSOT).
+**Skills UX:** Prefer MCP **`eversis-collections`** + load-by-id under `.ai/skills/` / `.ai/prompts/`. Both adapters also mirror skill packages under `.cursor/skills/eversis-*` and `.claude/skills/eversis-*` (and `.pi/skills/eversis-*` when Pi is selected) (framework sync / installer) for direct file read or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. The Cursor adapter generates thin `/eversis-*` slash shims under `.cursor/commands/` from `.ai/prompts` (stable id remains SSOT).
 
 First successful install checklist: [Start here](./website/docs/getting-started/start-here.md).
 
@@ -192,10 +192,22 @@ Interactive wizard (TTY) prompts for agents × domain profile × MCP servers —
 
 Selection is recorded at `.agent-collections/install-selection.json` (schema: [`docs/architecture/install-selection.md`](./docs/architecture/install-selection.md)) — required for `--upgrade`.
 
-**Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `AGENTS.md` (do not hand-edit generated `CLAUDE.md`).
+**Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `AGENTS.md` (do not hand-edit generated `CLAUDE.md`); Pi → the same `eversis-project-stack.mdc`, appended to `.pi/APPEND_SYSTEM.md` once it differs from the template.
 Full install guide (including Windows): [Installation](./website/docs/getting-started/installation.mdx).
 
 Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`): [Migration guide](./website/docs/advanced/migration-from-cursor-collections.md).
+
+### Pi coding agent (opt-in)
+
+Add `pi` to `--agents` (for example `--agents=cursor,claude,pi`, or `--agents=pi` alone; interactive menu `6) Pi only` / `7) Cursor + Claude + Pi`). The installer then writes, from `.ai/`:
+
+- `.pi/APPEND_SYSTEM.md` — always-on rules (agent core, testing and terminal, accessibility).
+- `.pi/prompts/eversis-*.md` — `/eversis-*` slash commands.
+- `.pi/skills/eversis-*/` — framework skills mirror, plus `eversis-rule-*` role-rule skills.
+- `.pi/extensions/eversis-context-budget.ts` — compacts the session once when context use crosses 50% (`EVERSIS_CONTEXT_BUDGET_PERCENT`, 1–95) and resumes an interrupted task. Pi-only: Cursor and Claude Code keep "window fill is not a trigger".
+- `.pi/settings.json` (seeded once) and `.pi/mcp.json` (`eversis-collections`; check with `pi mcp list`).
+
+Start `pi` in the project root and grant **project trust** (Pi loads `.pi/` only for trusted projects); run `/reload` after a re-sync. Keep a root `AGENTS.md` so Pi does not also load `CLAUDE.md`. Pi runs as an isolated install stage: a Pi failure keeps the other agents' output, leaves `pi` out of the recorded selection and exits 1 (`agent-collections setup completed with failures (pi)`). A missing `pi` CLI is only a warning. Pi ignore files, subscription sign-in and an isolated workspace are not part of this release. Details: [`adapters/pi/README.md`](./adapters/pi/README.md).
 
 ### Upgrade
 
@@ -205,9 +217,9 @@ bash scripts/setup-agent-collections.sh --upgrade --sync --non-interactive
 
 Reuses agents / MCP / profile / vendor / link / `ssot.externalSsotRepo` (and `ssot.confluenceSpaceKey`) from selection. Omit `--ssot-source` to keep the recorded domain-context URL; pass an empty value (`--ssot-source ""` or `--ssot-source=`) to clear it. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths are not overwritten without opt-in (see below).
 
-Per-field contract (`--upgrade`, and `--sync` whenever the record exists): an explicit `--agents`, `--mcp-servers`, `--profile`, `--vendor` or `--link-mode` **replaces** the recorded value (spaces in lists are ignored); an omitted flag **keeps** it. An explicit empty `--vendor=` (or `--vendor ""`) also counts as an override and switches a recorded `submodule` / `copy` install to `local` mode. Without `--agents`, adapters whose framework-generated files are already on disk (marker-bearing `CLAUDE.md` / `.claude/commands/eversis-*.md`, `.cursor/commands/eversis-*.md` / `.cursor/rules/eversis-*.mdc`) are kept even if the record lacks them; a hand-written `CLAUDE.md` does not enable Claude.
+Per-field contract (`--upgrade`, and `--sync` whenever the record exists): an explicit `--agents`, `--mcp-servers`, `--profile`, `--vendor` or `--link-mode` **replaces** the recorded value (spaces in lists are ignored); an omitted flag **keeps** it. An explicit empty `--vendor=` (or `--vendor ""`) also counts as an override and switches a recorded `submodule` / `copy` install to `local` mode. Without `--agents`, adapters whose framework-generated files are already on disk (marker-bearing `CLAUDE.md` / `.claude/commands/eversis-*.md`, `.cursor/commands/eversis-*.md` / `.cursor/rules/eversis-*.mdc`, `.pi/APPEND_SYSTEM.md`) are kept even if the record lacks them; a hand-written `CLAUDE.md` does not enable Claude.
 
-Without `--mcp-servers` the run is in **preserve mode**: every server already in `.cursor/mcp.json` and `.mcp.json` stays in its own file with its config unchanged (only `eversis-collections` is regenerated, because its command depends on host, vendor mode and framework path); recorded servers missing from a file are added from the template; nothing is removed, and Claude keeps catalog servers found in `.mcp.json` enabled. Preserved-only servers are **not** written back to the record. To re-template servers or deselect them, pass the full list explicitly with `--mcp-servers`. This also applies to entries written by older installers in Cursor-only syntax (`${env:X}`, `${workspaceFolder}`) in `.mcp.json`: preserve mode keeps them as they are, and only an explicit `--mcp-servers` run rewrites them into Claude Code syntax.
+Without `--mcp-servers` the run is in **preserve mode**: every server already in `.cursor/mcp.json` and `.mcp.json` (and `.pi/mcp.json` for Pi) stays in its own file with its config unchanged (only `eversis-collections` is regenerated, because its command depends on host, vendor mode and framework path); recorded servers missing from a file are added from the template; nothing is removed, and Claude keeps catalog servers found in `.mcp.json` enabled. Preserved-only servers are **not** written back to the record. To re-template servers or deselect them, pass the full list explicitly with `--mcp-servers`. This also applies to entries written by older installers in Cursor-only syntax (`${env:X}`, `${workspaceFolder}`) in `.mcp.json`: preserve mode keeps them as they are, and only an explicit `--mcp-servers` run rewrites them into Claude Code syntax.
 
 ---
 
@@ -271,7 +283,7 @@ MCP (Model Context Protocol) unlocks Jira, Figma, library docs, browser automati
 
 ### Default — workspace configuration (installer)
 
-The installer writes catalog servers into the **project** file (`.cursor/mcp.json` for Cursor, `.mcp.json` for Claude Code). Cursor Settings → MCP labels that copy with the **project folder name**.
+The installer writes catalog servers into the **project** file (`.cursor/mcp.json` for Cursor, `.mcp.json` for Claude Code, `.pi/mcp.json` for Pi). Cursor Settings → MCP labels that copy with the **project folder name**.
 
 Do **not** also merge those same catalog ids into Cursor **User** config (`~/.cursor/mcp.json`, badge **User**). Cursor loads both files; Settings shows **User vs** the project folder name for each duplicate, and two processes start (`eversis-collections` would then point at the wrong tree).
 
@@ -290,7 +302,7 @@ docker compose build eversis-collections
 Enable **`eversis-collections`** in Settings → MCP and restart the agent tool.
 
 - **Skills** — `eversis_skills_list` / `eversis_skills_get` load `.ai/skills/`
-- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the consumer project mounted as `/workspace` via `CONSUMER_PROJECT_ROOT`, not just `AGENT_COLLECTIONS_HOME`. Cursor: the installer writes `${workspaceFolder}` into MCP `env`. Vendored Claude Code: committed `scripts/run-eversis-collections-mcp.sh` sets `CONSUMER_PROJECT_ROOT` from the script location (parent of `scripts/`). Absolute (non-vendored) Claude Code still uses MCP `env` `${CLAUDE_PROJECT_DIR:-.}`. Compose falls back to `${PWD}` only when that root is unset
+- **Domain context** — `eversis_context_get` / `eversis_context_list` / `eversis_context_sync` read/refresh consumer-project domain knowledge under `docs/context/` (project-level and shared `domain-context`, when configured with `--ssot-source`); requires the consumer project mounted as `/workspace` via `CONSUMER_PROJECT_ROOT`, not just `AGENT_COLLECTIONS_HOME`. Cursor: the installer writes `${workspaceFolder}` into MCP `env`. Vendored Claude Code: committed `scripts/run-eversis-collections-mcp.sh` sets `CONSUMER_PROJECT_ROOT` from the script location (parent of `scripts/`). Absolute (non-vendored) Claude Code still uses MCP `env` `${CLAUDE_PROJECT_DIR:-.}`. Pi: a `bash -c` locator walks up from `$PWD` to the directory containing `.pi/` and sets `CONSUMER_PROJECT_ROOT` there (vendored: via the same wrapper script). Compose falls back to `${PWD}` only when that root is unset
 - **Word tools** — used by BA docs prompts when that workflow is in scope
 - Tool reference: [`mcp/eversis-collections-mcp/README.md`](./mcp/eversis-collections-mcp/README.md)
 
@@ -354,6 +366,7 @@ Re-run the installer with a **smaller** `--agents` or `--mcp-servers` list (or c
 | **MCP servers** | With an explicit `--mcp-servers`, framework-managed (catalog) entries not in the list are **removed** from `.cursor/mcp.json` and `.mcp.json`, and listed ones are re-templated (consumer-added servers outside the catalog are kept). Without `--mcp-servers` on upgrade / sync, existing entries in both files are kept unchanged. |
 | **Slash commands** | `npm run sync:adapters` / installer adapter sync **removes orphan** generated `eversis-*.md` under `.cursor/commands/`. |
 | **Claude omitted** | Framework-generated **`CLAUDE.md`** and triad **`.claudeignore`** are removed when Claude is not in `--agents` (project-edited files are left in place). On upgrade / sync without `--agents`, Claude stays selected while generated Claude files exist. |
+| **Pi omitted** | When Pi is explicitly omitted from `--agents`, framework-generated `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-*.md`, `.pi/skills/eversis-*` (framework skills and `eversis-rule-*` role skills) and `.pi/extensions/eversis-context-budget.ts` are removed; `.pi/settings.json`, `.pi/mcp.json` and hand-written files stay. On upgrade / sync without `--agents`, Pi stays selected while the generated `.pi/APPEND_SYSTEM.md` exists. |
 | **Hand-written `CLAUDE.md`** | When Claude is enabled and a root `CLAUDE.md` lacks the generator marker, it is copied to **`CLAUDE.md.pre-agent-collections.bak`** (or a timestamped `.bak` if a different backup already exists) before regeneration, with a warning. Move project-specific instructions into `.claude/CLAUDE.md`; do not commit the `.bak`. |
 | **Cursor rules** | Regenerated for the remaining agents; **`eversis-project-stack.mdc`** is never overwritten without opt-in. When Cursor is explicitly omitted from `--agents`, framework-generated `.cursor/rules/eversis-*.mdc` and `.cursor/commands/eversis-*.md` (generator marker) are removed; `eversis-project-stack.mdc` and hand-written files stay. |
 
@@ -381,7 +394,7 @@ Primary prompt entry = stable ids (`eversis-implement`, `eversis-review`). Optio
 
 ```text
 .ai/                 # SSOT — rules, skills, prompts
-adapters/             # cursor, claude, opencode + sync.mjs + profiles/
+adapters/             # cursor, claude, pi, opencode + sync.mjs + profiles/
 mcp/                  # eversis-collections-mcp (skills from .ai/skills)
 scripts/              # setup-agent-collections.sh
 templates/            # AGENTS, stack, mcp.json seeds
