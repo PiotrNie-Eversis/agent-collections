@@ -50,7 +50,6 @@ Empirical pilot notes live under `docs/context/<project>/` when present.
 | ----------- | ---------------------------------------------------------- | ----------------------------------------------------- |
 | Cursor      | `.cursor/rules/*.mdc`, `.cursor/commands/*.md`             | MCP → `.ai/skills`                                    |
 | Claude Code | `CLAUDE.md`, `.claude/rules/*.md`, `.claude/commands/*.md` | Native `.claude/skills/` (linked by installer) or MCP |
-| Pi          | `.pi/APPEND_SYSTEM.md`, `.pi/prompts/*.md` (opt-in; no Pi ignore file yet — AC-113) | Native `.pi/skills/` (linked by installer) or MCP |
 | OpenCode    | Placeholder config                                         | Deferred                                              |
 
 See also [adapter mapping](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/adapter-mapping.md) and [Migration](./advanced/migration-from-cursor-collections).

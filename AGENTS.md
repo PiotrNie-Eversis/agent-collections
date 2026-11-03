@@ -5,9 +5,9 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 ## Framework
 
 - **Core SSOT:** `.ai/` — rules, skills, prompts (see [`.ai/README.md`](./.ai/README.md))
-- **Adapters:** [`adapters/`](./adapters/) — Cursor, Claude Code, Pi (opt-in, [`adapters/pi/`](./adapters/pi/README.md)), OpenCode placeholder; refresh with `node adapters/sync.mjs` (optional `--agents cursor,claude`; add `pi` with `--out <dir>` to generate `.pi/` — none is committed here)
+- **Adapters:** [`adapters/`](./adapters/) — Cursor, Claude Code, OpenCode placeholder; refresh with `node adapters/sync.mjs` (optional `--agents cursor,claude`)
 - **Domain / area profiles:** [`adapters/profiles/`](./adapters/profiles/) — Frontend / Backend / Fullstack + area globs
-- **Installer:** [`scripts/setup-agent-collections.sh`](./scripts/setup-agent-collections.sh) — local / submodule / copy; `--agents` cursor, claude, pi (opencode = placeholder); selection at `.agent-collections/install-selection.json`
+- **Installer:** [`scripts/setup-agent-collections.sh`](./scripts/setup-agent-collections.sh) — local / submodule / copy; selection at `.agent-collections/install-selection.json`
 - **MCP:** package [`mcp/eversis-collections-mcp/`](./mcp/eversis-collections-mcp/); server id **`eversis-collections`**; env **`AGENT_COLLECTIONS_HOME`**; skills resolve from `.ai/skills/`
 - **Orchestration:** [`.ai/rules/orchestration/agent-core.md`](./.ai/rules/orchestration/agent-core.md) + [`spec-driven-development.md`](./.ai/rules/orchestration/spec-driven-development.md); load `engineering-manager` for Implement
 - **Prompts:** load by stable id under [`.ai/prompts/`](./.ai/prompts/) (e.g. `eversis-implement`, `eversis-review`)
@@ -87,12 +87,3 @@ On the **Cursor** channel, Implement can be started by stable id, `@` attach, or
 - `/eversis-review` — **standalone** code review (or re-review); optional when you want a review-only chat
 
 Slash files are thin HYBRID shims (SSOT pointer + Executable section). They are **not** used by Claude Code.
-
-## Channel notes (Pi)
-
-Optional. Applies to consumer projects installed with `--agents=…,pi` (this repository does not commit a `.pi/` tree).
-
-- Always-on rules come from generated `.pi/APPEND_SYSTEM.md`; role rules load on demand as `/skill:eversis-rule-*`; framework skills are mirrored under `.pi/skills/eversis-*/`.
-- `/eversis-implement`, `/eversis-review`, … — prompt templates generated under `.pi/prompts/` (same SSOT as above).
-- Pi loads `.pi/` only after project trust; run `/reload` after a re-sync. Keep this root `AGENTS.md` so Pi does not also load `CLAUDE.md`.
-- The context-budget extension compacts once at ~50% of the context window (Pi-only). See [`adapters/pi/README.md`](./adapters/pi/README.md).

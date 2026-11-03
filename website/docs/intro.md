@@ -12,7 +12,7 @@ AI agents are only as good as the process you give them. Left to guess, they ski
 
 > **Ideate → Research → Plan → Implement → Review → Fine**
 
-Under the hood, it's a **vendor-neutral multi-agent** product engineering framework — core rules, skills, and prompts under **`.ai/`** (the project's [SSOT](./reference/glossary#ssot)), packaged by [adapters](./reference/glossary#adapters) for Cursor, Claude Code, the [Pi coding agent](https://pi.dev/) (opt-in), and (placeholder) OpenCode.
+Under the hood, it's a **vendor-neutral multi-agent** product engineering framework — core rules, skills, and prompts under **`.ai/`** (the project's [SSOT](./reference/glossary#ssot)), packaged by [adapters](./reference/glossary#adapters) for Cursor, Claude Code, and (placeholder) OpenCode.
 
 Maintained by [Eversis](https://eversis.com).
 
@@ -40,7 +40,7 @@ Build this site locally (`cd website && npm run build`). **Public hosting is def
 | Layer | Location | Role |
 |-------|----------|------|
 | **Core SSOT** | `.ai/rules`, `.ai/skills`, `.ai/prompts` | Canonical content |
-| **Adapters** | `adapters/cursor`, `adapters/claude`, `adapters/pi`, `adapters/opencode` | Tool packaging + `sync.mjs` |
+| **Adapters** | `adapters/cursor`, `adapters/claude`, `adapters/opencode` | Tool packaging + `sync.mjs` |
 | **Installer** | `scripts/setup-agent-collections.sh` | Local / submodule / copy into consumers |
 | **[MCP](./reference/glossary#mcp)** | `mcp/eversis-collections-mcp` | Skills tools via `AGENT_COLLECTIONS_HOME`, plus **domain context** tools (`eversis_context_*`, see [Domain Context (SSOT)](./domain-context)) via a second, independent volume |
 
@@ -55,11 +55,9 @@ Build this site locally (`cd website && npm run build`). **Public hosting is def
 
 Prefer MCP **`eversis-collections`** and stable prompt ids under `.ai/prompts/`. Both adapters also get a local skills mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Both adapters generate thin `/eversis-*` shims — `.cursor/commands/` and `.claude/commands/` respectively — from `.ai/prompts` (TASK-598). Claude Code can use its native skills mirror without MCP.
 
-**Pi (opt-in):** choose `pi` at install time and the installer writes a `.pi/` folder — always-on rules in `.pi/APPEND_SYSTEM.md`, `/eversis-*` prompt templates in `.pi/prompts/`, the skills mirror plus role-rule skills in `.pi/skills/`, the `eversis-collections` MCP server in `.pi/mcp.json`, and a context-budget extension that compacts the session once it is about half full (a Pi-only feature). Pi reads `.pi/` only after you trust the project. See [Installation](./getting-started/installation).
-
 ## Multi-agent and isolation
 
-Use Cursor and/or Claude Code in the same monorepo with [isolation](./isolation) (cross-tool ignore + area profiles). Pi can sit alongside them; Pi ignore files are not shipped yet, so isolation currently covers Cursor, Claude Code and OpenCode. Abstract paths stay `apps/web` / `apps/api`; map consumer folder names locally.
+Use Cursor and/or Claude Code in the same monorepo with [isolation](./isolation) (cross-tool ignore + area profiles). Abstract paths stay `apps/web` / `apps/api`; map consumer folder names locally.
 
 ## Migrating from Cursor Collections
 

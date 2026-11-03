@@ -12,7 +12,7 @@ import TabItem from "@theme/TabItem";
 Configure **Model Context Protocol (MCP)** — the connection that lets your AI editor call project tools, skill packages, and (later) optional services such as Jira or Figma. This page gets you to a first successful **`eversis-collections`** connection. Optional servers come after that.
 
 :::tip What is MCP in plain language?
-Think of MCP as giving your AI editor **hands** for this project: it can use framework skills, read durable project knowledge, and (when you choose) talk to other tools. The core skills server runs **on your computer** (usually via Docker) and connects to Cursor, Claude Code, or Pi. It is **not** a separate cloud product you must buy.
+Think of MCP as giving your AI editor **hands** for this project: it can use framework skills, read durable project knowledge, and (when you choose) talk to other tools. The core skills server runs **on your computer** (usually via Docker) and connects to Cursor or Claude Code. It is **not** a separate cloud product you must buy.
 :::
 
 ## Choose your path by role
@@ -70,7 +70,7 @@ If `docker` is not recognized, start Docker Desktop and wait until the engine is
 </TabItem>
 </Tabs>
 
-The installer normally writes the MCP entry for you. The Compose-based shape looks like this (Cursor uses `${env:…}` syntax; Claude Code uses `${VAR}` / `${VAR:-default}`; Pi gets a `bash -c` wrapper because it does not expand variables in `command` / `args` — the installer translates per host):
+The installer normally writes the MCP entry for you. The Compose-based shape looks like this (Cursor uses `${env:…}` syntax; Claude Code uses `${VAR}` / `${VAR:-default}` — the installer translates per host):
 
 ```json
 "eversis-collections": {
@@ -137,20 +137,6 @@ Keep User MCP for personal tools only. Do **not** paste `templates/mcp.json` int
 Only add a manual Compose entry if the installer was not used. Prefer the project `.mcp.json` over a conflicting global config.
 
 </TabItem>
-<TabItem value="pi" label="Pi">
-
-**Pi** (the [Pi coding agent](https://pi.dev/), opt-in with `--agents=…,pi`) uses **`.pi/mcp.json`** in the consumer project. Docker is required to run the skills server.
-
-1. Open a terminal in your **consumer project root** and start `pi`. When Pi asks, **grant project trust** — Pi reads `.pi/` (including `.pi/mcp.json`) only for trusted projects.
-2. If Installation already wrote **`.pi/mcp.json`**, confirm **`eversis-collections`** is listed with `pi mcp list` — do not add a second entry. A Docker-backed server may show as not connected until Docker is running; the listing itself confirms the file parsed.
-3. How the server starts: the entry runs `bash -c` with a small script that walks up from the current folder to the nearest folder containing `.pi/` (your project root), so it also works when you start Pi in a subfolder.
-   - **Vendored** (`--vendor copy` or `--vendor submodule`) — the script runs `scripts/run-eversis-collections-mcp.sh`, the same wrapper Claude Code uses.
-   - **Local** (framework outside the consumer repo) — the script runs `docker compose -f "${AGENT_COLLECTIONS_HOME:-…}/docker-compose.yml" run --rm -T eversis-collections` with `CONSUMER_PROJECT_ROOT` set to the project root. The `…` default is the framework path the installer saw, so Pi still works when `AGENT_COLLECTIONS_HOME` is not exported.
-4. Skills also resolve via **`.pi/skills/`** (linked by the installer), not only through MCP. After a re-sync, run `/reload` in an open Pi session.
-
-If the installer reports a Pi failure for `.pi/mcp.json` (for example an existing file that is not valid JSON), fix or remove that file and re-run with the same `--agents`. Cursor and Claude Code files are written either way.
-
-</TabItem>
 </Tabs>
 
 ## Step 3 — Verify
@@ -178,7 +164,7 @@ Expect the assistant to call a core tool (`eversis_skills_list` and/or `eversis_
 
 Domain-context tools (names starting with `eversis_context_`) need your **consumer project root** — the repo that contains `.agent-collections/install-selection.json` and usually `docs/context/`.
 
-Open that folder as the workspace in Cursor (or work from that root in Claude Code or Pi). Do **not** rely on a random subfolder, and do not expect context tools to work if only the framework checkout is open when your real work lives in another repo.
+Open that folder as the workspace in Cursor (or work from that root in Claude Code). Do **not** rely on a random subfolder, and do not expect context tools to work if only the framework checkout is open when your real work lives in another repo.
 
 You do not need to understand Docker volumes for this rule. If context tools fail with path / `install-selection.json` errors, see [Troubleshooting](#troubleshooting) and the [advanced volume note](#domain-context-needs-the-project-volume-not-just-the-framework-volume).
 
@@ -235,7 +221,6 @@ The `eversis-collections` container mounts two folders:
   - **Cursor** — installer writes `CONSUMER_PROJECT_ROOT` into MCP `env` as `${workspaceFolder}`.
   - **Vendored Claude Code** (copy or submodule under `vendor/`) — wrapper script sets `CONSUMER_PROJECT_ROOT` to the parent of `scripts/` (consumer root, not the vendor tree).
   - **Absolute (non-vendored) Claude Code** — installer writes `CONSUMER_PROJECT_ROOT` to `${CLAUDE_PROJECT_DIR:-.}` in MCP `env`.
-  - **Pi** — the `bash -c` locator finds the nearest folder containing `.pi/` and uses it as the consumer root (vendored: through the wrapper script).
   - `${PWD}` is only a fallback.
 
 Domain-context tools read and write `docs/context/` through the consumer mount, not the framework-only mount. They treat the mount as the project only when `install-selection.json` is present.
