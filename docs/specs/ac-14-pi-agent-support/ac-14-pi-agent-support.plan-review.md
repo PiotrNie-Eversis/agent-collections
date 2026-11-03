@@ -28,7 +28,7 @@ Open Questions gate: all 8 rows are `✅ Resolved`, so the review can go ahead. 
 | S1 Pi map parity | **Resolved** | Task 2.1 (`:221`) |
 | S2 automated Pi load check | **Resolved** | Task 5.1 (`:370-382`) uses `pi --approve` and `pi mcp list`, with a Stop Rule that moves the check to QA. If Pi has no CLI command that only loads resources, Pi's own `dist` loaders can be run through `node -e` as a fallback. |
 | S3 computed counts | **Resolved** | Goal `:15`, diagram `:45`, smoke (a) `:311` |
-| S4 Pi-only stack seed | **Resolved** | Task 1.1 skips the unmodified seed (`:35,160`). Seeds made from an older template version are not caught; see N-S2. |
+| S4 Pi-only stack seed | **Resolved** | Task 1.1 skips the unmodified seed (`:35,160`). Seeds made from◊ an older template version are not caught; see N-S2. |
 | S5 README host notes | **Resolved** | Task 4.1 DoD (`:334-335`), Additional Context `:145` |
 | S6 prompt-quality read | **Resolved** | Task 5.2 (`:386`) |
 

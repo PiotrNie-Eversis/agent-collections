@@ -105,7 +105,7 @@ Read, list, and refresh **domain context** — durable, cross-task knowledge (a 
 
 ### Word (Business Manager Docs)
 
-**Docx paths:** Pass a **project-relative** path under the consumer project (container `/workspace`), e.g. `.playwright-mcp/backups/file.docx`. Host absolute paths (`/Users/...`) are not visible inside the MCP container. `/workspace` is the consumer project only when `.agent-collections/install-selection.json` is present (same rule as domain context); without it, resolution falls back to the image cwd. Cursor sets host MCP `env.CONSUMER_PROJECT_ROOT`; vendored Claude Code relies on `scripts/run-eversis-collections-mcp.sh` for the same mount.
+**Docx paths:** Pass a **project-relative** path under the consumer project (container `/workspace`), e.g. `.playwright-mcp/backups/file.docx`. Host absolute paths (`/Users/...`) are not visible inside the MCP container. `/workspace` is the consumer project only when `.agent-collections/install-selection.json` is present (same rule as domain context); without it, resolution falls back to the image cwd. Cursor sets host MCP `env.CONSUMER_PROJECT_ROOT`; vendored Claude Code relies on `scripts/run-eversis-collections-mcp.sh` for the same mount; Pi's `.pi/mcp.json` locator sets it to the nearest folder containing `.pi/`.
 
 #### `generate_summary_map`
 
@@ -226,6 +226,7 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 - **Cursor** — the installer writes it into MCP `env` as `${workspaceFolder}`.
 - **Vendored Claude Code** (copy or submodule under `vendor/` — a copy of the framework inside your repo) — `.mcp.json` starts `bash -c`, which execs `scripts/run-eversis-collections-mcp.sh`. That script sets `CONSUMER_PROJECT_ROOT` from its own location (the parent of `scripts/`) and points Compose at `vendor/agent-collections/docker-compose.yml`. Do not treat `${CLAUDE_PROJECT_DIR:-.}` as the portable vendored fix.
 - **Absolute (non-vendored) Claude Code** — still uses MCP `env` `${CLAUDE_PROJECT_DIR:-.}` and a baked `AGENT_COLLECTIONS_HOME` fallback on the `-f` path.
+- **Pi** (opt-in, `.pi/mcp.json`) — Pi does not expand `${VAR}` in `command` / `args`, so the entry is `bash -c` with a locator that walks up from `$PWD` to the nearest folder containing `.pi/` (the project root). **Vendored:** it execs that root's `scripts/run-eversis-collections-mcp.sh` (same wrapper as Claude Code). **Local:** it runs `CONSUMER_PROJECT_ROOT=<root> docker compose -f "${AGENT_COLLECTIONS_HOME:-<framework path>}/docker-compose.yml" run --rm -T eversis-collections` — bash, not Pi, expands that default. Pi reads `.pi/mcp.json` only after project trust; check it with `pi mcp list`.
 
 `${PWD}` is only a fallback (`PWD` is often the compose-file directory when `-f` is `vendor/agent-collections/docker-compose.yml`). Domain-context tools read `docs/context/` through `/workspace`, not `/repo`, and only treat `/workspace` as the project when `install-selection.json` is there. See [Domain Context (SSOT)](../../domain-context) and [MCP Setup](../../getting-started/mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume).
 
@@ -235,7 +236,7 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 2. Bootstrap with `setup-agent-collections.sh --build-mcp` — see [Installation — Step 2](../../getting-started/installation#step-2--install-into-your-project).
 3. Enable **`eversis-collections`** in Cursor MCP settings and restart.
 
-The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. For Cursor, the second volume uses host `CONSUMER_PROJECT_ROOT` `${workspaceFolder}`. Absolute (non-vendored) Claude Code still uses `${CLAUDE_PROJECT_DIR:-.}` in MCP `env`. Vendored Claude uses the wrapper above, not an env token. `${PWD}` is only a fallback. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../../getting-started/installation).
+The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. For Cursor, the second volume uses host `CONSUMER_PROJECT_ROOT` `${workspaceFolder}`. Absolute (non-vendored) Claude Code still uses `${CLAUDE_PROJECT_DIR:-.}` in MCP `env`. Vendored Claude uses the wrapper above, not an env token. Pi uses the `bash -c` locator above. `${PWD}` is only a fallback. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../../getting-started/installation).
 
 ## Do not register skills as Agent Skills
 

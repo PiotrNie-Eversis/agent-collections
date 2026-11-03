@@ -163,14 +163,14 @@ Pi surface contract (verified, Pi 1.4.0): project `.pi/` loads after project tru
 
 **Definition of Done**:
 
-- [ ] Generates one prompt per non-denied `.ai/prompts/{public,internal}/eversis-*.md` (28 today), 3 role skills, 1 `APPEND_SYSTEM.md` containing agent-core, testing-and-terminal and accessibility (with UI note)
-- [ ] No generated skill id equals any `.ai/skills/eversis-*` directory name (asserted at generation time → `fail`)
-- [ ] Role skill `name` ≤ 64 chars and `description` ≤ 1024 chars (asserted)
-- [ ] Every emitted front matter parses as YAML with the expected keys, including SSOT descriptions that contain `": "`
-- [ ] No emitted prompt body matches Pi's substitution pattern outside the final input line and the SSOT pointer line
-- [ ] `--check` exits 1 and names each drifted / orphan file; exits 0 on a fresh tree
-- [ ] Orphan cleanup removes only files with the Pi GENERATED marker in `.pi/prompts/` and `.pi/skills/eversis-rule-*`
-- [ ] Run `node adapters/pi/generate.mjs --out "$TMP" && node adapters/pi/generate.mjs --out "$TMP" --check`
+- [x] Generates one prompt per non-denied `.ai/prompts/{public,internal}/eversis-*.md` (28 today), 3 role skills, 1 `APPEND_SYSTEM.md` containing agent-core, testing-and-terminal and accessibility (with UI note)
+- [x] No generated skill id equals any `.ai/skills/eversis-*` directory name (asserted at generation time → `fail`)
+- [x] Role skill `name` ≤ 64 chars and `description` ≤ 1024 chars (asserted)
+- [x] Every emitted front matter parses as YAML with the expected keys, including SSOT descriptions that contain `": "`
+- [x] No emitted prompt body matches Pi's substitution pattern outside the final input line and the SSOT pointer line
+- [x] `--check` exits 1 and names each drifted / orphan file; exits 0 on a fresh tree
+- [x] Orphan cleanup removes only files with the Pi GENERATED marker in `.pi/prompts/` and `.pi/skills/eversis-rule-*`
+- [x] Run `node adapters/pi/generate.mjs --out "$TMP" && node adapters/pi/generate.mjs --out "$TMP" --check`
 
 **Stop Rule:** If any `.ai/prompts` file lacks `prompt_description` and has no usable first line, stop and report instead of inventing descriptions.
 
@@ -189,11 +189,11 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] Extension uses `import type` only from `@earendil-works/pi-coding-agent` (no runtime dependency)
-- [ ] `shouldCompact` covers: below → above fires; above → above does not; unknown → above fires; any → unknown does not; threshold override and invalid override fall back to 50
-- [ ] Factory test with a fake `pi` / `ctx`: mid-task crossing (tool results present) → exactly one `compact()` call and, on `onComplete`, exactly one `sendUserMessage`; final-turn crossing (no tool results) → one `compact()`, zero `sendUserMessage`; a second `turn_end` while in flight does not call `compact()` again; `onError` sends no continuation
-- [ ] Existing `.pi/settings.json` is byte-identical after generation; `--check` does not report it
-- [ ] Run `node --test 'adapters/pi/*.test.mjs'`
+- [x] Extension uses `import type` only from `@earendil-works/pi-coding-agent` (no runtime dependency)
+- [x] `shouldCompact` covers: below → above fires; above → above does not; unknown → above fires; any → unknown does not; threshold override and invalid override fall back to 50
+- [x] Factory test with a fake `pi` / `ctx`: mid-task crossing (tool results present) → exactly one `compact()` call and, on `onComplete`, exactly one `sendUserMessage`; final-turn crossing (no tool results) → one `compact()`, zero `sendUserMessage`; a second `turn_end` while in flight does not call `compact()` again; `onError` sends no continuation
+- [x] Existing `.pi/settings.json` is byte-identical after generation; `--check` does not report it
+- [x] Run `node --test 'adapters/pi/*.test.mjs'`
 
 **Clues**: Pi `examples/extensions/trigger-compact.ts`; `docs/extensions.md` (`turn_end`, `ctx.compact`, `ctx.getContextUsage`); `dist/core/agent-session.js` `compact()` calls `abort()` first; `pi.sendUserMessage` options in `dist/core/extensions/types.d.ts` (~line 1267).
 
@@ -205,8 +205,8 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] Both suites pass
-- [ ] Run `node --test 'adapters/pi/*.test.mjs'`
+- [x] Both suites pass
+- [x] Run `node --test 'adapters/pi/*.test.mjs'`
 
 ### Phase 2: Sync integration
 
@@ -224,10 +224,10 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] `node adapters/sync.mjs --check` output unchanged for this repo (no `.pi/` created here)
-- [ ] Pi generator failure exits non-zero **after** Cursor / Claude outputs are written
-- [ ] `--check --agents cursor,pi --out "$TMP"` passes on a fresh `cursor,pi` write and does not report missing Claude output
-- [ ] Run `node adapters/sync.mjs --check` and the `--out "$TMP"` write + check pair
+- [x] `node adapters/sync.mjs --check` output unchanged for this repo (no `.pi/` created here)
+- [x] Pi generator failure exits non-zero **after** Cursor / Claude outputs are written
+- [x] `--check --agents cursor,pi --out "$TMP"` passes on a fresh `cursor,pi` write and does not report missing Claude output
+- [x] Run `node adapters/sync.mjs --check` and the `--out "$TMP"` write + check pair
 
 ### Phase 3: Installer support
 
@@ -245,8 +245,8 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] `--agents=pi`, `--agents=cursor,claude,pi` validate; unknown ids still fail with the allowed list incl. `pi`
-- [ ] Run `bash -n scripts/lib/setup-agent-collections/agents.sh`
+- [x] `--agents=pi`, `--agents=cursor,claude,pi` validate; unknown ids still fail with the allowed list incl. `pi`
+- [x] Run `bash -n scripts/lib/setup-agent-collections/agents.sh`
 
 #### Task 3.2 - [MODIFY] Isolated Pi stage: sync, skills mirror, pruning
 
@@ -260,11 +260,11 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] Existing Claude / Cursor smoke assertions pass unchanged (refactor is behaviour-preserving)
-- [ ] Pi failure with `cursor,pi` → `pi` failure line; `.cursor/` output present; selection agents `["cursor"]`; exit 1
-- [ ] Pi failure with `pi` alone → exit 1; no `.cursor/` generated output; no selection recording `cursor`
-- [ ] Pi deselect removes only marker-gated / `eversis-*` Pi files; role skills survive the skills-mirror stale-prune
-- [ ] Run `bash -n` on changed files and `npm run installer:smoke`
+- [x] Existing Claude / Cursor smoke assertions pass unchanged (refactor is behaviour-preserving)
+- [x] Pi failure with `cursor,pi` → `pi` failure line; `.cursor/` output present; selection agents `["cursor"]`; exit 1
+- [x] Pi failure with `pi` alone → exit 1; no `.cursor/` generated output; no selection recording `cursor`
+- [x] Pi deselect removes only marker-gated / `eversis-*` Pi files; role skills survive the skills-mirror stale-prune
+- [x] Run `bash -n` on changed files and `npm run installer:smoke`
 
 **Stop Rule:** If the skills-helper refactor changes any existing smoke assertion, revert to a separate `_link_pi_skills` function and note it in the Changelog.
 
@@ -278,10 +278,10 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] New test cases: Pi vendored and Pi local produce valid JSON with the expected `eversis-collections` shape, no `inputs`, no `${workspaceFolder}` / `${env:` / `CLAUDE_PROJECT_DIR`
-- [ ] Malformed existing `.pi/mcp.json` → Pi failure recorded, `.cursor/mcp.json` still written, run exits 1 at the end
-- [ ] Existing Cursor / Claude cases unchanged
-- [ ] Run `bash scripts/lib/setup-agent-collections/mcp-merge.test.sh`
+- [x] New test cases: Pi vendored and Pi local produce valid JSON with the expected `eversis-collections` shape, no `inputs`, no `${workspaceFolder}` / `${env:` / `CLAUDE_PROJECT_DIR`
+- [x] Malformed existing `.pi/mcp.json` → Pi failure recorded, `.cursor/mcp.json` still written, run exits 1 at the end
+- [x] Existing Cursor / Claude cases unchanged
+- [x] Run `bash scripts/lib/setup-agent-collections/mcp-merge.test.sh`
 
 #### Task 3.4 - [MODIFY] Vendor-pin probe for the Pi agent id
 
@@ -291,8 +291,8 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] New test case: old pin without Pi + `--agents=pi` → realigned (or clear error when realignment is not possible), never a raw `unknown agent id: pi`
-- [ ] Run `bash scripts/lib/setup-agent-collections/vendor-sync-skew.test.sh`
+- [x] New test case: old pin without Pi + `--agents=pi` → realigned (or clear error when realignment is not possible), never a raw `unknown agent id: pi`
+- [x] Run `bash scripts/lib/setup-agent-collections/vendor-sync-skew.test.sh`
 
 #### Task 3.5 - [MODIFY] Upgrade detection and summary
 
@@ -302,9 +302,9 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] `--upgrade` on a Pi install keeps `pi` selected
-- [ ] Missing `pi` CLI yields a warning, exit 0
-- [ ] Run `bash -n` on both files and `npm run installer:smoke`
+- [x] `--upgrade` on a Pi install keeps `pi` selected
+- [x] Missing `pi` CLI yields a warning, exit 0
+- [x] Run `bash -n` on both files and `npm run installer:smoke`
 
 #### Task 3.6 - [MODIFY] Installer smoke coverage
 
@@ -314,8 +314,8 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] All new and existing smoke cases pass
-- [ ] Run `npm run installer:smoke`
+- [x] All new and existing smoke cases pass
+- [x] Run `npm run installer:smoke`
 
 ### Phase 4: Documentation
 
@@ -331,9 +331,9 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] Lists every emitted surface, generator usage, markers, trust / reload, budget env var, `$`→`＄` neutralisation, stack-overlay rule
-- [ ] Notes: project `APPEND_SYSTEM.md` replaces a user-level one; the extension's `import type` may need excluding from a consumer's TS / ESLint config; review the extension before granting trust
-- [ ] Run `npm run sync:website-docs:check`
+- [x] Lists every emitted surface, generator usage, markers, trust / reload, budget env var, `$`→`＄` neutralisation, stack-overlay rule
+- [x] Notes: project `APPEND_SYSTEM.md` replaces a user-level one; the extension's `import type` may need excluding from a consumer's TS / ESLint config; review the extension before granting trust
+- [x] Run `npm run sync:website-docs:check`
 
 #### Task 4.2 - [MODIFY] Architecture and adapter docs
 
@@ -343,8 +343,8 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] Pi listed with emitted paths; OpenCode text unchanged
-- [ ] Run `npm run sync:website-docs:check`
+- [x] Pi listed with emitted paths; OpenCode text unchanged
+- [x] Run `npm run sync:website-docs:check`
 
 #### Task 4.3 - [MODIFY] Public docs and changelog
 
@@ -354,8 +354,8 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] Every page that lists supported agents or per-host MCP setup lists Pi and states what its install provides
-- [ ] Run `npm run website:changelog:check` and `npm run website:build`
+- [x] Every page that lists supported agents or per-host MCP setup lists Pi and states what its install provides
+- [x] Run `npm run website:changelog:check` and `npm run website:build`
 
 **Stop Rule:** Pages listing agents only as migration history (`website/docs/advanced/migration-from-cursor-collections.md`, `isolation.md`) are not changed unless they claim a complete supported-agent list.
 
@@ -375,9 +375,9 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] No skill-collision, malformed-front-matter, prompt-template or extension-load warnings for the generated tree; all 28 prompts visible
-- [ ] `pi mcp list` parses `.pi/mcp.json` (connection state of Docker-backed servers is informational)
-- [ ] Result documented in Changelog
+- [x] No skill-collision, malformed-front-matter, prompt-template or extension-load warnings for the generated tree; all 28 prompts visible
+- [x] `pi mcp list` parses `.pi/mcp.json` (connection state of Docker-backed servers is informational)
+- [x] Result documented in Changelog
 
 **Stop Rule:** If Pi offers no non-interactive CLI to list loaded resources, drive Pi's own resource loaders from its installed `dist` via `node -e` instead; only if that also fails, record it and move the session check to the QA draft — never bypass or fake trust.
 
@@ -389,9 +389,9 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 **Definition of Done**:
 
-- [ ] Run the Phase 5 verification commands
-- [ ] Code review passes with no blocking findings
-- [ ] Review outcome documented in Changelog
+- [x] Run the Phase 5 verification commands
+- [x] Code review passes with no blocking findings
+- [x] Review outcome documented in Changelog
 
 **Clues**: Risk areas — refactor of the shared skills-mirror helper; `PI_STAGE_FAILED` paths; MCP `bash -c` quoting; marker-gated pruning never deleting hand-made `.pi/` files; continuation after compaction; `.ai/` untouched (`git diff --stat -- .ai/` empty).
 
@@ -404,13 +404,13 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 
 ## Quality Assurance
 
-- [ ] AC1 — `--agents=pi` install: a Pi session lists `/eversis-*` prompts, framework skills, role-rule skills; APPEND_SYSTEM rules active
-- [ ] AC2 — README, AGENTS.md, website getting-started and adapter docs list Pi and what the install provides
-- [ ] AC3 — install without `pi`: no `.pi/` generated files; re-run without `pi` prunes them; Cursor / Claude unaffected
-- [ ] AC4 — induced Pi failure (generation or `.pi/mcp.json`), with other agents and alone: clear `pi` failure, exit 1, other agents' output intact, selection excludes `pi`
-- [ ] AC5 — extension compacts once on crossing 50% and resumes the interrupted task (`shouldCompact` + fake-context tests; Pi load check)
-- [ ] AC6 — `git diff -- .ai/` empty; rule 14 still says window fill is not a trigger
-- [ ] AC7 — generator + installer + sync check + docs shipped; no placeholder maturity
+- [x] AC1 — `--agents=pi` install: a Pi session lists `/eversis-*` prompts, framework skills, role-rule skills; APPEND_SYSTEM rules active
+- [x] AC2 — README, AGENTS.md, website getting-started and adapter docs list Pi and what the install provides
+- [x] AC3 — install without `pi`: no `.pi/` generated files; re-run without `pi` prunes them; Cursor / Claude unaffected
+- [x] AC4 — induced Pi failure (generation or `.pi/mcp.json`), with other agents and alone: clear `pi` failure, exit 1, other agents' output intact, selection excludes `pi`
+- [x] AC5 — extension compacts once on crossing 50% and resumes the interrupted task (`shouldCompact` + fake-context tests; Pi load check)
+- [x] AC6 — `git diff -- .ai/` empty; rule 14 still says window fill is not a trigger
+- [x] AC7 — generator + installer + sync check + docs shipped; no placeholder maturity
 
 ## Improvements (Out of Scope)
 
@@ -432,3 +432,13 @@ Compaction instructions keep: active `docs/specs/**/*.plan.md` path, current pla
 | 2026-10-30 | Initial plan created from approved research (Q1–Q7 recommendations accepted). |
 | 2026-10-30 | Revised after plan review iteration 1 (REVISIONS NEEDED): B1 compaction continuation via `pi.sendUserMessage` + unknown/first-reading crossing; B2 JSON-quoted front matter; B3 `PI_STAGE_FAILED` flag, Pi-only paths; W1 Pi check via generator `--check`, agents-scoped check; W2 `$`→`＄` neutralisation; W3 Pi mirror/pruning inside isolated Pi stage, `eversis-rule-*` excluded from stale-prune; W4 isolated Pi MCP merge + failure headline; W5 vendor-pin probe (Task 3.4); W6 Pi-specific MCP branch; W7 `node --test 'adapters/pi/*.test.mjs'`; W8 `mcp-setup.mdx`, `integrations/eversis-collections.md`; S1 Pi map parity; S2 automated Pi load check; S3 computed counts (50 skills); S4 unmodified stack seed skipped; S5 README notes; S6 prompt-quality read in review. |
 | 2026-10-30 | Plan review iteration 2: APPROVED. Applied N-W1 (continuation only after a mid-task crossing with tool results; final-turn crossing compacts without a continuation; `ctx.isIdle()` selects send mode), N-S1 (neutralise only Pi substitution patterns; SSOT pointer line excluded), N-S2 (skip stack overlay when template placeholder markers remain), N-S3 (Pi `dist` loaders fallback for Task 5.1). |
+| 2026-10-30 | CHECKPOINT: Phase 1 (Tasks 1.1–1.3) and Phase 2 (Task 2.1) done and verified — `node --test 'adapters/pi/*.test.mjs'` 20/20 pass; `adapters/pi/generate.mjs --out <tmp>` + `--check` OK (28 prompts, 3 role skills, APPEND_SYSTEM, extension, settings seed); `node adapters/sync.mjs --check` output identical to HEAD, no `.pi/` in repo; `sync.mjs --agents cursor,pi --out <tmp>` write + `--check` OK. Changed: `adapters/pi/{rule-map.yaml,generate.mjs,generate.test.mjs,context-budget.test.mjs,assets/eversis-context-budget.ts,assets/settings.json}` (new), `adapters/sync.mjs` (modified). Notes: prompts without `## Executable prompt` (`eversis-ba-docs-planner`, `eversis-ba-docs-writer`) emit the whole SSOT body (benchmark behaviour); Pi `fine-handoff` row is `target: none` + `skill_id: eversis-fine-handoff`. Next: Phase 3 (installer). |
+| 2026-10-30 | RESUMED: orchestrator session continues from the CHECKPOINT above with Phase 3 (installer). |
+| 2026-10-30 | CHECKPOINT: Phase 3 (Tasks 3.1–3.6) done and verified — `bash -n` OK on all 11 changed `.sh`; `mcp-merge.test.sh` 51/51 (36 existing + 15 Pi); `vendor-sync-skew.test.sh` 14/14 (8 existing + 6 Pi); `upgrade-preserve` 38/38, `selection-ssot` 8/8, `framework-home` 3/3, `scaffolding`, `ssot`, `claude-settings-merge`, `run-eversis-collections-mcp` pass (`gitignore.test.sh` fails on HEAD too — `_ensure_artifacts_subblock` missing in untouched `gitignore.sh`, out of scope); `npm run installer:smoke` PASS incl. new cases a, a2 (re-run: role skills not stale-pruned), b, c, d, e, f, g; `node adapters/sync.mjs --check` OK. Changed: `scripts/setup-agent-collections.sh`, `scripts/setup-agent-collections.test.sh`, `scripts/lib/setup-agent-collections/{agents.sh,agents-prompt.mjs,link-framework.sh,selection.sh,mcp-merge.sh,mcp-merge.mjs,mcp-merge.test.sh,vendor-sync-skew.sh,vendor-sync-skew.test.sh,upgrade.sh,summary.sh}`. Notes: shared `_link_agent_skills <agent> <dst-rel> [prune-exclude-glob]` (Pi passes `eversis-rule-*`; Claude / Cursor keep identical behaviour, Stop Rule not triggered); Pi MCP locator fails with a stderr message when no `.pi/` is found above `$PWD` (local and vendored); a Pi MCP failure with `--agents=pi` alone also exits 1 right after the merge (no selection written). Next: Phase 4 (docs). |
+| 2026-10-30 | RESUMED: orchestrator session continues from the CHECKPOINT above with Phase 4 (documentation). |
+| 2026-10-30 | Phase 4 (Tasks 4.1–4.3) done by Repo Docs Writer — created `adapters/pi/README.md` (surfaces, generator usage, markers, `$`→`＄`, stack overlay, context budget, MCP locator, installer stage / deselect, trust, `/reload`, user-level `APPEND_SYSTEM.md`, TS/ESLint exclusion, extension review, `AGENTS.md` vs `CLAUDE.md`, AC-111–AC-114 out of scope); `docs/architecture/adapter-mapping.md` (Pi emit-matrix row, new §6A Pi adapter mapping — numbered 6A so external §6 OpenCode references stay valid — maturity `shipped`, §7/§8 notes, §9 checklist line); `adapters/README.md` (Pi sync note + per-adapter row); `README.md`, `AGENTS.md` (+ Pi channel notes), `website/docs/intro.md`, `getting-started/{installation.mdx (new "Add the Pi coding agent" + context-budget sections, flag table, verify step), start-here.mdx, prerequisites.mdx (Pi CLI optional row, Node.js, `pi --version`), mcp-setup.mdx (Pi tab: `.pi/mcp.json`, trust, `pi mcp list`)}`, `reference/integrations/eversis-collections.md`, `reference/framework-reference.md`; `website/docs/advanced/isolation.md` gets a Pi row under the plan's Stop Rule (its Multi-agent MVP table lists every tool); `migration-from-cursor-collections.md` unchanged (Cursor-vs-Claude matrix). `CHANGELOG.md` Unreleased › Added entry for AC-14 + `website/src/pages/changelog.md` regenerated. Verified: `npm run sync:website-docs:check` OK; `npm run website:changelog:check` OK; `npm run website:build` SUCCESS. OpenCode text unchanged. Next: Phase 5 (review). |
+| 2026-10-31 | Task 5.1 done (orchestrator). Temp project installed with `--agents=pi --vendor=copy` (exit 0). `pi --mode rpc --approve --no-session` + `get_commands`: 28 `eversis-*` prompts, 53 skills (50 framework + `eversis-rule-{code-reviewer,engineering-manager,spec-driven-development}`), stderr empty, no extension/resource error events. `pi mcp list` has no `--approve` and would need a write to the user-global `~/.pi/agent/trust.json`, so per the Stop Rule fallback `.pi/mcp.json` was validated with Pi's own `dist/extensions/mcp/config.js` `loadMcpConfig({ projectTrusted: true })` and an empty agent dir: `errors: []`, `eversis-collections` = `bash -c` locator. Also verified `dist/core/resource-loader.js:116`: one context file per directory, order `AGENTS.override.md` > `AGENTS.md` > `CLAUDE.md` (research Q6 precedence confirmed). |
+| 2026-11-03 | Task 5.2 code review (Code Reviewer, independent): **NOT PASS — 1 BLOCKER**. B1: `adapters/pi/generate.mjs` `emit()` (~596–622) silently overwrites a pre-existing hand-made (marker-less) `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-<id>.md`, `.pi/skills/eversis-rule-*/SKILL.md` or `.pi/extensions/eversis-context-budget.ts` — reproduced (hand-made APPEND_SYSTEM.md lost, no warning); contradicts the generator header (line 29 "Hand-made files under .pi/ are never touched") and the AC-99 `backupForeignClaudeMd` convention. Fix: back up a regular marker-less target to `<name>.pre-agent-collections.bak` (timestamped when a differing backup exists) with a warning before writing, plus a `generate.test.mjs` case. Suggestions: post-compaction re-fire on small windows; continuation fallback when no plan exists; `}` in local Pi MCP bash default. Verified green: `node --test 'adapters/pi/*.test.mjs'` 20/20; `node adapters/sync.mjs --check` OK; `mcp-merge.test.sh` 51/51; `vendor-sync-skew.test.sh` 14/14; `upgrade-preserve.test.sh` 38/38; `npm run installer:smoke` PASS; `npm run website:build` SUCCESS; `git diff --stat -- .ai/` empty; no package.json changes. Task 5.2 DoD left unticked until B1 is fixed and re-reviewed. |
+| 2026-11-03 | Rule 12 solution change — code-review fixes B1 + S1–S3 (Software Engineer). Human approval: "Go ahead with fix plus suggestions 1-3.". **B1:** `adapters/pi/generate.mjs` `createEmitter().emit` now calls `backupHandMadeTarget()` in write mode before replacing a target: a regular, marker-less file is copied byte-identical to `<name>.pre-agent-collections.bak` (timestamped `<name>.pre-agent-collections.<YYYYMMDDTHHMMSS>.bak` when a differing backup exists; identical backup reused) with `warning: backed up hand-made <rel> to <backup rel>` on stderr; marker-bearing files and symlinks get no backup; `--check` unchanged; `.pi/settings.json` still seed-only. Header comment corrected (follows `backupForeignClaudeMd` convention). `generate.test.mjs` +3 cases (hand-made APPEND_SYSTEM + prompt backed up byte-identical with warning, second run no new backup, timestamped backup on a differing re-edit; marker-bearing / symlink no backup; `--check` writes no backup). **S1:** `eversis-context-budget.ts` — `shouldCompact` stays pure with an optional `{ afterCompaction }` argument; the factory sets `justCompacted` in `onComplete`, so the first known reading after an extension-triggered compaction only sets a baseline (no compaction + continuation loop on small windows); first-ever unknown→above still fires. **S2:** `CONTINUATION_MESSAGE` adds "If there is no active plan, continue the interrupted task from the compaction summary." (gate wording intact). `context-budget.test.mjs` +3 cases. **S3:** `mcp-merge.mjs` Pi local locator — a framework path containing `}`, `"`, `$`, backtick or `\` is assigned single-quoted to `ac_home='…'` and the default becomes `${AGENT_COLLECTIONS_HOME:-$ac_home}` (bash keeps a backslash before `}` in a double-quoted default, so escaping could not work); plain paths keep the inline default; the Pi host-variable check also strips the `ac_home='…';` prefix. `mcp-merge.test.sh` +3 cases (path with ``} " $ ` '`` reaches `docker compose -f` byte-exact with `AGENT_COLLECTIONS_HOME` unset; env override still wins; no Pi host-variable false positive). `adapters/pi/README.md` updated (backup, post-compaction baseline, no-plan fallback, path indirection). Verified: `node --test 'adapters/pi/*.test.mjs'` 26/26; `node adapters/sync.mjs --check` OK; `mcp-merge.test.sh` 54/54; `npm run installer:smoke` PASS; `npm run sync:website-docs:check` OK; manual B1 repro in scratchpad shows both backups + warnings, second run no new backup, `--check` OK. Task 5.2 DoD left unticked pending re-review. |
+| 2026-11-03 | Code review pass 2 (Code Reviewer, full re-review): **PASS — 0 BLOCKERs**. B1 closed: reproduced hand-made `.pi/APPEND_SYSTEM.md` + `.pi/prompts/eversis-implement.md` → byte-identical `*.pre-agent-collections.bak` + `warning:` on stderr; re-run creates no new backup; differing re-edit → timestamped backup; symlinked extension replaced without backup (link target untouched); `--check` writes no backup; Pi loaders ignore `.bak` (prompts `.md` only, extensions `.ts`/`.js` only). S1 verified (post-compaction reading is a baseline only; no compaction loop; first unknown→above still fires). S2 verified (no-plan fallback; gate wording intact). S3 verified by executing generated `bash -c` with a stub `docker`: plain path inline, `/opt/we}ird $x "q" it's \`b\`` resolved exactly via single-quoted `ac_home`; Pi host-variable check accepts it. All DoD items and AC1–AC7 re-verified across the full change set (incl. fresh `--agents=cursor,claude` install → no `.pi/`). STRICT FORBIDDEN: in scope; no doc comments removed/shortened; no new deps; `git diff --stat -- .ai/` empty. Commands: `node --test 'adapters/pi/*.test.mjs'` 26/26; `node adapters/sync.mjs --check` OK; `sync.mjs --agents cursor,pi --out` write+check OK; `generate.mjs --out` + `--check` OK; `bash -n` on 11 changed `.sh` OK; `mcp-merge.test.sh` 54/54; `vendor-sync-skew.test.sh` 14/14; `upgrade-preserve.test.sh` 38/38; `npm run installer:smoke` PASS; `npm run website:build` SUCCESS. Suggestion (non-blocking): a backup of a hand-made `eversis-rule-*/SKILL.md` lives inside the role-skill dir, which Pi deselect / orphan cleanup removes whole. Task 5.2 DoD and QA AC1–AC7 ticked. |
+| 2026-11-03 | Fine declared (orchestrator) after code review pass 2 PASS. QA comment draft produced for human review; not posted to Jira. `docs/context/agent-collections/INDEX.md` tasks_since_audit 0 → 1. |

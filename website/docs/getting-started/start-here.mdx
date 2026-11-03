@@ -8,7 +8,7 @@ import TabItem from '@theme/TabItem';
 
 # Start here
 
-**Agent Collections** is a **vendor-neutral** multi-agent product engineering framework. Canonical content lives under **`.ai/`**; adapters package it for Cursor, Claude Code, and (placeholder) OpenCode.
+**Agent Collections** is a **vendor-neutral** multi-agent product engineering framework. Canonical content lives under **`.ai/`**; adapters package it for Cursor, Claude Code, the Pi coding agent (opt-in), and (placeholder) OpenCode.
 
 > **Ideate → Research → Plan → Implement → Review → Fine**
 
@@ -33,13 +33,13 @@ Pick your role below and follow that path in order. Each step links to the detai
 </TabItem>
 <TabItem value="developer-qa-tech" label="Developer / QA tech">
 
-Use **Cursor** and/or **Claude Code**. Read [Prerequisites](/docs/getting-started/prerequisites) first (including Node.js notes if you use Claude Code), then [Installation](/docs/getting-started/installation).
+Use **Cursor** and/or **Claude Code** — or the **Pi coding agent** (a terminal agent; opt-in, add `pi` to `--agents`). Read [Prerequisites](/docs/getting-started/prerequisites) first (including Node.js notes if you use Claude Code or Pi), then [Installation](/docs/getting-started/installation).
 
 1. **[Prerequisites](/docs/getting-started/prerequisites)** — Install an AI editor (**Cursor** and/or **Claude Code**), **Docker Desktop**, and **Git**. Details and accounts live on that page.
 2. **[Installation](/docs/getting-started/installation)** — Clone the framework, set `AGENT_COLLECTIONS_HOME` as shown there, and run the installer on a sample consumer project.
 3. Confirm expected folders and [Domain Context (SSOT)](/docs/domain-context) as in [You’re done when…](#youre-done-when).
 4. Optional: [MCP setup](/docs/getting-started/mcp-setup) if you enable the skills server beyond the installer defaults.
-5. Open the consumer project in your agent tool and attach **`@eversis-implement`** with a short task.
+5. Open the consumer project in your agent tool and attach **`@eversis-implement`** with a short task. In Pi, grant project trust first, then run **`/eversis-implement`** — see [Add the Pi coding agent](/docs/getting-started/installation#pi-coding-agent).
 
 </TabItem>
 <TabItem value="maintainer-mcp" label="Maintainer / MCP">
@@ -61,7 +61,7 @@ Your first install succeeded when:
 
 - The installer finished **without an error**.
 - The consumer project has **`.agent-collections/`** (including `install-selection.json`) and **`docs/context/<project>/INDEX.md`**.
-- In your AI editor, a first **`@eversis-implement`** (or `eversis-implement`) prompt gets a normal response — for example an Implement readiness block in chat.
+- In your AI editor, a first **`@eversis-implement`** (or `eversis-implement`; `/eversis-implement` in Pi) prompt gets a normal response — for example an Implement readiness block in chat.
 
 ## Next steps
 
