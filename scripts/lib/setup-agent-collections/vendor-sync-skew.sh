@@ -38,6 +38,32 @@ _sync_mjs_supports_flag() {
   grep -F -- "$flag" "$sync_mjs" >/dev/null 2>&1
 }
 
+# Agent ids _run_adapter_sync / run_pi_stage will pass that an older vendored
+# pin may not know. Today only pi (AC-14): its generator ships in
+# adapters/pi/generate.mjs and sync.mjs must list it under --agents.
+_adapter_sync_extra_agent_ids() {
+  if echo ",${SELECTED_AGENTS:-}," | grep -q ',pi,'; then
+    printf '%s\n' "pi"
+  fi
+}
+
+# True if vendored sync.mjs accepts the agent id (--help lists it under
+# --agents, else source grep) and the agent's generator exists.
+_sync_mjs_supports_agent() {
+  local sync_mjs="$1"
+  local agent="$2"
+  [[ -f "$sync_mjs" ]] || return 1
+  [[ -f "$(dirname "$sync_mjs")/${agent}/generate.mjs" ]] || return 1
+  if command -v node >/dev/null 2>&1; then
+    if node "$sync_mjs" --help 2>/dev/null \
+      | grep -E -- "--agents [^ ]*(,|\[| )${agent}(,|\]| |$)" >/dev/null 2>&1; then
+      return 0
+    fi
+    return 1
+  fi
+  grep -F -- "\"${agent}\"" "$sync_mjs" >/dev/null 2>&1
+}
+
 _vendor_sync_worktree_dirty() {
   local vendor_dir="$1"
   local porcelain
@@ -49,25 +75,34 @@ _installer_framework_sha() {
   git -C "${INSTALLER_FRAMEWORK_HOME}" rev-parse HEAD
 }
 
+# Args: flag (or agent id), reason, installer sha, vendor sha,
+# [kind: flag (default) | agent].
 _vendor_sync_skew_message() {
   local flag="$1"
   local reason="$2"
   local installer_sha="${3:-unknown}"
   local vendor_sha="${4:-unknown}"
+  local kind="${5:-flag}"
   local installer_home="${INSTALLER_FRAMEWORK_HOME:-unknown}"
   local vendor_home="${COLLECTIONS_HOME:-unknown}"
+  local rejected_label="Rejected CLI flag: " passed="${flag}" node_error="unknown argument"
+  if [[ "$kind" == "agent" ]]; then
+    rejected_label="Rejected agent id: "
+    passed="--agents ${flag}"
+    node_error="unknown agent id"
+  fi
 
   cat <<EOF
 The vendor submodule is behind the launched installer.
 
   Launched installer: ${installer_home} (${installer_sha})
   Vendored pin:       ${vendor_home} (${vendor_sha})
-  Rejected CLI flag:  ${flag}
+  ${rejected_label} ${flag}
   Reason:             ${reason}
 
-The launched installer will pass ${flag} into adapters/sync.mjs, but the
+The launched installer will pass ${passed} into adapters/sync.mjs, but the
 vendored copy does not accept it. Stopping before Node prints
-"unknown argument". Will not git checkout --force or reset --hard.
+"${node_error}". Will not git checkout --force or reset --hard.
 
 Recover (from the consumer repo):
   git -C "${vendor_home}" fetch origin
@@ -85,6 +120,7 @@ EOF
 _align_clean_vendor_to_installer_head() {
   local vendor_dir="${COLLECTIONS_HOME}"
   local flag="$1"
+  local kind="${2:-flag}"
   local installer_sha vendor_sha
 
   if [[ -z "${INSTALLER_FRAMEWORK_HOME:-}" ]]; then
@@ -93,12 +129,12 @@ _align_clean_vendor_to_installer_head() {
   if ! git -C "$INSTALLER_FRAMEWORK_HOME" rev-parse --git-dir >/dev/null 2>&1; then
     installer_sha="unknown"
     vendor_sha="$(git -C "$vendor_dir" rev-parse HEAD 2>/dev/null || echo unknown)"
-    die "$(_vendor_sync_skew_message "$flag" "launched installer is not a git directory" "$installer_sha" "$vendor_sha")"
+    die "$(_vendor_sync_skew_message "$flag" "launched installer is not a git directory" "$installer_sha" "$vendor_sha" "$kind")"
   fi
   installer_sha="$(_installer_framework_sha)"
 
   if ! git -C "$vendor_dir" rev-parse --git-dir >/dev/null 2>&1; then
-    die "$(_vendor_sync_skew_message "$flag" "vendor path is not a git directory" "$installer_sha" "unknown")"
+    die "$(_vendor_sync_skew_message "$flag" "vendor path is not a git directory" "$installer_sha" "unknown" "$kind")"
   fi
   vendor_sha="$(git -C "$vendor_dir" rev-parse HEAD 2>/dev/null || echo unknown)"
 
@@ -114,62 +150,89 @@ _align_clean_vendor_to_installer_head() {
     log_info "Fetching ${installer_sha} into submodule ${vendor_dir} …"
     if ! git -C "$vendor_dir" fetch origin "$installer_sha" 2>/dev/null; then
       if ! git -C "$vendor_dir" fetch origin; then
-        die "$(_vendor_sync_skew_message "$flag" "SHA missing from vendor object db and git fetch origin failed" "$installer_sha" "$vendor_sha")"
+        die "$(_vendor_sync_skew_message "$flag" "SHA missing from vendor object db and git fetch origin failed" "$installer_sha" "$vendor_sha" "$kind")"
       fi
     fi
   fi
 
   if ! git -C "$vendor_dir" cat-file -t "$installer_sha" >/dev/null 2>&1; then
-    die "$(_vendor_sync_skew_message "$flag" "SHA still missing after git fetch origin" "$installer_sha" "$vendor_sha")"
+    die "$(_vendor_sync_skew_message "$flag" "SHA still missing after git fetch origin" "$installer_sha" "$vendor_sha" "$kind")"
   fi
 
   git -C "$vendor_dir" checkout "$installer_sha" \
-    || die "$(_vendor_sync_skew_message "$flag" "git checkout failed (not forced)" "$installer_sha" "$vendor_sha")"
+    || die "$(_vendor_sync_skew_message "$flag" "git checkout failed (not forced)" "$installer_sha" "$vendor_sha" "$kind")"
   log_ok "Aligned vendor submodule ${vendor_dir} to launched installer SHA ${installer_sha}."
   return 0
 }
 
-# Product guard: on --upgrade/--sync + submodule, never call an old sync.mjs with new flags.
+# Product guard: on --upgrade/--sync + submodule, never call an old sync.mjs with
+# new flags or with an agent id it does not know (pi, AC-14).
 align_vendor_sync_cli_or_die() {
   [[ "${VENDOR_MODE:-}" == "submodule" ]] || return 0
   [[ "${ARG_UPGRADE:-false}" == "true" || "${ARG_SYNC:-false}" == "true" ]] || return 0
 
   local -a flags=()
+  local -a agents=()
   local line
   while IFS= read -r line; do
     [[ -n "$line" ]] && flags+=("$line")
   done < <(_adapter_sync_extra_flag_names)
-  [[ ${#flags[@]} -gt 0 ]] || return 0
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && agents+=("$line")
+  done < <(_adapter_sync_extra_agent_ids)
+  [[ ${#flags[@]} -gt 0 || ${#agents[@]} -gt 0 ]] || return 0
 
   local sync_mjs="${COLLECTIONS_HOME}/adapters/sync.mjs"
   local -a missing=()
+  local -a missing_agents=()
   local f
-  for f in "${flags[@]}"; do
+  for f in "${flags[@]+"${flags[@]}"}"; do
     if ! _sync_mjs_supports_flag "$sync_mjs" "$f"; then
       missing+=("$f")
     fi
   done
-  [[ ${#missing[@]} -eq 0 ]] && return 0
+  for f in "${agents[@]+"${agents[@]}"}"; do
+    if ! _sync_mjs_supports_agent "$sync_mjs" "$f"; then
+      missing_agents+=("$f")
+    fi
+  done
+  [[ ${#missing[@]} -eq 0 && ${#missing_agents[@]} -eq 0 ]] && return 0
 
-  local flag_list="${missing[*]}"
+  # Flags are reported first (pre-AC-14 message); a pin that only lacks an
+  # agent id is reported as "Rejected agent id".
+  local flag_list="${missing[*]-}" kind="flag"
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    flag_list="${missing_agents[*]}"
+    kind="agent"
+  fi
   local installer_sha vendor_sha
   installer_sha="$(git -C "${INSTALLER_FRAMEWORK_HOME:-/}" rev-parse HEAD 2>/dev/null || echo unknown)"
   vendor_sha="$(git -C "${COLLECTIONS_HOME:-/}" rev-parse HEAD 2>/dev/null || echo unknown)"
 
-  if _align_clean_vendor_to_installer_head "$flag_list"; then
+  if _align_clean_vendor_to_installer_head "$flag_list" "$kind"; then
     # Re-probe after align; still missing → die (wrong SHA / fetch of an old tree).
     missing=()
-    for f in "${flags[@]}"; do
+    missing_agents=()
+    for f in "${flags[@]+"${flags[@]}"}"; do
       if ! _sync_mjs_supports_flag "${COLLECTIONS_HOME}/adapters/sync.mjs" "$f"; then
         missing+=("$f")
       fi
     done
-    if [[ ${#missing[@]} -eq 0 ]]; then
+    for f in "${agents[@]+"${agents[@]}"}"; do
+      if ! _sync_mjs_supports_agent "${COLLECTIONS_HOME}/adapters/sync.mjs" "$f"; then
+        missing_agents+=("$f")
+      fi
+    done
+    if [[ ${#missing[@]} -eq 0 && ${#missing_agents[@]} -eq 0 ]]; then
       return 0
     fi
-    flag_list="${missing[*]}"
-    die "$(_vendor_sync_skew_message "$flag_list" "aligned pin still lacks flag" "$installer_sha" "$(git -C "${COLLECTIONS_HOME}" rev-parse HEAD 2>/dev/null || echo unknown)")"
+    if [[ ${#missing[@]} -gt 0 ]]; then
+      flag_list="${missing[*]}"
+      die "$(_vendor_sync_skew_message "$flag_list" "aligned pin still lacks flag" "$installer_sha" "$(git -C "${COLLECTIONS_HOME}" rev-parse HEAD 2>/dev/null || echo unknown)")"
+    fi
+    flag_list="${missing_agents[*]}"
+    die "$(_vendor_sync_skew_message "$flag_list" "aligned pin still lacks agent id" "$installer_sha" "$(git -C "${COLLECTIONS_HOME}" rev-parse HEAD 2>/dev/null || echo unknown)" agent)"
   fi
 
-  die "$(_vendor_sync_skew_message "$flag_list" "dirty vendor worktree — commit or stash, then checkout" "$installer_sha" "$vendor_sha")"
+  die "$(_vendor_sync_skew_message "$flag_list" "dirty vendor worktree — commit or stash, then checkout" "$installer_sha" "$vendor_sha" "$kind")"
 }

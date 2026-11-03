@@ -1,0 +1,42 @@
+# Pi adapter rule map (AC-14)
+# Packaging metadata lives here — not in .ai/rules/*.md
+# id/source parity with adapters/claude/rule-map.yaml (asserted by adapters/sync.mjs --check).
+#
+# target:
+#   append_system -> body concatenated into .pi/APPEND_SYSTEM.md (always-on)
+#   skill         -> .pi/skills/<skill_id>/SKILL.md (role rule, loaded on demand)
+#   none          -> not emitted; served by the mirrored framework skill <skill_id>
+# skill_id for target skill must start with eversis-rule- and must not equal any
+# .ai/skills/eversis-* directory name (asserted by adapters/pi/generate.mjs).
+# ui_note: true prefixes the body with a "UI files only" note.
+version: 1
+rules:
+  - id: eversis-agent-core
+    source: .ai/rules/orchestration/agent-core.md
+    target: append_system
+  - id: eversis-testing-and-terminal
+    source: .ai/rules/orchestration/testing-and-terminal.md
+    target: append_system
+  - id: eversis-accessibility
+    source: .ai/rules/frontend/accessibility.md
+    target: append_system
+    ui_note: true
+  - id: eversis-engineering-manager
+    source: .ai/rules/orchestration/engineering-manager.md
+    target: skill
+    skill_id: eversis-rule-engineering-manager
+    description: "Agent Collections Engineering Manager role rule (eversis-engineering-manager) — Implement readiness block, human gates, delegation, Continuity and QA handoff policy. Load when running /eversis-implement or orchestrating Implement."
+  - id: eversis-code-reviewer
+    source: .ai/rules/architecture/code-reviewer.md
+    target: skill
+    skill_id: eversis-rule-code-reviewer
+    description: "Agent Collections Code Reviewer role rule (eversis-code-reviewer) — PASS / BLOCKER / SUGGESTION review structure and hard-limit blockers. Load when running /eversis-review or the Review stage."
+  - id: eversis-fine-handoff
+    source: .ai/rules/orchestration/fine-handoff.md
+    target: none
+    skill_id: eversis-fine-handoff
+  - id: eversis-spec-driven-development
+    source: .ai/rules/orchestration/spec-driven-development.md
+    target: skill
+    skill_id: eversis-rule-spec-driven-development
+    description: "Agent Collections Delivery Standard role rule (eversis-spec-driven-development) — spec folder convention, research and plan gates, Review and Fine. Load when starting or delivering a spec-driven task."

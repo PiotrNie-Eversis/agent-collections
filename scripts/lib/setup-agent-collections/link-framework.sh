@@ -180,15 +180,23 @@ _resolve_framework_prefix() {
   echo '${AGENT_COLLECTIONS_HOME}'
 }
 
-_link_claude_skills() {
-  if ! echo ",${SELECTED_AGENTS:-}," | grep -q ',claude,'; then
+# Shared skills mirror for every agent that reads .ai/skills/eversis-* from a
+# local <agent>/skills/ folder (Claude, Cursor, Pi). Args: agent id (selection
+# guard), destination dir relative to TARGET_DIR (e.g. .claude/skills), and an
+# optional glob of destination entries the stale-prune must never touch (Pi
+# passes 'eversis-rule-*': those role skills are written by the Pi generator,
+# not mirrored from .ai/skills/). Returns non-zero on any failed mkdir / link /
+# copy / prune so an isolated caller (run_pi_stage) can report it.
+_link_agent_skills() {
+  local agent="$1" dst_rel="$2" prune_exclude="${3:-}"
+  if ! echo ",${SELECTED_AGENTS:-}," | grep -q ",${agent},"; then
     return 0
   fi
   local skills_src_root="${COLLECTIONS_HOME}/.ai/skills"
   [[ -d "$skills_src_root" ]] || return 0
 
-  local skills_dst_root="${TARGET_DIR}/.claude/skills"
-  mkdir -p "$skills_dst_root"
+  local skills_dst_root="${TARGET_DIR}/${dst_rel}"
+  mkdir -p "$skills_dst_root" || return 1
 
   local src name dst count=0
   local keep_names=""
@@ -197,18 +205,18 @@ _link_claude_skills() {
     name="$(basename "$src")"
     keep_names="${keep_names},${name},"
     dst="${skills_dst_root}/${name}"
-    rm -rf "$dst"
+    rm -rf "$dst" || return 1
     if [[ "${EFFECTIVE_LINK_MODE:-symlink}" == "symlink" ]]; then
-      _make_symlink "$src" "$dst"
+      _make_symlink "$src" "$dst" || return 1
     else
-      cp -R "$src" "$dst"
+      cp -R "$src" "$dst" || return 1
     fi
     count=$((count + 1))
   done
-  log_ok "Linked ${count} skill package(s) into .claude/skills/ (mode: ${EFFECTIVE_LINK_MODE:-symlink})."
+  log_ok "Linked ${count} skill package(s) into ${dst_rel}/ (mode: ${EFFECTIVE_LINK_MODE:-symlink})."
 
   # A skill package renamed or removed upstream (in .ai/skills/) would
-  # otherwise survive forever in .claude/skills/ — the loop above only adds
+  # otherwise survive forever in <agent>/skills/ — the loop above only adds
   # entries for what exists in the source today, it never removes what no
   # longer does. Prune destination entries with no matching source name.
   local existing removed=0
@@ -218,56 +226,51 @@ _link_claude_skills() {
     case "$keep_names" in
       *",${name},"*) continue ;;
     esac
-    rm -rf "$existing"
+    # shellcheck disable=SC2254
+    if [[ -n "$prune_exclude" ]]; then
+      case "$name" in
+        $prune_exclude) continue ;;
+      esac
+    fi
+    rm -rf "$existing" || return 1
     removed=$((removed + 1))
   done
   if [[ "$removed" -gt 0 ]]; then
-    log_ok "Removed ${removed} stale skill package(s) from .claude/skills/ (no longer in .ai/skills/)."
+    log_ok "Removed ${removed} stale skill package(s) from ${dst_rel}/ (no longer in .ai/skills/)."
   fi
+  return 0
 }
 
+_link_claude_skills() {
+  _link_agent_skills claude .claude/skills
+}
+
+# Same staleness concern as _link_claude_skills — prune destination entries
+# with no matching source name (handled inside _link_agent_skills).
 _link_cursor_skills() {
-  if ! echo ",${SELECTED_AGENTS:-}," | grep -q ',cursor,'; then
-    return 0
-  fi
-  local skills_src_root="${COLLECTIONS_HOME}/.ai/skills"
-  [[ -d "$skills_src_root" ]] || return 0
+  _link_agent_skills cursor .cursor/skills
+}
 
-  local skills_dst_root="${TARGET_DIR}/.cursor/skills"
-  mkdir -p "$skills_dst_root"
-
-  local src name dst count=0
-  local keep_names=""
-  for src in "$skills_src_root"/eversis-*; do
-    [[ -d "$src" ]] || continue
-    name="$(basename "$src")"
-    keep_names="${keep_names},${name},"
-    dst="${skills_dst_root}/${name}"
-    rm -rf "$dst"
-    if [[ "${EFFECTIVE_LINK_MODE:-symlink}" == "symlink" ]]; then
-      _make_symlink "$src" "$dst"
-    else
-      cp -R "$src" "$dst"
-    fi
-    count=$((count + 1))
+# Prints the agents CSV in $1 without the pi id (order kept, empty ids dropped).
+_agents_without_pi() {
+  local csv="$1" out="" id
+  local -a ids=()
+  IFS=',' read -ra ids <<< "$csv"
+  for id in ${ids[@]+"${ids[@]}"}; do
+    id="${id// /}"
+    [[ -z "$id" || "$id" == "pi" ]] && continue
+    out="${out:+${out},}${id}"
   done
-  log_ok "Linked ${count} skill package(s) into .cursor/skills/ (mode: ${EFFECTIVE_LINK_MODE:-symlink})."
+  printf '%s' "$out"
+}
 
-  # Same staleness concern as _link_claude_skills — prune destination entries
-  # with no matching source name.
-  local existing removed=0
-  for existing in "$skills_dst_root"/eversis-*; do
-    [[ -e "$existing" ]] || continue
-    name="$(basename "$existing")"
-    case "$keep_names" in
-      *",${name},"*) continue ;;
-    esac
-    rm -rf "$existing"
-    removed=$((removed + 1))
-  done
-  if [[ "$removed" -gt 0 ]]; then
-    log_ok "Removed ${removed} stale skill package(s) from .cursor/skills/ (no longer in .ai/skills/)."
-  fi
+_pi_selected() {
+  echo ",${SELECTED_AGENTS:-}," | grep -q ',pi,'
+}
+
+# True when pi is selected and no other agent is (Pi-only install).
+_pi_only_selected() {
+  _pi_selected && [[ -z "$(_agents_without_pi "${SELECTED_AGENTS:-}")" ]]
 }
 
 _run_adapter_sync() {
@@ -276,6 +279,15 @@ _run_adapter_sync() {
   [[ -f "$sync_mjs" ]] || die "Missing adapters/sync.mjs in framework home."
 
   local agents_csv="${SELECTED_AGENTS:-cursor}"
+  # Pi runs in its own isolated stage (run_pi_stage) so a Pi failure never
+  # aborts the other agents. Pass only the non-Pi agents here; a Pi-only
+  # selection skips this sync entirely — never fall back to cursor and never
+  # call sync.mjs with an empty --agents (AC-14 review B3).
+  agents_csv="$(_agents_without_pi "$agents_csv")"
+  if [[ -z "$agents_csv" ]]; then
+    log_info "Adapter sync for Cursor / Claude skipped (only pi selected — handled by the Pi stage)."
+    return 0
+  fi
   local args=(--out "${TARGET_DIR}" --agents "${agents_csv}")
 
   local framework_prefix
@@ -337,4 +349,155 @@ _write_or_clear_framework_home() {
     return 0
   fi
   echo "${COLLECTIONS_HOME}" > "${home_marker}/framework-home.txt"
+}
+
+# ---------------------------------------------------------------------------
+# Pi stage (AC-14) — everything Pi-specific (generation, skills mirror,
+# deselect pruning; the .pi/mcp.json merge lives in mcp-merge.sh) runs
+# isolated from the other agents. A Pi failure sets PI_STAGE_FAILED=true and
+# PI_STAGE_FAILURE_REASON and records a "pi" failure; it never edits
+# SELECTED_AGENTS, because an empty list falls back to cursor across the
+# installer (${SELECTED_AGENTS:-cursor}). The caller decides what happens
+# next: Pi-only → exit 1 right away; otherwise continue and exit 1 at the end.
+# ---------------------------------------------------------------------------
+
+readonly PI_GENERATED_MARKER="GENERATED by adapters/pi/generate.mjs"
+
+# Start from "false" so a stray value in the caller's env never marks a run
+# as a Pi failure.
+PI_STAGE_FAILED="false"
+PI_STAGE_FAILURE_REASON=""
+
+# Args: reason. Records the first Pi failure (later calls keep the first cause).
+mark_pi_stage_failed() {
+  local reason="$1"
+  if [[ "${PI_STAGE_FAILED:-false}" != "true" ]]; then
+    PI_STAGE_FAILED="true"
+    PI_STAGE_FAILURE_REASON="$reason"
+    if declare -F record_fail >/dev/null 2>&1; then
+      record_fail "pi"
+    fi
+  fi
+  export PI_STAGE_FAILED PI_STAGE_FAILURE_REASON
+  log_error "pi: ${reason} — other agents' output is kept; pi is left out of the recorded selection."
+}
+
+# Same framework prefix handling as _run_adapter_sync, but --agents pi only and
+# a non-zero return instead of die. The first "error:" line of the generator
+# output becomes the failure reason.
+_run_pi_adapter_sync() {
+  local sync_mjs="${COLLECTIONS_HOME}/adapters/sync.mjs"
+  if ! command -v node >/dev/null 2>&1; then
+    PI_SYNC_ERROR="node not found (install Node.js ≥ 18)"
+    return 1
+  fi
+  if [[ ! -f "$sync_mjs" ]]; then
+    PI_SYNC_ERROR="missing adapters/sync.mjs in framework home"
+    return 1
+  fi
+
+  local args=(--out "${TARGET_DIR}" --agents pi)
+  local framework_prefix
+  framework_prefix="$(_resolve_framework_prefix)"
+  if [[ -n "$framework_prefix" ]]; then
+    args+=(--framework-prefix "$framework_prefix")
+  fi
+
+  log_info "Running Pi adapter sync → ${TARGET_DIR} (agents: pi) …"
+  local output="" rc=0
+  output="$(cd "$COLLECTIONS_HOME" && node "$sync_mjs" "${args[@]}" 2>&1)" || rc=$?
+  [[ -n "$output" ]] && printf '%s\n' "$output"
+  if [[ "$rc" -ne 0 ]]; then
+    PI_SYNC_ERROR="$(printf '%s\n' "$output" | grep -m1 '^error:' | sed 's/^error: *//')"
+    [[ -n "$PI_SYNC_ERROR" ]] || PI_SYNC_ERROR="adapters/sync.mjs --agents pi exited with code ${rc}"
+    return 1
+  fi
+  log_ok "Pi adapter sync complete."
+  return 0
+}
+
+# Pi deselect (pi not in --agents): remove only framework-generated Pi files.
+# Marker-gated for generated files; eversis-* mirror entries in .pi/skills/
+# are framework-owned by name (same rule as .claude/skills/). Consumer-owned
+# .pi/settings.json and .pi/mcp.json stay (same convention as .mcp.json /
+# .cursor/mcp.json on deselect). Returns non-zero when a removal fails.
+_prune_deselected_pi() {
+  local pi_dir="${TARGET_DIR}/.pi"
+  [[ -d "$pi_dir" ]] || return 0
+  local reason="Pi not in --agents"
+
+  local append_system="${pi_dir}/APPEND_SYSTEM.md"
+  if [[ -f "$append_system" ]] && grep -qF "$PI_GENERATED_MARKER" "$append_system" 2>/dev/null; then
+    rm -f "$append_system" || return 1
+    log_ok "Removed generated .pi/APPEND_SYSTEM.md (${reason})."
+  fi
+
+  local extension="${pi_dir}/extensions/eversis-context-budget.ts"
+  if [[ -f "$extension" ]] && grep -qF "$PI_GENERATED_MARKER" "$extension" 2>/dev/null; then
+    rm -f "$extension" || return 1
+    log_ok "Removed generated .pi/extensions/eversis-context-budget.ts (${reason})."
+  fi
+
+  _prune_marker_gated_dir "${pi_dir}/prompts" "$PI_GENERATED_MARKER" \
+    ".pi/prompts/*.md" "eversis-*.md" "$reason"
+
+  local skills_dir="${pi_dir}/skills"
+  if [[ -d "$skills_dir" ]]; then
+    local entry name removed_roles=0 removed_mirror=0
+    for entry in "$skills_dir"/eversis-*; do
+      [[ -e "$entry" ]] || [[ -L "$entry" ]] || continue
+      name="$(basename "$entry")"
+      case "$name" in
+        eversis-rule-*)
+          # Generated role skills: only when their SKILL.md carries the marker.
+          [[ -f "${entry}/SKILL.md" ]] || continue
+          grep -qF "$PI_GENERATED_MARKER" "${entry}/SKILL.md" 2>/dev/null || continue
+          rm -rf "$entry" || return 1
+          removed_roles=$((removed_roles + 1))
+          ;;
+        *)
+          rm -rf "$entry" || return 1
+          removed_mirror=$((removed_mirror + 1))
+          ;;
+      esac
+    done
+    if [[ "$removed_roles" -gt 0 ]]; then
+      log_ok "Removed ${removed_roles} generated role skill(s) from .pi/skills/ (${reason})."
+    fi
+    if [[ "$removed_mirror" -gt 0 ]]; then
+      log_ok "Removed ${removed_mirror} framework skill package(s) from .pi/skills/ (${reason})."
+    fi
+  fi
+  return 0
+}
+
+# Isolated Pi stage, called by setup-agent-collections.sh after
+# link_framework_files. Returns 1 when the Pi stage failed (flag + reason set,
+# "pi" failure recorded); never dies for a Pi-caused error. Every sub-step is
+# checked explicitly because set -e is inactive inside `… || …` callers.
+run_pi_stage() {
+  if ! _pi_selected; then
+    if ! _prune_deselected_pi; then
+      mark_pi_stage_failed "could not remove generated .pi/ files after deselecting Pi"
+      return 1
+    fi
+    return 0
+  fi
+
+  if [[ -z "${EFFECTIVE_LINK_MODE:-}" ]]; then
+    EFFECTIVE_LINK_MODE="symlink"
+    [[ "${OS_TYPE:-}" == "windows" ]] && EFFECTIVE_LINK_MODE="copy"
+    export EFFECTIVE_LINK_MODE
+  fi
+
+  PI_SYNC_ERROR=""
+  if ! _run_pi_adapter_sync; then
+    mark_pi_stage_failed "Pi adapter generation failed: ${PI_SYNC_ERROR}"
+    return 1
+  fi
+  if ! _link_agent_skills pi .pi/skills 'eversis-rule-*'; then
+    mark_pi_stage_failed "framework skills mirror into .pi/skills/ failed"
+    return 1
+  fi
+  return 0
 }

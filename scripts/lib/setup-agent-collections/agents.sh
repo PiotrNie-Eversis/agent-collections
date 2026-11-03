@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/setup-agent-collections/agents.sh — agents axis (Cursor / Claude / OpenCode).
+# lib/setup-agent-collections/agents.sh — agents axis (Cursor / Claude / OpenCode / Pi).
 
 readonly AGENTS_PROMPT_MJS="${LIB_DIR}/agents-prompt.mjs"
 
@@ -32,6 +32,8 @@ _run_numbered_agents_prompt() {
   echo "  3) Cursor + Claude"
   echo "  4) OpenCode placeholder only (warning: not a full adapter)"
   echo "  5) Multi-agent (Cursor + Claude + OpenCode placeholder)"
+  echo "  6) Pi only"
+  echo "  7) Cursor + Claude + Pi"
   echo ""
   local choice=""
   read -r -p "Enter choice [1]: " choice
@@ -46,6 +48,8 @@ _run_numbered_agents_prompt() {
       SELECTED_AGENTS="cursor,claude,opencode"
       log_warn "OpenCode included as placeholder-only."
       ;;
+    6) SELECTED_AGENTS="pi" ;;
+    7) SELECTED_AGENTS="cursor,claude,pi" ;;
     *) SELECTED_AGENTS="cursor" ;;
   esac
   export SELECTED_AGENTS
@@ -63,7 +67,7 @@ _run_interactive_agents_prompt() {
 }
 
 resolve_agents_selection() {
-  # Sets SELECTED_AGENTS CSV: cursor,claude,opencode
+  # Sets SELECTED_AGENTS CSV: cursor,claude,opencode,pi
   if [[ -n "${SELECTED_AGENTS:-}" ]]; then
     _validate_agents "$SELECTED_AGENTS"
     export SELECTED_AGENTS
@@ -102,8 +106,8 @@ _validate_agents() {
     id="${id// /}"
     [[ -z "$id" ]] && continue
     case "$id" in
-      cursor|claude|opencode) : ;;
-      *) die "Unknown agent id '${id}'. Allowed: cursor, claude, opencode" ;;
+      cursor|claude|opencode|pi) : ;;
+      *) die "Unknown agent id '${id}'. Allowed: cursor, claude, opencode, pi" ;;
     esac
   done
   if echo ",${csv}," | grep -q ',opencode,'; then

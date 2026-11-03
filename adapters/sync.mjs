@@ -2,11 +2,16 @@
 /**
  * Adapter sync CLI (TASK-527).
  * Orchestrates Cursor + Claude generators from core. Zero npm dependencies.
+ * Pi (AC-14) is opt-in via --agents …,pi: the Pi generator runs last on write,
+ * and --check delegates to `adapters/pi/generate.mjs --check` (defaults stay
+ * cursor,claude, so no .pi/ is created in this repo unless pi is requested).
  *
  * Usage (repo root):
  *   node adapters/sync.mjs
  *   node adapters/sync.mjs --out /path/to/out
  *   node adapters/sync.mjs --check
+ *   node adapters/sync.mjs --agents cursor,pi --out /path/to/out
+ *   node adapters/sync.mjs --check --agents cursor,pi --out /path/to/out
  *   npm run sync:adapters
  *   npm run sync:adapters:check
  */
@@ -25,8 +30,11 @@ const CLAUDE_COMMANDS_GENERATE = path.join(
   "claude",
   "generate-commands.mjs",
 );
+const PI_GENERATE = path.join(__dirname, "pi", "generate.mjs");
 const CURSOR_MAP = path.join(__dirname, "cursor", "rule-map.yaml");
 const CLAUDE_MAP = path.join(__dirname, "claude", "rule-map.yaml");
+const PI_MAP = path.join(__dirname, "pi", "rule-map.yaml");
+const ALLOWED_AGENTS = ["cursor", "claude", "opencode", "pi"];
 
 function fail(message) {
   console.error(`error: ${message}`);
@@ -81,7 +89,7 @@ function parseArgs(argv) {
     if (arg === "--agents") {
       const next = argv[i + 1];
       if (!next || next.startsWith("-")) {
-        fail("--agents requires a comma-separated list (cursor,claude,opencode)");
+        fail("--agents requires a comma-separated list (cursor,claude,opencode,pi)");
       }
       agents = new Set(
         next
@@ -90,8 +98,8 @@ function parseArgs(argv) {
           .filter(Boolean),
       );
       for (const id of agents) {
-        if (!["cursor", "claude", "opencode"].includes(id)) {
-          fail(`unknown agent id: ${id} (allowed: cursor, claude, opencode)`);
+        if (!ALLOWED_AGENTS.includes(id)) {
+          fail(`unknown agent id: ${id} (allowed: ${ALLOWED_AGENTS.join(", ")})`);
         }
       }
       i++;
@@ -103,7 +111,7 @@ function parseArgs(argv) {
     }
     if (arg === "--help" || arg === "-h") {
       console.log(
-        "Usage: node adapters/sync.mjs [--check] [--out <dir>] [--agents cursor,claude,opencode]\n" +
+        "Usage: node adapters/sync.mjs [--check] [--out <dir>] [--agents cursor,claude,opencode,pi]\n" +
           "                              [--framework-prefix <path>]\n" +
           "  Default: regenerate Cursor (.mdc) then Claude (CLAUDE.md) from core.\n" +
           "  --check: compare fresh generation to disk; exit 0 if no drift (also checks\n" +
@@ -111,10 +119,14 @@ function parseArgs(argv) {
           "  --out: pass through to generators (write or compare under <dir>).\n" +
           "  --agents: only run selected adapters (default: cursor,claude).\n" +
           "            opencode is placeholder-only (copies opencode.jsonc when present).\n" +
+          "            pi runs the Pi generator last (adapters/pi/generate.mjs → .pi/).\n" +
+          "            With --check: only the named agents are checked (Pi via its\n" +
+          "            generator's --check against the target); omitted = cursor,claude.\n" +
           "  --framework-prefix: pass through to both generators — prepends <path> to\n" +
           "            .ai/... references in CLAUDE.md's How-to section and .cursor/commands/\n" +
           "            SSOT pointers, for vendored consumer installs (empty = self-host,\n" +
           "            unprefixed). Does not affect .cursor/rules/*.mdc body content.\n" +
+          "            Also passed to the Pi generator (.pi/ SSOT pointers) when pi is selected.\n" +
           "\n" +
           "npm: npm run sync:adapters | npm run sync:adapters:check",
       );
@@ -271,6 +283,44 @@ function assertIdSourceParity(cursorMap, claudeMap) {
     parts.push(`only in Claude map: ${onlyClaude.map(fmt).join("; ")}`);
   }
   fail(`Cursor↔Claude id/source parity failed — ${parts.join(" | ")}`);
+}
+
+/**
+ * Pi map parity (AC-14): every Claude id/source pair must be present in the
+ * Pi rule map (Pi decides per rule whether it is always-on, a role skill or
+ * served by a framework skill, but it must not silently drop a framework rule).
+ */
+function assertPiIdSourceParity(claudeMap, piMap) {
+  const piKeys = new Set(piMap.rules.map(idSourceKey));
+  const missing = claudeMap.rules
+    .map(idSourceKey)
+    .filter((key) => !piKeys.has(key))
+    .map((key) => key.split("\0").join(" → "));
+  if (missing.length > 0) {
+    fail(`Claude→Pi id/source parity failed — missing in Pi map: ${missing.join("; ")}`);
+  }
+}
+
+/**
+ * Run the Pi generator in --check mode against the target root (no temp-dir
+ * comparison, so the project-stack overlay is evaluated against the real
+ * target). Prints its output; returns true when it reports no drift.
+ */
+function runPiCheck(compareRoot, frameworkPrefixArgs) {
+  if (!fs.existsSync(PI_GENERATE)) {
+    fail(`Pi generator not found: ${PI_GENERATE}`);
+  }
+  const result = spawnSync(
+    process.execPath,
+    [PI_GENERATE, "--out", compareRoot, "--check", ...frameworkPrefixArgs],
+    { cwd: process.cwd(), encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+  );
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  if (result.error) {
+    fail(`Pi generator failed to start: ${result.error.message}`);
+  }
+  return result.status === 0;
 }
 
 function runGenerator(scriptPath, outRoot, label, extraArgs = []) {
@@ -457,10 +507,20 @@ function checkSkillsMirror(repoRoot, hostDirRel, label) {
   return drifts;
 }
 
-function runCheck(repoRoot, outRoot, frameworkPrefix) {
+/**
+ * @param {Set<string>|null} agents null = today's default check (Cursor + Claude);
+ *   otherwise only the named agents are checked (opencode has nothing to check).
+ */
+function runCheck(repoRoot, outRoot, frameworkPrefix, agents) {
+  const selected = agents ?? new Set(["cursor", "claude"]);
+  const checkCursor = selected.has("cursor");
+  const checkClaude = selected.has("claude");
+  const checkPi = selected.has("pi");
+
   const cursorMap = loadRuleMap(CURSOR_MAP, "Cursor");
   const claudeMap = loadRuleMap(CLAUDE_MAP, "Claude");
   assertIdSourceParity(cursorMap, claudeMap);
+  assertPiIdSourceParity(claudeMap, loadRuleMap(PI_MAP, "Pi"));
 
   for (const rule of cursorMap.rules) {
     if (!rule.output) {
@@ -473,26 +533,30 @@ function runCheck(repoRoot, outRoot, frameworkPrefix) {
     const frameworkPrefixArgs = frameworkPrefix
       ? ["--framework-prefix", frameworkPrefix]
       : [];
-    runGenerator(CURSOR_GENERATE, tmp, "Cursor", frameworkPrefixArgs);
-    runGenerator(CLAUDE_GENERATE, tmp, "Claude", frameworkPrefixArgs);
-    runGenerator(
-      CLAUDE_COMMANDS_GENERATE,
-      tmp,
-      "Claude commands",
-      frameworkPrefixArgs,
-    );
+    if (checkCursor) {
+      runGenerator(CURSOR_GENERATE, tmp, "Cursor", frameworkPrefixArgs);
+    }
+    if (checkClaude) {
+      runGenerator(CLAUDE_GENERATE, tmp, "Claude", frameworkPrefixArgs);
+      runGenerator(
+        CLAUDE_COMMANDS_GENERATE,
+        tmp,
+        "Claude commands",
+        frameworkPrefixArgs,
+      );
+    }
 
     const compareRoot = resolveCompareRoot(repoRoot, outRoot);
     const drifts = [];
 
-    for (const rule of cursorMap.rules) {
+    for (const rule of checkCursor ? cursorMap.rules : []) {
       const expected = path.join(tmp, rule.output);
       const actual = path.join(compareRoot, rule.output);
       const err = compareFiles(expected, actual, rule.id);
       if (err) drifts.push(err);
     }
 
-    {
+    if (checkCursor) {
       const expectedCommandsDir = path.join(tmp, ".cursor", "commands");
       const actualCommandsDir = path.join(compareRoot, ".cursor", "commands");
       const expectedNames = new Set();
@@ -537,7 +601,7 @@ function runCheck(repoRoot, outRoot, frameworkPrefix) {
       }
     }
 
-    {
+    if (checkClaude) {
       const expectedCommandsDir = path.join(tmp, ".claude", "commands");
       const actualCommandsDir = path.join(compareRoot, ".claude", "commands");
       const expectedNames = new Set();
@@ -582,7 +646,7 @@ function runCheck(repoRoot, outRoot, frameworkPrefix) {
       }
     }
 
-    {
+    if (checkClaude) {
       const expectedRulesDir = path.join(tmp, ".claude", "rules");
       const actualRulesDir = path.join(compareRoot, ".claude", "rules");
       const expectedNames = new Set();
@@ -623,7 +687,7 @@ function runCheck(repoRoot, outRoot, frameworkPrefix) {
       }
     }
 
-    {
+    if (checkClaude) {
       const expected = path.join(tmp, "CLAUDE.md");
       const actual = path.join(compareRoot, "CLAUDE.md");
       const err = compareFiles(expected, actual, "CLAUDE.md");
@@ -631,8 +695,16 @@ function runCheck(repoRoot, outRoot, frameworkPrefix) {
     }
 
     if (isFrameworkRootTarget(repoRoot, outRoot)) {
-      drifts.push(...checkSkillsMirror(repoRoot, ".cursor/skills", "cursor-skill"));
-      drifts.push(...checkSkillsMirror(repoRoot, ".claude/skills", "claude-skill"));
+      if (checkCursor) {
+        drifts.push(...checkSkillsMirror(repoRoot, ".cursor/skills", "cursor-skill"));
+      }
+      if (checkClaude) {
+        drifts.push(...checkSkillsMirror(repoRoot, ".claude/skills", "claude-skill"));
+      }
+    }
+
+    if (checkPi && !runPiCheck(compareRoot, frameworkPrefixArgs)) {
+      drifts.push(`pi: Pi adapter drift under ${compareRoot} (see generator output above)`);
     }
 
     if (drifts.length > 0) {
@@ -698,6 +770,13 @@ function runWrite(repoRoot, outRoot, agents, frameworkPrefix) {
       `adapter sync: framework skills mirror — .cursor/skills (${cursorCount}), .claude/skills (${claudeCount})`,
     );
   }
+  // Pi last (AC-14): a Pi generator failure exits non-zero only after the
+  // other selected adapters' outputs are already written. The .pi/skills
+  // framework mirror is owned by the installer, not this step.
+  if (selected.has("pi")) {
+    console.log("adapter sync: regenerating Pi…");
+    runGenerator(PI_GENERATE, outRoot, "Pi", frameworkPrefixArgs);
+  }
   console.log("adapter sync: done");
 }
 
@@ -708,7 +787,7 @@ function main() {
   const repoRoot = findRepoRoot(process.cwd());
 
   if (check) {
-    runCheck(repoRoot, outRoot, frameworkPrefix);
+    runCheck(repoRoot, outRoot, frameworkPrefix, agents);
   } else {
     runWrite(repoRoot, outRoot, agents, frameworkPrefix);
   }

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # mcp-merge.test.sh — unit tests for mcp-merge.sh host branching (Cursor vs
 # Claude Code) and the Claude-native syntax transform in mcp-merge.mjs.
+# Also covers the Pi host (AC-14): .pi/mcp.json bash -c locator entries and
+# Pi failure isolation.
 #
 # Usage (from repo root):
 #   bash scripts/lib/setup-agent-collections/mcp-merge.test.sh
@@ -88,6 +90,11 @@ source "${LIB_DIR}/common.sh"
 source "${LIB_DIR}/mcp-merge.sh"
 # shellcheck source=mcp-user-overlap.sh
 source "${LIB_DIR}/mcp-user-overlap.sh"
+# Pi failure isolation (mark_pi_stage_failed) lives with the Pi stage.
+FAILED_STEPS=()
+record_fail() { FAILED_STEPS+=("$1"); }
+# shellcheck source=link-framework.sh
+source "${LIB_DIR}/link-framework.sh"
 
 echo "mcp-merge.sh unit tests"
 echo ""
@@ -418,6 +425,245 @@ else
   _fail "preserve: eversis-collections not added when unselected and absent"
 fi
 unset MCP_PRESERVE_EXISTING _preserve_before _preserve_log
+
+# --- Pi host (AC-14) --------------------------------------------------------
+# Asserts the Pi eversis-collections entry is a bash -c locator that walks up
+# to the nearest .pi/ and that the file has no inputs and no host variable Pi
+# cannot expand in any command / args value.
+_assert_pi_mcp_shape() {
+  local file="$1" mode="$2" label="$3"
+  if node -e '
+      const fs = require("fs");
+      const [file, mode, home] = process.argv.slice(1);
+      const j = JSON.parse(fs.readFileSync(file, "utf8"));
+      if (j.inputs !== undefined) process.exit(1);
+      const e = j.mcpServers["eversis-collections"];
+      if (!e || e.command !== "bash" || !Array.isArray(e.args) || e.args[0] !== "-c") process.exit(2);
+      if (e.type !== "stdio" || e.env !== undefined) process.exit(3);
+      const script = e.args[1] || "";
+      if (!script.includes("[ ! -d \"$d/.pi\" ]")) process.exit(4);
+      if (mode === "vendored") {
+        if (!script.includes("exec \"$d/scripts/run-eversis-collections-mcp.sh\"")) process.exit(5);
+        if (script.includes("${")) process.exit(6);
+      } else {
+        if (!script.includes("CONSUMER_PROJECT_ROOT=\"$d\" exec docker compose -f \"${AGENT_COLLECTIONS_HOME:-" + home + "}/docker-compose.yml\" run --rm -T eversis-collections")) process.exit(7);
+      }
+      for (const [id, cfg] of Object.entries(j.mcpServers)) {
+        const vals = [cfg.command, ...(cfg.args || [])].filter((v) => typeof v === "string");
+        for (let v of vals) {
+          if (id === "eversis-collections") v = v.replace(/\$\{AGENT_COLLECTIONS_HOME:-[^}]*\}/g, "");
+          if (v.includes("${workspaceFolder}") || v.includes("${env:") || v.includes("CLAUDE_PROJECT_DIR") || v.includes("${")) process.exit(8);
+        }
+      }
+    ' "$file" "$mode" "$REPO_ROOT"; then
+    _pass "$label"
+  else
+    _fail "$label (shape check exit $?)"
+  fi
+}
+
+# Case 7: pi + vendored (copy) — locator execs the committed wrapper; only
+# .pi/mcp.json is written; other catalog servers copied as-is.
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/.pi" "${TARGET_DIR}/scripts"
+SELECTED_AGENTS="pi"
+VENDOR_MODE="copy"
+MCP_SELECTED_IDS="eversis-collections,context7,figma"
+PI_STAGE_FAILED="false"
+merge_mcp_json
+if [[ -f "${TARGET_DIR}/.pi/mcp.json" ]] && [[ ! -f "${TARGET_DIR}/.cursor/mcp.json" ]] && [[ ! -f "${TARGET_DIR}/.mcp.json" ]]; then
+  _pass "pi-only writes only .pi/mcp.json"
+else
+  _fail "pi-only writes only .pi/mcp.json"
+fi
+_assert_pi_mcp_shape "${TARGET_DIR}/.pi/mcp.json" vendored \
+  "pi+copy: eversis-collections is a bash -c .pi/ walk-up locator exec'ing the wrapper; no inputs, no host variables"
+_assert_wrapper_script_copied "$TARGET_DIR" \
+  "pi+copy copies run-eversis-collections-mcp.sh matching the template"
+if node -e '
+    const fs = require("fs");
+    const j = JSON.parse(fs.readFileSync(process.argv[1], "utf8")).mcpServers;
+    const t = JSON.parse(fs.readFileSync(process.argv[2], "utf8")).mcpServers;
+    if (JSON.stringify(j.context7) !== JSON.stringify(t.context7)) process.exit(1);
+    if (JSON.stringify(j.figma) !== JSON.stringify(t.figma)) process.exit(1);
+  ' "${TARGET_DIR}/.pi/mcp.json" "${REPO_ROOT}/templates/mcp.json"; then
+  _pass "pi: other catalog servers are copied as-is from the template"
+else
+  _fail "pi: other catalog servers are copied as-is from the template"
+fi
+# The locator finds the project root from a subdirectory (Pi spawns stdio
+# servers in the session directory). A stub wrapper prints its own location.
+mkdir -p "${TARGET_DIR}/src/deep/dir"
+printf '#!/usr/bin/env bash\necho "wrapper:$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"\n' \
+  > "${TARGET_DIR}/scripts/run-eversis-collections-mcp.sh"
+_pi_locator="$(node -e 'console.log(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).mcpServers["eversis-collections"].args[1])' "${TARGET_DIR}/.pi/mcp.json")"
+_pi_out="$(cd "${TARGET_DIR}/src/deep/dir" && bash -c "$_pi_locator" 2>&1)" || true
+if [[ "$_pi_out" == "wrapper:$(cd "$TARGET_DIR" && pwd)" ]]; then
+  _pass "pi vendored locator walks up from a subdirectory to the .pi/ project root"
+else
+  echo "    got: ${_pi_out}"
+  _fail "pi vendored locator walks up from a subdirectory to the .pi/ project root"
+fi
+
+# Case 7b: pi + local mode — docker compose with the resolved framework path
+# as the bash default and CONSUMER_PROJECT_ROOT from the .pi/ walk-up.
+rm -rf "${TARGET_DIR}/.pi" "${TARGET_DIR}/scripts"
+VENDOR_MODE=""
+MCP_SELECTED_IDS="eversis-collections"
+merge_mcp_json
+_assert_pi_mcp_shape "${TARGET_DIR}/.pi/mcp.json" local \
+  "pi local: eversis-collections bash -c locator runs docker compose with \${AGENT_COLLECTIONS_HOME:-<resolved>} inside the bash script"
+if [[ ! -f "${TARGET_DIR}/scripts/run-eversis-collections-mcp.sh" ]]; then
+  _pass "pi local mode does not copy the wrapper script"
+else
+  _fail "pi local mode does not copy the wrapper script"
+fi
+_fake_bin="$(mktemp -d)"
+printf '#!/usr/bin/env bash\necho "docker root=$CONSUMER_PROJECT_ROOT args=$*"\n' > "${_fake_bin}/docker"
+chmod +x "${_fake_bin}/docker"
+_pi_locator="$(node -e 'console.log(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).mcpServers["eversis-collections"].args[1])' "${TARGET_DIR}/.pi/mcp.json")"
+_pi_out="$(cd "${TARGET_DIR}/src/deep/dir" && env -u AGENT_COLLECTIONS_HOME PATH="${_fake_bin}:${PATH}" bash -c "$_pi_locator" 2>&1)" || true
+if [[ "$_pi_out" == "docker root=$(cd "$TARGET_DIR" && pwd) args=compose -f ${REPO_ROOT}/docker-compose.yml run --rm -T eversis-collections" ]]; then
+  _pass "pi local locator sets CONSUMER_PROJECT_ROOT to the .pi/ root and falls back to the resolved framework path"
+else
+  echo "    got: ${_pi_out}"
+  _fail "pi local locator sets CONSUMER_PROJECT_ROOT to the .pi/ root and falls back to the resolved framework path"
+fi
+rm -rf "$_fake_bin" "${TARGET_DIR}/src"
+unset _fake_bin _pi_locator _pi_out
+
+# Case 7b2: pi + local mode with a framework path containing characters that
+# would break a double-quoted ${VAR:-word} default (} " $ ` and ' plus a
+# space). With AGENT_COLLECTIONS_HOME unset the locator must hand docker the
+# exact path; the Pi host-variable check must not flag the baked-in path.
+_weird_parent="$(mktemp -d)"
+_weird_home="${_weird_parent}/fw }\"\$HOME\`x\`'q {a}"
+mkdir -p "${_weird_home}/templates"
+cp "${REPO_ROOT}/templates/mcp.json" "${_weird_home}/templates/mcp.json"
+_saved_home="$COLLECTIONS_HOME"
+COLLECTIONS_HOME="$_weird_home"
+rm -rf "${TARGET_DIR}/.pi" "${TARGET_DIR}/scripts"
+SELECTED_AGENTS="pi"
+VENDOR_MODE=""
+MCP_SELECTED_IDS="eversis-collections"
+PI_STAGE_FAILED="false"
+merge_mcp_json
+COLLECTIONS_HOME="$_saved_home"
+if [[ "$PI_STAGE_FAILED" == "false" ]] && [[ -f "${TARGET_DIR}/.pi/mcp.json" ]]; then
+  _pass "pi local: special-character framework path passes the Pi host-variable check"
+else
+  _fail "pi local: special-character framework path passes the Pi host-variable check"
+fi
+_fake_bin="$(mktemp -d)"
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$3"\n' > "${_fake_bin}/docker"
+chmod +x "${_fake_bin}/docker"
+mkdir -p "${TARGET_DIR}/src/deep/dir"
+_pi_locator="$(node -e 'console.log(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).mcpServers["eversis-collections"].args[1])' "${TARGET_DIR}/.pi/mcp.json")"
+_pi_out="$(cd "${TARGET_DIR}/src/deep/dir" && env -u AGENT_COLLECTIONS_HOME PATH="${_fake_bin}:${PATH}" bash -c "$_pi_locator" 2>&1)" || true
+if [[ "$_pi_out" == "${_weird_home}/docker-compose.yml" ]]; then
+  _pass "pi local: framework path with } \" \$ \` ' reaches docker compose -f byte-exact (AGENT_COLLECTIONS_HOME unset)"
+else
+  echo "    expected: ${_weird_home}/docker-compose.yml"
+  echo "    got:      ${_pi_out}"
+  _fail "pi local: framework path with } \" \$ \` ' reaches docker compose -f byte-exact (AGENT_COLLECTIONS_HOME unset)"
+fi
+_pi_out="$(cd "${TARGET_DIR}/src/deep/dir" && AGENT_COLLECTIONS_HOME=/override PATH="${_fake_bin}:${PATH}" bash -c "$_pi_locator" 2>&1)" || true
+if [[ "$_pi_out" == "/override/docker-compose.yml" ]]; then
+  _pass "pi local: exported AGENT_COLLECTIONS_HOME still overrides the special-character default"
+else
+  echo "    got: ${_pi_out}"
+  _fail "pi local: exported AGENT_COLLECTIONS_HOME still overrides the special-character default"
+fi
+rm -rf "$_fake_bin" "$_weird_parent" "${TARGET_DIR}/src" "${TARGET_DIR}/.pi"
+unset _fake_bin _pi_locator _pi_out _weird_parent _weird_home _saved_home
+
+# Case 7c: cursor,claude,pi together — Cursor / Claude files unchanged by Pi.
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/.pi" "${TARGET_DIR}/scripts"
+SELECTED_AGENTS="cursor,claude,pi"
+VENDOR_MODE=""
+merge_mcp_json
+_assert_docker_entry "${TARGET_DIR}/.cursor/mcp.json" '${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml' \
+  '${workspaceFolder}' \
+  "cursor,claude,pi: Cursor entry unchanged"
+_assert_docker_entry "${TARGET_DIR}/.mcp.json" "\${AGENT_COLLECTIONS_HOME:-${REPO_ROOT}}/docker-compose.yml" \
+  '${CLAUDE_PROJECT_DIR:-.}' \
+  "cursor,claude,pi: Claude entry unchanged"
+_assert_pi_mcp_shape "${TARGET_DIR}/.pi/mcp.json" local "cursor,claude,pi: Pi entry written"
+
+# Case 7d: malformed existing .pi/mcp.json → Pi failure recorded (no die),
+# Cursor file still written, Pi file left untouched.
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/.pi"
+mkdir -p "${TARGET_DIR}/.pi"
+echo '{not-json' > "${TARGET_DIR}/.pi/mcp.json"
+SELECTED_AGENTS="cursor,pi"
+PI_STAGE_FAILED="false"
+PI_STAGE_FAILURE_REASON=""
+FAILED_STEPS=()
+_rc=0
+_pi_log="$(merge_mcp_json 2>&1)" || _rc=$?
+# merge_mcp_json ran in a subshell above; re-run in this shell for the flags.
+PI_STAGE_FAILED="false"
+FAILED_STEPS=()
+merge_mcp_json >/dev/null 2>&1 || _rc=$?
+if [[ "$_rc" -eq 0 ]] && [[ "$PI_STAGE_FAILED" == "true" ]] \
+  && [[ " ${FAILED_STEPS[*]-} " == *" pi "* ]] \
+  && [[ "$PI_STAGE_FAILURE_REASON" == *".pi/mcp.json merge failed"* ]] \
+  && echo "$_pi_log" | grep -qF "pi: .pi/mcp.json merge failed"; then
+  _pass "malformed .pi/mcp.json: Pi failure recorded (flag, reason, record_fail pi), merge_mcp_json returns 0"
+else
+  echo "$_pi_log"
+  _fail "malformed .pi/mcp.json: Pi failure recorded (flag, reason, record_fail pi), merge_mcp_json returns 0"
+fi
+if [[ -f "${TARGET_DIR}/.cursor/mcp.json" ]] && [[ "$(cat "${TARGET_DIR}/.pi/mcp.json")" == "{not-json" ]]; then
+  _pass "malformed .pi/mcp.json: .cursor/mcp.json still written, .pi/mcp.json left as it was"
+else
+  _fail "malformed .pi/mcp.json: .cursor/mcp.json still written, .pi/mcp.json left as it was"
+fi
+
+# Case 7e: Pi stage already failed → .pi/mcp.json merge skipped.
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.pi"
+PI_STAGE_FAILED="true"
+merge_mcp_json 2>/dev/null
+if [[ -f "${TARGET_DIR}/.cursor/mcp.json" ]] && [[ ! -e "${TARGET_DIR}/.pi/mcp.json" ]]; then
+  _pass "Pi stage already failed: .pi/mcp.json merge skipped, Cursor still written"
+else
+  _fail "Pi stage already failed: .pi/mcp.json merge skipped, Cursor still written"
+fi
+PI_STAGE_FAILED="false"
+PI_STAGE_FAILURE_REASON=""
+
+# Case 7f: a catalog server whose command / args carry a host variable Pi
+# never expands there (here ${workspaceFolder}) fails the Pi merge instead of
+# writing an entry that cannot start.
+_pinned="$(mktemp -d)"
+mkdir -p "${_pinned}/templates"
+node -e '
+  const fs = require("fs");
+  const t = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  t.mcpServers.context7.args = ["-y", "@upstash/context7-mcp@latest", "--root", "${workspaceFolder}"];
+  fs.writeFileSync(process.argv[2], JSON.stringify(t, null, 2));
+' "${REPO_ROOT}/templates/mcp.json" "${_pinned}/templates/mcp.json"
+_saved_home="$COLLECTIONS_HOME"
+COLLECTIONS_HOME="$_pinned"
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.pi"
+SELECTED_AGENTS="cursor,pi"
+MCP_SELECTED_IDS="eversis-collections,context7"
+FAILED_STEPS=()
+_pi_log="$(merge_mcp_json 2>&1)" || true
+merge_mcp_json >/dev/null 2>&1 || true
+if [[ "$PI_STAGE_FAILED" == "true" ]] && [[ ! -e "${TARGET_DIR}/.pi/mcp.json" ]] \
+  && echo "$_pi_log" | grep -qF "host variable Pi does not expand" \
+  && echo "$_pi_log" | grep -qF "context7"; then
+  _pass "pi: \${workspaceFolder} in a catalog server's args fails the Pi merge (no .pi/mcp.json written)"
+else
+  echo "$_pi_log"
+  _fail "pi: \${workspaceFolder} in a catalog server's args fails the Pi merge (no .pi/mcp.json written)"
+fi
+COLLECTIONS_HOME="$_saved_home"
+rm -rf "$_pinned"
+PI_STAGE_FAILED="false"
+PI_STAGE_FAILURE_REASON=""
+unset _pinned _saved_home
+unset SELECTED_AGENTS VENDOR_MODE MCP_SELECTED_IDS _rc _pi_log
 
 echo ""
 echo "  ✅  All ${PASS} mcp-merge unit tests passed."

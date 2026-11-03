@@ -20,6 +20,7 @@ const choices = [
     value: 'opencode',
     checked: false,
   },
+  { name: 'pi — Pi coding agent (pi.dev)', value: 'pi', checked: false },
 ];
 
 try {
