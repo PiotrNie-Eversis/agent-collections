@@ -79,7 +79,12 @@ done
 
 # Commits on the target that are neither releases nor part of the source would
 # be silently overwritten by the snapshot (e.g. a hotfix made only on master).
-diverged="$(git log --format='%h %s' "${source_sha}..${target_sha}" | grep -v -E '^[0-9a-f]+ release: ' || true)"
+# Only commits after the latest release count: anything older was already
+# replaced (or deliberately overridden with --allow-diverged) by that release.
+last_release="$(git log -1 --format='%H' --extended-regexp --grep='^release: ' "$target_sha" || true)"
+range=("^${source_sha}" "$target_sha")
+[[ -n "$last_release" ]] && range+=("^${last_release}")
+diverged="$(git log --format='%h %s' "${range[@]}" | grep -v -E '^[0-9a-f]+ release: ' || true)"
 if [[ -n "$diverged" ]]; then
   echo "release-to-master: '${TO}' has commits that are not in '${FROM}' and are not releases:" >&2
   echo "$diverged" | sed 's/^/  /' >&2

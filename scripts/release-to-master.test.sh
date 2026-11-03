@@ -93,7 +93,9 @@ g switch -q develop
 if bash scripts/release-to-master.sh >/dev/null 2>&1; then fail "diverged release should fail"; fi
 bash scripts/release-to-master.sh --allow-diverged >/dev/null 2>&1 || fail "--allow-diverged should release"
 git ls-tree -r --name-only master | grep -qx "hotfix.txt" && fail "snapshot should replace master-only file"
-ok "divergence guard"
+echo "core v4" > core.txt && g commit -qam "core v4"
+bash scripts/release-to-master.sh >/dev/null 2>&1 || fail "commits replaced by an earlier release must not block the next one"
+ok "divergence guard (only commits after the latest release count)"
 
 echo "Case 6: refuses to run on the target branch"
 g switch -q master
