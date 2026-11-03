@@ -13,8 +13,15 @@
  *   3. Start `pi --mode rpc --approve --no-session` with an isolated HOME and an
  *      env of only PATH, HOME, TERM, NODE_NO_WARNINGS (no provider keys), and a
  *      `docker` that always exits 1 first on PATH, so no real MCP container is
- *      ever started. Send `get_commands`, wait for the response plus a settle
- *      window for MCP `notify` events, then close stdin.
+ *      ever started. Send `get_commands`, wait for the response (successful or
+ *      not, read from all stdout so far, so a response split across chunks
+ *      counts) plus a settle window for MCP `notify` events, then close stdin.
+ *      Pi runs in its own process group. When Pi exits, the whole group gets
+ *      SIGKILL, so no background process Pi started is left running (and none
+ *      keeps Pi's stdout open). On the overall timeout the group gets SIGTERM,
+ *      then SIGKILL 3 s later; at that SIGKILL Pi's stdout and stderr pipes
+ *      are also destroyed (output read so far is kept), so the run always
+ *      ends at most ~timeout + 3 s after start.
  *   4. Run Pi's own MCP config loader (dist/extensions/mcp/config.js
  *      `loadMcpConfig`) on the project's `.pi/mcp.json`, in a child process with
  *      the same isolated env. A missing loader is a warning, not a failure.
@@ -26,9 +33,18 @@
  * reports errors, or the real ~/.pi/agent changed. All problems are printed
  * before exit. Exit 2: usage error, `pi` not on PATH, installer failure.
  * The report always starts with `Pi <version> (<label>)` and the counts.
+ * Other lines of Pi's "MCP servers need attention" notice (not `config:`, not
+ * `<server>: failed:`, not the header or the `Run /mcp …` hint) are shown as
+ * `info: MCP notice: <line>`.
  *
  * Note: the home guard can also report changes made by another Pi session that
  * runs on the same machine at the same time.
+ *
+ * Note: a process that leaves Pi's process group (e.g. via `setsid`) is not
+ * killed. If it keeps Pi's stdout or stderr open, the run ends at the overall
+ * timeout's SIGKILL step (~timeout + 3 s), when the check destroys its end of
+ * those pipes, and is reported as "timed out after answering get_commands",
+ * even though Pi itself had exited. That outside process keeps running.
  *
  * Stdlib only, zero npm dependencies. Pure helpers are exported for
  * scripts/pi-load-check.test.mjs; main() runs only when executed directly.
@@ -62,11 +78,14 @@ class SetupError extends Error {}
 /**
  * Parse Pi's RPC stdout (JSON lines).
  * commands: the get_commands response's command list, or null when no
- * successful response arrived. notifications: `notify` event messages.
+ * successful response arrived. responded: true when any complete get_commands
+ * response line (successful or not) was parsed. notifications: `notify` event
+ * messages.
  * nonJson: stdout lines that are not JSON (Pi documents stdout as protocol only).
  */
 export function parseRpcOutput(stdout) {
   let commands = null;
+  let responded = false;
   const notifications = [];
   const nonJson = [];
   for (const raw of stdout.split("\n")) {
@@ -84,6 +103,7 @@ export function parseRpcOutput(stdout) {
       continue;
     }
     if (msg.type === "response" && msg.command === "get_commands") {
+      responded = true;
       if (msg.success === true && Array.isArray(msg.data?.commands)) {
         commands = msg.data.commands;
       }
@@ -93,7 +113,7 @@ export function parseRpcOutput(stdout) {
       notifications.push(String(msg.message ?? ""));
     }
   }
-  return { commands, notifications, nonJson };
+  return { commands, responded, notifications, nonJson };
 }
 
 /**
@@ -313,6 +333,9 @@ export function evaluate({ exitCode, stderr, timedOut, rpc, expected, mcpLoaderE
         problems.push(`MCP config error (Pi notify): ${line.slice("config:".length).trim()}`);
       } else if (/^[^\s:]+: failed:/.test(line)) {
         info.push(`MCP connection (expected; docker is stubbed): ${line}`);
+      } else if (line !== "" && !line.includes(MCP_ATTENTION) && !line.startsWith("Run /mcp")) {
+        // Anything else Pi reports here is shown, not dropped.
+        info.push(`MCP notice: ${line}`);
       }
     }
   }
@@ -488,7 +511,16 @@ function killGroup(child, signal) {
   }
 }
 
-/** Run Pi in RPC mode, ask for get_commands, settle, close stdin. */
+/**
+ * Run Pi in RPC mode, ask for get_commands, settle, close stdin.
+ * When Pi exits, its process group gets SIGKILL (leftovers only; Pi is done).
+ * `close` resolves the promise; the overall timeout and its kill timer stay
+ * armed until then. When the kill timer fires it also destroys the child's
+ * stdin, stdout and stderr, so a pipe held open from outside the group (which
+ * the group kill cannot reach) ends the run at most ~timeout + 3 s after
+ * start, reported as timed out. Output read before that is kept. The outside
+ * process itself is not killed.
+ */
 function runPiRpc({ piBin, cwd, env, settleMs, timeoutMs }) {
   return new Promise((resolve) => {
     const child = spawn(piBin, ["--mode", "rpc", "--approve", "--no-session"], {
@@ -510,7 +542,15 @@ function runPiRpc({ piBin, cwd, env, settleMs, timeoutMs }) {
     const overall = setTimeout(() => {
       timedOut = true;
       killGroup(child, "SIGTERM");
-      killTimer = setTimeout(() => killGroup(child, "SIGKILL"), 3000);
+      killTimer = setTimeout(() => {
+        killGroup(child, "SIGKILL");
+        // A process outside the group (e.g. `setsid`) may still hold the pipes
+        // open; `close` only fires once every stdio stream has closed, so
+        // destroy our end. `stdout` / `stderr` keep what was read so far.
+        for (const stream of [child.stdin, child.stdout, child.stderr]) {
+          if (stream && !stream.destroyed) stream.destroy();
+        }
+      }, 3000);
     }, timeoutMs);
 
     child.stdin.on("error", () => {
@@ -520,11 +560,9 @@ function runPiRpc({ piBin, cwd, env, settleMs, timeoutMs }) {
     child.stderr.setEncoding("utf8");
     child.stdout.on("data", (chunk) => {
       stdout += chunk;
-      if (!responded && parseRpcOutput(stdout).commands !== null) {
-        responded = true;
-        settleTimer = setTimeout(closeStdin, settleMs);
-      } else if (!responded && /"type"\s*:\s*"response"/.test(chunk)) {
-        // A failed response still ends the wait.
+      // Parse everything read so far: a response split across chunks still
+      // counts, and a failed response ends the wait too.
+      if (!responded && parseRpcOutput(stdout).responded) {
         responded = true;
         settleTimer = setTimeout(closeStdin, settleMs);
       }
@@ -534,6 +572,16 @@ function runPiRpc({ piBin, cwd, env, settleMs, timeoutMs }) {
     });
     child.on("error", (err) => {
       stderr += `${err.message}\n`;
+    });
+    child.on("exit", () => {
+      // Pi is done, so anything left in its group is a leftover. Killing it
+      // also frees Pi's stdout when a background process inherited it, so
+      // `close` follows now instead of at the timeout. `overall` and
+      // `killTimer` stay armed until `close`; the kill timer also destroys the
+      // stdio streams, so a pipe held from outside the group (see the header
+      // note on setsid) ends the run at ~timeout + 3 s.
+      clearTimeout(settleTimer);
+      killGroup(child, "SIGKILL");
     });
     child.on("close", (code) => {
       clearTimeout(overall);

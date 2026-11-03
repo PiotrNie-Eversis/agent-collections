@@ -1,7 +1,16 @@
 /**
- * Tests for scripts/pi-load-check.mjs (AC-138).
+ * Tests for scripts/pi-load-check.mjs (AC-138, AC-139).
  * Unit tests feed inline JSON-lines RPC fixtures to the exported pure helpers
- * (no Pi needed). Integration tests run only when `pi` is on PATH: they install
+ * (no Pi needed). Stub-Pi tests (AC-139) need no Pi either: they put a `/bin/sh`
+ * script named `pi` first on PATH and run the CLI with --project against an
+ * empty `.pi/` (normal exit with a background process, a failed response split
+ * across two chunks, a hang that ignores SIGTERM) and check the run's exit,
+ * timing and that no stub process is left. A fourth stub test starts a `perl`
+ * process that calls `setsid` (leaves Pi's group) and keeps stdout open; it
+ * checks the run still ends by the timeout's SIGKILL step, reported as timed
+ * out, and kills that process itself (skipped when `perl` is not on PATH).
+ * They are skipped on Windows.
+ * Integration tests run only when `pi` is on PATH: they install
  * the framework once through the CLI (--keep), then copy that project, break it
  * (bad prompt front matter, broken extension, malformed .pi/mcp.json) and run
  * the CLI with --project. Zero dependencies.
@@ -235,6 +244,28 @@ test("no response without timeout fails", () => {
   assert.deepEqual(result.problems, ["Pi sent no successful get_commands response"]);
 });
 
+test("parseRpcOutput: any complete get_commands response sets responded (AC-139 R3)", () => {
+  const failed = JSON.stringify({ type: "response", command: "get_commands", success: false, error: "x" });
+  const rpc = parseRpcOutput(`${failed}\n`);
+  assert.equal(rpc.responded, true);
+  assert.equal(rpc.commands, null);
+  assert.equal(parseRpcOutput(response(fullCommands())).responded, true);
+  // The state the stdout handler sees after the first half of a split line.
+  assert.equal(parseRpcOutput('{"type":"resp').responded, false);
+  assert.equal(parseRpcOutput("").responded, false);
+});
+
+test("other MCP notice lines show as info, header and hint do not (AC-139 R4)", () => {
+  const message = notify(
+    "MCP servers need attention:\n  eversis-collections: failed: MCP connection closed\n  something new from Pi\nRun /mcp to fix.",
+  );
+  const result = run(`${response(fullCommands())}\n${message}\n`);
+  assert.deepEqual(result.problems, []);
+  const notices = result.info.filter((i) => i.startsWith("MCP notice:"));
+  assert.deepEqual(notices, ["MCP notice: something new from Pi"]);
+  assert.ok(result.info.some((i) => i.includes("eversis-collections: failed:")));
+});
+
 test("mcpLoaderErrors null gives a warning, not a failure", () => {
   const result = run(response(fullCommands()), { mcpLoaderErrors: null });
   assert.deepEqual(result.problems, []);
@@ -322,6 +353,184 @@ test("listExpected reads generated prompts and skills by name", () => {
     { kind: "prompt", name: "eversis-x", path: path.join(real, ".pi", "prompts", "eversis-x.md") },
     { kind: "skill", name: "skill:eversis-a", path: path.join(real, ".pi", "skills", "eversis-a", "SKILL.md") },
   ]);
+});
+
+// --- stub Pi (AC-139; /bin/sh, no real Pi) -----------------------------------
+
+const noStub = process.platform === "win32";
+
+function onPath(name) {
+  for (const dir of (process.env.PATH ?? "").split(path.delimiter)) {
+    if (!dir) continue;
+    try {
+      fs.accessSync(path.join(dir, name), fs.constants.X_OK);
+      return true;
+    } catch {
+      // keep looking
+    }
+  }
+  return false;
+}
+const noPerl = noStub || !onPath("perl");
+
+/**
+ * Write a `pi` shell stub into a temp bin/ dir. The stub answers --version
+ * first (never writes stderr) and then runs `body`. Pi's env holds only PATH,
+ * HOME, TERM and NODE_NO_WARNINGS, so PID files go to an absolute dir baked in
+ * as $PIDS. Returns the project (empty .pi/), the PID dir and the CLI env.
+ */
+function stubPi(body) {
+  const dir = mkTmp();
+  const bin = path.join(dir, "bin");
+  const pids = path.join(dir, "pids");
+  const project = path.join(dir, "project");
+  for (const d of [bin, pids, path.join(project, ".pi")]) fs.mkdirSync(d, { recursive: true });
+  const script = [
+    "#!/bin/sh",
+    'case "$1" in --version) echo 0.0.0-stub; exit 0 ;; esac',
+    `PIDS='${pids}'`,
+    body,
+    "",
+  ].join("\n");
+  fs.writeFileSync(path.join(bin, "pi"), script);
+  fs.chmodSync(path.join(bin, "pi"), 0o755);
+  const env = { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH ?? ""}` };
+  return { project, pids, env };
+}
+
+/** Run the CLI with `env`; fails fast (30 s) and reports the elapsed time. */
+function runCliStub(args, env) {
+  const start = Date.now();
+  const r = spawnSync(process.execPath, [CLI, ...args], {
+    cwd: REPO_ROOT,
+    env,
+    encoding: "utf8",
+    timeout: 30000,
+  });
+  return { status: r.status, out: `${r.stdout}${r.stderr}`, elapsedMs: Date.now() - start };
+}
+
+function readPid(pids, name, out) {
+  const file = path.join(pids, name);
+  assert.ok(fs.existsSync(file), `stub did not record PID "${name}"; CLI output:\n${out}`);
+  const pid = Number(fs.readFileSync(file, "utf8").trim());
+  assert.ok(Number.isInteger(pid) && pid > 0, `bad PID in ${file}`);
+  return pid;
+}
+
+/** Gone = no such process, or a zombie (not yet reaped by its new parent). */
+function processGone(pid) {
+  try {
+    process.kill(pid, 0);
+  } catch (err) {
+    return err.code === "ESRCH" || err.code === "EPERM";
+  }
+  if (process.platform === "linux") {
+    try {
+      const stat = fs.readFileSync(`/proc/${pid}/stat`, "utf8");
+      return stat.slice(stat.lastIndexOf(")") + 2).startsWith("Z");
+    } catch {
+      return true;
+    }
+  }
+  const ps = spawnSync("ps", ["-o", "stat=", "-p", String(pid)], { encoding: "utf8" });
+  const state = `${ps.stdout ?? ""}`.trim();
+  return state === "" || state.startsWith("Z");
+}
+
+/** Poll up to 2 s for every PID to be gone; kill any survivor so none leaks. */
+async function assertAllGone(pidList, out) {
+  const deadline = Date.now() + 2000;
+  let alive = pidList.filter((p) => !processGone(p));
+  while (alive.length > 0 && Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 50));
+    alive = alive.filter((p) => !processGone(p));
+  }
+  for (const p of alive) {
+    try {
+      process.kill(p, "SIGKILL");
+    } catch {
+      // already gone
+    }
+  }
+  assert.deepEqual(alive, [], `stub process(es) still running after the run; CLI output:\n${out}`);
+}
+
+test("stub Pi: normal exit leaves no background process and does not wait for the timeout (AC-139 R2, AC2)", { skip: noStub }, async () => {
+  const ok = JSON.stringify({ type: "response", command: "get_commands", success: true, data: { commands: [] } });
+  const { project, pids, env } = stubPi(
+    [`printf '%s\\n' '${ok}'`, "sleep 300 &", 'echo $! > "$PIDS/sleep"', "cat > /dev/null", "exit 0"].join("\n"),
+  );
+  const r = runCliStub(["--project", project, "--settle-ms", "200", "--timeout-ms", "20000"], env);
+  const sleepPid = readPid(pids, "sleep", r.out);
+  await assertAllGone([sleepPid], r.out);
+  assert.doesNotMatch(r.out, /timed out/, r.out);
+  assert.ok(r.elapsedMs < 10000, `CLI took ${r.elapsedMs} ms:\n${r.out}`);
+});
+
+test("stub Pi: failed response split across two chunks fails without the timeout (AC-139 R3, AC3)", { skip: noStub }, () => {
+  const { project, env } = stubPi(
+    [
+      `printf '%s' '{"type":"resp'`,
+      "sleep 1",
+      `printf '%s\\n' 'onse","command":"get_commands","success":false,"error":"x"}'`,
+      "cat > /dev/null",
+      "exit 0",
+    ].join("\n"),
+  );
+  const r = runCliStub(["--project", project, "--settle-ms", "200", "--timeout-ms", "20000"], env);
+  assert.equal(r.status, 1, r.out);
+  assert.match(r.out, /Pi sent no successful get_commands response/);
+  assert.doesNotMatch(r.out, /timed out/, r.out);
+  assert.ok(r.elapsedMs < 10000, `CLI took ${r.elapsedMs} ms:\n${r.out}`);
+});
+
+test("stub Pi: hang that ignores SIGTERM times out, exits 1 and leaves no process (AC-139 R6, AC6)", { skip: noStub }, async () => {
+  const { project, pids, env } = stubPi(
+    ["trap '' TERM", 'echo $$ > "$PIDS/pi"', "sleep 300 &", 'echo $! > "$PIDS/sleep"', "wait"].join("\n"),
+  );
+  const r = runCliStub(["--project", project, "--settle-ms", "200", "--timeout-ms", "1000"], env);
+  const piPid = readPid(pids, "pi", r.out);
+  const sleepPid = readPid(pids, "sleep", r.out);
+  await assertAllGone([piPid, sleepPid], r.out);
+  assert.equal(r.status, 1, r.out);
+  assert.match(r.out, /Pi timed out before answering get_commands/);
+});
+
+test("stub Pi: pipe held open from outside the group ends at the timeout, reported as timed out (AC-139)", { skip: noPerl }, async () => {
+  const ok = JSON.stringify({ type: "response", command: "get_commands", success: true, data: { commands: [] } });
+  // perl leaves Pi's process group (setsid), writes its PID, then holds the
+  // inherited stdout/stderr for 30 s. The group kill cannot reach it. The
+  // stub waits for the PID file before exiting, so the group SIGKILL on exit
+  // cannot hit perl before setsid.
+  const perl = `perl -MPOSIX -e 'setsid; open my $f, ">", $ARGV[0] or exit 1; print $f $$; close $f; sleep 30' "$PIDS/setsid" &`;
+  const { project, pids, env } = stubPi(
+    [`printf '%s\\n' '${ok}'`, perl, 'while [ ! -s "$PIDS/setsid" ]; do sleep 0.1; done', "exit 0"].join("\n"),
+  );
+  let setsidPid = null;
+  try {
+    const r = runCliStub(["--project", project, "--settle-ms", "200", "--timeout-ms", "1000"], env);
+    setsidPid = readPid(pids, "setsid", r.out);
+    assert.equal(r.status, 1, r.out);
+    assert.match(r.out, /timed out/, r.out);
+    assert.ok(r.elapsedMs < 10000, `CLI took ${r.elapsedMs} ms:\n${r.out}`);
+  } finally {
+    // Outside Pi's group by design, so the check does not kill it: we do.
+    if (setsidPid === null) {
+      try {
+        setsidPid = Number(fs.readFileSync(path.join(pids, "setsid"), "utf8").trim()) || null;
+      } catch {
+        // no PID recorded
+      }
+    }
+    if (setsidPid !== null) {
+      try {
+        process.kill(setsidPid, "SIGKILL");
+      } catch {
+        // already gone
+      }
+    }
+  }
 });
 
 // --- integration (needs pi on PATH) ------------------------------------------

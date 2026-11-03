@@ -68,6 +68,8 @@ pi-load-check:pinned:
         - adapters/pi/**/*
         - .ai/prompts/**/*
         - .ai/skills/**/*
+        - .ai/rules/**/*
+        - adapters/sync.mjs
         - scripts/setup-agent-collections.sh
         - scripts/lib/setup-agent-collections/**/*
         - templates/mcp.json

@@ -134,7 +134,7 @@ Then start `pi` in the project root and **grant project trust** when Pi asks —
 
 If the `pi` command is not installed yet, the installer still writes `.pi/` and only shows a warning (`npm i -g @earendil-works/pi-coding-agent`). If the Pi part of the install fails, the other agents are still installed, `pi` is left out of `.agent-collections/install-selection.json`, the summary says **`agent-collections setup completed with failures (pi)`**, and the run exits with code 1 — fix the reported cause and re-run with the same `--agents`.
 
-Agent Collections is tested on Pi 1.4.0–1.5.0, and an automatic check tests it against each new Pi release.
+Agent Collections is tested on Pi 1.4.0–1.5.0, and an automatic check tests it weekly against the latest Pi release.
 
 #### Context budget (Pi only) {#pi-context-budget}
 
