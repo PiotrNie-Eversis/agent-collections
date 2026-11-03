@@ -23,6 +23,7 @@ g init -q -b master
 mkdir -p scripts/lib .githooks
 cp "${SRC_ROOT}/.release-exclude" .
 cp "${SRC_ROOT}/scripts/release-to-master.sh" scripts/
+cp "${SRC_ROOT}/scripts/check-release-tree.sh" scripts/
 cp "${SRC_ROOT}/scripts/lib/release-paths.sh" scripts/lib/
 cp "${SRC_ROOT}/.githooks/pre-commit" .githooks/
 chmod +x .githooks/pre-commit
@@ -115,5 +116,17 @@ g switch -q develop
 mkdir -p docs/specs/ac-3 && echo "y" > docs/specs/ac-3/a.md && g add docs/specs/ac-3/a.md
 g commit -q -m "spec on develop" || fail "hook should allow docs on develop"
 ok "hook blocks work-only docs on master only"
+
+echo "Case 8: CI check (scripts/check-release-tree.sh)"
+bash scripts/check-release-tree.sh master >/dev/null 2>&1 || fail "clean master should pass"
+if bash scripts/check-release-tree.sh develop >/dev/null 2>&1; then fail "develop has work-only paths and should fail"; fi
+g switch -q master
+mkdir -p docs/reports && echo "leak" > docs/reports/leak.md && g add docs/reports/leak.md
+g commit -q --no-verify -m "bypass hook"
+rc=0; bash scripts/check-release-tree.sh HEAD >/dev/null 2>&1 || rc=$?
+[[ "$rc" -eq 1 ]] || fail "hook-bypassing commit on master should exit 1 (got $rc)"
+rc=0; bash scripts/check-release-tree.sh no-such-ref >/dev/null 2>&1 || rc=$?
+[[ "$rc" -eq 2 ]] || fail "unknown ref should exit 2 (got $rc)"
+ok "CI check passes clean master, fails on work-only paths (exit 1) and bad refs (exit 2)"
 
 echo "PASS (${pass} cases)"

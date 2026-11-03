@@ -155,6 +155,60 @@ test("role skills: distinct ids, name/description limits, JSON-quoted front matt
     "fine-handoff is served by the framework skill mirror, not a role skill");
 });
 
+test("review-context note (AC-135): only in role skills the rule map flags, before the rule body", () => {
+  const NOTE_HEADING = "**Pi host note — review independence (AC-135).**";
+  const flagged = new Set(
+    ruleMapEntries()
+      .filter((r) => r.review_context_note === "true")
+      .map((r) => r.skill_id),
+  );
+  assert.ok(flagged.size > 0, "rule map flags at least one role skill");
+  for (const dir of fs.readdirSync(path.join(fresh, ".pi", "skills"))) {
+    const text = fs.readFileSync(path.join(fresh, ".pi", "skills", dir, "SKILL.md"), "utf8");
+    if (!flagged.has(dir)) {
+      assert.ok(!text.includes(NOTE_HEADING), `${dir} must not carry the note`);
+      continue;
+    }
+    const pointer = text.indexOf("> Agent Collections role rule");
+    const note = text.indexOf(NOTE_HEADING);
+    assert.ok(pointer !== -1 && note > pointer, `${dir}: note follows the SSOT pointer`);
+    const noteBlock = text.slice(note).split("\n\n")[0];
+    assert.ok(noteBlock.includes("Review context: same session as implementation (not independent)"));
+    assert.ok(noteBlock.includes("Review context: fresh session (independent)"));
+    assert.ok(noteBlock.includes("Automation & Technical Notes"));
+    assert.ok(noteBlock.includes("docs/specs/<key>/"));
+    assert.ok(!PI_SUBSTITUTION_RE.test(noteBlock), `${dir}: note has no Pi substitution pattern`);
+    assert.ok(text.indexOf("\n# ", note) > note, `${dir}: rule body (top heading) follows the note`);
+  }
+  const others = [
+    path.join(fresh, ".pi", "APPEND_SYSTEM.md"),
+    path.join(fresh, ".pi", "extensions", "eversis-context-budget.ts"),
+    ...fs.readdirSync(path.join(fresh, ".pi", "prompts")).map((n) => path.join(fresh, ".pi", "prompts", n)),
+  ];
+  for (const file of others) {
+    assert.ok(!fs.readFileSync(file, "utf8").includes(NOTE_HEADING), `${file} must not carry the note`);
+  }
+});
+
+test("review_context_note on a rule that is not target skill fails with a named error", () => {
+  const dir = path.join(mkTmp(), "adapter");
+  fs.mkdirSync(dir);
+  fs.copyFileSync(GENERATOR, path.join(dir, "generate.mjs"));
+  const map = fs
+    .readFileSync(path.join(__dirname, "rule-map.yaml"), "utf8")
+    .replace(
+      "    target: append_system\n",
+      "    target: append_system\n    review_context_note: true\n",
+    );
+  fs.writeFileSync(path.join(dir, "rule-map.yaml"), map);
+  const result = spawnSync(process.execPath, [path.join(dir, "generate.mjs"), "--out", mkTmp()], {
+    cwd: REPO_ROOT,
+    encoding: "utf8",
+  });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /review_context_note requires target skill \(got append_system\)/);
+});
+
 test("prompts: JSON-quoted front matter (incl. descriptions with ': '), marker, SSOT pointer, live input line", () => {
   let colonDescriptions = 0;
   for (const name of fs.readdirSync(path.join(fresh, ".pi", "prompts"))) {

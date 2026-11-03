@@ -32,7 +32,7 @@ The installer runs the generator for you with `--agents=pi` (see "Installer" bel
 | Path | Source | Written by | Notes |
 |------|--------|------------|-------|
 | `.pi/APPEND_SYSTEM.md` | `target: append_system` rules in [`rule-map.yaml`](./rule-map.yaml) | generator | Always-on: `agent-core`, `testing-and-terminal`, `accessibility` (with a "UI files only" note). Header lists the slash commands, skill locations, and a rule-id → Pi-skill table. Plus the stack overlay (below). |
-| `.pi/skills/eversis-rule-<name>/SKILL.md` | `target: skill` rules | generator | Role rules loaded on demand: `eversis-rule-engineering-manager`, `eversis-rule-code-reviewer`, `eversis-rule-spec-driven-development` (`/skill:<name>`). |
+| `.pi/skills/eversis-rule-<name>/SKILL.md` | `target: skill` rules | generator | Role rules loaded on demand: `eversis-rule-engineering-manager`, `eversis-rule-code-reviewer`, `eversis-rule-spec-driven-development` (`/skill:<name>`). Rules flagged `review_context_note: true` start with the Pi review note (see "Review in Pi"). |
 | `.pi/prompts/eversis-*.md` | `.ai/prompts/{public,internal}/eversis-*.md` | generator | One per prompt not in [`../claude/command-deny.yaml`](../claude/command-deny.yaml) (28 today). Front matter `description` + `argument-hint`, SSOT pointer, the Executable section (whole body when a prompt has none), and a final `**User input for this run:** $ARGUMENTS` line. |
 | `.pi/extensions/eversis-context-budget.ts` | [`assets/eversis-context-budget.ts`](./assets/eversis-context-budget.ts) | generator | Regenerated on every run. See "Context budget". |
 | `.pi/settings.json` | [`assets/settings.json`](./assets/settings.json) | generator | **Seeded once** when absent (only `$schema`); consumer-owned afterwards, never overwritten or reported by `--check`. |
@@ -69,6 +69,26 @@ This is **Pi-only**. Cursor and Claude Code have no window-fill trigger: rule 14
 
 The extension has no network access, file writes, or shell calls, and only an `import type` from `@earendil-works/pi-coding-agent` (no runtime dependency).
 
+## Review in Pi
+
+The Implement workflow wants code review in a context separate from the one that wrote the code: self-review is not verification (`eversis-orchestrating-implementation`, step 8). Cursor and Claude Code delegate review to a sub-agent. **Pi has no sub-agents**, so when `/eversis-implement` reaches the Review stage, the same model in the same context reviews its own change. That review is weaker and is not independent.
+
+The generator makes this visible. Rules flagged `review_context_note: true` in [`rule-map.yaml`](./rule-map.yaml) (`eversis-engineering-manager`, `eversis-code-reviewer`) get a Pi host note at the top of their role skill. With it, every review result in Pi starts with one line:
+
+- `Review context: same session as implementation (not independent)` — the session that implemented or edited the change also reviewed it;
+- `Review context: fresh session (independent)` — a new session that did not implement it.
+
+After a same-session review the result ends with the next step, and at Fine the QA comment draft repeats the `Review context:` line under **Automation & Technical Notes**.
+
+**Get an independent review today:**
+
+1. Finish the Implement run (or stop it at Review).
+2. Start a new Pi session in the project root (`pi`, or `/new` in an open session) — a clean context.
+3. Run `/eversis-review AC-123`. With only the key, the reviewer looks for `docs/specs/ac-123/` first, then the single `docs/specs/ac-123-<topic>/` folder, and asks if more than one matches. To skip the lookup, add the path: `/eversis-review AC-123 docs/specs/ac-123-topic/`.
+4. The result starts with `Review context: fresh session (independent)`.
+
+Do not use `/fork`, `/clone` or `/tree` for this: they keep the earlier conversation, so the review would not be independent. A review that runs automatically in a separate Pi session is planned (AC-136); until then, the fresh-session review is the recommended step for any change that matters. The note is Pi-only: Cursor and Claude Code output is unchanged.
+
 ## Generated skills
 
 `.pi/skills/eversis-*/` is **not generated** by this script — the installer's shared `_link_agent_skills` (`scripts/lib/setup-agent-collections/link-framework.sh`) links (symlink) or copies one entry per `.ai/skills/eversis-*/` directory, the same contract as `.claude/skills/` and `.cursor/skills/`. Its stale-prune skips `eversis-rule-*` entries, which belong to this generator.
@@ -100,8 +120,32 @@ Other selected catalog servers are copied as-is; the merge fails (as a Pi failur
 - **Keep a root `AGENTS.md`:** Pi reads `AGENTS.md` or `CLAUDE.md` as its context file and prefers `AGENTS.md`. Without `AGENTS.md`, a Claude + Pi project would load the generated `CLAUDE.md` (all seven rules) on top of `APPEND_SYSTEM.md`, duplicating the always-on rules.
 - **Not in AC-14:** Pi ignore files / heavy-file exclusion (AC-113), subscription sign-in and model settings (AC-111), token-economy trimming of always-on rules (AC-112), isolated workspace / sandbox (AC-114).
 
+## Load check
+
+A new Pi release can stop loading part of the `.pi/` tree without an error you would notice (for example, it drops a prompt whose front matter it cannot parse). `scripts/pi-load-check.mjs` (AC-138) catches that. It uses the `pi` on your PATH:
+
+1. Installs the framework for Pi into a temp project (`setup-agent-collections.sh --agents=pi`, non-interactive).
+2. Starts `pi --mode rpc` in that project and asks for its command list (`get_commands`).
+3. Runs Pi's own MCP config loader on `.pi/mcp.json`.
+
+It fails (exit 1) when Pi exits non-zero or times out, writes to stderr (an extension that does not load), is missing a generated prompt or skill, reports an MCP `config:` error, or its MCP loader reports errors. Every problem is printed and named, for example the prompt Pi dropped. The report always starts with `Pi <version> (<label>)` and the prompt / skill counts. Exit 2 means a usage error, no `pi` on PATH, or an installer failure. A failed MCP server connection is printed as `info:` only.
+
+```bash
+npm run pi:load-check
+node scripts/pi-load-check.mjs --project /path/to/project   # check an existing project, skip the install
+```
+
+Other options: `--label <text>` (printed in the report; default `local`), `--settle-ms <n>` (wait for MCP notices after the response; default 5000), `--timeout-ms <n>` (default 60000), `--keep` (keep the temp dir and print its path). Tests: `node --test scripts/pi-load-check.test.mjs` (the integration tests run only when `pi` is on PATH).
+
+- **Isolated, no credentials:** Pi runs with a temp `HOME` and only `PATH`, `HOME`, `TERM` and `NODE_NO_WARNINGS` in its environment, so no provider API key reaches it and no model is called. The check also compares your real `~/.pi/agent` before and after the run (`sessions/` and `install/` excluded) and fails if anything there changed.
+- **Stub `docker` for the installer:** the installer needs `docker` for the MCP image step. The check puts a stub `docker` first on the installer's PATH that reports the image as already built, so no image is built and no real Docker is needed. `.pi/mcp.json` is written as usual.
+- **Always-failing `docker` for Pi:** Pi gets a different stub `docker` that always exits 1, so no MCP container ever starts and the MCP server fails to connect the same way in CI and on a machine with Docker.
+- **Other Pi sessions:** the home check can also report changes made by another Pi session that runs on the same machine at the same time. Close it, or re-run.
+
+GitLab CI runs the check on the pinned Pi version for framework changes and on the latest Pi release weekly. Jobs, schedule setup and the pin-bump rule: [`scripts/README.md`](../../scripts/README.md) ("Pi load check in CI").
+
 ## Requirements
 
 - Node.js 18+ (stdlib only; no npm install). The `node:test` suites (`node --test 'adapters/pi/*.test.mjs'`) import the `.ts` extension and need Node ≥ 22.18 (dev-only).
-- Pi coding agent (`npm i -g @earendil-works/pi-coding-agent`) to use the generated tree; verified against Pi 1.4.0.
+- Pi coding agent (`npm i -g @earendil-works/pi-coding-agent`) to use the generated tree; tested on Pi 1.4.0–1.5.0; CI checks the pinned version (`PI_VERSION_PINNED`) and the latest release weekly (see "Load check").
 - Run from the **repository root** (directory that contains `.ai/` and `adapters/`).

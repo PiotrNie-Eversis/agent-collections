@@ -314,6 +314,7 @@ Pi (the [Pi coding agent](https://pi.dev/)) loads project files from `.pi/` only
 | `id` / `source` | Same pairs as the Claude map | `adapters/sync.mjs --check` fails when a Claude `id`/`source` pair is missing from the Pi map |
 | `target: append_system` | Always-on rule | Body concatenated into `.pi/APPEND_SYSTEM.md`: `eversis-agent-core`, `eversis-testing-and-terminal`, `eversis-accessibility` |
 | `ui_note: true` | UI-only rule | Body prefixed with a "UI files only" note (`eversis-accessibility`) |
+| `review_context_note: true` | Pi review-independence note (AC-135) | Only with `target: skill` (asserted). Role skill body prefixed with the Pi host note: review results start with a `Review context:` line (same session / fresh session), the QA draft repeats it, and a bare ticket key resolves the spec folder. Set on `eversis-engineering-manager`, `eversis-code-reviewer`; text lives in `adapters/pi/generate.mjs` |
 | `target: skill` + `skill_id` + `description` | Role rule loaded on demand | `.pi/skills/<skill_id>/SKILL.md`: `eversis-rule-engineering-manager`, `eversis-rule-code-reviewer`, `eversis-rule-spec-driven-development`. Ids start with `eversis-rule-` and must not equal an `.ai/skills/eversis-*` name (asserted) |
 | `target: none` + `skill_id` | Served by a framework skill | `eversis-fine-handoff` → mirrored framework skill `.pi/skills/eversis-fine-handoff/` (no second copy) |
 

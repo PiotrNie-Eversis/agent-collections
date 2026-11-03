@@ -134,9 +134,17 @@ Then start `pi` in the project root and **grant project trust** when Pi asks —
 
 If the `pi` command is not installed yet, the installer still writes `.pi/` and only shows a warning (`npm i -g @earendil-works/pi-coding-agent`). If the Pi part of the install fails, the other agents are still installed, `pi` is left out of `.agent-collections/install-selection.json`, the summary says **`agent-collections setup completed with failures (pi)`**, and the run exits with code 1 — fix the reported cause and re-run with the same `--agents`.
 
+Agent Collections is tested on Pi 1.4.0–1.5.0, and an automatic check tests it against each new Pi release.
+
 #### Context budget (Pi only) {#pi-context-budget}
 
 Long sessions get slower and less accurate as the context window (the model's working memory) fills up. On Pi, the framework's extension compacts (summarises) the session **once** when context use crosses 50%. The summary keeps the active plan file, the current plan task, the latest `CHECKPOINT:` row and any open approval gate. If the agent was in the middle of a task, it gets one automatic message to resume that task; if it had just finished, asked a question or stopped at a gate, the session is only compacted — nothing is treated as your approval. Change the threshold with `EVERSIS_CONTEXT_BUDGET_PERCENT` (1–95). Cursor and Claude Code do not get this trigger: in those tools a filling window is not a reason to stop or compact.
+
+#### Code review in Pi {#pi-review}
+
+Pi has no sub-agents, so when `/eversis-implement` reaches code review in Pi, the same session that wrote the code also reviews it. That is self-review, not an independent check. Every review result in Pi says which kind it was: `Review context: same session as implementation (not independent)` or `Review context: fresh session (independent)`. The QA comment draft repeats that line.
+
+To get an independent review, start a **new** Pi session in the project root (`pi`, or `/new` in an open session) and run `/eversis-review AC-123`. With only the ticket key, the reviewer finds the task's folder under `docs/specs/` and asks if more than one matches; you can also pass the folder, for example `/eversis-review AC-123 docs/specs/ac-123-topic/`. Do not use `/fork`, `/clone` or `/tree` for this — they keep the earlier conversation. An automatic review in a separate Pi session is planned. Cursor and Claude Code are not affected.
 
 Pi ignore files, subscription sign-in and an isolated workspace are not part of this release yet. Adapter details: [`adapters/pi/README.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/adapters/pi/README.md).
 

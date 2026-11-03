@@ -9,6 +9,8 @@
 # skill_id for target skill must start with eversis-rule- and must not equal any
 # .ai/skills/eversis-* directory name (asserted by adapters/pi/generate.mjs).
 # ui_note: true prefixes the body with a "UI files only" note.
+# review_context_note: true (target skill only) inserts the Pi review-independence
+# note before the body (AC-135; text in adapters/pi/generate.mjs).
 version: 1
 rules:
   - id: eversis-agent-core
@@ -26,11 +28,13 @@ rules:
     target: skill
     skill_id: eversis-rule-engineering-manager
     description: "Agent Collections Engineering Manager role rule (eversis-engineering-manager) — Implement readiness block, human gates, delegation, Continuity and QA handoff policy. Load when running /eversis-implement or orchestrating Implement."
+    review_context_note: true
   - id: eversis-code-reviewer
     source: .ai/rules/architecture/code-reviewer.md
     target: skill
     skill_id: eversis-rule-code-reviewer
     description: "Agent Collections Code Reviewer role rule (eversis-code-reviewer) — PASS / BLOCKER / SUGGESTION review structure and hard-limit blockers. Load when running /eversis-review or the Review stage."
+    review_context_note: true
   - id: eversis-fine-handoff
     source: .ai/rules/orchestration/fine-handoff.md
     target: none

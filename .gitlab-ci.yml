@@ -1,0 +1,88 @@
+# GitLab CI for the Agent Collections framework repository.
+#
+# master is production and must contain only the framework core (see
+# scripts/README.md, "Branches and releases"). Pushes to master are limited to
+# Maintainers by branch protection; this job additionally fails the master
+# pipeline when a commit carries work-only paths from .release-exclude
+# (e.g. a direct push made without the local .githooks/pre-commit hook).
+# It detects and alerts — it cannot reject the push itself.
+#
+# verify stage (AC-138): the Pi load check (scripts/pi-load-check.mjs) installs
+# the framework for Pi into a temp project and fails when Pi does not load a
+# generated prompt, skill or extension, or reports a `.pi/mcp.json` config error.
+#   - pi-load-check:pinned runs Pi $PI_VERSION_PINNED on merge requests and on
+#     develop pushes that touch the watched paths.
+#   - pi-load-check:latest runs the latest Pi release in scheduled pipelines
+#     (weekly schedule on develop, created in CI/CD -> Schedules; never target
+#     master) and on demand from the web UI ("Run pipeline").
+# Bump PI_VERSION_PINNED in a separate MR after a passing latest run.
+
+stages:
+  - guard
+  - verify
+
+variables:
+  # Pi version the pinned job installs (see scripts/README.md for the bump rule).
+  PI_VERSION_PINNED: "1.5.0"
+
+master-work-only-paths:
+  stage: guard
+  image: alpine:3.20
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+  variables:
+    GIT_DEPTH: "1"
+  before_script:
+    - apk add --no-cache bash git >/dev/null
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+  script:
+    - bash scripts/check-release-tree.sh HEAD
+
+# Shared Pi load check job. PI_VERSION and PI_LABEL come from the jobs below.
+# Pi is installed only here, with --ignore-scripts; the job holds no secrets and
+# the check passes no provider keys to Pi.
+.pi-load-check:
+  stage: verify
+  image: node:22
+  before_script:
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+    - node --version
+    - npm install -g --ignore-scripts --no-audit --no-fund "@earendil-works/pi-coding-agent@${PI_VERSION}"
+    - pi --version
+  script:
+    # Tests first: with Pi on PATH the integration tests (broken prompt,
+    # extension and mcp.json) prove the failure detection on this Pi version.
+    - node --test scripts/pi-load-check.test.mjs
+    - node scripts/pi-load-check.mjs --label "$PI_LABEL"
+
+# Pinned Pi on framework changes. Each rule names its pipeline source, because
+# `changes:` is always true in scheduled pipelines.
+pi-load-check:pinned:
+  extends: .pi-load-check
+  variables:
+    PI_VERSION: "$PI_VERSION_PINNED"
+    PI_LABEL: pinned
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes: &pi-load-check-paths
+        - adapters/pi/**/*
+        - .ai/prompts/**/*
+        - .ai/skills/**/*
+        - scripts/setup-agent-collections.sh
+        - scripts/lib/setup-agent-collections/**/*
+        - templates/mcp.json
+        - scripts/pi-load-check*.mjs
+        - package.json
+        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"'
+      changes: *pi-load-check-paths
+
+# Latest Pi release: scheduled pipelines and manual web runs only.
+pi-load-check:latest:
+  extends: .pi-load-check
+  variables:
+    PI_VERSION: latest
+    PI_LABEL: latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'

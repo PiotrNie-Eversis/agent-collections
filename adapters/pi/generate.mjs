@@ -78,6 +78,22 @@ const STACK_PLACEHOLDER_MARKERS = [
   "<!-- TODO",
   "replace with your product stack",
 ];
+/**
+ * Pi-only note inserted into role skills flagged `review_context_note: true`
+ * (AC-135). Pi has no sub-agents, so an in-session Review is self-review.
+ * Hand-offs: AC-134 keeps the flag when role skills move to on-demand loading,
+ * and drops the spec-folder lookup bullet once the review flow resolves the
+ * folder itself on every host; AC-136 replaces the fresh-session wording when
+ * review runs in a separate Pi session or process (keep a fallback line).
+ */
+const REVIEW_CONTEXT_NOTE = [
+  "> **Pi host note — review independence (AC-135).** Pi has no sub-agents, so a Review stage inside an Implement run uses the same context that wrote the code: that is self-review, not independent verification.",
+  ">",
+  "> - Start every review result with one line: `Review context: same session as implementation (not independent)` when this session implemented or edited the change, or `Review context: fresh session (independent)` when it did not (for example a new Pi session started with `/eversis-review`). Never present a same-session review as independent.",
+  "> - After a same-session review, end with the next step: start a new Pi session and run `/eversis-review <key>` (optionally with the spec folder or plan path).",
+  "> - At Fine, repeat the `Review context:` line under **Automation & Technical Notes** in the QA comment draft.",
+  "> - When `/eversis-review` gets only a ticket key, find the spec folder by lowercasing the key: use `docs/specs/<key>/` if it exists; otherwise use the single folder named `<key>-<topic>` (`ac-1350-…` is not a match for `ac-135`); if two or more match, ask which one; if none matches, say so and ask for the spec folder or plan path — never create a folder. Then read its `*.research.md` and `*.plan.md`.",
+].join("\n");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ADAPTER_DIR = __dirname;
@@ -359,6 +375,9 @@ function loadRuleMap(repoRoot) {
         fail(`Pi rule-map ${rule.id}: description exceeds ${MAX_SKILL_DESCRIPTION} chars (${description.length})`);
       }
     }
+    if (rule.review_context_note === true && rule.target !== "skill") {
+      fail(`Pi rule-map ${rule.id}: review_context_note requires target skill (got ${rule.target})`);
+    }
     if (rule.target === "none" && rule.skill_id && !frameworkSkills.has(rule.skill_id)) {
       fail(`Pi rule-map ${rule.id}: serving framework skill .ai/skills/${rule.skill_id} not found`);
     }
@@ -493,6 +512,7 @@ function buildRoleSkillContent(rule, repoRoot, frameworkPrefix) {
     "",
     `> Agent Collections role rule \`${rule.id}\` — SSOT: \`${ssotPath(frameworkPrefix, rule.source)}\`. Edit the SSOT, not this file.`,
     "",
+    ...(rule.review_context_note === true ? [REVIEW_CONTEXT_NOTE, ""] : []),
     body,
     "",
   ].join("\n");
