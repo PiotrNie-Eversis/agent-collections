@@ -5,11 +5,15 @@
  *
  * Reads the Agent Collections SSOT (.ai/rules, .ai/prompts) plus this
  * adapter's rule map and assets, and writes Pi's project surfaces:
- *   .pi/APPEND_SYSTEM.md                        always-on rules (target: append_system)
+ *   .pi/APPEND_SYSTEM.md                        small always-on core (hard limits from
+ *                                               agent-core.md, test line, ticket-work line,
+ *                                               command pointer)
  *                                               + customised eversis-project-stack overlay
  *   .pi/skills/eversis-rule-<name>/SKILL.md     role rules (target: skill), loaded on demand
  *   .pi/prompts/eversis-*.md                    slash commands from .ai/prompts/{public,internal}
  *   .pi/extensions/eversis-context-budget.ts    ~50% context-budget compaction extension
+ *   .pi/extensions/eversis-process-rules.ts     adds the process rules per run (AC-134);
+ *                                               bundle skill ids filled in from the rule map
  *   .pi/settings.json                           seeded once when absent (consumer-owned after)
  *
  * Framework skills (.ai/skills/eversis-*) are NOT emitted here — the installer
@@ -23,12 +27,13 @@
  * body text is replaced with "＄" (U+FF04), so only the final
  * "**User input for this run:** $ARGUMENTS" line is live. The SSOT pointer line
  * is left as-is so local-mode ${AGENT_COLLECTIONS_HOME} pointers stay readable
- * (Pi's substitution does not match that token).
+ * (Pi's substitution does not match that token). Rule ids in prompt bodies are
+ * rewritten to their Pi role-skill names (AC-134).
  *
  * Generated files carry the GENERATED marker; orphan cleanup only removes files
  * that carry it. Hand-made files under .pi/ that the generator does not target
  * are never touched. When a target path (APPEND_SYSTEM.md, a role-rule SKILL.md,
- * an eversis-*.md prompt, the extension) already holds a hand-made regular file
+ * an eversis-*.md prompt, an extension) already holds a hand-made regular file
  * without the marker, write mode first copies it byte-identical to
  * <name>.pre-agent-collections.bak beside it (timestamped
  * <name>.pre-agent-collections.<YYYYMMDDTHHMMSS>.bak when a differing backup
@@ -70,6 +75,7 @@ const APPEND_SYSTEM_REL = ".pi/APPEND_SYSTEM.md";
 const PROMPTS_DIR_REL = ".pi/prompts";
 const SKILLS_DIR_REL = ".pi/skills";
 const EXTENSION_REL = ".pi/extensions/eversis-context-budget.ts";
+const PROCESS_RULES_EXTENSION_REL = ".pi/extensions/eversis-process-rules.ts";
 const SETTINGS_REL = ".pi/settings.json";
 const STACK_OVERLAY_REL = ".cursor/rules/eversis-project-stack.mdc";
 const STACK_TEMPLATE_REL = "templates/eversis-project-stack.example.mdc";
@@ -78,6 +84,13 @@ const STACK_PLACEHOLDER_MARKERS = [
   "<!-- TODO",
   "replace with your product stack",
 ];
+/** Replaced in the process-rules asset with the bundle's skill ids, JSON-quoted. */
+const PROCESS_SKILL_IDS_PLACEHOLDER = "/* eversis:process-skill-ids */";
+/** Inserted before the body of role skills flagged `ui_note: true`. */
+const UI_NOTE = "> Applies when editing UI files (`*.tsx`, `*.jsx`, `*.vue`, `*.html`, `*.svelte`).";
+/** Rule whose hard-limits section is copied into the always-on core. */
+const CORE_RULE_ID = "eversis-agent-core";
+const HARD_LIMITS_HEADING = "## Hard limits (implement)";
 /**
  * Pi-only note inserted into role skills flagged `review_context_note: true`
  * (AC-135). Pi has no sub-agents, so an in-session Review is self-review.
@@ -100,6 +113,7 @@ const ADAPTER_DIR = __dirname;
 const MAP_PATH = path.join(ADAPTER_DIR, "rule-map.yaml");
 const DENY_PATH = path.join(ADAPTER_DIR, "..", "claude", "command-deny.yaml");
 const EXTENSION_ASSET = path.join(ADAPTER_DIR, "assets", "eversis-context-budget.ts");
+const PROCESS_RULES_ASSET = path.join(ADAPTER_DIR, "assets", "eversis-process-rules.ts");
 const SETTINGS_ASSET = path.join(ADAPTER_DIR, "assets", "settings.json");
 
 function fail(message) {
@@ -346,7 +360,7 @@ function loadRuleMap(repoRoot) {
     if (!rule.id || !rule.source) {
       fail(`Pi rule-map entry missing id/source: ${JSON.stringify(rule)}`);
     }
-    if (!["append_system", "skill", "none"].includes(rule.target)) {
+    if (!["skill", "none"].includes(rule.target)) {
       fail(`Pi rule-map ${rule.id}: unknown target ${rule.target}`);
     }
     if (rule.target === "skill") {
@@ -375,8 +389,14 @@ function loadRuleMap(repoRoot) {
         fail(`Pi rule-map ${rule.id}: description exceeds ${MAX_SKILL_DESCRIPTION} chars (${description.length})`);
       }
     }
+    if (rule.ui_note === true && rule.target !== "skill") {
+      fail(`Pi rule-map ${rule.id}: ui_note requires target skill (got ${rule.target})`);
+    }
     if (rule.review_context_note === true && rule.target !== "skill") {
       fail(`Pi rule-map ${rule.id}: review_context_note requires target skill (got ${rule.target})`);
+    }
+    if (rule.process_bundle === true && rule.target !== "skill") {
+      fail(`Pi rule-map ${rule.id}: process_bundle requires target skill (got ${rule.target})`);
     }
     if (rule.target === "none" && rule.skill_id && !frameworkSkills.has(rule.skill_id)) {
       fail(`Pi rule-map ${rule.id}: serving framework skill .ai/skills/${rule.skill_id} not found`);
@@ -462,7 +482,35 @@ function discoverPrompts(repoRoot, deny) {
   return found;
 }
 
-function buildPromptContent(prompt, raw, frameworkPrefix) {
+/**
+ * [rule id, Pi skill name] pairs for rules emitted as role skills. Rules with
+ * target none keep their id: the mirrored framework skill has that same name.
+ */
+function ruleIdRewrites(map) {
+  return map.rules
+    .filter((rule) => rule.target === "skill")
+    .map((rule) => [rule.id, rule.skill_id]);
+}
+
+function escapeRegExp(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Rewrite rule ids in prompt text to Pi skill names, dropping a Cursor ".mdc"
+ * suffix. The match is boundary-aware, so a longer name that merely contains a
+ * rule id (eversis-accessibility-auditing) is left alone.
+ */
+function rewriteRuleIds(text, rewrites) {
+  let result = text;
+  for (const [ruleId, skillId] of rewrites) {
+    const re = new RegExp(`(?<![a-z0-9_-])${escapeRegExp(ruleId)}(?:\\.mdc)?(?![a-z0-9_-])`, "g");
+    result = result.replace(re, () => skillId);
+  }
+  return result;
+}
+
+function buildPromptContent(prompt, raw, frameworkPrefix, rewrites) {
   const body = stripFrontMatterAndMarker(raw);
   const description =
     frontMatterValue(raw, "prompt_description") || firstUsableLine(body);
@@ -489,7 +537,7 @@ function buildPromptContent(prompt, raw, frameworkPrefix) {
     "",
     `> SSOT: \`${ssotPath(frameworkPrefix, prompt.sourceRel)}\` — Agent Collections prompt \`${prompt.id}\` (${prompt.audience}). Edit the SSOT, not this file.`,
     "",
-    neutralizePiSubstitution(executable.trim()),
+    neutralizePiSubstitution(rewriteRuleIds(executable.trim(), rewrites)),
     "",
     "---",
     "",
@@ -512,6 +560,7 @@ function buildRoleSkillContent(rule, repoRoot, frameworkPrefix) {
     "",
     `> Agent Collections role rule \`${rule.id}\` — SSOT: \`${ssotPath(frameworkPrefix, rule.source)}\`. Edit the SSOT, not this file.`,
     "",
+    ...(rule.ui_note === true ? [UI_NOTE, ""] : []),
     ...(rule.review_context_note === true ? [REVIEW_CONTEXT_NOTE, ""] : []),
     body,
     "",
@@ -549,54 +598,51 @@ function resolveStackOverlay(repoRoot, targetRoot) {
   return stripFrontMatterAndMarker(overlay);
 }
 
+/**
+ * The hard-limits section of agent-core.md, heading included,
+ * up to the next level-2 heading. There is no second copy to drift, so generation
+ * fails when the heading is gone.
+ */
+function extractHardLimits(map, repoRoot) {
+  const rule = map.rules.find((r) => r.id === CORE_RULE_ID);
+  if (!rule) fail(`Pi rule-map: missing rule ${CORE_RULE_ID} (source of the hard limits)`);
+  const body = stripFrontMatterAndMarker(
+    readFileOrFail(path.join(repoRoot, rule.source), `rule source for ${rule.id}`),
+  );
+  const lines = body.split("\n");
+  const start = lines.findIndex((line) => line.trim() === HARD_LIMITS_HEADING);
+  if (start === -1) {
+    fail(`Pi core: heading "${HARD_LIMITS_HEADING}" not found in ${rule.source}`);
+  }
+  const next = lines.findIndex((line, i) => i > start && line.startsWith("## "));
+  return lines.slice(start, next === -1 ? lines.length : next).join("\n").trim();
+}
+
 function buildAppendSystem(map, repoRoot, targetRoot, frameworkPrefix, promptIds) {
   const rulesRel = ssotPath(frameworkPrefix, ".ai/rules");
   const parts = [
-    "# Agent Collections — always-on project rules (Pi)",
+    "# Agent Collections — always-on core (Pi)",
     "",
     GENERATED_MARKER,
     "",
     `> Generated from the Agent Collections SSOT (\`${rulesRel}\`) by \`adapters/pi/generate.mjs\`.`,
     "> Edit the sources, not this file, then re-run the adapter sync (installer or `node adapters/sync.mjs --agents pi`).",
     "",
+    "## Ticket work",
+    "",
+    "**Ticket work starts with `/eversis-implement <ticket>`.** The delivery process (research, plan, review and QA handoff) loads only after an `eversis-*` command or while a plan is active. When someone asks for ticket work without a command, ask them to run it first.",
+    "",
+    extractHardLimits(map, repoRoot),
+    "",
+    "## Quality checks",
+    "",
+    "After substantive code changes, run the project's lint, typecheck and tests (commands from the project stack document, `package.json`, `Makefile` or equivalent), and fix failures you introduce before finishing.",
+    "",
     "## Pi surfaces",
     "",
     `- **Slash commands:** \`.pi/prompts/\` — ${promptIds.length} prompts, e.g. \`/eversis-implement\`, \`/eversis-review\`.`,
-    "- **Framework skills:** `.pi/skills/eversis-*/` (mirror of `.ai/skills/`), also via the `eversis-collections` MCP (`eversis_skills_get`).",
-    "- **Role-rule skills:** `.pi/skills/eversis-rule-*/` — load with `/skill:<name>` or read its `SKILL.md`.",
-    "",
-    "Rule ids used in prompts and skills map to Pi as follows:",
-    "",
-    "| Rule id | In Pi |",
-    "| ------- | ----- |",
+    "- **Skills:** `.pi/skills/eversis-*/` — load with `/skill:<name>` or read its `SKILL.md`.",
   ];
-  for (const rule of map.rules) {
-    let where;
-    if (rule.target === "append_system") {
-      where = "always on (this file)";
-    } else if (rule.target === "skill") {
-      where = `role skill \`/skill:${rule.skill_id}\``;
-    } else if (rule.skill_id) {
-      where = `framework skill \`/skill:${rule.skill_id}\``;
-    } else {
-      where = "not emitted for Pi";
-    }
-    parts.push(`| \`${rule.id}\` | ${where} |`);
-  }
-
-  for (const rule of map.rules.filter((r) => r.target === "append_system")) {
-    const body = stripFrontMatterAndMarker(
-      readFileOrFail(path.join(repoRoot, rule.source), `rule source for ${rule.id}`),
-    );
-    parts.push("", "---", "");
-    if (rule.ui_note) {
-      parts.push(
-        "> Applies when editing UI files (`*.tsx`, `*.jsx`, `*.vue`, `*.html`, `*.svelte`).",
-        "",
-      );
-    }
-    parts.push(body);
-  }
 
   const overlay = resolveStackOverlay(repoRoot, targetRoot);
   if (overlay) {
@@ -610,6 +656,29 @@ function buildAppendSystem(map, repoRoot, targetRoot, frameworkPrefix, promptIds
     );
   }
   return parts.join("\n") + "\n";
+}
+
+/**
+ * The process-rules extension with the bundle's skill ids in place, in rule-map
+ * order. The raw asset stays valid TypeScript and its functions take the ids as a
+ * parameter, so the placeholder is the only thing substituted.
+ */
+function buildProcessRulesExtension(map) {
+  const source = normalizeNewlines(readFileOrFail(PROCESS_RULES_ASSET, "process-rules extension asset"));
+  const occurrences = source.split(PROCESS_SKILL_IDS_PLACEHOLDER).length - 1;
+  if (occurrences !== 1) {
+    fail(
+      `process-rules extension asset: expected exactly one ${PROCESS_SKILL_IDS_PLACEHOLDER} placeholder, found ${occurrences}`,
+    );
+  }
+  const ids = map.rules.filter((r) => r.process_bundle === true).map((r) => r.skill_id);
+  if (ids.length === 0) {
+    fail("Pi rule-map: no rule has process_bundle: true");
+  }
+  const filled = source.replace(PROCESS_SKILL_IDS_PLACEHOLDER, () =>
+    ids.map((id) => JSON.stringify(id)).join(", "),
+  );
+  return `${GENERATED_MARKER_TS}\n${filled}`;
 }
 
 /**
@@ -766,7 +835,10 @@ function generate(repoRoot, outRoot, frameworkPrefix, check) {
     fail(`${piDir} exists and is not a directory`);
   }
 
-  // 1. Always-on rules.
+  // Built first, so a bad asset fails before any file is written.
+  const processRulesExtension = buildProcessRulesExtension(map);
+
+  // 1. Always-on core.
   emitter.emit(
     APPEND_SYSTEM_REL,
     buildAppendSystem(map, repoRoot, targetRoot, frameworkPrefix, prompts.map((p) => p.id)),
@@ -784,18 +856,20 @@ function generate(repoRoot, outRoot, frameworkPrefix, check) {
 
   // 3. Prompts -> slash commands with $ARGUMENTS.
   const promptIds = new Set();
+  const rewrites = ruleIdRewrites(map);
   for (const prompt of prompts) {
     const raw = readFileOrFail(path.join(repoRoot, prompt.sourceRel), `prompt ${prompt.id}`);
     promptIds.add(prompt.id);
     emitter.emit(
       path.posix.join(PROMPTS_DIR_REL, `${prompt.id}.md`),
-      buildPromptContent(prompt, raw, frameworkPrefix),
+      buildPromptContent(prompt, raw, frameworkPrefix, rewrites),
     );
   }
 
-  // 4. Context-budget extension (regenerated, marker-gated).
+  // 4. Extensions (regenerated, marker-gated).
   const extensionSource = normalizeNewlines(readFileOrFail(EXTENSION_ASSET, "extension asset"));
   emitter.emit(EXTENSION_REL, `${GENERATED_MARKER_TS}\n${extensionSource}`);
+  emitter.emit(PROCESS_RULES_EXTENSION_REL, processRulesExtension);
 
   // 5. Orphans, then the consumer-owned settings seed.
   cleanupOrphans(targetRoot, emitter, promptIds, skillIds);
@@ -832,7 +906,7 @@ function main() {
 
   const removed = emitter.written.filter((w) => w.startsWith("removed "));
   console.log(
-    `generated Pi adapter: ${promptCount} prompt(s), ${skillCount} role skill(s), APPEND_SYSTEM.md, context-budget extension${seeded ? ", settings.json (seeded)" : ""}`,
+    `generated Pi adapter: ${promptCount} prompt(s), ${skillCount} role skill(s), APPEND_SYSTEM.md, context-budget and process-rules extensions${seeded ? ", settings.json (seeded)" : ""}`,
   );
   if (removed.length > 0) {
     console.log(`removed ${removed.length} orphan generated file(s):`);

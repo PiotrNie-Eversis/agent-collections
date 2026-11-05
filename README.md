@@ -192,7 +192,7 @@ Interactive wizard (TTY) prompts for agents × domain profile × MCP servers —
 
 Selection is recorded at `.agent-collections/install-selection.json` (schema: [`docs/architecture/install-selection.md`](./docs/architecture/install-selection.md)) — required for `--upgrade`.
 
-**Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `AGENTS.md` (do not hand-edit generated `CLAUDE.md`); Pi → the same `eversis-project-stack.mdc`, appended to `.pi/APPEND_SYSTEM.md` once it differs from the template.
+**Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `AGENTS.md` (do not hand-edit generated `CLAUDE.md`); Pi → the same `eversis-project-stack.mdc`, appended to the core in `.pi/APPEND_SYSTEM.md` once it differs from the template.
 Full install guide (including Windows): [Installation](./website/docs/getting-started/installation.mdx).
 
 Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`): [Migration guide](./website/docs/advanced/migration-from-cursor-collections.md).
@@ -201,9 +201,10 @@ Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS
 
 Add `pi` to `--agents` (for example `--agents=cursor,claude,pi`, or `--agents=pi` alone; interactive menu `6) Pi only` / `7) Cursor + Claude + Pi`). The installer then writes, from `.ai/`:
 
-- `.pi/APPEND_SYSTEM.md` — always-on rules (agent core, testing and terminal, accessibility).
+- `.pi/APPEND_SYSTEM.md` — a small always-on core: hard limits, the quality-check line, and the line that ticket work starts with `/eversis-implement`.
 - `.pi/prompts/eversis-*.md` — `/eversis-*` slash commands.
 - `.pi/skills/eversis-*/` — framework skills mirror, plus `eversis-rule-*` role-rule skills.
+- `.pi/extensions/eversis-process-rules.ts` — adds the process rules after an `eversis-*` command or while a plan is active, so a session without a command costs close to plain Pi. Its state lives in `.pi/eversis-state/`. Details and measured sizes: [`adapters/pi/README.md`](./adapters/pi/README.md).
 - `.pi/extensions/eversis-context-budget.ts` — compacts the session once when context use crosses 50% (`EVERSIS_CONTEXT_BUDGET_PERCENT`, 1–95) and resumes an interrupted task. Pi-only: Cursor and Claude Code keep "window fill is not a trigger".
 - `.pi/settings.json` (seeded once) and `.pi/mcp.json` (`eversis-collections`; check with `pi mcp list`).
 
@@ -366,7 +367,7 @@ Re-run the installer with a **smaller** `--agents` or `--mcp-servers` list (or c
 | **MCP servers** | With an explicit `--mcp-servers`, framework-managed (catalog) entries not in the list are **removed** from `.cursor/mcp.json` and `.mcp.json`, and listed ones are re-templated (consumer-added servers outside the catalog are kept). Without `--mcp-servers` on upgrade / sync, existing entries in both files are kept unchanged. |
 | **Slash commands** | `npm run sync:adapters` / installer adapter sync **removes orphan** generated `eversis-*.md` under `.cursor/commands/`. |
 | **Claude omitted** | Framework-generated **`CLAUDE.md`** and triad **`.claudeignore`** are removed when Claude is not in `--agents` (project-edited files are left in place). On upgrade / sync without `--agents`, Claude stays selected while generated Claude files exist. |
-| **Pi omitted** | When Pi is explicitly omitted from `--agents`, framework-generated `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-*.md`, `.pi/skills/eversis-*` (framework skills and `eversis-rule-*` role skills) and `.pi/extensions/eversis-context-budget.ts` are removed; `.pi/settings.json`, `.pi/mcp.json` and hand-written files stay. On upgrade / sync without `--agents`, Pi stays selected while the generated `.pi/APPEND_SYSTEM.md` exists. |
+| **Pi omitted** | When Pi is explicitly omitted from `--agents`, framework-generated `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-*.md`, `.pi/skills/eversis-*` (framework skills and `eversis-rule-*` role skills), `.pi/extensions/eversis-context-budget.ts`, `.pi/extensions/eversis-process-rules.ts` and `.pi/eversis-state/` are removed; `.pi/settings.json`, `.pi/mcp.json` and hand-written files stay. On upgrade / sync without `--agents`, Pi stays selected while the generated `.pi/APPEND_SYSTEM.md` exists. |
 | **Hand-written `CLAUDE.md`** | When Claude is enabled and a root `CLAUDE.md` lacks the generator marker, it is copied to **`CLAUDE.md.pre-agent-collections.bak`** (or a timestamped `.bak` if a different backup already exists) before regeneration, with a warning. Move project-specific instructions into `.claude/CLAUDE.md`; do not commit the `.bak`. |
 | **Cursor rules** | Regenerated for the remaining agents; **`eversis-project-stack.mdc`** is never overwritten without opt-in. When Cursor is explicitly omitted from `--agents`, framework-generated `.cursor/rules/eversis-*.mdc` and `.cursor/commands/eversis-*.md` (generator marker) are removed; `eversis-project-stack.mdc` and hand-written files stay. |
 

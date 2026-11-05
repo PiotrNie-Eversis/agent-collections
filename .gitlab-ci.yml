@@ -10,6 +10,9 @@
 # verify stage (AC-138): the Pi load check (scripts/pi-load-check.mjs) installs
 # the framework for Pi into a temp project and fails when Pi does not load a
 # generated prompt, skill or extension, or reports a `.pi/mcp.json` config error.
+# The same jobs run the Pi adapter unit tests and the process rules integration
+# test (AC-134), which starts Pi with a stub model and fails when the rules
+# section does not reach the request.
 #   - pi-load-check:pinned runs Pi $PI_VERSION_PINNED on merge requests and on
 #     develop pushes that touch the watched paths.
 #   - pi-load-check:latest runs the latest Pi release in scheduled pipelines
@@ -54,6 +57,10 @@ master-work-only-paths:
     # extension and mcp.json) prove the failure detection on this Pi version.
     - node --test scripts/pi-load-check.test.mjs
     - node scripts/pi-load-check.mjs --label "$PI_LABEL"
+    # Unit tests import the .ts extensions: they need Node >= 22.18. The
+    # integration test uses a local stub model, with no keys and no real provider.
+    - node --test 'adapters/pi/*.test.mjs'
+    - node --test adapters/pi/process-rules.integration.mjs
 
 # Pinned Pi on framework changes. Each rule names its pipeline source, because
 # `changes:` is always true in scheduled pipelines.

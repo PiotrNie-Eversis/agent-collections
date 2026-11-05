@@ -434,8 +434,8 @@ _assert_pi_tree() {
   [[ "$prompts" == "$PI_EXPECTED_PROMPTS" ]] \
     || { echo "FAIL: ${label}: .pi/prompts has ${prompts} eversis-*.md, expected ${PI_EXPECTED_PROMPTS}"; exit 1; }
   roles="$(grep -lF "$PI_MARKER" "${target}/.pi/skills"/eversis-rule-*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
-  [[ "$roles" == "3" ]] \
-    || { echo "FAIL: ${label}: expected 3 generated eversis-rule-* role skills, found ${roles}"; exit 1; }
+  [[ "$roles" == "6" ]] \
+    || { echo "FAIL: ${label}: expected 6 generated eversis-rule-* role skills, found ${roles}"; exit 1; }
   local src name mirrored=0
   for src in "${ROOT}/.ai/skills"/eversis-*; do
     [[ -d "$src" ]] || continue
@@ -450,6 +450,8 @@ _assert_pi_tree() {
     || { echo "FAIL: ${label}: .pi/skills mirror has ${mirror_count} entries, expected ${PI_EXPECTED_SKILLS}"; exit 1; }
   grep -qF "$PI_MARKER" "${target}/.pi/extensions/eversis-context-budget.ts" 2>/dev/null \
     || { echo "FAIL: ${label}: missing generated .pi/extensions/eversis-context-budget.ts"; exit 1; }
+  grep -qF "$PI_MARKER" "${target}/.pi/extensions/eversis-process-rules.ts" 2>/dev/null \
+    || { echo "FAIL: ${label}: missing generated .pi/extensions/eversis-process-rules.ts"; exit 1; }
   [[ -f "${target}/.pi/settings.json" ]] \
     || { echo "FAIL: ${label}: missing seeded .pi/settings.json"; exit 1; }
   node -e '
@@ -581,6 +583,10 @@ mkdir -p "${TARGET_CURSOR_PI}/.pi/prompts" "${TARGET_CURSOR_PI}/.pi/skills/my-te
 echo 'hand-made' > "${TARGET_CURSOR_PI}/.pi/prompts/eversis-handmade.md"
 echo 'hand-made' > "${TARGET_CURSOR_PI}/.pi/prompts/team.md"
 echo 'hand-made' > "${TARGET_CURSOR_PI}/.pi/skills/my-team-skill/SKILL.md"
+# .pi/eversis-state/ is created by the extension at runtime, never by the installer.
+mkdir -p "${TARGET_CURSOR_PI}/.pi/eversis-state"
+echo '*' > "${TARGET_CURSOR_PI}/.pi/eversis-state/.gitignore"
+echo '{"plan":"docs/specs/ac-1/ac-1.plan.md"}' > "${TARGET_CURSOR_PI}/.pi/eversis-state/active-plan.json"
 PI_DESELECT_LOG="${TMP}/consumer-cursor-pi-deselect.log"
 bash "${ROOT}/scripts/setup-agent-collections.sh" \
   --collections-home "$ROOT" \
@@ -595,6 +601,10 @@ bash "${ROOT}/scripts/setup-agent-collections.sh" \
 [[ -e "${TARGET_CURSOR_PI}/.pi/APPEND_SYSTEM.md" ]] && { echo "FAIL: (c) .pi/APPEND_SYSTEM.md survived Pi deselect"; exit 1; }
 [[ -e "${TARGET_CURSOR_PI}/.pi/extensions/eversis-context-budget.ts" ]] \
   && { echo "FAIL: (c) .pi/extensions/eversis-context-budget.ts survived Pi deselect"; exit 1; }
+[[ -e "${TARGET_CURSOR_PI}/.pi/extensions/eversis-process-rules.ts" ]] \
+  && { echo "FAIL: (c) .pi/extensions/eversis-process-rules.ts survived Pi deselect"; exit 1; }
+[[ -e "${TARGET_CURSOR_PI}/.pi/eversis-state" ]] \
+  && { echo "FAIL: (c) .pi/eversis-state/ survived Pi deselect"; exit 1; }
 grep -lF "$PI_MARKER" "${TARGET_CURSOR_PI}/.pi/prompts"/*.md >/dev/null 2>&1 \
   && { echo "FAIL: (c) generated .pi/prompts survived Pi deselect"; exit 1; }
 shopt -s nullglob

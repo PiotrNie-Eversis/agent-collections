@@ -43,7 +43,7 @@ node adapters/sync.mjs --check --agents cursor,claude,pi --out /path/to/project
 |---------|---------|--------|
 | [Cursor](./cursor/) | `node adapters/cursor/generate.mjs` | `.cursor/rules/eversis-*.mdc` (mapped) |
 | [Claude Code](./claude/) | `node adapters/claude/generate.mjs` | root `CLAUDE.md` |
-| [Pi](./pi/) | `node adapters/pi/generate.mjs` (or `sync.mjs --agents pi`) | `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-*.md`, `.pi/skills/eversis-rule-*/SKILL.md`, `.pi/extensions/eversis-context-budget.ts`, `.pi/settings.json` (seeded once); installer adds `.pi/skills/eversis-*/` and `.pi/mcp.json` |
+| [Pi](./pi/) | `node adapters/pi/generate.mjs` (or `sync.mjs --agents pi`) | `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-*.md`, `.pi/skills/eversis-rule-*/SKILL.md`, `.pi/extensions/eversis-process-rules.ts`, `.pi/extensions/eversis-context-budget.ts`, `.pi/settings.json` (seeded once); installer adds `.pi/skills/eversis-*/` and `.pi/mcp.json` |
 | [OpenCode](./opencode/) | — (placeholder) | `opencode.jsonc` / stub |
 
 Prefer `adapters/sync.mjs` after changing `.ai/rules` or any `rule-map.yaml` (add `--agents …,pi` when the target uses Pi).

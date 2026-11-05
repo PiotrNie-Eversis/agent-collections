@@ -33,7 +33,7 @@ Consumer install / upgrade entry for **Agent Collections**.
 
 ## Pi load check in CI
 
-`.gitlab-ci.yml` has a `verify` stage with two jobs. Each installs Node 22 and Pi (`npm install -g --ignore-scripts`), runs `node --test scripts/pi-load-check.test.mjs`, then `node scripts/pi-load-check.mjs`. The job log starts the report with `Pi <version> (pinned)` or `Pi <version> (latest)`.
+`.gitlab-ci.yml` has a `verify` stage with two jobs. Each installs Node 22 and Pi (`npm install -g --ignore-scripts`), runs `node --test scripts/pi-load-check.test.mjs`, then `node scripts/pi-load-check.mjs`, then the Pi adapter unit tests (`node --test 'adapters/pi/*.test.mjs'`, which need Node 22.18 or later) and `node --test adapters/pi/process-rules.integration.mjs`. That last test starts Pi with a local stub model, no keys and a temp `HOME`, and fails when the process rules section does not reach the request (AC-134). The job log starts the report with `Pi <version> (pinned)` or `Pi <version> (latest)`.
 
 - **`pi-load-check:pinned`** runs Pi `PI_VERSION_PINNED` (now `1.5.0`) on merge requests and on `develop` pushes that change a watched path: `adapters/pi/**`, `.ai/prompts/**`, `.ai/skills/**`, `.ai/rules/**`, `adapters/sync.mjs`, `scripts/setup-agent-collections.sh`, `scripts/lib/setup-agent-collections/**`, `templates/mcp.json`, `scripts/pi-load-check*.mjs`, `package.json`, `.gitlab-ci.yml`.
 - **`pi-load-check:latest`** runs the latest Pi release in scheduled pipelines and when someone with Developer access or higher starts a pipeline from the web UI (**Build → Pipelines → Run pipeline**). The job has no secrets or write tokens.

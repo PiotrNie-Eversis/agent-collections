@@ -418,9 +418,11 @@ _run_pi_adapter_sync() {
 
 # Pi deselect (pi not in --agents): remove only framework-generated Pi files.
 # Marker-gated for generated files; eversis-* mirror entries in .pi/skills/
-# are framework-owned by name (same rule as .claude/skills/). Consumer-owned
-# .pi/settings.json and .pi/mcp.json stay (same convention as .mcp.json /
-# .cursor/mcp.json on deselect). Returns non-zero when a removal fails.
+# are framework-owned by name (same rule as .claude/skills/), and so is
+# .pi/eversis-state/, which the process-rules extension creates and which has no
+# marker. Consumer-owned .pi/settings.json and .pi/mcp.json stay (same convention
+# as .mcp.json / .cursor/mcp.json on deselect). Returns non-zero when a removal
+# fails.
 _prune_deselected_pi() {
   local pi_dir="${TARGET_DIR}/.pi"
   [[ -d "$pi_dir" ]] || return 0
@@ -432,10 +434,19 @@ _prune_deselected_pi() {
     log_ok "Removed generated .pi/APPEND_SYSTEM.md (${reason})."
   fi
 
-  local extension="${pi_dir}/extensions/eversis-context-budget.ts"
-  if [[ -f "$extension" ]] && grep -qF "$PI_GENERATED_MARKER" "$extension" 2>/dev/null; then
-    rm -f "$extension" || return 1
-    log_ok "Removed generated .pi/extensions/eversis-context-budget.ts (${reason})."
+  local extension_name extension
+  for extension_name in eversis-context-budget.ts eversis-process-rules.ts; do
+    extension="${pi_dir}/extensions/${extension_name}"
+    if [[ -f "$extension" ]] && grep -qF "$PI_GENERATED_MARKER" "$extension" 2>/dev/null; then
+      rm -f "$extension" || return 1
+      log_ok "Removed generated .pi/extensions/${extension_name} (${reason})."
+    fi
+  done
+
+  local state_dir="${pi_dir}/eversis-state"
+  if [[ -e "$state_dir" ]] || [[ -L "$state_dir" ]]; then
+    rm -rf "$state_dir" || return 1
+    log_ok "Removed .pi/eversis-state/ (${reason})."
   fi
 
   _prune_marker_gated_dir "${pi_dir}/prompts" "$PI_GENERATED_MARKER" \

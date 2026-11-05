@@ -43,7 +43,7 @@ adapters
 |---------|-------|---------|--------|------------------|----------|
 | **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** full mirror | **No** emit — resolve via MCP skill resolution | **Thin** `.cursor/commands/eversis-*.md` from `.ai/prompts` (HYBRID pointer + Executable) — not a full prompt copy | Generator: `adapters/cursor/` (Cursor generator + thin slash commands) |
 | **Claude Code** | Root **`CLAUDE.md`** (H2 section per non-glob-scoped mapped rule) + `.claude/rules/*.md` (`paths:` frontmatter for glob-scoped rules) | **No** full mirror | **Native** `.claude/skills/eversis-*/` — linked/copied by the **installer** (not the generator) from `.ai/skills/`, one dir per skill package | **Thin** `.claude/commands/eversis-*.md` from `.ai/prompts` (same HYBRID pointer + Executable shape as Cursor's thin slash commands; `description` + `argument-hint` frontmatter, marker at file end) — closes the claude-code-setup research's F1 | Generator: `adapters/claude/generate.mjs` + `generate-commands.mjs` (Claude Code generator); skills linking + `.claude/CLAUDE.md`/`.claude/settings.json` seeding: installer (`scripts/lib/setup-agent-collections/`) — **shipped** |
-| **Pi** (opt-in, AC-14) | Always-on rules → `.pi/APPEND_SYSTEM.md` (+ customised `eversis-project-stack` overlay); role rules → `.pi/skills/eversis-rule-*/SKILL.md` — per [`adapters/pi/rule-map.yaml`](../../adapters/pi/rule-map.yaml) | `.pi/prompts/eversis-*.md` — Executable section copied with Pi-safe front matter and `$ARGUMENTS` (Pi prompt templates cannot point at a file; see §6A) | **Native** `.pi/skills/eversis-*/` — linked/copied by the **installer** from `.ai/skills/` (same contract as Claude Code) | `.pi/extensions/eversis-context-budget.ts` (context budget); `.pi/settings.json` seeded once; `.pi/mcp.json` written by the installer | Generator: `adapters/pi/generate.mjs` (run via `adapters/sync.mjs --agents …,pi`); skills mirror + `.pi/mcp.json`: installer — **shipped** |
+| **Pi** (opt-in, AC-14) | Small always-on core → `.pi/APPEND_SYSTEM.md` (+ customised `eversis-project-stack` overlay); rule bodies → role skills `.pi/skills/eversis-rule-*/SKILL.md`, five of them added per run by `.pi/extensions/eversis-process-rules.ts` (`eversis-fine-handoff` stays a framework skill) — per [`adapters/pi/rule-map.yaml`](../../adapters/pi/rule-map.yaml) | `.pi/prompts/eversis-*.md` — Executable section copied with Pi-safe front matter and `$ARGUMENTS` (Pi prompt templates cannot point at a file; see §6A) | **Native** `.pi/skills/eversis-*/` — linked/copied by the **installer** from `.ai/skills/` (same contract as Claude Code) | `.pi/extensions/eversis-process-rules.ts` (rules on demand), `.pi/extensions/eversis-context-budget.ts` (context budget); `.pi/settings.json` seeded once; `.pi/mcp.json` written by the installer | Generator: `adapters/pi/generate.mjs` (run via `adapters/sync.mjs --agents …,pi`); skills mirror + `.pi/mcp.json`: installer — **shipped** |
 | **OpenCode** | Point at core (or generated) paths via `opencode.json` `instructions` | Deferred | Deferred | Config placeholder; optional `AGENTS.md` | **placeholder** |
 
 Skills and prompts remain under `.ai/` as SSOT. Cursor slash files are **thin packaging** only (stable id + path + optional Executable section). Adapters **must not** claim they ship a full multi-copy of skills/prompts. Pi prompt files copy only the Executable section (generated, marker-bearing, regenerated on sync) — the SSOT stays under `.ai/prompts/`.
@@ -312,25 +312,27 @@ Pi (the [Pi coding agent](https://pi.dev/)) loads project files from `.pi/` only
 | Field (`adapters/pi/rule-map.yaml`) | Meaning | Mapping |
 |-------|---------|---------|
 | `id` / `source` | Same pairs as the Claude map | `adapters/sync.mjs --check` fails when a Claude `id`/`source` pair is missing from the Pi map |
-| `target: append_system` | Always-on rule | Body concatenated into `.pi/APPEND_SYSTEM.md`: `eversis-agent-core`, `eversis-testing-and-terminal`, `eversis-accessibility` |
-| `ui_note: true` | UI-only rule | Body prefixed with a "UI files only" note (`eversis-accessibility`) |
+| `process_bundle: true` | Rule added on demand (AC-134) | Only with `target: skill` (asserted). The generator writes these skill ids into `.pi/extensions/eversis-process-rules.ts`, which adds their text after an `eversis-*` command or while a plan is active. Set on `eversis-agent-core`, `eversis-testing-and-terminal`, `eversis-accessibility`, `eversis-engineering-manager`, `eversis-spec-driven-development` |
+| `ui_note: true` | UI-only rule | Only with `target: skill`. Body prefixed with a "UI files only" note (`eversis-accessibility`) |
 | `review_context_note: true` | Pi review-independence note (AC-135) | Only with `target: skill` (asserted). Role skill body prefixed with the Pi host note: review results start with a `Review context:` line (same session / fresh session), the QA draft repeats it, and a bare ticket key resolves the spec folder. Set on `eversis-engineering-manager`, `eversis-code-reviewer`; text lives in `adapters/pi/generate.mjs` |
-| `target: skill` + `skill_id` + `description` | Role rule loaded on demand | `.pi/skills/<skill_id>/SKILL.md`: `eversis-rule-engineering-manager`, `eversis-rule-code-reviewer`, `eversis-rule-spec-driven-development`. Ids start with `eversis-rule-` and must not equal an `.ai/skills/eversis-*` name (asserted) |
+| `target: skill` + `skill_id` + `description` | Role rule loaded on demand | `.pi/skills/<skill_id>/SKILL.md`: `eversis-rule-agent-core`, `eversis-rule-testing-and-terminal`, `eversis-rule-accessibility`, `eversis-rule-engineering-manager`, `eversis-rule-code-reviewer`, `eversis-rule-spec-driven-development`. Ids start with `eversis-rule-` and must not equal an `.ai/skills/eversis-*` name (asserted) |
 | `target: none` + `skill_id` | Served by a framework skill | `eversis-fine-handoff` → mirrored framework skill `.pi/skills/eversis-fine-handoff/` (no second copy) |
 
 ### 6A.2 Output structure
 
 | Path | Written by | Lifecycle |
 |------|------------|-----------|
-| `.pi/APPEND_SYSTEM.md` | generator | Regenerated; header lists slash commands, skill locations and a rule-id → Pi-skill table; customised `.cursor/rules/eversis-project-stack.mdc` appended only when it differs from the template and has no placeholder markers |
+| `.pi/APPEND_SYSTEM.md` | generator | Regenerated; the small core: hard limits extracted from `agent-core.md`, the quality-check line, the line that ticket work starts with `/eversis-implement`, and a pointer to commands and skills; customised `.cursor/rules/eversis-project-stack.mdc` appended only when it differs from the template and has no placeholder markers |
 | `.pi/skills/eversis-rule-*/SKILL.md` | generator | Regenerated; orphans removed (marker-gated) |
 | `.pi/prompts/eversis-*.md` | generator | One per non-denied prompt (`adapters/claude/command-deny.yaml`); JSON-quoted front matter; `$` before a Pi substitution pattern rendered as `＄` (U+FF04); final `**User input for this run:** $ARGUMENTS` line; orphans removed (marker-gated) |
+| `.pi/extensions/eversis-process-rules.ts` | generator | Regenerated with the `process_bundle` skill ids; adds the rules as a prompt section after an `eversis-*` command or while a plan is active, and otherwise removes `eversis-*` entries from the skill listing — Pi-only, needs Pi 1.5.0 |
+| `.pi/eversis-state/` | extension (runtime) | Active-plan pointer; ignores itself in git; removed by name on Pi deselect, because it has no marker |
 | `.pi/extensions/eversis-context-budget.ts` | generator | Regenerated; compacts once when context use crosses `EVERSIS_CONTEXT_BUDGET_PERCENT` (default 50) — Pi-only, Cursor / Claude Code keep "window fill is not a trigger" |
 | `.pi/settings.json` | generator | Seeded once when absent; consumer-owned afterwards |
 | `.pi/skills/eversis-*/` | installer | Mirror of `.ai/skills/eversis-*/` (symlink or copy); stale-prune skips `eversis-rule-*` |
 | `.pi/mcp.json` | installer | `eversis-collections` as a `bash -c` locator that walks up from `$PWD` to the directory containing `.pi/`; kept on deselect |
 
-Every generated file carries `GENERATED by adapters/pi/generate.mjs`; orphan cleanup and installer deselect pruning are marker-gated (framework skill mirror entries are framework-owned by `eversis-*` name, as for `.claude/skills/`). `CLAUDE.md` / `AGENTS.md` are not generated for Pi; Pi reads them as context files, so consumers keep a root `AGENTS.md` to avoid Pi loading the generated `CLAUDE.md` as well.
+Every generated file carries `GENERATED by adapters/pi/generate.mjs`; orphan cleanup and installer deselect pruning are marker-gated (framework skill mirror entries are framework-owned by `eversis-*` name, as for `.claude/skills/`). `CLAUDE.md` / `AGENTS.md` are not generated for Pi; Pi reads them as context files, so consumers keep a root `AGENTS.md` to avoid Pi loading the generated `CLAUDE.md` as well; without it the small core does not hold.
 
 ### 6A.3 Status block (for install wizard / docs)
 
@@ -338,7 +340,8 @@ Every generated file carries `GENERATED by adapters/pi/generate.mjs`; orphan cle
 adapter: pi
 maturity: shipped
 emits: .pi/APPEND_SYSTEM.md, .pi/skills/eversis-rule-*/SKILL.md, .pi/prompts/eversis-*.md,
-       .pi/extensions/eversis-context-budget.ts, .pi/settings.json (seed once)
+       .pi/extensions/eversis-process-rules.ts, .pi/extensions/eversis-context-budget.ts,
+       .pi/settings.json (seed once)
 installer: .pi/skills/eversis-*/ mirror, .pi/mcp.json
 does_not_emit: Pi ignore files (AC-113), sign-in / model settings (AC-111), sandbox (AC-114)
 ```
