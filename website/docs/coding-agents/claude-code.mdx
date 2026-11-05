@@ -1,0 +1,30 @@
+---
+sidebar_position: 1
+title: Claude Code
+---
+
+import AgentWorkflowDiagram from '@site/src/components/AgentWorkflowDiagram';
+
+# Agent Collections in Claude Code
+
+Claude Code reads the process rules from `CLAUDE.md` on every session. The Engineering Manager role delegates research, planning, implementation and review to sub-agents, so review runs in a separate context by default.
+
+## The delivery cycle
+
+Each stage shows what the process does and which Claude Code tools do the work. Quick Flow can skip Research and Plan.
+
+<AgentWorkflowDiagram agent="claude" />
+
+## What gets installed
+
+| Path | What it holds |
+| --- | --- |
+| `CLAUDE.md` | One section for each of the six always-on rules |
+| `.claude/rules/eversis-accessibility.md` | The accessibility rule, loaded for matching UI files |
+| `.claude/commands/eversis-*.md` | Thin pointers to the prompts in `.ai/prompts/` |
+| `.claude/skills/eversis-*/` | Skill packages, linked or copied by the installer |
+| `.mcp.json` | MCP servers, including `eversis-collections` |
+
+These files are generated. Do not edit them by hand: the next sync overwrites them.
+
+For setup, see [Installation](../getting-started/installation.mdx) and [MCP Setup](../getting-started/mcp-setup.mdx).

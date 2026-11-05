@@ -1,0 +1,225 @@
+.wrapper {
+  --line: var(--ifm-color-emphasis-400);
+  --card: #fff;
+  --card-border: rgba(15, 23, 42, 0.1);
+  --text: #1f2937;
+  --muted: #4b5563;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+:global(html[data-theme='dark']) .wrapper {
+  --card: #1e1e24;
+  --card-border: rgba(255, 255, 255, 0.12);
+  --text: #f1f1f3;
+  --muted: #b8b8c0;
+}
+
+.pill {
+  margin: 0;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.phases {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+
+.line {
+  flex-shrink: 0;
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+}
+
+.phase {
+  width: 100%;
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--tone-border);
+  border-left-width: 4px;
+  border-radius: 12px;
+  background: var(--tone-bg);
+}
+
+.amber {
+  --tone-bg: rgba(217, 119, 6, 0.08);
+  --tone-border: rgba(217, 119, 6, 0.5);
+  --tone-text: #92400e;
+}
+.blue {
+  --tone-bg: rgba(37, 99, 235, 0.08);
+  --tone-border: rgba(37, 99, 235, 0.5);
+  --tone-text: #1e40af;
+}
+.violet {
+  --tone-bg: rgba(109, 40, 217, 0.08);
+  --tone-border: rgba(109, 40, 217, 0.5);
+  --tone-text: #5b21b6;
+}
+.green {
+  --tone-bg: rgba(5, 150, 105, 0.08);
+  --tone-border: rgba(5, 150, 105, 0.5);
+  --tone-text: #065f46;
+}
+.sky {
+  --tone-bg: rgba(2, 132, 199, 0.08);
+  --tone-border: rgba(2, 132, 199, 0.5);
+  --tone-text: #075985;
+}
+
+:global(html[data-theme='dark']) .amber {
+  --tone-text: #fcd34d;
+}
+:global(html[data-theme='dark']) .blue {
+  --tone-text: #93c5fd;
+}
+:global(html[data-theme='dark']) .violet {
+  --tone-text: #c4b5fd;
+}
+:global(html[data-theme='dark']) .green {
+  --tone-text: #6ee7b7;
+}
+:global(html[data-theme='dark']) .sky {
+  --tone-text: #7dd3fc;
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  color: var(--tone-text);
+  font-size: 1rem;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 1.25rem;
+}
+
+.columnLabel {
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.process {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tool {
+  display: grid;
+  grid-template-columns: 4.75rem minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: baseline;
+  margin: 0;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.kind {
+  color: var(--tone-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.name {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.note {
+  grid-column: 2;
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.marker {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.gate {
+  border-color: rgba(109, 40, 217, 0.5);
+  background: rgba(109, 40, 217, 0.1);
+  color: #5b21b6;
+}
+.issues {
+  border-color: rgba(194, 65, 12, 0.5);
+  background: rgba(194, 65, 12, 0.1);
+  color: #9a3412;
+}
+.approved {
+  border-color: rgba(5, 150, 105, 0.5);
+  background: rgba(5, 150, 105, 0.1);
+  color: #065f46;
+}
+
+:global(html[data-theme='dark']) .gate {
+  color: #c4b5fd;
+}
+:global(html[data-theme='dark']) .issues {
+  color: #fdba74;
+}
+:global(html[data-theme='dark']) .approved {
+  color: #6ee7b7;
+}
+
+@media (max-width: 640px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .tool {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .note {
+    grid-column: 1;
+  }
+}
