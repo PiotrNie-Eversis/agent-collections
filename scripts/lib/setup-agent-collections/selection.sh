@@ -17,7 +17,12 @@ write_install_selection() {
   [[ -z "$vendor_mode" ]] && vendor_mode="local"
   local link_mode="${EFFECTIVE_LINK_MODE:-${ARG_LINK_MODE:-auto}}"
   local agents_json
-  agents_json="$(node -e "console.log(JSON.stringify(String(process.argv[1]||'cursor').split(',').map(s=>s.trim()).filter(Boolean)))" "${SELECTED_AGENTS:-cursor}")"
+  # A failed Pi stage (AC-14) leaves pi out of the record so a later
+  # --upgrade does not treat a broken Pi install as selected. SELECTED_AGENTS
+  # itself is never edited (an empty list would fall back to cursor).
+  local drop_pi="false"
+  [[ "${PI_STAGE_FAILED:-false}" == "true" ]] && drop_pi="true"
+  agents_json="$(node -e "console.log(JSON.stringify(String(process.argv[1]||'cursor').split(',').map(s=>s.trim()).filter(Boolean).filter(s=>!(process.argv[2]==='true'&&s==='pi'))))" "${SELECTED_AGENTS:-cursor}" "$drop_pi")"
   local mcp_json
   mcp_json="$(node -e "console.log(JSON.stringify(String(process.argv[1]||'eversis-collections').split(',').map(s=>s.trim()).filter(Boolean)))" "${MCP_SELECTED_IDS:-eversis-collections}")"
 

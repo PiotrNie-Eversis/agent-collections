@@ -1,0 +1,70 @@
+---
+sidebar_position: 3
+title: Pi
+---
+
+import PeleDiagram from '@site/src/components/PeleDiagram';
+import AgentWorkflowDiagram from '@site/src/components/AgentWorkflowDiagram';
+
+export const rulesFlow = `flowchart TB
+    start(["Session starts"]) --> check{"Saved command,<br/>or active plan?"}
+    check -- Yes --> on["Rules on<br/>Notice shown"]
+    check -- No --> off["Rules off"]
+    on --> message(["Person sends a message"])
+    off --> message
+    message --> command{"eversis-* command?"}
+    command -- Yes --> save["Rules on, notice shown<br/>Command saved in the session"]
+    command -- No --> active{"Rules on?"}
+    save --> full["<b>Core + five rule skills</b><br/>All skills listed"]
+    active -- Yes --> full
+    active -- No --> core["<b>Core only</b><br/>eversis-* skills hidden"]
+    full --> model(["Request goes to the model"])
+    core --> model
+    model --> edit{"Pi edited a plan<br/>in docs/specs?"}
+    edit -- Yes --> pointer["Path saved in<br/>active-plan.json"]
+    pointer -. next session .-> check`;
+
+# Agent Collections in Pi
+
+Agent Collections gives Pi the process: the gates, the role rules and the skills. Pi gives Agent Collections the runtime: commands, extensions, tools and MCP.
+
+## The delivery cycle
+
+Each stage shows what the process does and which Pi tools do the work. Quick Flow can skip Research and Plan.
+
+<AgentWorkflowDiagram agent="pi" />
+
+## When the process rules turn on
+
+Pi loads the full process rules only when a session needs them. Every session gets a small always-on core. The extension `eversis-process-rules` adds the rest.
+
+<PeleDiagram
+  id="pi-rules-flow"
+  source={rulesFlow}
+  label="At session start, the rules turn on if the session has a saved command or there is an active plan. On each message, an eversis command turns the rules on. With the rules on, the request carries the core and five rule skills, and all skills are listed. With the rules off, it carries the core only and eversis skills are hidden. When Pi edits a plan in docs/specs, the path is saved and applies from the next session."
+/>
+
+The five rule skills are `eversis-rule-agent-core`, `eversis-rule-testing-and-terminal`, `eversis-rule-accessibility`, `eversis-rule-engineering-manager` and `eversis-rule-spec-driven-development`. Other role skills, such as `eversis-rule-code-reviewer`, load on demand.
+
+| Trigger | Stays on for | Ends when |
+| --- | --- | --- |
+| An `eversis-*` command | The rest of that session, including `--continue`, `/reload` and compaction | A new session starts |
+| An active plan | Each new session | The plan has no open checkbox, or its file is absent, for example on another git branch |
+
+- A plan edit does not change the running session. It applies from the next session.
+- A plan counts only if Pi edited it and the edit succeeded.
+- A command sent while the agent is busy starts the rules with the next run, and the notice says so.
+
+## What the model receives
+
+Measured on a full install with Pi 1.5.0:
+
+| Request | System prompt |
+| --- | --- |
+| Before on-demand rules, every request | 42,902 characters |
+| No command | 4,556 characters |
+| First request after a command | 57,908 characters |
+
+Your numbers will be higher if the project has a customised project-stack overlay or a long `AGENTS.md`, because both are always on.
+
+For setup, see [Installation](../getting-started/installation.mdx). The full behaviour is in `adapters/pi/README.md`.

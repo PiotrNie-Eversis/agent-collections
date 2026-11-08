@@ -16,7 +16,14 @@ print_summary() {
 
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "${_BOLD}${_GREEN}agent-collections setup complete${_RESET}"
+  local pi_selected=false pi_failed=false
+  echo ",${agents_csv}," | grep -q ',pi,' && pi_selected=true
+  [[ "${PI_STAGE_FAILED:-false}" == "true" ]] && pi_failed=true
+  if [[ "$pi_failed" == "true" ]]; then
+    echo "${_BOLD}${_YELLOW}agent-collections setup completed with failures (pi)${_RESET}"
+  else
+    echo "${_BOLD}${_GREEN}agent-collections setup complete${_RESET}"
+  fi
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
   echo "  Mode:          ${mode}"
@@ -33,6 +40,16 @@ print_summary() {
     echo "  ${_YELLOW}OpenCode:${_RESET} placeholder-only — not a full adapter."
     echo ""
   fi
+  if [[ "$pi_failed" == "true" ]]; then
+    echo "  ${_RED}Pi:${_RESET}            FAILED — ${PI_STAGE_FAILURE_REASON:-see the pi error above}"
+    echo "                 Other agents were installed; pi is not in the recorded selection."
+    echo "                 Fix the cause, then re-run with the same --agents (the run exits 1)."
+    echo ""
+  elif [[ "$pi_selected" == "true" ]] && ! command -v pi >/dev/null 2>&1; then
+    echo "  ${_YELLOW}Pi:${_RESET}            'pi' CLI not found on PATH — .pi/ was generated; install the Pi"
+    echo "                 coding agent (npm i -g @earendil-works/pi-coding-agent) to use it."
+    echo ""
+  fi
 
   echo "${_BOLD}Next steps:${_RESET}"
   echo ""
@@ -45,6 +62,17 @@ print_summary() {
   if echo ",${agents_csv}," | grep -q ',claude,'; then
     echo "  ${step}. Customise .claude/CLAUDE.md (Claude stack / skills policy)"
     echo "     Do not hand-edit generated CLAUDE.md; it is overwritten on adapter sync."
+    step=$((step + 1))
+  fi
+
+  if [[ "$pi_selected" == "true" ]] && [[ "$pi_failed" != "true" ]]; then
+    echo "  ${step}. Start pi in the project root and grant project trust (Pi loads .pi/ only for trusted projects)"
+    echo "     Run /reload in an open Pi session after every re-sync."
+    step=$((step + 1))
+    echo "  ${step}. Customise .cursor/rules/eversis-project-stack.mdc — once it differs from the template, the"
+    echo "     next sync appends it to .pi/APPEND_SYSTEM.md (Pi stack / skills policy)"
+    step=$((step + 1))
+    echo "  ${step}. Keep a root AGENTS.md so Pi does not also load CLAUDE.md as its context file"
     step=$((step + 1))
   fi
 
@@ -84,7 +112,11 @@ print_summary() {
   echo "--mcp-servers, unlisted catalog servers are pruned; adapter sync removes orphan generated"
   echo "slash commands and scoped rules. When Claude is explicitly omitted, framework-generated"
   echo "CLAUDE.md, .claudeignore, .claude/commands/, .claude/rules/, and .claude/skills/ are"
-  echo "removed if present. See README upgrade / recovery notes."
+  echo "removed if present. When Pi is explicitly omitted, framework-generated .pi/APPEND_SYSTEM.md,"
+  echo ".pi/prompts/eversis-*.md, .pi/skills/eversis-* (framework skills and eversis-rule-* role"
+  echo "skills), .pi/extensions/eversis-context-budget.ts, .pi/extensions/eversis-process-rules.ts"
+  echo "and .pi/eversis-state/ are removed; .pi/settings.json and .pi/mcp.json stay. See README"
+  echo "upgrade / recovery notes."
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""

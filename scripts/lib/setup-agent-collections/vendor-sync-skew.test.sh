@@ -197,6 +197,110 @@ else
   _fail "local mode: no checkout"
 fi
 
+# --- AC-14: agent-id probe (pi) -------------------------------------------
+# A pin from before AC-14 lists only cursor,claude under --agents and has no
+# adapters/pi/generate.mjs. With --agents=pi the guard must realign a clean
+# pin, or stop with a clear "Rejected agent id" message on a dirty one —
+# never let the vendored sync.mjs print a raw "unknown agent id: pi".
+write_pi_sync_mjs() {
+  local root="$1"
+  mkdir -p "${root}/adapters/pi"
+  cat > "${root}/adapters/sync.mjs" <<'EOF'
+#!/usr/bin/env node
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log("Usage: node adapters/sync.mjs [--check] [--out <dir>] [--agents cursor,claude,opencode,pi]");
+  console.log("                              [--framework-prefix <path>]");
+  process.exit(0);
+}
+process.exit(0);
+EOF
+  echo '// pi generator stub' > "${root}/adapters/pi/generate.mjs"
+}
+
+# (pi-1) probe false on an old pin (no pi under --agents, no generator)
+if _sync_mjs_supports_agent "$OLD_SYNC" "pi"; then
+  _fail "agent probe false when sync.mjs predates pi"
+else
+  _pass "agent probe false when sync.mjs predates pi"
+fi
+
+# (pi-2) probe true when --help lists pi and adapters/pi/generate.mjs exists
+PI_NEW_ROOT="${TMP}/pi-new"
+write_pi_sync_mjs "$PI_NEW_ROOT"
+if _sync_mjs_supports_agent "${PI_NEW_ROOT}/adapters/sync.mjs" "pi"; then
+  _pass "agent probe true when sync.mjs lists pi and the Pi generator exists"
+else
+  _fail "agent probe true when sync.mjs lists pi and the Pi generator exists"
+fi
+
+# (pi-3) --help lists pi but the generator is missing → still skewed
+rm -f "${PI_NEW_ROOT}/adapters/pi/generate.mjs"
+if _sync_mjs_supports_agent "${PI_NEW_ROOT}/adapters/sync.mjs" "pi"; then
+  _fail "agent probe false when adapters/pi/generate.mjs is missing"
+else
+  _pass "agent probe false when adapters/pi/generate.mjs is missing"
+fi
+
+# (pi-4) clean old pin + --agents=pi → aligned to the installer SHA
+PI_ALIGN_VENDOR="${TMP}/pi-align-vendor.git"
+init_git_repo "$PI_ALIGN_VENDOR"
+write_sync_mjs "${PI_ALIGN_VENDOR}/adapters/sync.mjs" "yes"
+git -C "$PI_ALIGN_VENDOR" add adapters/sync.mjs
+git -C "$PI_ALIGN_VENDOR" commit -qm "pre-AC-14 sync"
+pi_old_sha="$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)"
+write_pi_sync_mjs "$PI_ALIGN_VENDOR"
+git -C "$PI_ALIGN_VENDOR" add adapters
+git -C "$PI_ALIGN_VENDOR" commit -qm "AC-14 sync"
+pi_new_sha="$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)"
+git clone -q "$PI_ALIGN_VENDOR" "${TMP}/pi-align-installer.git"
+git -C "$PI_ALIGN_VENDOR" checkout -q "$pi_old_sha"
+INSTALLER_FRAMEWORK_HOME="${TMP}/pi-align-installer.git"
+COLLECTIONS_HOME="$PI_ALIGN_VENDOR"
+VENDOR_MODE="submodule"
+ADAPTER_SYNC_EXTRA_FLAGS=()
+SELECTED_AGENTS="cursor,pi"
+export SELECTED_AGENTS
+rc=0
+align_out="$(align_vendor_sync_cli_or_die 2>&1)" || rc=$?
+if [[ "$rc" -eq 0 && "$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)" == "$pi_new_sha" ]] \
+  && echo "$align_out" | grep -q "Aligned vendor submodule" \
+  && ! echo "$align_out" | grep -qF "unknown agent id: pi"; then
+  _pass "pi clean align: old pin without Pi is checked out at the installer SHA"
+else
+  echo "$align_out"
+  _fail "pi clean align: old pin without Pi is checked out at the installer SHA"
+fi
+
+# (pi-5) dirty old pin + --agents=pi → clear skew message, no checkout
+git -C "$PI_ALIGN_VENDOR" checkout -q "$pi_old_sha"
+echo "dirty" > "${PI_ALIGN_VENDOR}/uncommitted.txt"
+rc=0
+align_out="$(align_vendor_sync_cli_or_die 2>&1)" || rc=$?
+if [[ "$rc" -ne 0 ]] \
+  && [[ "$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)" == "$pi_old_sha" ]] \
+  && echo "$align_out" | grep -q "submodule" \
+  && echo "$align_out" | grep -qF "Rejected agent id:  pi" \
+  && echo "$align_out" | grep -qF -- "--agents pi" \
+  && ! echo "$align_out" | grep -qF "unknown agent id: pi"; then
+  _pass "pi dirty pin: die with 'Rejected agent id: pi' and no checkout"
+else
+  echo "$align_out"
+  _fail "pi dirty pin: die with 'Rejected agent id: pi' and no checkout"
+fi
+rm -f "${PI_ALIGN_VENDOR}/uncommitted.txt"
+
+# (pi-6) pi not selected → agent probe skipped even on an old pin
+git -C "$PI_ALIGN_VENDOR" checkout -q "$pi_old_sha"
+SELECTED_AGENTS="cursor,claude"
+rc=0
+align_vendor_sync_cli_or_die >/dev/null 2>&1 || rc=$?
+if [[ "$rc" -eq 0 && "$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)" == "$pi_old_sha" ]]; then
+  _pass "pi not selected: no agent-id probe, no checkout"
+else
+  _fail "pi not selected: no agent-id probe, no checkout"
+fi
+unset SELECTED_AGENTS
+
 echo ""
 echo "Passed: ${PASS}"
 if [[ "$FAIL" -ne 0 ]]; then

@@ -206,6 +206,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/docs/coding-agents/',
+          label: 'Coding Agents',
+          position: 'left',
+        },
+        {
           to: '/docs/reference/',
           label: 'Reference',
           position: 'left',

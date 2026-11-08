@@ -12,6 +12,7 @@
     "mcp:test": "npm --prefix mcp/eversis-collections-mcp test",
     "mcp:install": "npm --prefix mcp/eversis-collections-mcp install",
     "installer:smoke": "bash scripts/setup-agent-collections.test.sh",
+    "pi:load-check": "node scripts/pi-load-check.mjs",
     "website:install": "npm --prefix website install",
     "website:build": "npm --prefix website run build",
     "website:changelog:sync": "node scripts/sync-changelog.mjs",

@@ -1,0 +1,61 @@
+# Pi adapter rule map (AC-14)
+# Packaging metadata lives here — not in .ai/rules/*.md
+# id/source parity with adapters/claude/rule-map.yaml (asserted by adapters/sync.mjs --check).
+#
+# target:
+#   skill -> .pi/skills/<skill_id>/SKILL.md (role rule, loaded on demand)
+#   none  -> not emitted; served by the mirrored framework skill <skill_id>
+# .pi/APPEND_SYSTEM.md is not a rule target: it is the small always-on core built
+# by adapters/pi/generate.mjs (AC-134).
+# skill_id for target skill must start with eversis-rule- and must not equal any
+# .ai/skills/eversis-* directory name (asserted by adapters/pi/generate.mjs).
+# ui_note: true (target skill only) prefixes the body with a "UI files only" note.
+# review_context_note: true (target skill only) inserts the Pi review-independence
+# note before the body (AC-135; text in adapters/pi/generate.mjs).
+# process_bundle: true (target skill only) adds the skill to the process rules the
+# eversis-process-rules extension injects after an eversis-* command or while a
+# plan is active (AC-134).
+version: 1
+rules:
+  - id: eversis-agent-core
+    source: .ai/rules/orchestration/agent-core.md
+    target: skill
+    skill_id: eversis-rule-agent-core
+    description: "Agent Collections core role rule (eversis-agent-core) — delivery lifecycle, human gates, skills discovery, quality bar and hard limits. Load when delivering work through the Agent Collections lifecycle."
+    process_bundle: true
+  - id: eversis-testing-and-terminal
+    source: .ai/rules/orchestration/testing-and-terminal.md
+    target: skill
+    skill_id: eversis-rule-testing-and-terminal
+    description: "Agent Collections testing role rule (eversis-testing-and-terminal) — discover the project's commands, then run lint, typecheck and tests after non-trivial changes. Load when finishing a code change."
+    process_bundle: true
+  - id: eversis-accessibility
+    source: .ai/rules/frontend/accessibility.md
+    target: skill
+    skill_id: eversis-rule-accessibility
+    description: "Agent Collections accessibility role rule (eversis-accessibility) — semantic HTML, keyboard operability, labels and contrast for user-facing UI. Load when editing UI files."
+    ui_note: true
+    process_bundle: true
+  - id: eversis-engineering-manager
+    source: .ai/rules/orchestration/engineering-manager.md
+    target: skill
+    skill_id: eversis-rule-engineering-manager
+    description: "Agent Collections Engineering Manager role rule (eversis-engineering-manager) — Implement readiness block, human gates, delegation, Continuity and QA handoff policy. Load when running /eversis-implement or orchestrating Implement."
+    review_context_note: true
+    process_bundle: true
+  - id: eversis-code-reviewer
+    source: .ai/rules/architecture/code-reviewer.md
+    target: skill
+    skill_id: eversis-rule-code-reviewer
+    description: "Agent Collections Code Reviewer role rule (eversis-code-reviewer) — PASS / BLOCKER / SUGGESTION review structure and hard-limit blockers. Load when running /eversis-review or the Review stage."
+    review_context_note: true
+  - id: eversis-fine-handoff
+    source: .ai/rules/orchestration/fine-handoff.md
+    target: none
+    skill_id: eversis-fine-handoff
+  - id: eversis-spec-driven-development
+    source: .ai/rules/orchestration/spec-driven-development.md
+    target: skill
+    skill_id: eversis-rule-spec-driven-development
+    description: "Agent Collections Delivery Standard role rule (eversis-spec-driven-development) — spec folder convention, research and plan gates, Review and Fine. Load when starting or delivering a spec-driven task."
+    process_bundle: true

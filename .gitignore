@@ -4,15 +4,8 @@
 # Consumer selection + local install metadata (framework tree may keep docs only)
 # Selection is written in consumer projects; do not commit sample selection here.
 
-# Agent specs / research / plan — local only (MVP)
-docs/specs/*/
-
-# Agent context subfolders — local only (README stays tracked)
-docs/context/*/
-
-# Agent reports — local only (README stays tracked)
-docs/reports/*
-!docs/reports/README.md
+# develop branch: docs/specs, docs/context and docs/reports are tracked
+# (master keeps them local-only).
 
 # MCP package
 mcp/eversis-collections-mcp/node_modules/

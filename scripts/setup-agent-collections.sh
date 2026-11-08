@@ -28,7 +28,8 @@
 #                             Per field: --agents / --mcp-servers / --profile /
 #                             --vendor / --link-mode replace the recorded value; an
 #                             omitted flag keeps it. Without --mcp-servers, MCP
-#                             entries already in .cursor/mcp.json / .mcp.json are
+#                             entries already in .cursor/mcp.json / .mcp.json
+#                             (and .pi/mcp.json for Pi) are
 #                             kept unchanged (only eversis-collections is
 #                             regenerated); agents with framework-generated files on
 #                             disk are kept. Pass --mcp-servers / --agents to refresh
@@ -38,8 +39,11 @@
 #   --gitignore-agent-artifacts
 #                             Local mode only: gitignore docs/specs/*/ and docs/context/*/.
 #   --mcp-servers LIST        Comma-separated MCP server ids (non-interactive).
-#   --agents LIST             Comma-separated agent adapters: cursor,claude,opencode
-#                             (opencode is placeholder-only).
+#   --agents LIST             Comma-separated agent adapters: cursor,claude,opencode,pi
+#                             (opencode is placeholder-only). pi installs the Pi
+#                             coding agent surfaces (.pi/) in an isolated stage: a
+#                             Pi failure keeps the other agents' output, omits pi
+#                             from the recorded selection and exits 1 at the end.
 #   --profile NAME            Domain profile: frontend | backend | fullstack
 #   --ssot-source URL         GitLab domain-context project to seed docs/context/global/
 #                             from (git subtree add, best-effort — never blocks install).
@@ -280,6 +284,17 @@ record_ok "build-mcp"
 link_framework_files || { record_fail "link-framework"; _print_partial_fail; exit 1; }
 record_ok "link-framework"
 
+# Pi stage (AC-14): generation, .pi/skills/ mirror and Pi deselect pruning run
+# isolated. A Pi failure sets PI_STAGE_FAILED (SELECTED_AGENTS is never
+# edited — an empty list would fall back to cursor). Pi-only → stop here with
+# exit 1; otherwise the other agents continue and the run exits 1 at the end.
+if ! run_pi_stage; then
+  if _pi_only_selected; then
+    _print_partial_fail
+    exit 1
+  fi
+fi
+
 apply_domain_profile || { record_fail "domain-profile"; _print_partial_fail; exit 1; }
 record_ok "domain-profile"
 
@@ -289,6 +304,18 @@ record_ok "area-scope"
 _resolve_mcp_selection
 merge_mcp_json || { record_fail "mcp-merge"; _print_partial_fail; exit 1; }
 record_ok "mcp-merge"
+# The .pi/mcp.json merge (inside merge_mcp_json) is the last Pi step: a failure
+# there is a Pi failure, not an mcp-merge one.
+if _pi_selected; then
+  if [[ "${PI_STAGE_FAILED:-false}" == "true" ]]; then
+    if _pi_only_selected; then
+      _print_partial_fail
+      exit 1
+    fi
+  else
+    record_ok "pi"
+  fi
+fi
 
 manage_gitignore
 merge_ignore_triad || true
@@ -310,4 +337,8 @@ record_ok "selection"
 
 print_summary
 _print_partial_fail  # no-op if empty failures
+if [[ "${PI_STAGE_FAILED:-false}" == "true" ]]; then
+  log_error "Finished with a Pi failure (${PI_STAGE_FAILURE_REASON}) — other agents were installed; exiting 1."
+  exit 1
+fi
 log_ok "Done."

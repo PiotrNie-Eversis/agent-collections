@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# .githooks/pre-commit — keep work-only docs off the production branch.
+#
+# master (and main) carry only the framework core; docs/specs, docs/context/<project>,
+# docs/reports, docs/plans and docs/decisions entries live on develop and are
+# published to master only through scripts/release-to-master.sh, which strips them.
+# This hook rejects a commit on master that stages any path from .release-exclude.
+#
+# Enable once per clone:  git config core.hooksPath .githooks
+
+set -euo pipefail
+
+branch="$(git symbolic-ref --quiet --short HEAD || true)"
+case "$branch" in
+  master|main) ;;
+  *) exit 0 ;;
+esac
+
+root="$(git rev-parse --show-toplevel)"
+helper="${root}/scripts/lib/release-paths.sh"
+if [[ ! -f "$helper" ]]; then
+  echo "pre-commit: ${helper} not found — cannot check work-only paths." >&2
+  exit 1
+fi
+# shellcheck source=../scripts/lib/release-paths.sh
+source "$helper"
+
+blocked="$(list_release_excluded_staged)"
+if [[ -n "$blocked" ]]; then
+  echo "pre-commit: work-only docs cannot be committed on '${branch}' (production):" >&2
+  echo "$blocked" | sed 's/^/  /' >&2
+  echo "Commit them on develop (or a feature branch). master receives changes only via" >&2
+  echo "scripts/release-to-master.sh, which leaves these paths out." >&2
+  exit 1
+fi

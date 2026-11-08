@@ -1,0 +1,24 @@
+# Work-only paths: tracked on develop (and feature branches), never on master.
+#
+# master is the production branch and carries only the framework core. It is
+# produced from develop by scripts/release-to-master.sh, which removes every
+# path below from the snapshot. .githooks/pre-commit blocks committing them on
+# master. One git pathspec per line (glob / exclude magic allowed); blank lines
+# and lines starting with # are ignored.
+#
+# READMEs stay on master so the folder conventions remain documented for
+# consumers (and AGENTS.md links keep resolving).
+
+:(glob)docs/specs/**
+:(exclude)docs/specs/README.md
+
+:(glob)docs/context/*/**
+
+:(glob)docs/reports/**
+:(exclude)docs/reports/README.md
+
+:(glob)docs/plans/**
+:(exclude)docs/plans/README.md
+
+:(glob)docs/decisions/0*.md
+docs/decisions/INDEX.md

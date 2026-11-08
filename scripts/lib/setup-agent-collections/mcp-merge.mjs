@@ -70,11 +70,57 @@ const regenerateEversis =
     Object.prototype.hasOwnProperty.call(existing?.mcpServers ?? {}, 'eversis-collections'));
 if (regenerateEversis) {
   const composeFile = 'docker-compose.yml';
-  // Vendored Claude: do not put ${CLAUDE_PROJECT_DIR:-.} in committed JSON —
-  // config-time ${VAR} expansion leaves it empty on the VS Code extension.
-  // Use bash -c with a bare $CLAUDE_PROJECT_DIR token (no braces) plus an
-  // upward walk so the spawn env / cwd can still find the wrapper script.
-  if (host === 'claude' && useRelative) {
+  if (host === 'pi') {
+    // Pi (AC-14) expands ${VAR} only in env / headers — never in command /
+    // args — has no ${workspaceFolder} and never sets CLAUDE_PROJECT_DIR. Stdio
+    // servers inherit the session directory, which may be a subdirectory, so a
+    // bash -c locator walks up from $PWD to the nearest directory containing
+    // .pi/ (the project root). Every ${...} below lives inside the bash script
+    // string and is expanded by bash, not by Pi.
+    const findRoot = [
+      'd="$PWD";',
+      'while [ "$d" != "/" ] && [ ! -d "$d/.pi" ]; do d="$(dirname "$d")"; done;',
+      'if [ ! -d "$d/.pi" ]; then echo "eversis-collections: no .pi/ directory above $PWD" >&2; exit 1; fi;',
+    ];
+    let script;
+    if (useRelative) {
+      // Vendored: exec the committed wrapper (it derives the consumer root and
+      // the vendored compose file from its own location).
+      script = [
+        ...findRoot,
+        'if [ ! -f "$d/scripts/run-eversis-collections-mcp.sh" ]; then echo "eversis-collections: missing $d/scripts/run-eversis-collections-mcp.sh" >&2; exit 1; fi;',
+        'exec "$d/scripts/run-eversis-collections-mcp.sh"',
+      ].join(' ');
+    } else {
+      // Local: the framework checkout lives outside the repo. GUI-launched
+      // shells may not inherit AGENT_COLLECTIONS_HOME, so the path resolved by
+      // the installer is baked in as the bash default (escaped for a
+      // double-quoted bash word).
+      // A backslash cannot escape "}" inside a double-quoted ${VAR:-word}
+      // (bash keeps the backslash), so a path containing "}", '"', "$", "`"
+      // or "\" is first assigned, single-quoted, to ac_home and the default
+      // becomes $ac_home. Plain paths keep the readable inline default.
+      const needsIndirection = /[}"$`\\]/.test(collections);
+      const bashDefault = needsIndirection ? '$ac_home' : collections;
+      const homeAssign = needsIndirection
+        ? [`ac_home='${collections.replace(/'/g, "'\\''")}';`]
+        : [];
+      script = [
+        ...homeAssign,
+        ...findRoot,
+        `CONSUMER_PROJECT_ROOT="$d" exec docker compose -f "\${AGENT_COLLECTIONS_HOME:-${bashDefault}}/${composeFile}" run --rm -T eversis-collections`,
+      ].join(' ');
+    }
+    picked['eversis-collections'] = {
+      command: 'bash',
+      args: ['-c', script],
+      type: 'stdio',
+    };
+  } else if (host === 'claude' && useRelative) {
+    // Vendored Claude: do not put ${CLAUDE_PROJECT_DIR:-.} in committed JSON —
+    // config-time ${VAR} expansion leaves it empty on the VS Code extension.
+    // Use bash -c with a bare $CLAUDE_PROJECT_DIR token (no braces) plus an
+    // upward walk so the spawn env / cwd can still find the wrapper script.
     const locator = [
       'if [ -n "$CLAUDE_PROJECT_DIR" ] && [ -f "$CLAUDE_PROJECT_DIR/scripts/run-eversis-collections-mcp.sh" ]; then',
       'exec "$CLAUDE_PROJECT_DIR/scripts/run-eversis-collections-mcp.sh";',
@@ -153,6 +199,38 @@ if (host === 'claude') {
   }
 }
 
+if (host === 'pi') {
+  // Other catalog servers are copied as-is for Pi. Fail instead of writing an
+  // entry whose command / args still carry a host variable Pi never expands
+  // there (${workspaceFolder}, ${env:X}, CLAUDE_PROJECT_DIR, any ${...}). The
+  // eversis-collections bash script is exempt only for its
+  // ${AGENT_COLLECTIONS_HOME:-...} default, which bash (not Pi) expands, and
+  // its single-quoted ac_home='...' framework path (literal to bash).
+  const offending = [];
+  for (const [id, cfg] of Object.entries(picked)) {
+    const values = [];
+    if (typeof cfg.command === 'string') values.push(cfg.command);
+    if (Array.isArray(cfg.args)) values.push(...cfg.args.filter((a) => typeof a === 'string'));
+    for (const raw of values) {
+      const value =
+        id === 'eversis-collections'
+          ? raw
+              .replace(/^ac_home='(?:[^']|'\\'')*'; /, '')
+              .replace(/\$\{AGENT_COLLECTIONS_HOME:-(?:\\.|[^}])*\}/g, '')
+          : raw;
+      if (value.includes('${') || value.includes('CLAUDE_PROJECT_DIR')) {
+        offending.push(id);
+        break;
+      }
+    }
+  }
+  if (offending.length > 0) {
+    fail(
+      `pi: command/args still contain a host variable Pi does not expand (\${workspaceFolder}, \${env:…}, CLAUDE_PROJECT_DIR) in: ${offending.join(', ')}`,
+    );
+  }
+}
+
 const existingServers = existing.mcpServers ?? {};
 let mergedServers;
 if (preserveExisting) {
@@ -213,9 +291,10 @@ const result = {
   mcpServers: mergedServers,
   inputs: cleanedTop.inputs ?? template.inputs ?? [],
 };
-if (host === 'claude') {
+if (host === 'claude' || host === 'pi') {
   // Claude Code's .mcp.json ignores "inputs" (a VS Code/Cursor-only key) —
   // drop it even if it survived from a pre-existing hand-edited file.
+  // Pi's .pi/mcp.json has no "inputs" key either (AC-14).
   delete result.inputs;
 }
 

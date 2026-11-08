@@ -1,0 +1,37 @@
+---
+sidebar_position: 2
+title: Cursor
+---
+
+import AgentWorkflowDiagram from '@site/src/components/AgentWorkflowDiagram';
+
+# Agent Collections in Cursor
+
+Cursor applies two rules to every request and keeps the role rules attach-only. The Engineering Manager role delegates research, planning, implementation and review to sub-agents, so review runs in a separate context by default.
+
+## The delivery cycle
+
+Each stage shows what the process does and which Cursor tools do the work. Quick Flow can skip Research and Plan.
+
+<AgentWorkflowDiagram agent="cursor" />
+
+## How the rules load
+
+| Rule | Loads |
+| --- | --- |
+| `eversis-agent-core`, `eversis-testing-and-terminal` | Always |
+| `eversis-accessibility` | For matching UI files |
+| `eversis-engineering-manager`, `eversis-code-reviewer`, `eversis-fine-handoff`, `eversis-spec-driven-development` | Attach-only |
+
+## What gets installed
+
+| Path | What it holds |
+| --- | --- |
+| `.cursor/rules/eversis-*.mdc` | Rules, plus your `eversis-project-stack` policy |
+| `.cursor/commands/eversis-*.md` | Thin slash commands for the prompts in `.ai/prompts/` |
+| `.cursor/skills/eversis-*/` | Skill packages, linked or copied by the installer |
+| `.cursor/mcp.json` | MCP servers, including `eversis-collections` |
+
+Generated files are overwritten on the next sync, so do not edit them by hand. `eversis-project-stack` is yours to edit.
+
+For setup, see [Installation](../getting-started/installation.mdx) and [MCP Setup](../getting-started/mcp-setup.mdx).

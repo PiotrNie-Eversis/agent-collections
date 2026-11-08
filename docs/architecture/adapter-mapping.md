@@ -2,7 +2,7 @@
 
 **Status:** Canonical (committed)  
 **Story:** Work Stream 2 / Story 2.1  
-**Audience:** Implementers of the Cursor generator, the Claude Code generator, the OpenCode placeholder, and the adapter sync CLI
+**Audience:** Implementers of the Cursor generator, the Claude Code generator, the Pi generator, the OpenCode placeholder, and the adapter sync CLI
 
 This document is the **single source of truth** for how Agent Collections **core** (`.ai/`) transforms into each tool’s native packaging. Core rule bodies stay vendor-neutral Markdown; packaging metadata and generated outputs live in the **adapter** layer (created in follow-on stories — **not** in this document’s delivery).
 
@@ -22,6 +22,7 @@ This document is the **single source of truth** for how Agent Collections **core
 adapters
   cursor/   → .cursor/rules/*.mdc + thin .cursor/commands/eversis-*.md
   claude/   → CLAUDE.md
+  pi/       → .pi/APPEND_SYSTEM.md + .pi/prompts/ + .pi/skills/eversis-rule-*/ + .pi/extensions/ (opt-in)
   opencode/ → opencode.json (+ optional AGENTS pointers)
 ```
 
@@ -42,9 +43,10 @@ adapters
 |---------|-------|---------|--------|------------------|----------|
 | **Cursor** | Generate `.cursor/rules/*.mdc` via **rule-map** | **No** full mirror | **No** emit — resolve via MCP skill resolution | **Thin** `.cursor/commands/eversis-*.md` from `.ai/prompts` (HYBRID pointer + Executable) — not a full prompt copy | Generator: `adapters/cursor/` (Cursor generator + thin slash commands) |
 | **Claude Code** | Root **`CLAUDE.md`** (H2 section per non-glob-scoped mapped rule) + `.claude/rules/*.md` (`paths:` frontmatter for glob-scoped rules) | **No** full mirror | **Native** `.claude/skills/eversis-*/` — linked/copied by the **installer** (not the generator) from `.ai/skills/`, one dir per skill package | **Thin** `.claude/commands/eversis-*.md` from `.ai/prompts` (same HYBRID pointer + Executable shape as Cursor's thin slash commands; `description` + `argument-hint` frontmatter, marker at file end) — closes the claude-code-setup research's F1 | Generator: `adapters/claude/generate.mjs` + `generate-commands.mjs` (Claude Code generator); skills linking + `.claude/CLAUDE.md`/`.claude/settings.json` seeding: installer (`scripts/lib/setup-agent-collections/`) — **shipped** |
+| **Pi** (opt-in, AC-14) | Small always-on core → `.pi/APPEND_SYSTEM.md` (+ customised `eversis-project-stack` overlay); rule bodies → role skills `.pi/skills/eversis-rule-*/SKILL.md`, five of them added per run by `.pi/extensions/eversis-process-rules.ts` (`eversis-fine-handoff` stays a framework skill) — per [`adapters/pi/rule-map.yaml`](../../adapters/pi/rule-map.yaml) | `.pi/prompts/eversis-*.md` — Executable section copied with Pi-safe front matter and `$ARGUMENTS` (Pi prompt templates cannot point at a file; see §6A) | **Native** `.pi/skills/eversis-*/` — linked/copied by the **installer** from `.ai/skills/` (same contract as Claude Code) | `.pi/extensions/eversis-process-rules.ts` (rules on demand), `.pi/extensions/eversis-context-budget.ts` (context budget); `.pi/settings.json` seeded once; `.pi/mcp.json` written by the installer | Generator: `adapters/pi/generate.mjs` (run via `adapters/sync.mjs --agents …,pi`); skills mirror + `.pi/mcp.json`: installer — **shipped** |
 | **OpenCode** | Point at core (or generated) paths via `opencode.json` `instructions` | Deferred | Deferred | Config placeholder; optional `AGENTS.md` | **placeholder** |
 
-Skills and prompts remain under `.ai/` as SSOT. Cursor slash files are **thin packaging** only (stable id + path + optional Executable section). Adapters **must not** claim they ship a full multi-copy of skills/prompts.
+Skills and prompts remain under `.ai/` as SSOT. Cursor slash files are **thin packaging** only (stable id + path + optional Executable section). Adapters **must not** claim they ship a full multi-copy of skills/prompts. Pi prompt files copy only the Executable section (generated, marker-bearing, regenerated on sync) — the SSOT stays under `.ai/prompts/`.
 
 ---
 
@@ -299,6 +301,53 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 
 ---
 
+## 6A. Pi adapter mapping
+
+**Maturity:** `shipped` (AC-14) — opt-in: `adapters/sync.mjs` defaults stay `cursor,claude`; the installer adds Pi with `--agents=…,pi`. Adapter doc: [`adapters/pi/README.md`](../../adapters/pi/README.md).
+
+Pi (the [Pi coding agent](https://pi.dev/)) loads project files from `.pi/` only after **project trust** is granted. Prompts are Pi prompt templates (`description` / `argument-hint` front matter, `$ARGUMENTS`); skills follow Agent Skills (`name` ≤ 64, `description` ≤ 1024; the first discovered skill wins on a name collision); extensions are TypeScript files loaded by Pi.
+
+### 6A.1 Field map
+
+| Field (`adapters/pi/rule-map.yaml`) | Meaning | Mapping |
+|-------|---------|---------|
+| `id` / `source` | Same pairs as the Claude map | `adapters/sync.mjs --check` fails when a Claude `id`/`source` pair is missing from the Pi map |
+| `process_bundle: true` | Rule added on demand (AC-134) | Only with `target: skill` (asserted). The generator writes these skill ids into `.pi/extensions/eversis-process-rules.ts`, which adds their text after an `eversis-*` command or while a plan is active. Set on `eversis-agent-core`, `eversis-testing-and-terminal`, `eversis-accessibility`, `eversis-engineering-manager`, `eversis-spec-driven-development` |
+| `ui_note: true` | UI-only rule | Only with `target: skill`. Body prefixed with a "UI files only" note (`eversis-accessibility`) |
+| `review_context_note: true` | Pi review-independence note (AC-135) | Only with `target: skill` (asserted). Role skill body prefixed with the Pi host note: review results start with a `Review context:` line (same session / fresh session), the QA draft repeats it, and a bare ticket key resolves the spec folder. Set on `eversis-engineering-manager`, `eversis-code-reviewer`; text lives in `adapters/pi/generate.mjs` |
+| `target: skill` + `skill_id` + `description` | Role rule loaded on demand | `.pi/skills/<skill_id>/SKILL.md`: `eversis-rule-agent-core`, `eversis-rule-testing-and-terminal`, `eversis-rule-accessibility`, `eversis-rule-engineering-manager`, `eversis-rule-code-reviewer`, `eversis-rule-spec-driven-development`. Ids start with `eversis-rule-` and must not equal an `.ai/skills/eversis-*` name (asserted) |
+| `target: none` + `skill_id` | Served by a framework skill | `eversis-fine-handoff` → mirrored framework skill `.pi/skills/eversis-fine-handoff/` (no second copy) |
+
+### 6A.2 Output structure
+
+| Path | Written by | Lifecycle |
+|------|------------|-----------|
+| `.pi/APPEND_SYSTEM.md` | generator | Regenerated; the small core: hard limits extracted from `agent-core.md`, the quality-check line, the line that ticket work starts with `/eversis-implement`, and a pointer to commands and skills; customised `.cursor/rules/eversis-project-stack.mdc` appended only when it differs from the template and has no placeholder markers |
+| `.pi/skills/eversis-rule-*/SKILL.md` | generator | Regenerated; orphans removed (marker-gated) |
+| `.pi/prompts/eversis-*.md` | generator | One per non-denied prompt (`adapters/claude/command-deny.yaml`); JSON-quoted front matter; `$` before a Pi substitution pattern rendered as `＄` (U+FF04); final `**User input for this run:** $ARGUMENTS` line; orphans removed (marker-gated) |
+| `.pi/extensions/eversis-process-rules.ts` | generator | Regenerated with the `process_bundle` skill ids; adds the rules as a prompt section after an `eversis-*` command or while a plan is active, and otherwise removes `eversis-*` entries from the skill listing — Pi-only, needs Pi 1.5.0 |
+| `.pi/eversis-state/` | extension (runtime) | Active-plan pointer; ignores itself in git; removed by name on Pi deselect, because it has no marker |
+| `.pi/extensions/eversis-context-budget.ts` | generator | Regenerated; compacts once when context use crosses `EVERSIS_CONTEXT_BUDGET_PERCENT` (default 50) — Pi-only, Cursor / Claude Code keep "window fill is not a trigger" |
+| `.pi/settings.json` | generator | Seeded once when absent; consumer-owned afterwards |
+| `.pi/skills/eversis-*/` | installer | Mirror of `.ai/skills/eversis-*/` (symlink or copy); stale-prune skips `eversis-rule-*` |
+| `.pi/mcp.json` | installer | `eversis-collections` as a `bash -c` locator that walks up from `$PWD` to the directory containing `.pi/`; kept on deselect |
+
+Every generated file carries `GENERATED by adapters/pi/generate.mjs`; orphan cleanup and installer deselect pruning are marker-gated (framework skill mirror entries are framework-owned by `eversis-*` name, as for `.claude/skills/`). `CLAUDE.md` / `AGENTS.md` are not generated for Pi; Pi reads them as context files, so consumers keep a root `AGENTS.md` to avoid Pi loading the generated `CLAUDE.md` as well; without it the small core does not hold.
+
+### 6A.3 Status block (for install wizard / docs)
+
+```text
+adapter: pi
+maturity: shipped
+emits: .pi/APPEND_SYSTEM.md, .pi/skills/eversis-rule-*/SKILL.md, .pi/prompts/eversis-*.md,
+       .pi/extensions/eversis-process-rules.ts, .pi/extensions/eversis-context-budget.ts,
+       .pi/settings.json (seed once)
+installer: .pi/skills/eversis-*/ mirror, .pi/mcp.json
+does_not_emit: Pi ignore files (AC-113), sign-in / model settings (AC-111), sandbox (AC-114)
+```
+
+---
+
 ## 7. Maturity legend
 
 | Value | Meaning |
@@ -307,7 +356,7 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | `placeholder` | Spec + sample config only; wizard must not claim a full adapter |
 | `deferred` | Explicitly out of current adapter MVP |
 
-**Cursor** packaging for mapped rules is available via `adapters/cursor/`. **Claude Code** packaging is available via `adapters/claude/` — generates root `CLAUDE.md`, `.claude/rules/*.md`, and `.claude/commands/*.md`; the installer additionally links `.claude/skills/` and seeds `.claude/CLAUDE.md` / `.claude/settings.json` (claude-code-setup work, see §2 emit matrix). BA Docs rules may still be temporary Cursor symlinks; full skill/prompt mirrors remain outside adapter MVP emit. Ignore / monorepo isolation: canonical strategy is [`isolation-strategy.md`](./isolation-strategy.md); ignore triad materialized at repo root (enforced for Claude Code via `.claude/settings.json` `permissions.deny`); monorepo path globs remain a follow-up (see isolation strategy §8.2).
+**Cursor** packaging for mapped rules is available via `adapters/cursor/`. **Claude Code** packaging is available via `adapters/claude/` — generates root `CLAUDE.md`, `.claude/rules/*.md`, and `.claude/commands/*.md`; the installer additionally links `.claude/skills/` and seeds `.claude/CLAUDE.md` / `.claude/settings.json` (claude-code-setup work, see §2 emit matrix). BA Docs rules may still be temporary Cursor symlinks; full skill/prompt mirrors remain outside adapter MVP emit. Ignore / monorepo isolation: canonical strategy is [`isolation-strategy.md`](./isolation-strategy.md); ignore triad materialized at repo root (enforced for Claude Code via `.claude/settings.json` `permissions.deny`); monorepo path globs remain a follow-up (see isolation strategy §8.2). **Pi** packaging is available via `adapters/pi/` (opt-in, §6A) — generates `.pi/APPEND_SYSTEM.md`, role-rule skills, prompts and the context-budget extension; the installer mirrors `.pi/skills/eversis-*/` and writes `.pi/mcp.json`. Pi ignore files are not shipped yet (AC-113).
 
 ---
 
@@ -318,6 +367,7 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 | **Adapter mapping (this document)** | Mapping specification (this file) + pointer from `.ai/README.md` |
 | **Cursor generator** | `adapters/cursor/`, live `rule-map.yaml`, replace framework symlinks (**done** in this repo for mapped rules) |
 | **Claude Code generator** | Claude `CLAUDE.md` generator (`adapters/claude/`) — **done** in this repo |
+| **Pi generator** | `adapters/pi/` (AC-14) — **done**; opt-in via `--agents …,pi` |
 | **OpenCode placeholder** | Materialization from §6 (**done** — `adapters/opencode/` + root `opencode.jsonc`) |
 | **Adapter sync CLI** | Sync / generation CLI — **done**: `node adapters/sync.mjs` (`--check`, optional `--out`; npm `sync:adapters` / `sync:adapters:check`) |
 | **MCP skill resolve** | Resolve skills from `.ai/skills/` via MCP |
@@ -337,4 +387,5 @@ does_not_emit: full skill/prompt mirrors, ignore files, production-grade agent p
 - [ ] No packaging YAML written into `.ai/rules/*.md`
 - [x] Claude output is a single `CLAUDE.md` with one H2 per mapped rule (`adapters/claude/`)
 - [x] OpenCode placeholder uses `$schema` + `instructions` and status `placeholder` (materialized: `adapters/opencode/`)
+- [x] Pi output is generated from `adapters/pi/rule-map.yaml` with Claude `id`/`source` parity, marker-gated cleanup, and no role-skill id colliding with a framework skill (`adapters/pi/`)
 - [ ] Emit matrix respected (no silent full `.cursor` tree mirror in MVP)
