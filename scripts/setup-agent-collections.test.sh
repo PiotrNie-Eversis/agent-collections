@@ -452,6 +452,8 @@ _assert_pi_tree() {
     || { echo "FAIL: ${label}: missing generated .pi/extensions/eversis-context-budget.ts"; exit 1; }
   grep -qF "$PI_MARKER" "${target}/.pi/extensions/eversis-process-rules.ts" 2>/dev/null \
     || { echo "FAIL: ${label}: missing generated .pi/extensions/eversis-process-rules.ts"; exit 1; }
+  grep -qF "$PI_MARKER" "${target}/.pi/extensions/eversis-review.ts" 2>/dev/null \
+    || { echo "FAIL: ${label}: missing generated .pi/extensions/eversis-review.ts"; exit 1; }
   [[ -f "${target}/.pi/settings.json" ]] \
     || { echo "FAIL: ${label}: missing seeded .pi/settings.json"; exit 1; }
   node -e '
@@ -603,6 +605,8 @@ bash "${ROOT}/scripts/setup-agent-collections.sh" \
   && { echo "FAIL: (c) .pi/extensions/eversis-context-budget.ts survived Pi deselect"; exit 1; }
 [[ -e "${TARGET_CURSOR_PI}/.pi/extensions/eversis-process-rules.ts" ]] \
   && { echo "FAIL: (c) .pi/extensions/eversis-process-rules.ts survived Pi deselect"; exit 1; }
+[[ -e "${TARGET_CURSOR_PI}/.pi/extensions/eversis-review.ts" ]] \
+  && { echo "FAIL: (c) .pi/extensions/eversis-review.ts survived Pi deselect"; exit 1; }
 [[ -e "${TARGET_CURSOR_PI}/.pi/eversis-state" ]] \
   && { echo "FAIL: (c) .pi/eversis-state/ survived Pi deselect"; exit 1; }
 grep -lF "$PI_MARKER" "${TARGET_CURSOR_PI}/.pi/prompts"/*.md >/dev/null 2>&1 \
@@ -621,6 +625,8 @@ done
   || { echo "FAIL: (c) Pi deselect affected Cursor output"; exit 1; }
 grep -qF '.pi/settings.json and' "$PI_DESELECT_LOG" \
   || { echo "FAIL: (c) Deselection paragraph does not describe Pi surfaces"; exit 1; }
+grep -qF '.pi/extensions/eversis-review.ts' "$PI_DESELECT_LOG" \
+  || { echo "FAIL: (c) Deselection paragraph does not list .pi/extensions/eversis-review.ts"; exit 1; }
 _assert_selection_agents "$TARGET_CURSOR_PI" '["cursor"]' "(c) Pi deselect"
 
 # (d) induced Pi generation failure (.pi is a regular file) with cursor,pi.

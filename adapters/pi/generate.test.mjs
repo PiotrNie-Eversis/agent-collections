@@ -157,6 +157,13 @@ test("emits one prompt per non-denied SSOT prompt, role skills, APPEND_SYSTEM, e
   );
   const asset = fs.readFileSync(path.join(__dirname, "assets", "eversis-context-budget.ts"), "utf8");
   assert.equal(ext, `// ${MARKER} — do not edit; re-run the generator\n${asset}`);
+  const review = fs.readFileSync(path.join(fresh, ".pi", "extensions", "eversis-review.ts"), "utf8");
+  const reviewAsset = fs.readFileSync(path.join(__dirname, "assets", "eversis-review.ts"), "utf8");
+  assert.equal(
+    review,
+    `// ${MARKER} — do not edit; re-run the generator\n${reviewAsset.replace(/\r\n/g, "\n")}`,
+    "review extension: marker line, then the asset unchanged (AC-136)",
+  );
   assert.match(freshRun.stdout, new RegExp(`${promptIds.length} prompt\\(s\\), 6 role skill\\(s\\)`));
 });
 
@@ -177,8 +184,8 @@ test("role skills: distinct ids, name/description limits, JSON-quoted front matt
     "fine-handoff is served by the framework skill mirror, not a role skill");
 });
 
-test("review-context note (AC-135): only in role skills the rule map flags, before the rule body", () => {
-  const NOTE_HEADING = "**Pi host note — review independence (AC-135).**";
+test("review-context note (AC-135, AC-136): only in role skills the rule map flags, before the rule body", () => {
+  const NOTE_HEADING = "**Pi host note — review independence (AC-135, AC-136).**";
   const flagged = new Set(
     ruleMapEntries()
       .filter((r) => r.review_context_note === "true")
@@ -197,6 +204,11 @@ test("review-context note (AC-135): only in role skills the rule map flags, befo
     const noteBlock = text.slice(note).split("\n\n")[0];
     assert.ok(noteBlock.includes("Review context: same session as implementation (not independent)"));
     assert.ok(noteBlock.includes("Review context: fresh session (independent)"));
+    assert.ok(noteBlock.includes("Review context: separate Pi session (independent)"), `${dir}: separate-session label`);
+    assert.ok(noteBlock.includes("`eversis_independent_review`"), `${dir}: names the review tool`);
+    assert.ok(noteBlock.includes("Proceed to Fine only when the tool's result is PASS"), `${dir}: Fine only on PASS`);
+    assert.ok(noteBlock.includes("again after every blocker fix"), `${dir}: re-review after blocker fixes`);
+    assert.ok(noteBlock.includes("start a new Pi session in the project root and run `/eversis-review <key>`"), `${dir}: fallback steps`);
     assert.ok(noteBlock.includes("Automation & Technical Notes"));
     assert.ok(noteBlock.includes("docs/specs/<key>/"));
     assert.ok(!PI_SUBSTITUTION_RE.test(noteBlock), `${dir}: note has no Pi substitution pattern`);
@@ -206,6 +218,7 @@ test("review-context note (AC-135): only in role skills the rule map flags, befo
     path.join(fresh, ".pi", "APPEND_SYSTEM.md"),
     path.join(fresh, ".pi", "extensions", "eversis-context-budget.ts"),
     path.join(fresh, ".pi", "extensions", "eversis-process-rules.ts"),
+    path.join(fresh, ".pi", "extensions", "eversis-review.ts"),
     ...fs.readdirSync(path.join(fresh, ".pi", "prompts")).map((n) => path.join(fresh, ".pi", "prompts", n)),
   ];
   for (const file of others) {
@@ -438,6 +451,8 @@ test("--check: exit 0 on a fresh tree; exit 1 naming drifted, missing and orphan
   fs.appendFileSync(drifted, "\nlocal edit\n");
   const driftedExtension = path.join(out, ".pi", "extensions", "eversis-process-rules.ts");
   fs.appendFileSync(driftedExtension, "\n// local edit\n");
+  const driftedReview = path.join(out, ".pi", "extensions", "eversis-review.ts");
+  fs.appendFileSync(driftedReview, "\n// local edit\n");
   const missing = path.join(out, ".pi", "skills", "eversis-rule-code-reviewer", "SKILL.md");
   fs.rmSync(missing);
   const orphanPrompt = path.join(out, ".pi", "prompts", "eversis-retired.md");
@@ -450,6 +465,7 @@ test("--check: exit 0 on a fresh tree; exit 1 naming drifted, missing and orphan
   assert.equal(bad.status, 1);
   assert.ok(bad.stderr.includes(`drift: ${drifted}`), bad.stderr);
   assert.ok(bad.stderr.includes(`drift: ${driftedExtension}`), bad.stderr);
+  assert.ok(bad.stderr.includes(`drift: ${driftedReview}`), bad.stderr);
   assert.ok(bad.stderr.includes(`missing: ${missing}`), bad.stderr);
   assert.ok(bad.stderr.includes(`orphan: ${orphanPrompt}`), bad.stderr);
   assert.ok(bad.stderr.includes(`orphan: ${path.join(orphanSkillDir, "SKILL.md")}`), bad.stderr);
@@ -459,6 +475,18 @@ test("--check: exit 0 on a fresh tree; exit 1 naming drifted, missing and orphan
   assert.equal(check(out).status, 0);
   assert.ok(!fs.existsSync(orphanPrompt));
   assert.ok(!fs.existsSync(orphanSkillDir));
+});
+
+test("--check: a missing review extension is reported (AC-136)", () => {
+  const out = mkTmp();
+  generate(out);
+  const review = path.join(out, ".pi", "extensions", "eversis-review.ts");
+  fs.rmSync(review);
+  const bad = check(out);
+  assert.equal(bad.status, 1);
+  assert.ok(bad.stderr.includes(`missing: ${review}`), bad.stderr);
+  generate(out);
+  assert.equal(check(out).status, 0);
 });
 
 test("orphan cleanup never removes hand-made files", () => {

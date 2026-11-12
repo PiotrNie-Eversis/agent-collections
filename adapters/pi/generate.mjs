@@ -14,6 +14,9 @@
  *   .pi/extensions/eversis-context-budget.ts    ~50% context-budget compaction extension
  *   .pi/extensions/eversis-process-rules.ts     adds the process rules per run (AC-134);
  *                                               bundle skill ids filled in from the rule map
+ *   .pi/extensions/eversis-review.ts            eversis_independent_review tool: runs the
+ *                                               review in a separate Pi session (AC-136);
+ *                                               copied unchanged
  *   .pi/settings.json                           seeded once when absent (consumer-owned after)
  *
  * Framework skills (.ai/skills/eversis-*) are NOT emitted here — the installer
@@ -76,6 +79,7 @@ const PROMPTS_DIR_REL = ".pi/prompts";
 const SKILLS_DIR_REL = ".pi/skills";
 const EXTENSION_REL = ".pi/extensions/eversis-context-budget.ts";
 const PROCESS_RULES_EXTENSION_REL = ".pi/extensions/eversis-process-rules.ts";
+const REVIEW_EXTENSION_REL = ".pi/extensions/eversis-review.ts";
 const SETTINGS_REL = ".pi/settings.json";
 const STACK_OVERLAY_REL = ".cursor/rules/eversis-project-stack.mdc";
 const STACK_TEMPLATE_REL = "templates/eversis-project-stack.example.mdc";
@@ -93,17 +97,24 @@ const CORE_RULE_ID = "eversis-agent-core";
 const HARD_LIMITS_HEADING = "## Hard limits (implement)";
 /**
  * Pi-only note inserted into role skills flagged `review_context_note: true`
- * (AC-135). Pi has no sub-agents, so an in-session Review is self-review.
+ * (AC-135; rewritten by AC-136). Pi has no sub-agents, so an in-session Review
+ * is self-review. The eversis_independent_review tool
+ * (.pi/extensions/eversis-review.ts) runs the review in a separate Pi session
+ * instead, and the note tells the model when to call it and how to label results.
  * Hand-offs: AC-134 keeps the flag when role skills move to on-demand loading,
  * and drops the spec-folder lookup bullet once the review flow resolves the
- * folder itself on every host; AC-136 replaces the fresh-session wording when
- * review runs in a separate Pi session or process (keep a fallback line).
+ * folder itself on every host. AC-136 (done) replaced the fresh-session wording
+ * with the tool call and kept the fresh-session steps as the fallback line.
+ * AC-141 may reuse runCleanRole from eversis-review.ts for other roles.
  */
 const REVIEW_CONTEXT_NOTE = [
-  "> **Pi host note — review independence (AC-135).** Pi has no sub-agents, so a Review stage inside an Implement run uses the same context that wrote the code: that is self-review, not independent verification.",
+  "> **Pi host note — review independence (AC-135, AC-136).** Pi has no sub-agents, so a Review stage inside an Implement run would use the same context that wrote the code: that is self-review, not independent verification. The extension tool `eversis_independent_review` runs the review in a separate Pi session that has not seen this conversation (file-editing tools removed, writing shell commands blocked).",
   ">",
-  "> - Start every review result with one line: `Review context: same session as implementation (not independent)` when this session implemented or edited the change, or `Review context: fresh session (independent)` when it did not (for example a new Pi session started with `/eversis-review`). Never present a same-session review as independent.",
-  "> - After a same-session review, end with the next step: start a new Pi session and run `/eversis-review <key>` (optionally with the spec folder or plan path).",
+  "> - At the Review stage of an Implement run, and again after every blocker fix, call `eversis_independent_review` with the ticket key (and the spec folder when known). Do not review the change yourself in this session. A successful result starts with `Review context: separate Pi session (independent)`.",
+  "> - Proceed to Fine only when the tool's result is PASS. On BLOCKER, fix the findings and call the tool again (the orchestration limit on review rounds still applies).",
+  "> - If the tool reports that the independent review did not run, say so and give its fresh-session steps: start a new Pi session in the project root and run `/eversis-review <key>` (optionally with the spec folder or plan path). Start any review done in this session with `Review context: same session as implementation (not independent)`. Never present it as independent.",
+  "> - When your prompt says you run in a separate Pi session started by `eversis_independent_review`, you are that review: review directly (the tool is not available there) and start the result with `Review context: separate Pi session (independent)`.",
+  "> - In a new Pi session started with `/eversis-review` by a person (no implementation in it), start the result with `Review context: fresh session (independent)`.",
   "> - At Fine, repeat the `Review context:` line under **Automation & Technical Notes** in the QA comment draft.",
   "> - When `/eversis-review` gets only a ticket key, find the spec folder by lowercasing the key: use `docs/specs/<key>/` if it exists; otherwise use the single folder named `<key>-<topic>` (`ac-1350-…` is not a match for `ac-135`); if two or more match, ask which one; if none matches, say so and ask for the spec folder or plan path — never create a folder. Then read its `*.research.md` and `*.plan.md`.",
 ].join("\n");
@@ -114,6 +125,7 @@ const MAP_PATH = path.join(ADAPTER_DIR, "rule-map.yaml");
 const DENY_PATH = path.join(ADAPTER_DIR, "..", "claude", "command-deny.yaml");
 const EXTENSION_ASSET = path.join(ADAPTER_DIR, "assets", "eversis-context-budget.ts");
 const PROCESS_RULES_ASSET = path.join(ADAPTER_DIR, "assets", "eversis-process-rules.ts");
+const REVIEW_ASSET = path.join(ADAPTER_DIR, "assets", "eversis-review.ts");
 const SETTINGS_ASSET = path.join(ADAPTER_DIR, "assets", "settings.json");
 
 function fail(message) {
@@ -870,6 +882,8 @@ function generate(repoRoot, outRoot, frameworkPrefix, check) {
   const extensionSource = normalizeNewlines(readFileOrFail(EXTENSION_ASSET, "extension asset"));
   emitter.emit(EXTENSION_REL, `${GENERATED_MARKER_TS}\n${extensionSource}`);
   emitter.emit(PROCESS_RULES_EXTENSION_REL, processRulesExtension);
+  const reviewSource = normalizeNewlines(readFileOrFail(REVIEW_ASSET, "review extension asset"));
+  emitter.emit(REVIEW_EXTENSION_REL, `${GENERATED_MARKER_TS}\n${reviewSource}`);
 
   // 5. Orphans, then the consumer-owned settings seed.
   cleanupOrphans(targetRoot, emitter, promptIds, skillIds);
@@ -906,7 +920,7 @@ function main() {
 
   const removed = emitter.written.filter((w) => w.startsWith("removed "));
   console.log(
-    `generated Pi adapter: ${promptCount} prompt(s), ${skillCount} role skill(s), APPEND_SYSTEM.md, context-budget and process-rules extensions${seeded ? ", settings.json (seeded)" : ""}`,
+    `generated Pi adapter: ${promptCount} prompt(s), ${skillCount} role skill(s), APPEND_SYSTEM.md, context-budget, process-rules and review extensions${seeded ? ", settings.json (seeded)" : ""}`,
   );
   if (removed.length > 0) {
     console.log(`removed ${removed.length} orphan generated file(s):`);

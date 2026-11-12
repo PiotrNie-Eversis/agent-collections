@@ -435,7 +435,7 @@ _prune_deselected_pi() {
   fi
 
   local extension_name extension
-  for extension_name in eversis-context-budget.ts eversis-process-rules.ts; do
+  for extension_name in eversis-context-budget.ts eversis-process-rules.ts eversis-review.ts; do
     extension="${pi_dir}/extensions/${extension_name}"
     if [[ -f "$extension" ]] && grep -qF "$PI_GENERATED_MARKER" "$extension" 2>/dev/null; then
       rm -f "$extension" || return 1

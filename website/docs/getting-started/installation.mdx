@@ -128,6 +128,7 @@ With Pi selected, the installer writes a `.pi/` folder in your project:
 | `.pi/skills/` | All framework skills (`eversis-*`) plus role-rule skills (`eversis-rule-*`, loaded with `/skill:<name>`) |
 | `.pi/extensions/eversis-process-rules.ts` | Adds the process rules after an `eversis-*` command or while a plan is active ([details](#pi-process-rules)). Keeps its state in `.pi/eversis-state/`, which ignores itself in git |
 | `.pi/extensions/eversis-context-budget.ts` | Context budget — compacts the session once when context use crosses **50%** of the model window and resumes an interrupted task ([details](#pi-context-budget)) |
+| `.pi/extensions/eversis-review.ts` | Independent code review — runs `/eversis-review` in a separate Pi session through the `eversis_independent_review` tool ([details](#pi-review)) |
 | `.pi/mcp.json` | The `eversis-collections` MCP server — see [MCP Setup](./mcp-setup) |
 | `.pi/settings.json` | Seeded once; yours to edit afterwards |
 
@@ -154,9 +155,15 @@ Long sessions get slower and less accurate as the context window (the model's wo
 
 #### Code review in Pi {#pi-review}
 
-Pi has no sub-agents, so when `/eversis-implement` reaches code review in Pi, the same session that wrote the code also reviews it. That is self-review, not an independent check. Every review result in Pi says which kind it was: `Review context: same session as implementation (not independent)` or `Review context: fresh session (independent)`. The QA comment draft repeats that line.
+Pi has no sub-agents, so without help, when `/eversis-implement` reaches code review in Pi, the same session that wrote the code also reviews it. That is self-review, not an independent check. The extension `.pi/extensions/eversis-review.ts` fixes this: at the review step, and again after every blocker fix, the agent calls the `eversis_independent_review` tool, which runs `/eversis-review` in a **separate Pi session** that has not seen the implementing conversation. That session sees only the review prompt, the spec folder and the repository. It cannot use Pi's file-editing tools, and shell commands that look like they write files are blocked; it can still run tests, so it is edit-restricted, not read-only. The agent goes on to Fine only when the result is PASS.
 
-To get an independent review, start a **new** Pi session in the project root (`pi`, or `/new` in an open session) and run `/eversis-review AC-123`. With only the ticket key, the reviewer finds the task's folder under `docs/specs/` and asks if more than one matches; you can also pass the folder, for example `/eversis-review AC-123 docs/specs/ac-123-topic/`. Do not use `/fork`, `/clone` or `/tree` for this — they keep the earlier conversation. An automatic review in a separate Pi session is planned. Cursor and Claude Code are not affected.
+**Token cost:** each review is about one extra review run, repeated after each blocker fix. Pi shows a notice when it starts, and the result ends with a `Review usage:` line.
+
+Every review result in Pi says which kind it was: `Review context: separate Pi session (independent)`, `Review context: same session as implementation (not independent)` or `Review context: fresh session (independent)`. The QA comment draft repeats that line.
+
+If the separate session cannot run, the tool says `Independent review did not run` with the reason, and the steps below. One known case: a model that only a Pi extension supplies (`pi.registerProvider`) is not available to the clean session; models from Pi login, `auth.json` or `models.json` work.
+
+As a fallback, or to review yourself, start a **new** Pi session in the project root (`pi`, or `/new` in an open session) and run `/eversis-review AC-123`. With only the ticket key, the reviewer finds the task's folder under `docs/specs/` and asks if more than one matches; you can also pass the folder, for example `/eversis-review AC-123 docs/specs/ac-123-topic/`. Do not use `/fork`, `/clone` or `/tree` for this — they keep the earlier conversation. Cursor and Claude Code are not affected.
 
 Pi ignore files, subscription sign-in and an isolated workspace are not part of this release yet. Adapter details: [`adapters/pi/README.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/adapters/pi/README.md).
 
