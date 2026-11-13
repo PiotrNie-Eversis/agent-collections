@@ -42,7 +42,7 @@ Provides integration with Jira and Confluence for gathering requirements, task c
 ```
 
 :::note
-Atlassian removes the old endpoint `https://mcp.atlassian.com/v1/mcp` on 2027-03-01. Run `setup-agent-collections.sh --upgrade` to move an unchanged v1 entry to v2. A custom URL is not changed. After the switch, authorize the Atlassian connection again.
+Atlassian removes the old endpoint `https://mcp.atlassian.com/v1/mcp` on 2027-03-01. Run `setup-agent-collections.sh --upgrade --sync` to move an unchanged v1 entry to v2. A custom URL is not changed. After the switch, authorize the Atlassian connection again.
 :::
 
 ## Authentication

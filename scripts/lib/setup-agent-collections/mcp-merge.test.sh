@@ -476,35 +476,74 @@ fi
 
 rm -rf "${TARGET_DIR}/.cursor"
 cat > "${TARGET_DIR}/.mcp.json" <<'EOF'
-{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http" } } }
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "headers": { "X-Custom": "keep" } } } }
 EOF
 SELECTED_AGENTS="claude"
-merge_mcp_json 2>/dev/null
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
 if node -e '
     const a = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers.atlassian;
     if (!a || a.url !== process.argv[2] || a.type !== "http") process.exit(1);
-  ' "${TARGET_DIR}/.mcp.json" "$_atlassian_v2"; then
-  _pass "claude preserve: exact v1 atlassian url in .mcp.json moved to v2"
+    if (JSON.stringify(a.headers) !== JSON.stringify({ "X-Custom": "keep" })) process.exit(1);
+  ' "${TARGET_DIR}/.mcp.json" "$_atlassian_v2" \
+  && echo "$_preserve_log" | grep -qF '[mcp-merge] claude: atlassian URL moved from v1 to v2'; then
+  _pass "claude preserve: exact v1 atlassian url in .mcp.json moved to v2, headers kept, stderr notice"
 else
-  _fail "claude preserve: exact v1 atlassian url in .mcp.json moved to v2"
+  _fail "claude preserve: exact v1 atlassian url in .mcp.json moved to v2, headers kept, stderr notice"
 fi
 
 rm -f "${TARGET_DIR}/.mcp.json"
 mkdir -p "${TARGET_DIR}/.pi"
 cat > "${TARGET_DIR}/.pi/mcp.json" <<'EOF'
-{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http" } } }
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "headers": { "X-Custom": "keep" } } } }
 EOF
 SELECTED_AGENTS="pi"
 PI_STAGE_FAILED="false"
-merge_mcp_json 2>/dev/null
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
 if [[ "$PI_STAGE_FAILED" == "false" ]] && node -e '
     const a = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers.atlassian;
     if (!a || a.url !== process.argv[2] || a.type !== "http") process.exit(1);
-  ' "${TARGET_DIR}/.pi/mcp.json" "$_atlassian_v2"; then
-  _pass "pi preserve: exact v1 atlassian url in .pi/mcp.json moved to v2"
+    if (JSON.stringify(a.headers) !== JSON.stringify({ "X-Custom": "keep" })) process.exit(1);
+  ' "${TARGET_DIR}/.pi/mcp.json" "$_atlassian_v2" \
+  && echo "$_preserve_log" | grep -qF '[mcp-merge] pi: atlassian URL moved from v1 to v2'; then
+  _pass "pi preserve: exact v1 atlassian url in .pi/mcp.json moved to v2, headers kept, stderr notice"
 else
-  _fail "pi preserve: exact v1 atlassian url in .pi/mcp.json moved to v2"
+  _fail "pi preserve: exact v1 atlassian url in .pi/mcp.json moved to v2, headers kept, stderr notice"
 fi
+
+# Replace mode (preserve=false) with an old framework template whose atlassian
+# url is still v1: the written entry must carry the v2 url. COLLECTIONS_HOME
+# points at a temp tree holding only the modified template (as in Case 4b).
+rm -rf "${TARGET_DIR}/.pi" "${TARGET_DIR}/.cursor"
+_old_home="$(mktemp -d)"
+mkdir -p "${_old_home}/templates"
+node -e '
+    const fs = require("fs");
+    const [src, dst] = process.argv.slice(1);
+    const t = JSON.parse(fs.readFileSync(src, "utf8"));
+    if (!t.mcpServers || !t.mcpServers.atlassian) process.exit(1);
+    t.mcpServers.atlassian.url = "https://mcp.atlassian.com/v1/mcp";
+    fs.writeFileSync(dst, JSON.stringify(t, null, 2) + "\n");
+  ' "${REPO_ROOT}/templates/mcp.json" "${_old_home}/templates/mcp.json"
+_saved_home="$COLLECTIONS_HOME"
+_saved_ids="$MCP_SELECTED_IDS"
+COLLECTIONS_HOME="$_old_home"
+SELECTED_AGENTS="cursor"
+MCP_SELECTED_IDS="eversis-collections,atlassian"
+MCP_PRESERVE_EXISTING="false"
+merge_mcp_json 2>/dev/null
+if node -e '
+    const a = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers.atlassian;
+    if (!a || a.url !== process.argv[2]) process.exit(1);
+  ' "${TARGET_DIR}/.cursor/mcp.json" "$_atlassian_v2"; then
+  _pass "replace: old template with v1 atlassian url writes the v2 url"
+else
+  _fail "replace: old template with v1 atlassian url writes the v2 url"
+fi
+COLLECTIONS_HOME="$_saved_home"
+MCP_SELECTED_IDS="$_saved_ids"
+MCP_PRESERVE_EXISTING="true"
+rm -rf "$_old_home"
+unset _old_home _saved_home _saved_ids
 rm -rf "${TARGET_DIR}/.pi" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/.cursor" "${TARGET_DIR}/scripts"
 PI_STAGE_FAILED="false"
 PI_STAGE_FAILURE_REASON=""
