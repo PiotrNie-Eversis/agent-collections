@@ -115,7 +115,7 @@ g commit -q -m "readme on master" || fail "hook should allow README on master"
 g switch -q develop
 mkdir -p docs/specs/ac-3 && echo "y" > docs/specs/ac-3/a.md && g add docs/specs/ac-3/a.md
 g commit -q -m "spec on develop" || fail "hook should allow docs on develop"
-ok "hook blocks work-only docs on master only"
+ok "hook blocks work-only paths on master, allows them alone on develop"
 
 echo "Case 8: CI check (scripts/check-release-tree.sh)"
 bash scripts/check-release-tree.sh master >/dev/null 2>&1 || fail "clean master should pass"
@@ -128,5 +128,39 @@ rc=0; bash scripts/check-release-tree.sh HEAD >/dev/null 2>&1 || rc=$?
 rc=0; bash scripts/check-release-tree.sh no-such-ref >/dev/null 2>&1 || rc=$?
 [[ "$rc" -eq 2 ]] || fail "unknown ref should exit 2 (got $rc)"
 ok "CI check passes clean master, fails on work-only paths (exit 1) and bad refs (exit 2)"
+
+echo "Case 9: pre-commit hook rejects mixed core + work-only commits off master"
+g switch -q develop
+mkdir -p adapters/x docs/specs/ac-4
+echo "a1" > adapters/x/a.md && echo "s1" > docs/specs/ac-4/a.md
+g add adapters/x/a.md docs/specs/ac-4/a.md
+err="$(g commit -q -m "mixed" 2>&1 >/dev/null)" && fail "hook should reject a mixed commit on develop"
+grep -qx "  adapters/x/a.md" <<< "$err" || fail "mixed message should list the core path"
+grep -qx "  docs/specs/ac-4/a.md" <<< "$err" || fail "mixed message should list the work-only path"
+grep -q "git restore --staged" <<< "$err" || fail "mixed message should show how to split"
+grep -q "ALLOW_MIXED_COMMIT=1" <<< "$err" || fail "mixed message should mention the escape hatch"
+g restore --staged docs/specs/ac-4/a.md
+g commit -q -m "core only" || fail "hook should allow a core-only commit on develop"
+g add docs/specs/ac-4/a.md
+g commit -q -m "docs(ac-4)" || fail "hook should allow a work-only-only commit on develop"
+echo "specs readme v2" > docs/specs/README.md && echo "a2" > adapters/x/a.md
+g add docs/specs/README.md adapters/x/a.md
+g commit -q -m "readme + core" || fail "hook should treat docs/specs/README.md as core"
+g rm -q docs/specs/ac-4/a.md && echo "a3" > adapters/x/a.md && g add adapters/x/a.md
+if g commit -q -m "delete spec + core" 2>/dev/null; then fail "hook should reject a work-only deletion mixed with core"; fi
+ALLOW_MIXED_COMMIT=1 g commit -q -m "deliberate mix" || fail "ALLOW_MIXED_COMMIT=1 should allow a mixed commit"
+g switch -q --detach
+echo "a4" > adapters/x/a.md && mkdir -p docs/specs/ac-5 && echo "s5" > docs/specs/ac-5/a.md
+g add adapters/x/a.md docs/specs/ac-5/a.md
+if g commit -q -m "mixed detached" 2>/dev/null; then fail "hook should reject a mixed commit on detached HEAD"; fi
+g reset -q --hard && rm -rf docs/specs/ac-5
+g switch -q master
+mkdir -p docs/specs/ac-6 && echo "z" > docs/specs/ac-6/a.md && g add docs/specs/ac-6/a.md
+if g commit -q -m "spec on master" 2>/dev/null; then fail "hook should still block work-only paths on master"; fi
+if ALLOW_MIXED_COMMIT=1 g commit -q -m "spec on master" 2>/dev/null; then
+  fail "ALLOW_MIXED_COMMIT must not lift the master block"
+fi
+g reset -q && rm -rf docs/specs/ac-6
+ok "mixed commits rejected off master (incl. deletions, detached HEAD); single-group, README and ALLOW_MIXED_COMMIT pass; master block unchanged"
 
 echo "PASS (${pass} cases)"

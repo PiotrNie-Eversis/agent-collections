@@ -26,8 +26,10 @@ Consumer install / upgrade entry for **Agent Collections**.
   git push origin master
   ```
 
+  Guided alternative (run from `develop`; refuses to run on `master`): `npm run release:master` (or `node scripts/release-master.mjs`, with `--dry-run`, `--yes`, `--allow-diverged`). It fetches `origin`, stops when local `develop` or `master` differs from `origin`, shows the dry run, then asks before the release commit and before `git push origin master`.
+
   The script copies the `develop` tree, removes the `.release-exclude` paths, and commits it on top of `master` (single parent), so deletions and renames carry over and work-only docs never do. It stops when `master` has commits that are neither releases nor in `develop` (a hotfix made only on `master`); bring them into `develop`, or pass `--allow-diverged` to overwrite them.
-- **Guard:** enable the hook once per clone with `git config core.hooksPath .githooks`. On `master`/`main` it rejects commits that stage `.release-exclude` paths (READMEs stay allowed).
+- **Guard:** enable the hook once per clone with `git config core.hooksPath .githooks`. On `master`/`main` it rejects commits that stage `.release-exclude` paths (READMEs stay allowed). On every other branch it rejects a commit that mixes work-only and core paths: commit the core first, then `docs(ac-n)`, then `docs(context)`. For a deliberate exception use `ALLOW_MIXED_COMMIT=1 git commit …` (it does not lift the `master` block); `git commit --no-verify` bypasses all hooks.
 - **CI guard:** `.gitlab-ci.yml` runs `scripts/check-release-tree.sh` on every `master` pipeline and fails it when work-only paths are present (e.g. a push made without the hook). It detects and alerts; it cannot reject the push. To clean up, make sure the change is on `develop`, then release with `--allow-diverged`.
 - **Branch protection (GitLab):** protect only `master` — *Allowed to merge: No one*, *Allowed to push and merge: Maintainers*, *Allowed to force push: off*.
 
