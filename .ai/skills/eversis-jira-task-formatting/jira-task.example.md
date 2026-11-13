@@ -84,9 +84,9 @@ h2. Delivery Standard
 
 This story follows full spec-driven development (mandatory under Agent Collections / epic PROJ-123 when applicable).
 
-* Spec folder: docs/specs/ac-2-context-management/
-* Research: ac-2-context-management.research.md — required before plan
-* Plan: ac-2-context-management.plan.md — required before implementation
+* Spec folder: docs/specs/proj-123-context-management/
+* Research: proj-123-context-management.research.md — required before plan
+* Plan: proj-123-context-management.plan.md — required before implementation
 * Implement: load eversis-implement (approved plan attached)
 * Review: load eversis-review before Done
 * Fine: QA comment draft per eversis-fine-handoff

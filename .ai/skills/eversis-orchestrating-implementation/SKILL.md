@@ -77,15 +77,15 @@ Recommend Quick Flow or Full Flow in chat with a short reason, and allow the use
 
 #### Spec folder lookup
 
-When Implement or research starts from a ticket key, lowercase the key first (`AC-2` becomes `ac-2`) and resolve the spec folder as follows.
+When Implement or research starts from a ticket key, lowercase the key first (`PROJ-123` becomes `proj-123`) and resolve the spec folder as follows.
 
 1. If `docs/specs/<key>/` exists, use it. Sibling folders named `<key>-*` do not raise a question and do not cause a second folder to be created.
-2. Otherwise a hit is a directory whose name equals `<key>` or starts with `<key>-`. `ac-20` is not a hit for `ac-2`.
+2. Otherwise a hit is a directory whose name equals `<key>` or starts with `<key>-`. `proj-1230` is not a hit for `proj-123`.
 3. One hit: use that folder. Do not create `docs/specs/<key>/`.
 4. Two or more hits: stop and ask which folder. Do not pick in silence and do not create a third folder.
 5. Zero hits: create `docs/specs/<key>-<topic>/`. `<topic>` is at most three hyphen-separated words. Research and plan file names repeat the folder name.
 
-The canonical example is `docs/specs/ac-2-context-management/` with `ac-2-context-management.research.md` and `ac-2-context-management.plan.md`. A name that puts the topic before the key is not the pattern.
+The canonical example is `docs/specs/proj-123-context-management/` with `proj-123-context-management.research.md` and `proj-123-context-management.plan.md`. A name that puts the topic before the key is not the pattern.
 
 #### Implement readiness (mandatory first output)
 

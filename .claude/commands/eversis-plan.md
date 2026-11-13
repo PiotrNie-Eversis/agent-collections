@@ -20,7 +20,7 @@ Analyze the feature context for the provided task or Jira ID and prepare a detai
 
 Use the required skills to understand the feature, design the solution, and author the plan artifact.
 
-The file outcome should be a markdown file whose name repeats the folder name with a `.plan.md` suffix (e.g., `ac-2-context-management.plan.md`). Place it in `docs/specs/<key>-<topic>/` (or your team's `specifications/<key>-<topic>/` folder). The topic is at most three hyphen-separated words.
+The file outcome should be a markdown file whose name repeats the folder name with a `.plan.md` suffix (e.g., `proj-123-context-management.plan.md`). Place it in `docs/specs/<key>-<topic>/` (or your team's `specifications/<key>-<topic>/` folder). The topic is at most three hyphen-separated words.
 
 Arguments: $ARGUMENTS
 

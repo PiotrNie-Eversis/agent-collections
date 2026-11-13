@@ -45,12 +45,12 @@ The Engineering Manager identifies that the task is missing necessary context an
 
 ## Output
 
-A `.research.md` file placed under the folder from **Spec folder lookup** in `eversis-orchestrating-implementation` (or your team's `specifications/`): when creating a new folder, use `docs/specs/<key>-<topic>/` with at most three topic words; the research file name repeats the folder name. Exact `docs/specs/<key>/` wins; do not create a key-only folder beside a topic folder; `ac-20` is not a hit for `ac-2`; when two topic folders match and no exact folder exists, ask which one.
+A `.research.md` file placed under the folder from **Spec folder lookup** in `eversis-orchestrating-implementation` (or your team's `specifications/`): when creating a new folder, use `docs/specs/<key>-<topic>/` with at most three topic words; the research file name repeats the folder name. Exact `docs/specs/<key>/` wins; do not create a key-only folder beside a topic folder; `proj-1230` is not a hit for `proj-123`; when two topic folders match and no exact folder exists, ask which one.
 
 ```text
 docs/specs/
-  ac-2-context-management/
-    ac-2-context-management.research.md
+  proj-123-context-management/
+    proj-123-context-management.research.md
 ```
 
 The file contains all relevant information needed to build comprehensive context: task summary, requirements, user stories, acceptance criteria, assumptions, open questions, and suggested next steps.
@@ -65,7 +65,7 @@ Review the generated research document carefully. Verify accuracy and iterate as
 
 Research the task based on the provided Jira ID or task description.
 
-The file outcome should be a markdown research file whose name repeats the resolved folder name with a `.research.md` suffix (e.g. `ac-2-context-management.research.md`). Resolve or create the folder with **Spec folder lookup** in `eversis-orchestrating-implementation`: a new folder is `docs/specs/<key>-<topic>/` (at most three topic words); exact `docs/specs/<key>/` wins; do not create a key-only folder beside a topic folder; `ac-20` is not a hit for `ac-2`; when two topic folders match and no exact folder exists, ask which one. Place the file under `docs/specs/` (or your team's `specifications/` folder).
+The file outcome should be a markdown research file whose name repeats the resolved folder name with a `.research.md` suffix (e.g. `proj-123-context-management.research.md`). Resolve or create the folder with **Spec folder lookup** in `eversis-orchestrating-implementation`: a new folder is `docs/specs/<key>-<topic>/` (at most three topic words); exact `docs/specs/<key>/` wins; do not create a key-only folder beside a topic folder; `proj-1230` is not a hit for `proj-123`; when two topic folders match and no exact folder exists, ask which one. Place the file under `docs/specs/` (or your team's `specifications/` folder).
 
 It should contain every relevant information needed to build a comprehensive context for the task or feature.
 

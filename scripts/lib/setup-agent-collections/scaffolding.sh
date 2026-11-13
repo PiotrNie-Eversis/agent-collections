@@ -38,9 +38,9 @@ Feature research and implementation plan artifacts for this project.
 Naming convention: `docs/specs/<key>-<topic>/`
 
 ```
-docs/specs/ac-2-context-management/
-  ac-2-context-management.research.md
-  ac-2-context-management.plan.md
+docs/specs/proj-123-context-management/
+  proj-123-context-management.research.md
+  proj-123-context-management.plan.md
 ```
 README_EOF
     log_ok "Created docs/specs/README.md."
