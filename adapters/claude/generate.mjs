@@ -36,7 +36,7 @@ function buildHowToSection(frameworkPrefix) {
 - Resolve skills via MCP (\`eversis_skills_get\` / \`eversis_skills_list\`) when available; otherwise read \`${withPrefix(".ai/skills/<id>/SKILL.md")}\`.
 - Do **not** expect \`.cursor/commands\` or Cursor \`@\` attachment as the only entry — those are Cursor-channel packaging.
 - Prefer backend / system-layer trees for CLI work; do **not** load Cursor-specific packaging (\`.cursor/rules/*.mdc\`, slash commands) for standards — this file is the Claude Code instruction surface.
-- Full ignore-file / monorepo path isolation (\`.claudeignore\`, \`claudeMdExcludes\`) is **deferred** to TASK-528–530; until then, stay in the relevant package tree and avoid unrelated frontend/tool config when possible.
+- Stay in the relevant package tree and avoid unrelated frontend/tool config when possible.
 `;
 }
 

@@ -9,7 +9,7 @@
 - Resolve skills via MCP (`eversis_skills_get` / `eversis_skills_list`) when available; otherwise read `.ai/skills/<id>/SKILL.md`.
 - Do **not** expect `.cursor/commands` or Cursor `@` attachment as the only entry — those are Cursor-channel packaging.
 - Prefer backend / system-layer trees for CLI work; do **not** load Cursor-specific packaging (`.cursor/rules/*.mdc`, slash commands) for standards — this file is the Claude Code instruction surface.
-- Full ignore-file / monorepo path isolation (`.claudeignore`, `claudeMdExcludes`) is **deferred** to TASK-528–530; until then, stay in the relevant package tree and avoid unrelated frontend/tool config when possible.
+- Stay in the relevant package tree and avoid unrelated frontend/tool config when possible.
 
 ## eversis-agent-core
 
@@ -119,7 +119,7 @@ Use when running the **Implement** prompt (`eversis-implement`) or acting as the
 
 ## Canonical workflow
 
-Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` after TASK-520 / adapter resolution). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
+Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` or the adapter-resolved path). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
 
 ## Human gates
 
@@ -182,7 +182,7 @@ Use when running the **Review** prompt (`eversis-review`).
 - Apply orchestration **`testing-and-terminal.md`** for quality commands and evidence.
 - Check against specs under `docs/specs/`, the implementation plan, and `docs/context/` as referenced in the task.
 - Output structured **PASS** / **BLOCKER** / **SUGGESTION** findings.
-- Full review methodology lives in skill **`eversis-code-reviewing`** (package body under `.ai/skills/` after TASK-520; until then resolve via MCP or adapter path).
+- Full review methodology lives in skill **`eversis-code-reviewing`** (package body under `.ai/skills/`; resolve via MCP or the adapter path).
 
 ## Hard limits (BLOCKER)
 
@@ -204,7 +204,7 @@ When implementation is declared **Fine**, produce a clear, human-friendly QA sum
 
 This contract covers **Implement handoff only** (one ticket comment draft). For full test planning or regression, use the QA workflow prompt/skill (`eversis-qa-workflow`) — do not expand this draft into a full test plan.
 
-The detailed skill package is **`eversis-fine-handoff`** (body lands under `.ai/skills/` in TASK-520). Until then, follow this contract and load the skill via MCP or adapter-resolved path when available.
+The detailed skill package is **`eversis-fine-handoff`** (`.ai/skills/eversis-fine-handoff/`). Follow this contract and load the skill via MCP or the adapter-resolved path when available.
 
 ## When to run
 
@@ -354,9 +354,8 @@ The topic after the key is at most three hyphen-separated words. Research and pl
 
 Do **not** start implementation without approved research and plan artifacts when this Delivery Standard applies.
 
-### This framework repository vs consumers
+### Committing spec folders
 
-- In **`agent-collections`**, all `docs/specs/*/` story folders are **gitignored**, regardless of ticket prefix or naming (local agent artifacts; MVP committed docs are README / CHANGELOG / `.ai/`).
 - **Consumer projects** choose whether to commit or ignore their own `docs/specs/` — the folder convention stays the same either way.
 
 ## Delivery Standard (copy into Jira / story descriptions)
@@ -364,7 +363,7 @@ Do **not** start implementation without approved research and plan artifacts whe
 ```text
 ## Delivery Standard
 
-This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
+This story follows full spec-driven development (Agent Collections Delivery Standard).
 
 * Spec folder: docs/specs/ac-2-context-management/
 * Research: ac-2-context-management.research.md — required before plan

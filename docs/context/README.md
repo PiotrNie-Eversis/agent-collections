@@ -14,6 +14,6 @@ By default this folder is committed like any other project doc. Projects install
 
 ## Framework repository (`agent-collections`)
 
-This repo applies the same local-only pattern to itself that `--gitignore-agent-artifacts` gives consumer projects — `docs/context/*/` subfolders here (e.g. `agent-collections/`) are gitignored; only this `README.md` stays tracked. Same treatment already applied to `docs/specs/*/` (see `CHANGELOG.md`).
+This repo tracks `docs/context/*/` subfolders (e.g. `agent-collections/`) on `develop`; `.release-exclude` removes them from `master`, where only this README stays. `docs/specs/*/`, `docs/plans/`, `docs/reports/` and `docs/decisions/` entries follow the same model. Branches and releases: [`scripts/README.md`](../../scripts/README.md#branches-and-releases-framework-repository).
 
 **Consumer projects** may commit `docs/context/` by default, or opt in to gitignoring `docs/context/*/` subfolders with `--gitignore-agent-artifacts`.

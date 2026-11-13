@@ -40,7 +40,7 @@ When working with the framework in **any** repository, agent/project deliverable
 | `docs/specs/` | SDD research / plan / plan-review artifacts (`docs/specs/<key>-<topic>/`) |
 | `docs/decisions/` | Architecture decisions — one file per decision plus `INDEX.md` |
 
-**Framework repository note:** all `docs/specs/*/` subfolders are **gitignored** (local-only story work on the framework itself), regardless of naming. They are not the published product surface. Committed standards and templates live elsewhere (this file, `templates/`).
+**Framework repository note:** `docs/specs/*/` subfolders are work-only story artifacts: tracked on `develop` and removed from `master` by `.release-exclude`. They are not the published product surface. Committed standards and templates live elsewhere (this file, `templates/`).
 
 ## Role matrix
 

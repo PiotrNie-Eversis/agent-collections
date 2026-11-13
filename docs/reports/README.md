@@ -14,6 +14,6 @@ Do **not** put these under `docs/specs/` — specs hold SDD research and impleme
 
 ## Framework repository
 
-In **this** monorepo, `docs/reports/` is trackable (not gitignored), unlike `docs/specs/*/`. Keep this README committed so the path stays discoverable next to `docs/context/`, `docs/plans/`, `docs/specs/`, and `docs/decisions/`.
+In **this** monorepo, `docs/reports/` is work-only, like `docs/specs/*/`: tracked on `develop`, removed from `master` by `.release-exclude` (this README stays). Keep this README committed so the path stays discoverable next to `docs/context/`, `docs/plans/`, `docs/specs/`, and `docs/decisions/`.
 
 **Consumer projects** may adopt the same path when they run `eversis-review-codebase`.

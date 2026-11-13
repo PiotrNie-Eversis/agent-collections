@@ -22,7 +22,7 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 |------|------|
 | [`docs/context/`](./docs/context/) | Internal knowledge, task baselines |
 | [`docs/plans/`](./docs/plans/) | Optional flat plans; prefer specs for Implement |
-| [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<key>-<topic>/`; `task-*` local-only / gitignored in this repo) |
+| [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<key>-<topic>/`; tracked on `develop`, removed from `master` by `.release-exclude`) |
 | [`docs/decisions/`](./docs/decisions/) | Architecture decisions — one file per decision plus `INDEX.md` |
 | [`docs/reports/`](./docs/reports/) | Agent-generated reports (e.g. `code-quality-report.md` from `eversis-review-codebase`) |
 
