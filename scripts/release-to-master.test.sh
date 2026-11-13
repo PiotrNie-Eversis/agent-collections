@@ -34,8 +34,8 @@ g add -A && g commit -q -m "initial core"
 # develop: core change + work-only docs + kept READMEs.
 g switch -q -c develop
 echo "core v2" > core.txt
-mkdir -p docs/specs/ac-1-x docs/context/proj/comp docs/reports docs/plans docs/decisions
-echo "spec" > docs/specs/ac-1-x/ac-1-x.plan.md
+mkdir -p docs/specs/proj-1-x docs/context/proj/comp docs/reports docs/plans docs/decisions
+echo "spec" > docs/specs/proj-1-x/proj-1-x.plan.md
 echo "specs readme" > docs/specs/README.md
 echo "idx" > docs/context/proj/INDEX.md
 echo "comp" > docs/context/proj/comp/index.md
@@ -47,7 +47,7 @@ echo "plan" > docs/plans/p1.md
 echo "dec" > docs/decisions/0001-x.md
 echo "dec idx" > docs/decisions/INDEX.md
 echo "dec readme" > docs/decisions/README.md
-echo "zażółć" > "docs/specs/ac-1-x/Porównanie okna.md"
+echo "zażółć" > "docs/specs/proj-1-x/Porównanie okna.md"
 g add -A && g commit -q -m "develop work"
 
 echo "Case 1: snapshot release from develop"
@@ -58,7 +58,7 @@ for kept in core.txt docs/architecture/a.md docs/specs/README.md docs/context/RE
             docs/reports/README.md docs/plans/README.md docs/decisions/README.md .release-exclude; do
   grep -qxF "$kept" <<< "$files" || fail "kept path missing on master: $kept"
 done
-for gone in docs/specs/ac-1-x/ac-1-x.plan.md docs/context/proj/INDEX.md docs/context/proj/comp/index.md \
+for gone in docs/specs/proj-1-x/proj-1-x.plan.md docs/context/proj/INDEX.md docs/context/proj/comp/index.md \
             docs/reports/r1.md docs/plans/p1.md docs/decisions/0001-x.md docs/decisions/INDEX.md; do
   grep -qxF "$gone" <<< "$files" && fail "work-only path leaked to master: $gone"
 done
@@ -106,7 +106,7 @@ ok "branch guard"
 
 echo "Case 7: pre-commit hook"
 git config core.hooksPath .githooks
-mkdir -p docs/specs/ac-2 && echo "x" > docs/specs/ac-2/a.md && g add docs/specs/ac-2/a.md
+mkdir -p docs/specs/proj-2 && echo "x" > docs/specs/proj-2/a.md && g add docs/specs/proj-2/a.md
 if g commit -q -m "should be blocked" 2>/dev/null; then fail "hook should block docs on master"; fi
 g reset -q
 echo "core fix" >> core.txt && g add core.txt
@@ -114,7 +114,7 @@ g commit -q -m "core fix on master" || fail "hook should allow core files on mas
 echo "readme" > docs/specs/README.md && g add docs/specs/README.md
 g commit -q -m "readme on master" || fail "hook should allow README on master"
 g switch -q develop
-mkdir -p docs/specs/ac-3 && echo "y" > docs/specs/ac-3/a.md && g add docs/specs/ac-3/a.md
+mkdir -p docs/specs/proj-3 && echo "y" > docs/specs/proj-3/a.md && g add docs/specs/proj-3/a.md
 g commit -q -m "spec on develop" || fail "hook should allow docs on develop"
 ok "hook blocks work-only paths on master, allows them alone on develop"
 
@@ -132,36 +132,36 @@ ok "CI check passes clean master, fails on work-only paths (exit 1) and bad refs
 
 echo "Case 9: pre-commit hook rejects mixed core + work-only commits off master"
 g switch -q develop
-mkdir -p adapters/x docs/specs/ac-4
-echo "a1" > adapters/x/a.md && echo "s1" > docs/specs/ac-4/a.md
-g add adapters/x/a.md docs/specs/ac-4/a.md
+mkdir -p adapters/x docs/specs/proj-4
+echo "a1" > adapters/x/a.md && echo "s1" > docs/specs/proj-4/a.md
+g add adapters/x/a.md docs/specs/proj-4/a.md
 err="$(g commit -q -m "mixed" 2>&1 >/dev/null)" && fail "hook should reject a mixed commit on develop"
 grep -qx "  adapters/x/a.md" <<< "$err" || fail "mixed message should list the core path"
-grep -qx "  docs/specs/ac-4/a.md" <<< "$err" || fail "mixed message should list the work-only path"
+grep -qx "  docs/specs/proj-4/a.md" <<< "$err" || fail "mixed message should list the work-only path"
 grep -q "git restore --staged" <<< "$err" || fail "mixed message should show how to split"
 grep -q "ALLOW_MIXED_COMMIT=1" <<< "$err" || fail "mixed message should mention the escape hatch"
-g restore --staged docs/specs/ac-4/a.md
+g restore --staged docs/specs/proj-4/a.md
 g commit -q -m "core only" || fail "hook should allow a core-only commit on develop"
-g add docs/specs/ac-4/a.md
-g commit -q -m "docs(ac-4)" || fail "hook should allow a work-only-only commit on develop"
+g add docs/specs/proj-4/a.md
+g commit -q -m "docs(proj-4)" || fail "hook should allow a work-only-only commit on develop"
 echo "specs readme v2" > docs/specs/README.md && echo "a2" > adapters/x/a.md
 g add docs/specs/README.md adapters/x/a.md
 g commit -q -m "readme + core" || fail "hook should treat docs/specs/README.md as core"
-g rm -q docs/specs/ac-4/a.md && echo "a3" > adapters/x/a.md && g add adapters/x/a.md
+g rm -q docs/specs/proj-4/a.md && echo "a3" > adapters/x/a.md && g add adapters/x/a.md
 if g commit -q -m "delete spec + core" 2>/dev/null; then fail "hook should reject a work-only deletion mixed with core"; fi
 ALLOW_MIXED_COMMIT=1 g commit -q -m "deliberate mix" || fail "ALLOW_MIXED_COMMIT=1 should allow a mixed commit"
 g switch -q --detach
-echo "a4" > adapters/x/a.md && mkdir -p docs/specs/ac-5 && echo "s5" > docs/specs/ac-5/a.md
-g add adapters/x/a.md docs/specs/ac-5/a.md
+echo "a4" > adapters/x/a.md && mkdir -p docs/specs/proj-5 && echo "s5" > docs/specs/proj-5/a.md
+g add adapters/x/a.md docs/specs/proj-5/a.md
 if g commit -q -m "mixed detached" 2>/dev/null; then fail "hook should reject a mixed commit on detached HEAD"; fi
-g reset -q --hard && rm -rf docs/specs/ac-5
+g reset -q --hard && rm -rf docs/specs/proj-5
 g switch -q master
-mkdir -p docs/specs/ac-6 && echo "z" > docs/specs/ac-6/a.md && g add docs/specs/ac-6/a.md
+mkdir -p docs/specs/proj-6 && echo "z" > docs/specs/proj-6/a.md && g add docs/specs/proj-6/a.md
 if g commit -q -m "spec on master" 2>/dev/null; then fail "hook should still block work-only paths on master"; fi
 if ALLOW_MIXED_COMMIT=1 g commit -q -m "spec on master" 2>/dev/null; then
   fail "ALLOW_MIXED_COMMIT must not lift the master block"
 fi
-g reset -q && rm -rf docs/specs/ac-6
+g reset -q && rm -rf docs/specs/proj-6
 ok "mixed commits rejected off master (incl. deletions, detached HEAD); single-group, README and ALLOW_MIXED_COMMIT pass; master block unchanged"
 
 # --- Copy mode (default) ------------------------------------------------------
@@ -183,8 +183,8 @@ new_repo() {
   g add -A && g commit -q -m "initial core"
   git config core.hooksPath .githooks
   g switch -q -c develop
-  mkdir -p docs/specs/ac-1-x && echo "spec" > docs/specs/ac-1-x/ac-1-x.plan.md
-  g add -A && g commit -q -m "docs(ac-1): spec"
+  mkdir -p docs/specs/proj-1-x && echo "spec" > docs/specs/proj-1-x/proj-1-x.plan.md
+  g add -A && g commit -q -m "docs(proj-1): spec"
   echo "readme" > README.md && g add README.md && g commit -q -m "docs: readme"
 }
 
@@ -265,8 +265,8 @@ bash scripts/release-to-master.sh >/dev/null || fail "release after dry run"
 ok "dry run"
 
 echo "Case 14 (c): a mixed commit stops the copy and is named"
-echo "core v4" > core.txt && echo "s2" > docs/specs/ac-1-x/note.md
-g add core.txt docs/specs/ac-1-x/note.md
+echo "core v4" > core.txt && echo "s2" > docs/specs/proj-1-x/note.md
+g add core.txt docs/specs/proj-1-x/note.md
 ALLOW_MIXED_COMMIT=1 commit_as "feat: mixed"
 mixed="$(git rev-parse --short HEAD)"
 m="$(git rev-parse master)"
@@ -274,7 +274,7 @@ rc=0; err="$(bash scripts/release-to-master.sh 2>&1 >/dev/null)" || rc=$?
 [[ "$rc" -eq 1 ]] || fail "mixed commit should stop the release"
 grep -q "${mixed} feat: mixed" <<< "$err" || fail "mixed commit should be named"
 grep -qx "  core.txt" <<< "$err" || fail "mixed message should list the core path"
-grep -qx "  docs/specs/ac-1-x/note.md" <<< "$err" || fail "mixed message should list the work-only path"
+grep -qx "  docs/specs/proj-1-x/note.md" <<< "$err" || fail "mixed message should list the work-only path"
 grep -q -- "--snapshot" <<< "$err" || fail "mixed message should suggest --snapshot"
 [[ "$(git rev-parse master)" == "$m" ]] || fail "mixed commit moved master"
 bash scripts/release-to-master.sh --snapshot >/dev/null || fail "--snapshot should repair after a mixed commit"

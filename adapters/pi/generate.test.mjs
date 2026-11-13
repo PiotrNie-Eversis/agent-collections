@@ -162,7 +162,7 @@ test("emits one prompt per non-denied SSOT prompt, role skills, APPEND_SYSTEM, e
   assert.equal(
     review,
     `// ${MARKER} — do not edit; re-run the generator\n${reviewAsset.replace(/\r\n/g, "\n")}`,
-    "review extension: marker line, then the asset unchanged (AC-136)",
+    "review extension: marker line, then the asset unchanged",
   );
   assert.match(freshRun.stdout, new RegExp(`${promptIds.length} prompt\\(s\\), 6 role skill\\(s\\)`));
 });
@@ -184,8 +184,8 @@ test("role skills: distinct ids, name/description limits, JSON-quoted front matt
     "fine-handoff is served by the framework skill mirror, not a role skill");
 });
 
-test("review-context note (AC-135, AC-136): only in role skills the rule map flags, before the rule body", () => {
-  const NOTE_HEADING = "**Pi host note — review independence (AC-135, AC-136).**";
+test("review-context note: only in role skills the rule map flags, before the rule body", () => {
+  const NOTE_HEADING = "**Pi host note — review independence.**";
   const flagged = new Set(
     ruleMapEntries()
       .filter((r) => r.review_context_note === "true")
@@ -414,7 +414,7 @@ test("process-rules extension: generated file loads and adds the real bundle fro
     sessionManager: { getBranch: () => [] },
   };
   handlers.session_start({ reason: "startup" }, ctx);
-  handlers.input({ text: "/eversis-review AC-1" }, ctx);
+  handlers.input({ text: "/eversis-review PROJ-1" }, ctx);
   const event = { systemPromptOptions: { sections: {}, skills: [] } };
   handlers.before_agent_start(event, ctx);
   const section = event.systemPromptOptions.sections[SECTION_KEY];
@@ -477,7 +477,7 @@ test("--check: exit 0 on a fresh tree; exit 1 naming drifted, missing and orphan
   assert.ok(!fs.existsSync(orphanSkillDir));
 });
 
-test("--check: a missing review extension is reported (AC-136)", () => {
+test("--check: a missing review extension is reported", () => {
   const out = mkTmp();
   generate(out);
   const review = path.join(out, ".pi", "extensions", "eversis-review.ts");

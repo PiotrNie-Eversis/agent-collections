@@ -203,7 +203,7 @@ export function isWritingCommand(command: string): string | undefined {
 export function keyProblem(key: unknown): string | undefined {
   if (typeof key !== "string" || key.length === 0) return "the ticket key is missing";
   if (key.length > MAX_KEY_LENGTH || !KEY_RE.test(key)) {
-    return "the ticket key must look like AC-123 (letters and digits, a hyphen, a number)";
+    return "the ticket key must look like PROJ-123 (letters and digits, a hyphen, a number)";
   }
   return undefined;
 }
@@ -483,10 +483,10 @@ export function register(pi: ExtensionAPI, config: ReviewConfig): void {
     parameters: {
       type: "object",
       properties: {
-        key: { type: "string", description: "Ticket key, for example AC-123." },
+        key: { type: "string", description: "Ticket key, for example PROJ-123." },
         specFolder: {
           type: "string",
-          description: "Optional spec folder under docs/specs/, for example docs/specs/ac-123-topic.",
+          description: "Optional spec folder under docs/specs/, for example docs/specs/proj-123-topic.",
         },
       },
       required: ["key"],

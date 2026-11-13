@@ -17,7 +17,7 @@ write_install_selection() {
   [[ -z "$vendor_mode" ]] && vendor_mode="local"
   local link_mode="${EFFECTIVE_LINK_MODE:-${ARG_LINK_MODE:-auto}}"
   local agents_json
-  # A failed Pi stage (AC-14) leaves pi out of the record so a later
+  # A failed Pi stage leaves pi out of the record so a later
   # --upgrade does not treat a broken Pi install as selected. SELECTED_AGENTS
   # itself is never edited (an empty list would fall back to cursor).
   local drop_pi="false"

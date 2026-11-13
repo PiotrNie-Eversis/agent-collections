@@ -52,7 +52,7 @@ const PROVIDER = "ac136-stub";
 const MODEL = "stub-model";
 const TOOL_NAME = "eversis_independent_review";
 const MARKER = "AC136-PARENT-MARKER-5d1e";
-const PARENT_MESSAGE = `${MARKER} please run the independent review for AC-1`;
+const PARENT_MESSAGE = `${MARKER} please run the independent review for PROJ-1`;
 /** Text only the child's prompt carries (the tool's fixed review instruction). */
 const CHILD_PROBE = `separate Pi session started by the ${TOOL_NAME} tool`;
 const CHILD_ANSWER = "PASS\n\nStub review: no findings.";
@@ -156,7 +156,7 @@ async function startStub() {
       const send = (choice) =>
         res.write(`data: ${JSON.stringify({ id: "1", object: "chat.completion.chunk", choices: [choice] })}\n\n`);
       if (!isChild && last?.role === "user" && textOf(last).includes(MARKER)) {
-        const fn = { name: TOOL_NAME, arguments: JSON.stringify({ key: "AC-1" }) };
+        const fn = { name: TOOL_NAME, arguments: JSON.stringify({ key: "PROJ-1" }) };
         send({ index: 0, delta: { role: "assistant", tool_calls: [{ index: 0, id: "call-1", type: "function", function: fn }] }, finish_reason: null });
         send({ index: 0, delta: {}, finish_reason: "tool_calls" });
       } else {
@@ -378,7 +378,7 @@ describe("independent review on real Pi (stub model)", describeOptions, () => {
       assert.match(result, /Independent review did not run: /);
       assert.ok(result.includes("stub refuses the review session"), "names the reason");
       assert.ok(result.includes("Start a new Pi session in the project root."));
-      assert.ok(result.includes("`/eversis-review AC-1`"));
+      assert.ok(result.includes("`/eversis-review PROJ-1`"));
       assert.ok(result.includes("Review context: same session as implementation (not independent)"));
     } finally {
       stub.refuseChild = false;

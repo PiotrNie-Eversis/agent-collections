@@ -247,11 +247,11 @@ PI_ALIGN_VENDOR="${TMP}/pi-align-vendor.git"
 init_git_repo "$PI_ALIGN_VENDOR"
 write_sync_mjs "${PI_ALIGN_VENDOR}/adapters/sync.mjs" "yes"
 git -C "$PI_ALIGN_VENDOR" add adapters/sync.mjs
-git -C "$PI_ALIGN_VENDOR" commit -qm "pre-AC-14 sync"
+git -C "$PI_ALIGN_VENDOR" commit -qm "pre-pi sync"
 pi_old_sha="$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)"
 write_pi_sync_mjs "$PI_ALIGN_VENDOR"
 git -C "$PI_ALIGN_VENDOR" add adapters
-git -C "$PI_ALIGN_VENDOR" commit -qm "AC-14 sync"
+git -C "$PI_ALIGN_VENDOR" commit -qm "pi sync"
 pi_new_sha="$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)"
 git clone -q "$PI_ALIGN_VENDOR" "${TMP}/pi-align-installer.git"
 git -C "$PI_ALIGN_VENDOR" checkout -q "$pi_old_sha"

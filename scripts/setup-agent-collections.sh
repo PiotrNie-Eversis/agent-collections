@@ -325,7 +325,7 @@ record_ok "build-mcp"
 link_framework_files || { record_fail "link-framework"; _print_partial_fail; exit 1; }
 record_ok "link-framework"
 
-# Pi stage (AC-14): generation, .pi/skills/ mirror and Pi deselect pruning run
+# Pi stage: generation, .pi/skills/ mirror and Pi deselect pruning run
 # isolated. A Pi failure sets PI_STAGE_FAILED (SELECTED_AGENTS is never
 # edited — an empty list would fall back to cursor). Pi-only → stop here with
 # exit 1; otherwise the other agents continue and the run exits 1 at the end.

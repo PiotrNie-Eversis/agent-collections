@@ -145,7 +145,7 @@ A Pi session without a command stays small: about 4,600 characters of system pro
 - After any `eversis-*` command, for the rest of that session.
 - In a new session, when Pi edited or wrote a `docs/specs/**/*.plan.md` file that still has an open checkbox. The notice names the plan and the file to delete if the work is abandoned.
 
-**Start ticket work with `/eversis-implement <ticket>`.** A plain request such as "implement AC-123" gets the hard limits and quality checks, but not the research, plan and review gates. A command run costs more than before (about 58,000 characters), because it carries the full process as text. Cursor and Claude Code keep their rules always on.
+**Start ticket work with `/eversis-implement <ticket>`.** A plain request such as "implement PROJ-123" gets the hard limits and quality checks, but not the research, plan and review gates. A command run costs more than before (about 58,000 characters), because it carries the full process as text. Cursor and Claude Code keep their rules always on.
 
 `eversis-add-domain-knowledge` is not a command, and a plain request may not find it. Run it with `/skill:eversis-add-domain-knowledge`.
 
@@ -163,7 +163,7 @@ Every review result in Pi says which kind it was: `Review context: separate Pi s
 
 If the separate session cannot run, the tool says `Independent review did not run` with the reason, and the steps below. One known case: a model that only a Pi extension supplies (`pi.registerProvider`) is not available to the clean session; models from Pi login, `auth.json` or `models.json` work.
 
-As a fallback, or to review yourself, start a **new** Pi session in the project root (`pi`, or `/new` in an open session) and run `/eversis-review AC-123`. With only the ticket key, the reviewer finds the task's folder under `docs/specs/` and asks if more than one matches; you can also pass the folder, for example `/eversis-review AC-123 docs/specs/ac-123-topic/`. Do not use `/fork`, `/clone` or `/tree` for this — they keep the earlier conversation. Cursor and Claude Code are not affected.
+As a fallback, or to review yourself, start a **new** Pi session in the project root (`pi`, or `/new` in an open session) and run `/eversis-review PROJ-123`. With only the ticket key, the reviewer finds the task's folder under `docs/specs/` and asks if more than one matches; you can also pass the folder, for example `/eversis-review PROJ-123 docs/specs/proj-123-topic/`. Do not use `/fork`, `/clone` or `/tree` for this — they keep the earlier conversation. Cursor and Claude Code are not affected.
 
 Pi ignore files, subscription sign-in and an isolated workspace are not part of this release yet. Adapter details: [`adapters/pi/README.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/adapters/pi/README.md).
 

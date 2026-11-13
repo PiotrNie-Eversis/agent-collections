@@ -2,8 +2,8 @@
 
 Generates Cursor packaging from Agent Collections core:
 
-- `.cursor/rules/*.mdc` from `.ai/rules` via [`rule-map.yaml`](./rule-map.yaml) (TASK-524)
-- Thin `.cursor/commands/eversis-*.md` slash shims from `.ai/prompts/{public,internal}/` (TASK-598)
+- `.cursor/rules/*.mdc` from `.ai/rules` via [`rule-map.yaml`](./rule-map.yaml)
+- Thin `.cursor/commands/eversis-*.md` slash shims from `.ai/prompts/{public,internal}/`
 
 ## Run (from repository root)
 
@@ -42,7 +42,7 @@ Re-run after core, map, or prompt Executable-section changes. **Do not hand-edit
 
 Source of packaging metadata: [`rule-map.yaml`](./rule-map.yaml). Mapping contract: [`docs/architecture/adapter-mapping.md`](../../docs/architecture/adapter-mapping.md).
 
-## Slash commands (TASK-598)
+## Slash commands
 
 | Item | Detail |
 |------|--------|
@@ -61,7 +61,7 @@ Stable prompt id under `.ai/prompts/` remains SSOT. Claude Code does **not** con
 
 | Path | Reason |
 |------|--------|
-| `.cursor/rules/eversis-project-stack.mdc` | **Consumer-owned** — never overwrite without opt-in (TASK-521 / README) |
+| `.cursor/rules/eversis-project-stack.mdc` | **Consumer-owned** — never overwrite without opt-in (see the installer README) |
 | `.cursor/skills/` | Not emitted by this generator — `adapters/sync.mjs` refreshes relative symlinks to `.ai/skills/eversis-*` in the framework root only; consumers use the installer |
 | `.cursor/prompts/` | Outside Cursor emit (no full prompt mirror; commands cover slash UX) |
 | BA Docs role rules (`eversis-ba-docs-*.mdc`) | **Not emitted in MVP** — use `.ai/prompts` + MCP skills + `/eversis-ba-docs-*` slash shims (CQ3 close-out) |

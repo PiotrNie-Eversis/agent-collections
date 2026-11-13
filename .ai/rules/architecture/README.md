@@ -9,8 +9,8 @@ Cross-cutting architecture and quality standards.
 
 **Orchestration hard limits / testing:** [`../orchestration/agent-core.md`](../orchestration/agent-core.md), [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md).
 
-**Deferred:** BA Docs planner/writer rules (optional later / with TASK-520 skills).
+**Not covered by rules:** BA Docs planner/writer guidance lives only in the skills `eversis-ba-docs-planner` and `eversis-ba-docs-writer`.
 
 **Consumer project stack** stays project-owned — not stored in `.ai/`.
 
-**Full architecture / code-reviewing skill bodies:** **TASK-520**.
+**Full architecture / code-reviewing procedures:** skills `eversis-architecture-designing` and `eversis-code-reviewing` under [`../../skills/`](../../skills/).

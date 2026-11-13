@@ -93,7 +93,7 @@ _prune_deselected_agents() {
 # for Cursor was a separate, pre-existing gap (see
 # docs/specs/promote-skill-cursor-packaging/promote-skill-cursor-packaging.plan.md
 # Open Question 3); it is now closed by _prune_deselected_cursor_generated
-# below (AC-99), which marker-gates those files instead.
+# below, which marker-gates those files instead.
 _prune_deselected_cursor_skills() {
   local agents_csv="${SELECTED_AGENTS:-cursor}"
   if echo ",${agents_csv}," | grep -q ',cursor,'; then
@@ -117,7 +117,7 @@ _prune_deselected_cursor_skills() {
 # Cursor deselect (explicit --agents without cursor): remove generated
 # .cursor/commands/eversis-*.md and .cursor/rules/eversis-*.mdc. Without this,
 # detect_installed_agents (upgrade.sh) finds their markers on the next
-# --upgrade and silently re-selects Cursor (AC-99 review B1). Marker-gated:
+# --upgrade and silently re-selects Cursor. Marker-gated:
 # the project-owned eversis-project-stack.mdc (no marker) and any hand-written
 # eversis-* file stay; the stack rule is also skipped by name for safety.
 _prune_deselected_cursor_generated() {
@@ -296,7 +296,7 @@ _run_adapter_sync() {
   # Pi runs in its own isolated stage (run_pi_stage) so a Pi failure never
   # aborts the other agents. Pass only the non-Pi agents here; a Pi-only
   # selection skips this sync entirely — never fall back to cursor and never
-  # call sync.mjs with an empty --agents (AC-14 review B3).
+  # call sync.mjs with an empty --agents.
   agents_csv="$(_agents_without_pi "$agents_csv")"
   if [[ -z "$agents_csv" ]]; then
     log_info "Adapter sync for Cursor / Claude skipped (only pi selected — handled by the Pi stage)."
@@ -366,7 +366,7 @@ _write_or_clear_framework_home() {
 }
 
 # ---------------------------------------------------------------------------
-# Pi stage (AC-14) — everything Pi-specific (generation, skills mirror,
+# Pi stage — everything Pi-specific (generation, skills mirror,
 # deselect pruning; the .pi/mcp.json merge lives in mcp-merge.sh) runs
 # isolated from the other agents. A Pi failure sets PI_STAGE_FAILED=true and
 # PI_STAGE_FAILURE_REASON and records a "pi" failure; it never edits

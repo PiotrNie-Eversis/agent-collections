@@ -100,5 +100,5 @@ Agent Collections is MIT-licensed and free.
 - [Get the repo](https://gitlab3.eversis.com/eversis-ai/agent-collections) - install it in an afternoon, run it against a real ticket, see what changes
 
 :::brand
-Questions, bugs, and ideas: use [GitHub Issues](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/issues) on the repository.
+Questions, bugs, and ideas: report them to the Agent Collections maintainers.
 :::

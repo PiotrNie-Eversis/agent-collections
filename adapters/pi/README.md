@@ -1,6 +1,6 @@
 # Pi adapter
 
-Generates the [Pi coding agent](https://pi.dev/)'s project surfaces under `.pi/` from Agent Collections core (AC-14): a small always-on core in `.pi/APPEND_SYSTEM.md`, role rules as `.pi/skills/eversis-rule-*/SKILL.md`, slash commands in `.pi/prompts/eversis-*.md`, a process-rules extension that adds the rules on demand, a context-budget extension, an independent-review extension, and a one-time `.pi/settings.json` seed. `.pi/skills/eversis-*/` (framework skills) and `.pi/mcp.json` are written by the installer, not by this generator (see "Generated skills" and "MCP" below). Mapping contract: [`docs/architecture/adapter-mapping.md`](../../docs/architecture/adapter-mapping.md) §6A.
+Generates the [Pi coding agent](https://pi.dev/)'s project surfaces under `.pi/` from Agent Collections core: a small always-on core in `.pi/APPEND_SYSTEM.md`, role rules as `.pi/skills/eversis-rule-*/SKILL.md`, slash commands in `.pi/prompts/eversis-*.md`, a process-rules extension that adds the rules on demand, a context-budget extension, an independent-review extension, and a one-time `.pi/settings.json` seed. `.pi/skills/eversis-*/` (framework skills) and `.pi/mcp.json` are written by the installer, not by this generator (see "Generated skills" and "MCP" below). Mapping contract: [`docs/architecture/adapter-mapping.md`](../../docs/architecture/adapter-mapping.md) §6A.
 
 Pi is **opt-in**: `adapters/sync.mjs` keeps its default `cursor,claude`, and this repository does not commit a `.pi/` tree.
 
@@ -61,7 +61,7 @@ When the target has `.cursor/rules/eversis-project-stack.mdc` **and** it differs
 
 ## Process rules on demand
 
-Pi used to carry the process rules on every request, including a one-line question. Now a session without a command costs close to plain Pi, and a command still gets the full process (AC-134).
+Pi used to carry the process rules on every request, including a one-line question. Now a session without a command costs close to plain Pi, and a command still gets the full process.
 
 **Always on, in every Pi session:** `.pi/APPEND_SYSTEM.md`, a small core of about 1,500 characters. It holds the hard limits, the line that runs lint, typecheck and tests after substantive code changes, one hard line that ticket work starts with `/eversis-implement <ticket>`, a pointer to the commands, and the project-stack overlay when you have one.
 
@@ -74,7 +74,7 @@ The rules turn on in two ways:
 
 `.pi/eversis-state/` ignores itself with its own `.gitignore`, so your `.gitignore` does not change. The extension writes only in that folder, and makes no network or shell calls. It refuses symlinks planted in that path, but the check is not atomic against another process running as the same user at the same moment. Pi deselect removes the folder.
 
-**Exception to the Delivery Standard:** in Pi, the process runs only after a command or with an active plan. A plain request such as "implement AC-123" gets the hard limits and the quality checks, but not the research, plan and review gates. The only guard is the core's line telling the model to ask for `/eversis-implement` first, and a model can ignore it. Cursor and Claude Code keep their rules always on, so this applies to Pi alone. Start ticket work with the command.
+**Exception to the Delivery Standard:** in Pi, the process runs only after a command or with an active plan. A plain request such as "implement PROJ-123" gets the hard limits and the quality checks, but not the research, plan and review gates. The only guard is the core's line telling the model to ask for `/eversis-implement` first, and a model can ignore it. Cursor and Claude Code keep their rules always on, so this applies to Pi alone. Start ticket work with the command.
 
 **Domain knowledge:** `eversis-add-domain-knowledge` is a skill, not a prompt, so it is not one of the 28 commands, and asking in plain words may no longer find it because it is hidden from the listing. Run it with the exact command `/skill:eversis-add-domain-knowledge`. It does not turn the process rules on.
 
@@ -82,7 +82,7 @@ The rules turn on in two ways:
 
 System prompt as sent to the model, recorded by a stub model on Pi 1.5.0. Tokens are estimated as characters / 4.
 
-| Request | Before AC-134 | After AC-134 |
+| Request | Rules on every request (before) | Rules on demand (now) |
 |---------|---:|---:|
 | Session without a command | 42,902 chars (~10.7k tokens) | 4,556 chars (~1.1k tokens) |
 | First request of `/eversis-implement` | 42,902 chars (~10.7k tokens) | 57,908 chars (~14.5k tokens) |
@@ -106,7 +106,7 @@ Pi can compact a long session, but Agent Collections wants compaction earlier, w
 - **Summary instructions** keep the active `docs/specs/**/*.plan.md` path (and research path), the current phase / task and its DoD state, the latest `CHECKPOINT:` / `RESUMED:` rows, any open human gate (never recorded as approved unless the human approved it), and the next step.
 - **Continuation:** Pi's compaction aborts the running turn and does not resume it. When the crossing turn was **mid-task** (it had tool results), the extension sends **one** automatic message after compaction: resume the current plan task from the summary, re-read the plan file first, do not restart finished tasks, do not pass an open human gate, and — if there is no active plan — continue the interrupted task from the compaction summary. The message states it is automatic and not an approval of any gate. When the crossing turn was a **final turn** (no tool results: the agent finished, asked a question, or stopped at a gate), it compacts and shows a notice only — no unrequested run starts and nothing can be read as gate approval.
 
-This is **Pi-only**. Cursor and Claude Code have no window-fill trigger: rule 14 of `eversis-orchestrating-implementation` (no window-fill trigger, AC-2 decision) is unchanged.
+This is **Pi-only**. Cursor and Claude Code have no window-fill trigger: rule 14 of `eversis-orchestrating-implementation` (no window-fill trigger, a recorded framework decision) is unchanged.
 
 The extension has no network access, file writes, or shell calls, and only an `import type` from `@earendil-works/pi-coding-agent` (no runtime dependency).
 
@@ -114,7 +114,7 @@ The extension has no network access, file writes, or shell calls, and only an `i
 
 The Implement workflow wants code review in a context separate from the one that wrote the code: self-review is not verification (`eversis-orchestrating-implementation`, step 8). Cursor and Claude Code delegate review to a sub-agent. **Pi has no sub-agents**, so without help, when `/eversis-implement` reaches the Review stage, the same model in the same context reviews its own change. That review is weaker and is not independent.
 
-### Automatic review in a separate Pi session (AC-136)
+### Automatic review in a separate Pi session
 
 The extension `.pi/extensions/eversis-review.ts` registers one tool, `eversis_independent_review`. At the Review stage of an Implement run, and again after every blocker fix, the agent calls it with the ticket key (and the spec folder when known). The tool runs `/eversis-review <key> [<spec folder>]` in a **separate Pi session** in the same Pi process and returns that session's PASS / BLOCKER / SUGGESTION result. The agent goes on to Fine only when the result is PASS.
 
@@ -142,7 +142,7 @@ After a same-session review the result ends with the next step, and at Fine the 
 
 1. Finish the Implement run (or stop it at Review).
 2. Start a new Pi session in the project root (`pi`, or `/new` in an open session) — a clean context.
-3. Run `/eversis-review AC-123`. With only the key, the reviewer looks for `docs/specs/ac-123/` first, then the single `docs/specs/ac-123-<topic>/` folder, and asks if more than one matches. To skip the lookup, add the path: `/eversis-review AC-123 docs/specs/ac-123-topic/`.
+3. Run `/eversis-review PROJ-123`. With only the key, the reviewer looks for `docs/specs/proj-123/` first, then the single `docs/specs/proj-123-<topic>/` folder, and asks if more than one matches. To skip the lookup, add the path: `/eversis-review PROJ-123 docs/specs/proj-123-topic/`.
 4. The result starts with `Review context: fresh session (independent)`.
 
 Do not use `/fork`, `/clone` or `/tree` for this: they keep the earlier conversation, so the review would not be independent. The automatic review above does not use them either: its session starts empty. The note and the review extension are Pi-only: Cursor and Claude Code output is unchanged.
@@ -167,9 +167,9 @@ Other selected catalog servers are copied as-is; the merge fails (as a Pi failur
 - **Missing `pi` CLI:** summary warning only (`npm i -g @earendil-works/pi-coding-agent`); `.pi/` is still generated.
 - **Deselect** (re-run with `--agents` without `pi`): removes framework-generated `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-*.md`, `.pi/skills/eversis-*` (framework skills — an entry that is not an identical framework copy is first copied to `.pi/pre-agent-collections-backup/skills/` — and `eversis-rule-*` role skills), `.pi/extensions/eversis-context-budget.ts`, `.pi/extensions/eversis-process-rules.ts`, `.pi/extensions/eversis-review.ts` and `.pi/eversis-state/`. `.pi/settings.json` and `.pi/mcp.json` stay.
 - **Upgrade:** `--upgrade` keeps `pi` selected when `.pi/APPEND_SYSTEM.md` carries the generator marker.
-- **Hand-ported `.pi/` stops the upgrade (AC-143):** `--upgrade` / `--sync` without `--agents` exits 1 before writing anything when `pi` is not selected and `.pi/` holds a Pi setup the framework did not generate — a file with the legacy marker `GENERATED by scripts/gen-pi-adapter.mjs`, a `.pi/skills/eversis-*` entry (not `eversis-rule-*`), or a `.pi/prompts/eversis-*.md` without the generator marker. The message names both ways forward with your current agents: `--agents <current>,pi` migrates (the generator copies each hand-made file it replaces to `*.pre-agent-collections.bak`; `.pi/skills/eversis-*` entries are replaced by the mirror), `--agents <current>` keeps Pi out. In both paths every `.pi/skills/eversis-*` entry that is not an identical framework copy — a real directory or regular file with no matching `.ai/skills/<name>`, or with different content (an outdated framework copy included) — is first copied to `.pi/pre-agent-collections-backup/skills/<name>` (an identical existing backup is reused; otherwise `<name>.<YYYYMMDDTHHMMSS>`), with the warning `Backed up .pi/skills/<name> to <path> (no matching framework skill)` or `… (differs from the framework skill)`. That folder is outside `.pi/skills/`, so Pi does not load it, and it never counts as a hand port or a legacy finding. After that explicit deselect, the log lists the hand-made `.pi/prompts/eversis-*.md` and legacy-marked files left in place; delete them so a later plain upgrade does not stop again.
-- **Legacy generator report (AC-143):** every run warns (never stops, never deletes) when it finds `scripts/gen-pi-adapter.mjs`, `scripts/pi-rule-map.yaml`, `package.json` scripts named `sync:agents*` or whose command mentions `gen-pi-adapter` / `pi-rule-map`, or `.pi/` files with the legacy marker (`*.bak` copies excluded). The summary repeats the list. Remove them: `setup-agent-collections.sh --upgrade --sync` replaces that generator, and its `sync:agents` script would otherwise undo the upgrade.
-- **Skills mirror is a copy (AC-143):** `.pi/skills/eversis-*` are always copied from `.ai/skills/`, whatever `--link-mode` says, so a tool that writes into `.pi/skills/` cannot change `vendor/agent-collections/` or the shared framework checkout. An existing symlinked mirror is replaced on the next run; re-run `--sync` to refresh the copies. `.claude/skills/` and `.cursor/skills/` still follow `--link-mode`, and the recorded `linkMode` is unchanged.
+- **Hand-ported `.pi/` stops the upgrade:** `--upgrade` / `--sync` without `--agents` exits 1 before writing anything when `pi` is not selected and `.pi/` holds a Pi setup the framework did not generate — a file with the legacy marker `GENERATED by scripts/gen-pi-adapter.mjs`, a `.pi/skills/eversis-*` entry (not `eversis-rule-*`), or a `.pi/prompts/eversis-*.md` without the generator marker. The message names both ways forward with your current agents: `--agents <current>,pi` migrates (the generator copies each hand-made file it replaces to `*.pre-agent-collections.bak`; `.pi/skills/eversis-*` entries are replaced by the mirror), `--agents <current>` keeps Pi out. In both paths every `.pi/skills/eversis-*` entry that is not an identical framework copy — a real directory or regular file with no matching `.ai/skills/<name>`, or with different content (an outdated framework copy included) — is first copied to `.pi/pre-agent-collections-backup/skills/<name>` (an identical existing backup is reused; otherwise `<name>.<YYYYMMDDTHHMMSS>`), with the warning `Backed up .pi/skills/<name> to <path> (no matching framework skill)` or `… (differs from the framework skill)`. That folder is outside `.pi/skills/`, so Pi does not load it, and it never counts as a hand port or a legacy finding. After that explicit deselect, the log lists the hand-made `.pi/prompts/eversis-*.md` and legacy-marked files left in place; delete them so a later plain upgrade does not stop again.
+- **Legacy generator report:** every run warns (never stops, never deletes) when it finds `scripts/gen-pi-adapter.mjs`, `scripts/pi-rule-map.yaml`, `package.json` scripts named `sync:agents*` or whose command mentions `gen-pi-adapter` / `pi-rule-map`, or `.pi/` files with the legacy marker (`*.bak` copies excluded). The summary repeats the list. Remove them: `setup-agent-collections.sh --upgrade --sync` replaces that generator, and its `sync:agents` script would otherwise undo the upgrade.
+- **Skills mirror is a copy:** `.pi/skills/eversis-*` are always copied from `.ai/skills/`, whatever `--link-mode` says, so a tool that writes into `.pi/skills/` cannot change `vendor/agent-collections/` or the shared framework checkout. An existing symlinked mirror is replaced on the next run; re-run `--sync` to refresh the copies. `.claude/skills/` and `.cursor/skills/` still follow `--link-mode`, and the recorded `linkMode` is unchanged.
 
 ## Consumer project notes
 
@@ -179,11 +179,11 @@ Other selected catalog servers are copied as-is; the merge fails (as a Pi failur
 - **Review the extensions before trusting:** once trusted, `.pi/extensions/eversis-context-budget.ts`, `.pi/extensions/eversis-process-rules.ts` and `.pi/extensions/eversis-review.ts` run inside Pi with your user privileges. They are short and dependency-free — read them first. The review extension imports Pi's own SDK (`@earendil-works/pi-coding-agent`, supplied by Pi when it loads the file) at runtime and starts a model session for each review; it still adds no npm dependencies.
 - **TypeScript / ESLint:** each extension's `import type` from `@earendil-works/pi-coding-agent` does not resolve in a project that does not install Pi locally. Exclude `.pi/extensions/` from the consumer's `tsconfig` / ESLint config if their checks cover it.
 - **Keep a root `AGENTS.md`:** Pi reads `AGENTS.md` or `CLAUDE.md` as its context file and prefers `AGENTS.md`. A `claude,pi` project without a root `AGENTS.md` loads the full generated `CLAUDE.md` (all seven rules) on every request, so the small core does not hold and sessions without a command stay expensive.
-- **Not in AC-14:** Pi ignore files / heavy-file exclusion (AC-113), subscription sign-in and model settings (AC-111), further token-economy trimming (AC-112), isolated workspace / sandbox (AC-114).
+- **Not covered by this adapter:** Pi ignore files / heavy-file exclusion, subscription sign-in and model settings, further token-economy trimming, isolated workspace / sandbox.
 
 ## Load check
 
-A new Pi release can stop loading part of the `.pi/` tree without an error you would notice (for example, it drops a prompt whose front matter it cannot parse). `scripts/pi-load-check.mjs` (AC-138) catches that. It uses the `pi` on your PATH:
+A new Pi release can stop loading part of the `.pi/` tree without an error you would notice (for example, it drops a prompt whose front matter it cannot parse). `scripts/pi-load-check.mjs` catches that. It uses the `pi` on your PATH:
 
 1. Installs the framework for Pi into a temp project (`setup-agent-collections.sh --agents=pi`, non-interactive).
 2. Starts `pi --mode rpc` in that project and asks for its command list (`get_commands`).

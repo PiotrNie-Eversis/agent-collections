@@ -111,7 +111,7 @@ const HARD_LIMITS_HEADING = "## Hard limits (implement)";
  * runCleanRole from eversis-review.ts.
  */
 const REVIEW_CONTEXT_NOTE = [
-  "> **Pi host note — review independence (AC-135, AC-136).** Pi has no sub-agents, so a Review stage inside an Implement run would use the same context that wrote the code: that is self-review, not independent verification. The extension tool `eversis_independent_review` runs the review in a separate Pi session that has not seen this conversation (file-editing tools removed, writing shell commands blocked).",
+  "> **Pi host note — review independence.** Pi has no sub-agents, so a Review stage inside an Implement run would use the same context that wrote the code: that is self-review, not independent verification. The extension tool `eversis_independent_review` runs the review in a separate Pi session that has not seen this conversation (file-editing tools removed, writing shell commands blocked).",
   ">",
   "> - At the Review stage of an Implement run, and again after every blocker fix, call `eversis_independent_review` with the ticket key (and the spec folder when known). Do not review the change yourself in this session. A successful result starts with `Review context: separate Pi session (independent)`.",
   "> - Proceed to Fine only when the tool's result is PASS. On BLOCKER, fix the findings and call the tool again (the orchestration limit on review rounds still applies).",
@@ -119,7 +119,7 @@ const REVIEW_CONTEXT_NOTE = [
   "> - When your prompt says you run in a separate Pi session started by `eversis_independent_review`, you are that review: review directly (the tool is not available there) and start the result with `Review context: separate Pi session (independent)`.",
   "> - In a new Pi session started with `/eversis-review` by a person (no implementation in it), start the result with `Review context: fresh session (independent)`.",
   "> - At Fine, repeat the `Review context:` line under **Automation & Technical Notes** in the QA comment draft.",
-  "> - When `/eversis-review` gets only a ticket key, find the spec folder by lowercasing the key: use `docs/specs/<key>/` if it exists; otherwise use the single folder named `<key>-<topic>` (`ac-1350-…` is not a match for `ac-135`); if two or more match, ask which one; if none matches, say so and ask for the spec folder or plan path — never create a folder. Then read its `*.research.md` and `*.plan.md`.",
+  "> - When `/eversis-review` gets only a ticket key, find the spec folder by lowercasing the key: use `docs/specs/<key>/` if it exists; otherwise use the single folder named `<key>-<topic>` (`proj-1350-…` is not a match for `proj-135`); if two or more match, ask which one; if none matches, say so and ask for the spec folder or plan path — never create a folder. Then read its `*.research.md` and `*.plan.md`.",
 ].join("\n");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

@@ -8,4 +8,4 @@ Neutral guidance for APIs, services, and data-access layers.
 
 **Testing discipline:** [`../orchestration/testing-and-terminal.md`](../orchestration/testing-and-terminal.md).
 
-**Full backend skill body:** **TASK-520**.
+**Full backend procedures:** skill `eversis-implementing-backend` under [`../../skills/`](../../skills/).

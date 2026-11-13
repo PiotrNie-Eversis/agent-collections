@@ -4,7 +4,7 @@ Tool-specific packaging that **consumes** Agent Collections core (`.ai/`). Gener
 
 Mapping contract: [`docs/architecture/adapter-mapping.md`](../docs/architecture/adapter-mapping.md).
 
-## Sync all shipped adapters (TASK-527)
+## Sync all shipped adapters
 
 From the repository root, regenerate **Cursor** then **Claude** outputs from core:
 
@@ -24,7 +24,7 @@ npm run sync:adapters:check
 
 Optional `--out <dir>` is passed through to both generators (same behaviour as each `generate.mjs`).
 
-**Pi (opt-in, AC-14):** add `pi` to `--agents` to also run the Pi generator — last, after Cursor / Claude. With `--check`, only the named agents are checked; Pi is checked by its own generator's `--check` against the target. Defaults stay `cursor,claude`, so no `.pi/` is created in this repository unless you ask for it:
+**Pi (opt-in):** add `pi` to `--agents` to also run the Pi generator — last, after Cursor / Claude. With `--check`, only the named agents are checked; Pi is checked by its own generator's `--check` against the target. Defaults stay `cursor,claude`, so no `.pi/` is created in this repository unless you ask for it:
 
 ```bash
 node adapters/sync.mjs --agents cursor,claude,pi --out /path/to/project
