@@ -274,6 +274,27 @@ if (preserveExisting) {
   mergedServers = { ...kept, ...picked };
 }
 
+// Atlassian removes the v1 endpoint on 2027-03-01 (AC-144). This is the one
+// exception to preserve mode besides eversis-collections: an atlassian entry
+// whose url is exactly the old framework default moves to v2, every other key
+// (type, env, headers, …) is kept. Any other URL (self-hosted proxy, already
+// v2, hand-edited) is left alone.
+const ATLASSIAN_V1_URL = 'https://mcp.atlassian.com/v1/mcp';
+const ATLASSIAN_V2_URL = 'https://mcp.atlassian.com/v2/mcp';
+const atlassianEntry = mergedServers.atlassian;
+if (
+  atlassianEntry &&
+  typeof atlassianEntry === 'object' &&
+  !Array.isArray(atlassianEntry) &&
+  atlassianEntry.url === ATLASSIAN_V1_URL
+) {
+  mergedServers.atlassian = { ...atlassianEntry, url: ATLASSIAN_V2_URL };
+  // Host and id only — never config values (env may hold tokens).
+  console.error(
+    `[mcp-merge] ${host}: atlassian URL moved from v1 to v2 — authorize the Atlassian connection again`,
+  );
+}
+
 const ALLOWED_TOP = new Set(['mcpServers', 'inputs']);
 const cleanedTop = {};
 for (const [key, value] of Object.entries(existing)) {

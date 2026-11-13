@@ -424,6 +424,92 @@ if node -e '
 else
   _fail "preserve: eversis-collections not added when unselected and absent"
 fi
+
+# Case 6g (AC-144): Atlassian removes the v1 endpoint on 2027-03-01. Preserve
+# mode moves an atlassian entry whose url is exactly the v1 URL to v2 on every
+# host and keeps all other keys; any other URL is left byte-equal.
+_atlassian_v2='https://mcp.atlassian.com/v2/mcp'
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/.pi" "${TARGET_DIR}/scripts"
+mkdir -p "${TARGET_DIR}/.cursor"
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } } } }
+EOF
+_preserve_before="$(cat "${TARGET_DIR}/.cursor/mcp.json")"
+SELECTED_AGENTS="cursor"
+VENDOR_MODE=""
+MCP_SELECTED_IDS="context7"
+MCP_PRESERVE_EXISTING="true"
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
+if node -e '
+    const fs = require("fs");
+    const [beforeJson, file, v2] = process.argv.slice(1);
+    const before = JSON.parse(beforeJson).mcpServers.atlassian;
+    const after = JSON.parse(fs.readFileSync(file, "utf8")).mcpServers.atlassian;
+    if (!after || after.url !== v2) process.exit(1);
+    if (after.type !== before.type) process.exit(1);
+    if (JSON.stringify(after.env) !== JSON.stringify(before.env)) process.exit(1);
+    if (JSON.stringify({ ...after, url: before.url }) !== JSON.stringify(before)) process.exit(1);
+  ' "$_preserve_before" "${TARGET_DIR}/.cursor/mcp.json" "$_atlassian_v2" \
+  && echo "$_preserve_log" | grep -qF '[mcp-merge] cursor: atlassian URL moved from v1 to v2 — authorize the Atlassian connection again' \
+  && ! echo "$_preserve_log" | grep -qF 'MY_ATLASSIAN_TOKEN'; then
+  _pass "preserve: exact v1 atlassian url moved to v2, type/env kept, stderr notice without config values"
+else
+  _fail "preserve: exact v1 atlassian url moved to v2, type/env kept, stderr notice without config values"
+fi
+
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://atlassian-proxy.example.com/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } } } }
+EOF
+_preserve_before="$(cat "${TARGET_DIR}/.cursor/mcp.json")"
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
+if node -e '
+    const fs = require("fs");
+    const before = JSON.parse(process.argv[1]).mcpServers;
+    const after = JSON.parse(fs.readFileSync(process.argv[2], "utf8")).mcpServers;
+    if (JSON.stringify(after.atlassian) !== JSON.stringify(before.atlassian)) process.exit(1);
+  ' "$_preserve_before" "${TARGET_DIR}/.cursor/mcp.json" \
+  && ! echo "$_preserve_log" | grep -qF 'atlassian URL moved'; then
+  _pass "preserve: custom atlassian url (proxy) kept byte-equal, no v1→v2 notice"
+else
+  _fail "preserve: custom atlassian url (proxy) kept byte-equal, no v1→v2 notice"
+fi
+
+rm -rf "${TARGET_DIR}/.cursor"
+cat > "${TARGET_DIR}/.mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http" } } }
+EOF
+SELECTED_AGENTS="claude"
+merge_mcp_json 2>/dev/null
+if node -e '
+    const a = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers.atlassian;
+    if (!a || a.url !== process.argv[2] || a.type !== "http") process.exit(1);
+  ' "${TARGET_DIR}/.mcp.json" "$_atlassian_v2"; then
+  _pass "claude preserve: exact v1 atlassian url in .mcp.json moved to v2"
+else
+  _fail "claude preserve: exact v1 atlassian url in .mcp.json moved to v2"
+fi
+
+rm -f "${TARGET_DIR}/.mcp.json"
+mkdir -p "${TARGET_DIR}/.pi"
+cat > "${TARGET_DIR}/.pi/mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http" } } }
+EOF
+SELECTED_AGENTS="pi"
+PI_STAGE_FAILED="false"
+merge_mcp_json 2>/dev/null
+if [[ "$PI_STAGE_FAILED" == "false" ]] && node -e '
+    const a = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers.atlassian;
+    if (!a || a.url !== process.argv[2] || a.type !== "http") process.exit(1);
+  ' "${TARGET_DIR}/.pi/mcp.json" "$_atlassian_v2"; then
+  _pass "pi preserve: exact v1 atlassian url in .pi/mcp.json moved to v2"
+else
+  _fail "pi preserve: exact v1 atlassian url in .pi/mcp.json moved to v2"
+fi
+rm -rf "${TARGET_DIR}/.pi" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/.cursor" "${TARGET_DIR}/scripts"
+PI_STAGE_FAILED="false"
+PI_STAGE_FAILURE_REASON=""
+SELECTED_AGENTS="cursor"
+unset _atlassian_v2
 unset MCP_PRESERVE_EXISTING _preserve_before _preserve_log
 
 # --- Pi host (AC-14) --------------------------------------------------------
