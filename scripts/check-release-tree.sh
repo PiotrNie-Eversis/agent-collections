@@ -3,7 +3,8 @@
 #
 # master is production and must contain only the framework core; the work-only
 # paths listed in .release-exclude (docs/specs, docs/context/<project>, ...)
-# belong on develop. scripts/release-to-master.sh strips them and
+# belong on develop. scripts/release-to-master.sh leaves them out (it copies
+# only core commits, or writes a filtered snapshot with --snapshot) and
 # .githooks/pre-commit blocks them locally, but a push from a clone without the
 # hook (or with --no-verify) would still reach master. This check runs in CI on
 # every master pipeline and fails the pipeline when such paths are present.
@@ -34,12 +35,16 @@ if [[ -n "$found" ]]; then
   count="$(printf '%s\n' "$found" | wc -l | tr -d ' ')"
   echo "check-release-tree: ${count} work-only path(s) on $(git rev-parse --short "$ref") — they belong on develop, not on master:" >&2
   printf '%s\n' "$found" | sed 's/^/  /' >&2
-  echo "Fix: the next 'bash scripts/release-to-master.sh --allow-diverged' (run from develop) replaces master with a clean snapshot; make sure the change is on develop first." >&2
+  echo "Fix: the next 'bash scripts/release-to-master.sh --snapshot --allow-diverged' (run from develop) replaces master with a clean snapshot; make sure the change is on develop first." >&2
   exit 1
 fi
 
+# A release commit is either a snapshot ("release: …" subject) or a commit
+# copied by release-to-master.sh ("(cherry picked from commit <sha>)" line).
 subject="$(git log -1 --format=%s "$ref")"
-if [[ "$subject" != release:* ]]; then
+body="$(git log -1 --format=%B "$ref")"
+if [[ "$subject" != release:* ]] &&
+   ! grep -qE '^\(cherry picked from commit [0-9a-f]{40}\)$' <<< "$body"; then
   echo "check-release-tree: note: '${subject}' is not a release commit — master should change only via scripts/release-to-master.sh." >&2
 fi
 echo "check-release-tree: OK — no work-only paths on $(git rev-parse --short "$ref")."

@@ -2,9 +2,11 @@
 #
 # master is production and must contain only the framework core (see
 # scripts/README.md, "Branches and releases"). Pushes to master are limited to
-# Maintainers by branch protection; this job additionally fails the master
-# pipeline when a commit carries work-only paths from .release-exclude
-# (e.g. a direct push made without the local .githooks/pre-commit hook).
+# Maintainers by branch protection; master changes through
+# scripts/release-to-master.sh (copied core commits, or a --snapshot repair
+# commit). This job additionally fails the master pipeline when a commit
+# carries work-only paths from .release-exclude (e.g. a direct push made
+# without the local .githooks/pre-commit hook).
 # It detects and alerts — it cannot reject the push itself.
 #
 # verify stage (AC-138): the Pi load check (scripts/pi-load-check.mjs) installs

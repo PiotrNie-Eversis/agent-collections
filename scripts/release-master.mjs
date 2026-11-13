@@ -3,27 +3,32 @@
  * release-master.mjs — guided release of develop to master.
  *
  * A thin, interactive wrapper around scripts/release-to-master.sh, which does
- * the actual work (filtered snapshot of develop without the .release-exclude
- * paths, one "release: develop@<sha>" commit on local master). This wrapper adds
- * the steps around it:
+ * the actual work on local master. By default it copies each core commit of
+ * develop to master as its own commit (with a "(cherry picked from commit
+ * <sha>)" line) and skips work-only commits from .release-exclude. With
+ * --snapshot it writes one filtered "release: develop@<sha>" snapshot commit
+ * instead (repair mode). This wrapper adds the steps around it:
  *
  *   1. refuse to run on master;
  *   2. git fetch origin, then stop when local develop or master differs from
  *      origin (an unpushed or stale develop would be released by mistake);
- *   3. show the dry run;
- *   4. ask before creating the release commit;
+ *   3. show the dry run (the commits to copy or skip, or the snapshot diff);
+ *   4. ask before writing to local master;
  *   5. ask before git push origin master.
  *
  * Ships with the framework core (also on master, so `npm run release:master`
  * resolves there), but step 1 makes it run only from develop or a feature branch.
  *
  * Usage (repo root, any branch except master):
- *   node scripts/release-master.mjs [--dry-run] [--yes] [--allow-diverged]
+ *   node scripts/release-master.mjs [--dry-run] [--yes] [--snapshot [--allow-diverged]]
  *   npm run release:master -- [same options]
  *
  *   --dry-run         Fetch, check and show what the release would change; write nothing.
- *   --yes             Do not ask; create the release commit and push.
- *   --allow-diverged  Passed to release-to-master.sh (overwrite master-only commits).
+ *   --yes             Do not ask; write the release to master and push.
+ *   --snapshot        Passed to release-to-master.sh (one filtered snapshot commit
+ *                     instead of copying commits; repair mode).
+ *   --allow-diverged  Passed to release-to-master.sh; only with --snapshot
+ *                     (overwrite master-only commits).
  *
  * Stdlib only. Exit codes: 0 done or nothing to release, 1 stopped or failed.
  */
@@ -72,16 +77,18 @@ async function confirm(question, assumeYes) {
 }
 
 function parseArgs(argv) {
-  const opts = { dryRun: false, yes: false, allowDiverged: false };
+  const opts = { dryRun: false, yes: false, snapshot: false, allowDiverged: false };
   for (const arg of argv) {
     if (arg === "--dry-run") opts.dryRun = true;
     else if (arg === "--yes") opts.yes = true;
+    else if (arg === "--snapshot") opts.snapshot = true;
     else if (arg === "--allow-diverged") opts.allowDiverged = true;
     else if (arg === "-h" || arg === "--help") {
-      console.log("Usage: node scripts/release-master.mjs [--dry-run] [--yes] [--allow-diverged]");
+      console.log("Usage: node scripts/release-master.mjs [--dry-run] [--yes] [--snapshot [--allow-diverged]]");
       process.exit(0);
     } else fail(`unknown option: ${arg} (see --help)`);
   }
+  if (opts.allowDiverged && !opts.snapshot) fail("--allow-diverged works only with --snapshot (see --help).");
   return opts;
 }
 
@@ -110,18 +117,25 @@ async function main() {
     }
   }
 
-  const passThrough = opts.allowDiverged ? ["--allow-diverged"] : [];
+  const passThrough = [
+    ...(opts.snapshot ? ["--snapshot"] : []),
+    ...(opts.allowDiverged ? ["--allow-diverged"] : []),
+  ];
   const preview = runRelease(["--dry-run", ...passThrough]);
-  if (preview.includes("nothing to release")) return;
+  // Match only the script's own status line, not a commit subject in the list.
+  if (/^release-to-master: nothing to release\b/m.test(preview)) return;
   if (opts.dryRun) return;
 
-  if (!(await confirm(`Create the release commit on local '${TARGET}'?`, opts.yes))) {
+  const question = opts.snapshot
+    ? `Create the release commit on local '${TARGET}'?`
+    : `Copy the listed commits to local '${TARGET}'?`;
+  if (!(await confirm(question, opts.yes))) {
     console.log("release-master: stopped — nothing written.");
     return;
   }
   const before = git(["rev-parse", `refs/heads/${TARGET}`]);
   runRelease(passThrough);
-  console.log(git(["show", "--stat", "--format=%h %s", TARGET]).split("\n").slice(0, 30).join("\n"));
+  console.log(git(["log", "--stat", "--format=%h %s", `${before}..${TARGET}`]).split("\n").slice(0, 60).join("\n"));
 
   if (!(await confirm(`Push '${TARGET}' to ${REMOTE}?`, opts.yes))) {
     console.log(`release-master: not pushed. Publish later with: git push ${REMOTE} ${TARGET}`);

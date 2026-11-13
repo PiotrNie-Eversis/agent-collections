@@ -7,7 +7,7 @@ Consumer install / upgrade entry for **Agent Collections**.
 | `setup-agent-collections.sh` | Main installer CLI (local / submodule / copy) |
 | `setup-agent-collections.test.sh` | Non-interactive smoke test |
 | `lib/setup-agent-collections/` | Shared bash/node helpers |
-| `release-to-master.sh` | Publish `develop` to `master` as a filtered snapshot (maintainers) |
+| `release-to-master.sh` | Publish `develop` to `master` by copying core commits (`--snapshot`: one filtered snapshot; maintainers) |
 | `release-to-master.test.sh` | Tests for the release script and `.githooks/pre-commit` |
 | `lib/release-paths.sh` | Reads `.release-exclude` (work-only paths) for the release script and hook |
 | `check-release-tree.sh` | Fails when a commit carries `.release-exclude` paths (CI guard for `master`) |
@@ -21,16 +21,22 @@ Consumer install / upgrade entry for **Agent Collections**.
 - **Release:** from any branch except `master`, run
 
   ```bash
-  bash scripts/release-to-master.sh --dry-run   # preview
-  bash scripts/release-to-master.sh             # one "release: develop@<sha>" commit on local master
+  bash scripts/release-to-master.sh --dry-run   # preview: one "copy" or "skip" line per commit
+  bash scripts/release-to-master.sh             # copy the new core commits to local master
   git push origin master
   ```
 
-  Guided alternative (run from `develop`; refuses to run on `master`): `npm run release:master` (or `node scripts/release-master.mjs`, with `--dry-run`, `--yes`, `--allow-diverged`). It fetches `origin`, stops when local `develop` or `master` differs from `origin`, shows the dry run, then asks before the release commit and before `git push origin master`.
+  Guided alternative (run from `develop`; refuses to run on `master`): `npm run release:master` (or `node scripts/release-master.mjs`, with `--dry-run`, `--yes`, `--snapshot`, `--allow-diverged`). It fetches `origin`, stops when local `develop` or `master` differs from `origin`, shows the dry run, then asks before writing to `master` and before `git push origin master`.
 
-  The script copies the `develop` tree, removes the `.release-exclude` paths, and commits it on top of `master` (single parent), so deletions and renames carry over and work-only docs never do. It stops when `master` has commits that are neither releases nor in `develop` (a hotfix made only on `master`); bring them into `develop`, or pass `--allow-diverged` to overwrite them.
+  **Copy mode (default).** The script copies each core commit of `develop` to `master` as its own commit, in `develop` order, like `git cherry-pick -x`: same author and author date, and the message ends with `(cherry picked from commit <full sha>)`. You are the committer. It needs git 2.40 or later.
+  - **Base:** the latest `release: develop@<sha>` commit on `master`. Its body line `Snapshot of develop <full sha>` says which `develop` commit it covers. Only commits after that one are looked at.
+  - **Already released:** commits on `master` after the base that carry the `(cherry picked from commit …)` line. They are not copied again, so a second run prints `nothing to release`.
+  - **Skipped:** commits that change only `.release-exclude` paths (`skip (work-only)`), empty commits (`skip (empty)`), and commits whose change is already on `master` (`skip (already on master)`).
+  - **Stops (nothing written, the commit is named):** a commit that mixes core and work-only paths, a merge commit, a commit that does not apply cleanly, a commit on `master` after the base without the cherry-pick line (a hotfix made only on `master`), no `release:` base on `master`, or a final tree that differs from `develop` without the work-only paths (post-check). Deletions and renames are copied like any other change.
+
+  **Snapshot mode (`--snapshot`, repair).** Copies the whole `develop` tree, removes the `.release-exclude` paths, and commits it on top of `master` (single parent) as one `release: develop@<sha>` commit. Use it once to create the first base, and to recover from any stop above; the new commit becomes the next base. It stops when `master` has commits that are neither releases nor in `develop` (copied commits count as releases); bring them into `develop`, or pass `--snapshot --allow-diverged` to overwrite them. `--allow-diverged` without `--snapshot` is refused.
 - **Guard:** enable the hook once per clone with `git config core.hooksPath .githooks`. On `master`/`main` it rejects commits that stage `.release-exclude` paths (READMEs stay allowed). On every other branch it rejects a commit that mixes work-only and core paths: commit the core first, then `docs(ac-n)`, then `docs(context)`. For a deliberate exception use `ALLOW_MIXED_COMMIT=1 git commit …` (it does not lift the `master` block); `git commit --no-verify` bypasses all hooks.
-- **CI guard:** `.gitlab-ci.yml` runs `scripts/check-release-tree.sh` on every `master` pipeline and fails it when work-only paths are present (e.g. a push made without the hook). It detects and alerts; it cannot reject the push. To clean up, make sure the change is on `develop`, then release with `--allow-diverged`.
+- **CI guard:** `.gitlab-ci.yml` runs `scripts/check-release-tree.sh` on every `master` pipeline and fails it when work-only paths are present (e.g. a push made without the hook). It detects and alerts; it cannot reject the push. It prints a note when the commit is neither a `release:` snapshot nor a copied commit. To clean up, make sure the change is on `develop`, then release with `--snapshot --allow-diverged`.
 - **Branch protection (GitLab):** protect only `master` — *Allowed to merge: No one*, *Allowed to push and merge: Maintainers*, *Allowed to force push: off*.
 
 ## Pi load check in CI

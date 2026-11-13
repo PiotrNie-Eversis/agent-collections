@@ -4,8 +4,8 @@
 #
 # Work-only paths are listed in .release-exclude (docs/specs, docs/context/<project>,
 # docs/reports, docs/plans and docs/decisions entries; READMEs excluded there stay
-# core). They live on develop and reach master only through
-# scripts/release-to-master.sh, which strips them. Two checks:
+# core). They live on develop and never reach master: scripts/release-to-master.sh
+# copies only core commits (or, with --snapshot, strips them). Two checks:
 #
 #   1. On master/main: reject a commit that stages any work-only path.
 #      ALLOW_MIXED_COMMIT does not lift this block.
