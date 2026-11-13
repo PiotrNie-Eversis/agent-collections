@@ -34,6 +34,13 @@
 #                             regenerated); agents with framework-generated files on
 #                             disk are kept. Pass --mcp-servers / --agents to refresh
 #                             or deselect.
+#                             Stops (exit 1, nothing written) when --agents is
+#                             omitted, pi is not selected and .pi/ holds a Pi setup
+#                             the framework did not generate (hand port); re-run with
+#                             --agents <current>,pi to migrate or --agents <current>
+#                             to keep Pi out. A legacy Pi generator
+#                             (scripts/gen-pi-adapter.mjs, scripts/pi-rule-map.yaml,
+#                             sync:agents scripts) is reported, never run or removed.
 #   --non-interactive         Skip all prompts; use defaults / flags.
 #   --force                   Allow setup even when COLLECTIONS_HOME looks incomplete.
 #   --gitignore-agent-artifacts
@@ -51,6 +58,12 @@
 #                             install-selection.json; pass an empty value
 #                             (--ssot-source "" or --ssot-source=) to clear it.
 #   --ssot-branch NAME        Branch of --ssot-source to seed from. Default: main.
+#   --project-name NAME       Name of docs/context/<NAME>/ (kebab-cased). Default:
+#                             SSOT_PROJECT_SLUG env, else the recorded
+#                             ssot.projectContextPath, else the main worktree's
+#                             name when the target is a linked git worktree, else
+#                             the target folder name. On --upgrade/--sync a passed
+#                             value replaces the recorded path; omit it to keep it.
 #   --confluence-space-key KEY
 #                             Optional. Records a Confluence space key for the
 #                             one-time AS-IS import (eversis-import-confluence-knowledge
@@ -61,6 +74,10 @@
 # Environment variables:
 #   AGENT_COLLECTIONS_HOME      Canonical path to agent-collections checkout.
 #   AGENT_COLLECTIONS_REPO_URL  Git URL to clone from (default: upstream GitHub repo).
+#   SSOT_PROJECT_SLUG           Name of docs/context/<NAME>/ (kebab-cased) when
+#                               --project-name is not passed (kept for compatibility;
+#                               the flag wins). Like the flag, it replaces the
+#                               recorded ssot.projectContextPath.
 #
 # Examples:
 #   bash /path/to/agent-collections/scripts/setup-agent-collections.sh \
@@ -102,6 +119,8 @@ ARG_SSOT_SOURCE_PASSED="false"
 ARG_SSOT_BRANCH="main"
 ARG_CONFLUENCE_SPACE_KEY=""
 ARG_CONFLUENCE_SPACE_KEY_PASSED="false"
+ARG_PROJECT_NAME=""
+ARG_PROJECT_NAME_PASSED="false"
 # Set to "true" only by load_selection_or_fail (record reused, no --mcp-servers);
 # start from "false" so a stray value in the caller's env never turns a fresh
 # install into preserve mode.
@@ -113,6 +132,7 @@ export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_VENDOR_PASSE
        ARG_GITIGNORE_AGENT_ARTIFACTS ARG_MCP_SERVERS ARG_AGENTS ARG_PROFILE \
        ARG_SSOT_SOURCE ARG_SSOT_SOURCE_PASSED ARG_SSOT_BRANCH \
        ARG_CONFLUENCE_SPACE_KEY ARG_CONFLUENCE_SPACE_KEY_PASSED \
+       ARG_PROJECT_NAME ARG_PROJECT_NAME_PASSED \
        MCP_PRESERVE_EXISTING \
        SETUP_SCRIPT_DIR="${SCRIPT_DIR}" LIB_DIR="${LIB_DIR}"
 
@@ -178,6 +198,15 @@ while [[ $# -gt 0 ]]; do
       ARG_CONFLUENCE_SPACE_KEY="${1#*=}"
       ARG_CONFLUENCE_SPACE_KEY_PASSED="true"
       shift ;;
+    --project-name)
+      [[ $# -lt 2 ]] && { echo "ERROR: --project-name requires a value" >&2; exit 1; }
+      ARG_PROJECT_NAME="$2"
+      ARG_PROJECT_NAME_PASSED="true"
+      shift 2 ;;
+    --project-name=*)
+      ARG_PROJECT_NAME="${1#*=}"
+      ARG_PROJECT_NAME_PASSED="true"
+      shift ;;
     --help|-h)
       awk '/^# setup-agent-collections.sh/,/^[^#]/ { if ($0 ~ /^#/) { sub(/^# ?/, ""); print } }' "$0"
       exit 0 ;;
@@ -216,6 +245,8 @@ source "${LIB_DIR}/agents.sh"
 source "${LIB_DIR}/profile.sh"
 # shellcheck source=lib/setup-agent-collections/link-framework.sh
 source "${LIB_DIR}/link-framework.sh"
+# shellcheck source=lib/setup-agent-collections/legacy-pi.sh
+source "${LIB_DIR}/legacy-pi.sh"
 # shellcheck source=lib/setup-agent-collections/vendor-sync-skew.sh
 source "${LIB_DIR}/vendor-sync-skew.sh"
 # shellcheck source=lib/setup-agent-collections/mcp-prompt.sh
@@ -242,6 +273,11 @@ source "${LIB_DIR}/upgrade.sh"
 source "${LIB_DIR}/area-scope.sh"
 # shellcheck source=lib/setup-agent-collections/summary.sh
 source "${LIB_DIR}/summary.sh"
+
+# --project-name must leave a usable folder name once kebab-cased (ssot.sh).
+if [[ "$ARG_PROJECT_NAME_PASSED" == "true" ]] && [[ -z "$(_ssot_kebab "$ARG_PROJECT_NAME")" ]]; then
+  die "--project-name needs a name with at least one letter or digit (got: '${ARG_PROJECT_NAME}')."
+fi
 
 COMPLETED_STEPS=()
 FAILED_STEPS=()
@@ -270,7 +306,12 @@ unset _script_repo_root _resolved_target
 # field inside load_selection_or_fail (omitted flag = recorded value).
 if [[ "$ARG_UPGRADE" == "true" ]] || { [[ "$ARG_SYNC" == "true" ]] && [[ -f "${TARGET_DIR}/.agent-collections/install-selection.json" ]]; }; then
   load_selection_or_fail
+  # A hand-ported .pi/ with pi unselected stops here, before
+  # run_vendor_setup or anything else writes under TARGET_DIR.
+  check_pi_hand_port_or_stop
 fi
+# Warn-only (fresh installs too): a legacy Pi generator would undo this install.
+report_legacy_pi_generator
 
 run_vendor_setup || { record_fail "vendor"; _print_partial_fail; exit 1; }
 record_ok "vendor"

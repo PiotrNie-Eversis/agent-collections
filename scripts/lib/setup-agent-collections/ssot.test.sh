@@ -52,6 +52,89 @@ else
   _fail "scaffold_ssot_project does not overwrite an existing INDEX.md"
 fi
 
+# Slug precedence: --project-name → SSOT_PROJECT_SLUG → recorded
+# ssot.projectContextPath → main worktree name (linked worktree toplevel) →
+# target basename. Runs on its own temp tree; TARGET_DIR is restored after.
+SLUG_ROOT="$(mktemp -d)"
+trap 'rm -rf "$TARGET_DIR" "$REMOTE_DIR" "$SLUG_ROOT"' EXIT
+_saved_target="$TARGET_DIR"
+_slug_of() {
+  # Args: target dir. Prints the slug with the caller's ARG_* / env settings.
+  ( TARGET_DIR="$1"; _ssot_project_slug 2>/dev/null )
+}
+_expect_slug() {
+  local got="$1" want="$2" label="$3"
+  if [[ "$got" == "$want" ]]; then
+    _pass "$label"
+  else
+    _fail "${label} (got '${got}', want '${want}')"
+  fi
+}
+_write_record() {
+  mkdir -p "$1/.agent-collections"
+  printf '{"ssot":{"projectContextPath":"%s"}}\n' "$2" > "$1/.agent-collections/install-selection.json"
+}
+
+MAIN_REPO="${SLUG_ROOT}/Main_Project"
+mkdir -p "$MAIN_REPO"
+git -C "$MAIN_REPO" init -q -b main
+git -C "$MAIN_REPO" config user.email test@example.com
+git -C "$MAIN_REPO" config user.name test
+echo "main" > "${MAIN_REPO}/README.md"
+mkdir -p "${MAIN_REPO}/packages/web-app"
+echo "web" > "${MAIN_REPO}/packages/web-app/README.md"
+git -C "$MAIN_REPO" add -A
+git -C "$MAIN_REPO" commit -q -m "init"
+WORKTREE="${SLUG_ROOT}/main-project-pi-test"
+git -C "$MAIN_REPO" worktree add -q "$WORKTREE" -b pi-test
+# Plain repo whose git dir lives elsewhere (--separate-git-dir) under another
+# name: its basename (plain-repo) differs from what the worktree / bare-repo
+# rules would derive from the git dir (other-store), so the case below tells
+# the rules apart.
+PLAIN_REPO="${SLUG_ROOT}/Plain_Repo"
+mkdir -p "${SLUG_ROOT}/stores"
+git init -q --separate-git-dir "${SLUG_ROOT}/stores/other-store.git" "$PLAIN_REPO"
+# Bare repo + worktrees layout: Bare_Proj/.bare holds the repo, worktrees sit
+# beside it. The hidden bare dir must not name the project ("bare").
+BARE_PROJ="${SLUG_ROOT}/Bare_Proj"
+mkdir -p "$BARE_PROJ"
+git clone -q --bare "$MAIN_REPO" "${BARE_PROJ}/.bare"
+git -C "${BARE_PROJ}/.bare" worktree add -q "${BARE_PROJ}/feature-x" -b feature-x
+NON_REPO="${SLUG_ROOT}/Plain Folder"
+mkdir -p "$NON_REPO"
+
+unset SSOT_PROJECT_SLUG || true
+ARG_PROJECT_NAME="" ARG_PROJECT_NAME_PASSED="false"
+
+ARG_PROJECT_NAME="Custom Name" ARG_PROJECT_NAME_PASSED="true"
+_expect_slug "$(SSOT_PROJECT_SLUG=from-env _slug_of "$WORKTREE")" "custom-name" \
+  "--project-name wins over SSOT_PROJECT_SLUG (and is kebab-cased)"
+ARG_PROJECT_NAME="" ARG_PROJECT_NAME_PASSED="false"
+
+_write_record "$WORKTREE" "docs/context/recorded/"
+_expect_slug "$(SSOT_PROJECT_SLUG=From_Env _slug_of "$WORKTREE")" "from-env" \
+  "SSOT_PROJECT_SLUG wins over the record and the worktree name (and is kebab-cased)"
+_expect_slug "$(_slug_of "$WORKTREE")" "recorded" \
+  "recorded ssot.projectContextPath wins over the linked worktree name"
+rm -rf "${WORKTREE}/.agent-collections"
+
+_expect_slug "$(_slug_of "$WORKTREE")" "main-project" \
+  "linked worktree toplevel uses the main worktree's name"
+if ( TARGET_DIR="$WORKTREE"; _ssot_project_slug 2>&1 >/dev/null ) | grep -qF "linked worktree"; then
+  _pass "linked worktree rule logs one info line"
+else
+  _fail "linked worktree rule logs one info line"
+fi
+_expect_slug "$(_slug_of "${WORKTREE}/packages/web-app")" "web-app" \
+  "subdirectory of a linked worktree keeps its own basename"
+_expect_slug "$(_slug_of "$PLAIN_REPO")" "plain-repo" \
+  "main worktree (plain repo, git dir elsewhere) uses its own basename, not the git dir's name"
+_expect_slug "$(_slug_of "${BARE_PROJ}/feature-x")" "bare-proj" \
+  "linked worktree of a proj/.bare repo uses the parent folder's name"
+_expect_slug "$(_slug_of "$NON_REPO")" "plain-folder" \
+  "non-repo target uses its basename"
+TARGET_DIR="$_saved_target"
+
 # Case 3: seed_ssot_global with no ARG_SSOT_SOURCE — succeeds, creates nothing
 ARG_SSOT_SOURCE=""
 seed_ssot_global

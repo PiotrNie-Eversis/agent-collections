@@ -33,7 +33,15 @@ write_install_selection() {
     local existing_project existing_global
     existing_project="$(node -e "const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); const p=j.ssot&&j.ssot.projectContextPath; if (typeof p==='string' && p.trim()) process.stdout.write(p);" "$out")" || true
     existing_global="$(node -e "const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); const p=j.ssot&&j.ssot.globalContextPath; if (typeof p==='string' && p.trim()) process.stdout.write(p);" "$out")" || true
-    [[ -n "$existing_project" ]] && project_context_path="$existing_project"
+    # An explicit name — --project-name, or SSOT_PROJECT_SLUG set
+    # before the run (SSOT_PROJECT_NAME_EXPLICIT, from scaffold_ssot_project) —
+    # replaces the recorded path (same per-field contract as the other flags);
+    # omitted, the record is kept.
+    if [[ "${ARG_PROJECT_NAME_PASSED:-false}" != "true" ]] && \
+       [[ "${SSOT_PROJECT_NAME_EXPLICIT:-false}" != "true" ]] && \
+       [[ -n "$existing_project" ]]; then
+      project_context_path="$existing_project"
+    fi
     [[ -n "$existing_global" ]] && global_context_path="$existing_global"
   fi
 

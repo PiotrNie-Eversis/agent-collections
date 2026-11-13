@@ -50,6 +50,19 @@ print_summary() {
     echo "                 coding agent (npm i -g @earendil-works/pi-coding-agent) to use it."
     echo ""
   fi
+  # Repeat the legacy Pi generator report so it is not lost in scroll;
+  # its sync:agents script would regenerate the old .pi/ tree after this run.
+  if [[ -n "${LEGACY_PI_FINDINGS:-}" ]]; then
+    echo "  ${_YELLOW}Legacy Pi:${_RESET}     remove the old Pi generator — it would undo this install:"
+    local legacy_line
+    while IFS= read -r legacy_line; do
+      [[ -n "$legacy_line" ]] || continue
+      echo "                 - ${legacy_line}"
+    done <<< "${LEGACY_PI_FINDINGS}"
+    echo "                 setup-agent-collections.sh --upgrade --sync replaces it; find references with"
+    echo "                 git grep -nE \"sync:agents|gen-pi-adapter|pi-rule-map\""
+    echo ""
+  fi
 
   echo "${_BOLD}Next steps:${_RESET}"
   echo ""
