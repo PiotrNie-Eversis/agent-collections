@@ -125,7 +125,7 @@ else
   _pass "no double-slash glob in permissions.deny"
 fi
 
-# Case 6 (AC-99): preserve mode unions catalog ids already in .mcp.json into
+# Case 6: preserve mode unions catalog ids already in .mcp.json into
 # enabledMcpjsonServers (selection order first); non-catalog ids are ignored.
 cat > "${TARGET_DIR}/.mcp.json" <<'EOF'
 { "mcpServers": { "atlassian": { "type": "http" }, "eversis-collections": {}, "my-private-server": {} } }

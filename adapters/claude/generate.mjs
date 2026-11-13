@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Claude Code adapter generator (TASK-526).
+ * Claude Code adapter generator.
  * Reads adapters/claude/rule-map.yaml and writes a single root CLAUDE.md
  * from core .ai/rules sources (H2 section per mapped rule). Zero npm dependencies.
  *
@@ -414,7 +414,7 @@ function buildClaudeMarkdown(repoRoot, rules, frameworkPrefix) {
 /**
  * A root CLAUDE.md that is a regular file without GENERATED_MARKER was not
  * written by this generator — it is the consumer's own file (e.g. a project
- * adopting the framework after the fact, AC-99). Copy it aside before
+ * adopting the framework after the fact). Copy it aside before
  * writeClaudeMd unlinks it, so even an explicit `--agents=…,claude` never
  * loses it. An existing backup is reused only when byte-identical; otherwise
  * a timestamped name is used so an older backup is never overwritten.

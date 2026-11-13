@@ -1,7 +1,7 @@
 /**
- * Tests for scripts/pi-load-check.mjs (AC-138, AC-139).
+ * Tests for scripts/pi-load-check.mjs.
  * Unit tests feed inline JSON-lines RPC fixtures to the exported pure helpers
- * (no Pi needed). Stub-Pi tests (AC-139) need no Pi either: they put a `/bin/sh`
+ * (no Pi needed). Stub-Pi tests need no Pi either: they put a `/bin/sh`
  * script named `pi` first on PATH and run the CLI with --project against an
  * empty `.pi/` (normal exit with a background process, a failed response split
  * across two chunks, a hang that ignores SIGTERM) and check the run's exit,
@@ -355,7 +355,7 @@ test("listExpected reads generated prompts and skills by name", () => {
   ]);
 });
 
-// --- stub Pi (AC-139; /bin/sh, no real Pi) -----------------------------------
+// --- stub Pi (/bin/sh, no real Pi) -------------------------------------------
 
 const noStub = process.platform === "win32";
 

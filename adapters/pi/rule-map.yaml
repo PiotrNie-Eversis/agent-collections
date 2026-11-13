@@ -1,4 +1,4 @@
-# Pi adapter rule map (AC-14)
+# Pi adapter rule map
 # Packaging metadata lives here — not in .ai/rules/*.md
 # id/source parity with adapters/claude/rule-map.yaml (asserted by adapters/sync.mjs --check).
 #
@@ -6,15 +6,15 @@
 #   skill -> .pi/skills/<skill_id>/SKILL.md (role rule, loaded on demand)
 #   none  -> not emitted; served by the mirrored framework skill <skill_id>
 # .pi/APPEND_SYSTEM.md is not a rule target: it is the small always-on core built
-# by adapters/pi/generate.mjs (AC-134).
+# by adapters/pi/generate.mjs; role rules load on demand.
 # skill_id for target skill must start with eversis-rule- and must not equal any
 # .ai/skills/eversis-* directory name (asserted by adapters/pi/generate.mjs).
 # ui_note: true (target skill only) prefixes the body with a "UI files only" note.
 # review_context_note: true (target skill only) inserts the Pi review-independence
-# note before the body (AC-135; text in adapters/pi/generate.mjs).
+# note before the body (text in adapters/pi/generate.mjs).
 # process_bundle: true (target skill only) adds the skill to the process rules the
 # eversis-process-rules extension injects after an eversis-* command or while a
-# plan is active (AC-134).
+# plan is active.
 version: 1
 rules:
   - id: eversis-agent-core

@@ -1,5 +1,5 @@
 /**
- * Integration test for .pi/extensions/eversis-review.ts on real Pi (AC-136).
+ * Integration test for .pi/extensions/eversis-review.ts on real Pi.
  *
  * Runs `pi --mode rpc --approve` in temp projects against a local stub model and
  * reads what Pi really sent to it. The parent's user message carries a unique

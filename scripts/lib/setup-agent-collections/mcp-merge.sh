@@ -44,7 +44,7 @@ merge_mcp_json() {
 
   warn_user_mcp_catalog_overlap
 
-  # Pi (AC-14): its own guarded call, run last. Skipped when the Pi stage
+  # Pi: its own guarded call, run last. Skipped when the Pi stage
   # already failed; a Pi merge / validation failure (e.g. a malformed
   # existing .pi/mcp.json) marks the Pi stage failed instead of dying, so the
   # Cursor / Claude files above stay written and the install continues.
@@ -150,7 +150,7 @@ _merge_mcp_json_for_host() {
   # Submodule upgrades repoint COLLECTIONS_HOME at the pinned vendor tree,
   # which does not contain this template until that pin moves. The running
   # installer (INSTALLER_FRAMEWORK_HOME / this script's repo) does.
-  # Vendored Pi (AC-14) execs the same wrapper from its own bash -c locator.
+  # Vendored Pi execs the same wrapper from its own bash -c locator.
   if { [[ "$host" == "claude" ]] || [[ "$host" == "pi" ]]; } && [[ "$use_relative" == "true" ]]; then
     local wrapper_src=""
     if ! wrapper_src="$(_resolve_wrapper_template)"; then

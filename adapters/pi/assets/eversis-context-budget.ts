@@ -1,5 +1,5 @@
 /**
- * Agent Collections context budget for Pi (AC-14).
+ * Agent Collections context budget for Pi.
  *
  * Shipped by the Agent Collections Pi adapter (source:
  * adapters/pi/assets/eversis-context-budget.ts, copied to

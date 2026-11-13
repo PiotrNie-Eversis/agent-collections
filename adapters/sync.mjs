@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Adapter sync CLI (TASK-527).
+ * Adapter sync CLI.
  * Orchestrates Cursor + Claude generators from core. Zero npm dependencies.
- * Pi (AC-14) is opt-in via --agents …,pi: the Pi generator runs last on write,
+ * Pi is opt-in via --agents …,pi: the Pi generator runs last on write,
  * and --check delegates to `adapters/pi/generate.mjs --check` (defaults stay
  * cursor,claude, so no .pi/ is created in this repo unless pi is requested).
  *
@@ -286,7 +286,7 @@ function assertIdSourceParity(cursorMap, claudeMap) {
 }
 
 /**
- * Pi map parity (AC-14): every Claude id/source pair must be present in the
+ * Pi map parity: every Claude id/source pair must be present in the
  * Pi rule map (Pi decides per rule whether it is always-on, a role skill or
  * served by a framework skill, but it must not silently drop a framework rule).
  */
@@ -770,7 +770,7 @@ function runWrite(repoRoot, outRoot, agents, frameworkPrefix) {
       `adapter sync: framework skills mirror — .cursor/skills (${cursorCount}), .claude/skills (${claudeCount})`,
     );
   }
-  // Pi last (AC-14): a Pi generator failure exits non-zero only after the
+  // Pi last: a Pi generator failure exits non-zero only after the
   // other selected adapters' outputs are already written. The .pi/skills
   // framework mirror is owned by the installer, not this step.
   if (selected.has("pi")) {

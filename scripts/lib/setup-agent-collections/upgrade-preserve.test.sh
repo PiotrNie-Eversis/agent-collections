@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# upgrade-preserve.test.sh — AC-99: --upgrade / --sync selection resolution
+# upgrade-preserve.test.sh — --upgrade / --sync selection resolution
 # (per-field flag override, marker-gated agent detection, MCP preserve flag)
 # without Docker. Sources upgrade.sh directly, like selection-ssot.test.sh.
 #

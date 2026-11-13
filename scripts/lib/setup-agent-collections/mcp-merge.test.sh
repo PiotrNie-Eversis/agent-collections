@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mcp-merge.test.sh — unit tests for mcp-merge.sh host branching (Cursor vs
 # Claude Code) and the Claude-native syntax transform in mcp-merge.mjs.
-# Also covers the Pi host (AC-14): .pi/mcp.json bash -c locator entries and
+# Also covers the Pi host: .pi/mcp.json bash -c locator entries and
 # Pi failure isolation.
 #
 # Usage (from repo root):
@@ -266,7 +266,7 @@ else
   _fail "AWS API uvx pins mcp<2; AWS docs server stays unpinned"
 fi
 
-# Case 6 (AC-99): preserve mode — upgrade/sync reusing the record without
+# Case 6: preserve mode — upgrade/sync reusing the record without
 # --mcp-servers. Existing entries are kept byte-equal (custom env included),
 # eversis-collections is regenerated, missing selected ids come from the
 # template, nothing is deleted.
@@ -425,7 +425,7 @@ else
   _fail "preserve: eversis-collections not added when unselected and absent"
 fi
 
-# Case 6g (AC-144): Atlassian removes the v1 endpoint on 2027-03-01. Preserve
+# Case 6g: Atlassian removes the v1 endpoint on 2027-03-01. Preserve
 # mode moves an atlassian entry whose url is exactly the v1 URL to v2 on every
 # host and keeps all other keys; any other URL is left byte-equal.
 _atlassian_v2='https://mcp.atlassian.com/v2/mcp'
@@ -512,7 +512,7 @@ SELECTED_AGENTS="cursor"
 unset _atlassian_v2
 unset MCP_PRESERVE_EXISTING _preserve_before _preserve_log
 
-# --- Pi host (AC-14) --------------------------------------------------------
+# --- Pi host ----------------------------------------------------------------
 # Asserts the Pi eversis-collections entry is a bash -c locator that walks up
 # to the nearest .pi/ and that the file has no inputs and no host variable Pi
 # cannot expand in any command / args value.

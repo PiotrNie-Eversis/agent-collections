@@ -197,11 +197,12 @@ else
   _fail "local mode: no checkout"
 fi
 
-# --- AC-14: agent-id probe (pi) -------------------------------------------
-# A pin from before AC-14 lists only cursor,claude under --agents and has no
-# adapters/pi/generate.mjs. With --agents=pi the guard must realign a clean
-# pin, or stop with a clear "Rejected agent id" message on a dirty one —
-# never let the vendored sync.mjs print a raw "unknown agent id: pi".
+# --- agent-id probe (pi) ---------------------------------------------------
+# A pin from before Pi support was added lists only cursor,claude under
+# --agents and has no adapters/pi/generate.mjs. With --agents=pi the guard
+# must realign a clean pin, or stop with a clear "Rejected agent id" message
+# on a dirty one — never let the vendored sync.mjs print a raw
+# "unknown agent id: pi".
 write_pi_sync_mjs() {
   local root="$1"
   mkdir -p "${root}/adapters/pi"

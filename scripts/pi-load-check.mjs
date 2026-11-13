@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Pi load check (AC-138).
+ * Pi load check.
  *
  * Proves that the Pi coding agent on PATH loads the `.pi/` tree the framework
  * installer writes, and names what it dropped. Steps:

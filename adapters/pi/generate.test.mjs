@@ -1,5 +1,5 @@
 /**
- * Tests for adapters/pi/generate.mjs (AC-14).
+ * Tests for adapters/pi/generate.mjs.
  * Runs the generator CLI into temp directories; counts are computed from
  * .ai/ and the rule map, never hard-coded. Zero dependencies (front matter is
  * checked with a minimal key + JSON-string parser).

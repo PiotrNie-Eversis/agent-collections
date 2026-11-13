@@ -1,5 +1,5 @@
 /**
- * Integration test for .pi/extensions/eversis-process-rules.ts on real Pi (AC-134).
+ * Integration test for .pi/extensions/eversis-process-rules.ts on real Pi.
  *
  * Runs `pi --mode rpc --approve` in temp projects and reads what Pi really sent
  * to a local stub model. event.systemPrompt keeps the pre-mutation length, so
@@ -33,7 +33,10 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 const GENERATOR = path.join(REPO_ROOT, "adapters", "pi", "generate.mjs");
 const SKILLS_SOURCE = path.join(REPO_ROOT, ".ai", "skills");
 
-/** System prompt size of a full install before AC-134 (research, Pi 1.5.0). */
+/**
+ * System prompt size of a full install before the process rules moved to
+ * on-demand loading (measured during research, Pi 1.5.0).
+ */
 const BASELINE_CHARS = 45_996;
 const SECTION_OPEN = "<eversis_process_rules>";
 const SECTION_CLOSE = "</eversis_process_rules>";

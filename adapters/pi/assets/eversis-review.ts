@@ -1,5 +1,5 @@
 /**
- * Agent Collections independent review for Pi (AC-136).
+ * Agent Collections independent review for Pi.
  *
  * Shipped by the Agent Collections Pi adapter (source:
  * adapters/pi/assets/eversis-review.ts, copied unchanged to
@@ -27,11 +27,12 @@
  *
  * Every failure (bad input, no model, model not available to a clean session,
  * session error, abort, empty answer) returns an error result that says the
- * independent review did not run and gives the fresh-session steps (AC-135). A
- * failure result never carries the independent label.
+ * independent review did not run and gives the fresh-session steps (the manual
+ * fallback: run the review in a new Pi session). A failure result never carries
+ * the independent label.
  *
- * `runCleanRole` holds the SDK logic and is kept generic so a later role runner
- * (AC-141) can reuse it; only the review tool is exposed.
+ * `runCleanRole` holds the SDK logic and is kept generic so a later runner for
+ * other process roles can reuse it; only the review tool is exposed.
  *
  * Pi-only: Cursor and Claude Code run review in their own sub-agents.
  * Runtime import of Pi's own SDK (`@earendil-works/pi-coding-agent`, supplied by
@@ -297,7 +298,8 @@ function stripIndependentLabel(text: string): string {
 
 /**
  * The tool result text when the independent review did not run: the reason,
- * the fresh-session steps (AC-135) and the same-session label rule. Pass only
+ * the fresh-session steps (the manual fallback in a new Pi session) and the
+ * same-session label rule. Pass only
  * validated params: a key or folder that does not pass the checks is shown as
  * a placeholder, never echoed. It never contains the independent label, even
  * when the reason quotes it; the joined text is stripped once more as a
@@ -365,7 +367,8 @@ function assertCompleted(session: SdkSession): void {
  * Runs one prompt in a new, clean Pi session and returns its last answer and
  * usage. The session is in memory, loads only `extensionPaths` plus an inline
  * bash guard, and has `excludeTools` removed. `signal` aborts it; it is always
- * disposed. Kept role-neutral for reuse (AC-141).
+ * disposed. Kept role-neutral so a later runner for other process roles can
+ * reuse it.
  */
 export async function runCleanRole(sdk: PiSdk, options: CleanRoleOptions): Promise<CleanRoleResult> {
   const { cwd, guard, signal, onProgress } = options;

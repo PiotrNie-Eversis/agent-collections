@@ -1,5 +1,5 @@
 /**
- * Tests for adapters/pi/assets/eversis-process-rules.ts (AC-134).
+ * Tests for adapters/pi/assets/eversis-process-rules.ts.
  * Imports the .ts asset directly via Node's native type stripping
  * (Node >= 22.18; dev-only — the installer itself keeps Node >= 18).
  * Handlers run against a fake Pi in a temp project; Pi is never started.

@@ -6,11 +6,11 @@
  *  - First run (no existing file): seed the whole file from
  *    templates/claude-settings.json.
  *  - Every run: fully regenerate `permissions.deny` (from .claudeignore path
- *    classes — the single source of truth for path classes, TASK-529) and
+ *    classes — the single source of truth for path classes) and
  *    `enabledMcpjsonServers` (from the current MCP selection). Every other
  *    key in an existing file — including `permissions.allow` and anything a
  *    consumer added by hand — is left untouched.
- *  - Preserve mode (CS_PRESERVE_EXISTING=true, AC-99 upgrade/sync reusing the
+ *  - Preserve mode (CS_PRESERVE_EXISTING=true, upgrade/sync reusing the
  *    record): `enabledMcpjsonServers` is the selection plus every catalog id
  *    already present in `.mcp.json` (CS_MCP_JSON_PATH), so servers that
  *    mcp-merge.mjs kept on disk stay enabled in Claude Code.

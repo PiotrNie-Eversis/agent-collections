@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Pi coding agent adapter generator (AC-14; port of the sternik-kariery
+ * Pi coding agent adapter generator (port of the sternik-kariery
  * consumer generator scripts/gen-pi-adapter.mjs into the framework).
  *
  * Reads the Agent Collections SSOT (.ai/rules, .ai/prompts) plus this
@@ -12,10 +12,10 @@
  *   .pi/skills/eversis-rule-<name>/SKILL.md     role rules (target: skill), loaded on demand
  *   .pi/prompts/eversis-*.md                    slash commands from .ai/prompts/{public,internal}
  *   .pi/extensions/eversis-context-budget.ts    ~50% context-budget compaction extension
- *   .pi/extensions/eversis-process-rules.ts     adds the process rules per run (AC-134);
+ *   .pi/extensions/eversis-process-rules.ts     adds the process rules per run;
  *                                               bundle skill ids filled in from the rule map
  *   .pi/extensions/eversis-review.ts            eversis_independent_review tool: runs the
- *                                               review in a separate Pi session (AC-136);
+ *                                               review in a separate Pi session;
  *                                               copied unchanged
  *   .pi/settings.json                           seeded once when absent (consumer-owned after)
  *
@@ -31,7 +31,8 @@
  * "**User input for this run:** $ARGUMENTS" line is live. The SSOT pointer line
  * is left as-is so local-mode ${AGENT_COLLECTIONS_HOME} pointers stay readable
  * (Pi's substitution does not match that token). Rule ids in prompt bodies are
- * rewritten to their Pi role-skill names (AC-134).
+ * rewritten to their Pi role-skill names, because role rules ship as Pi skills
+ * loaded on demand, not as always-on rules.
  *
  * Generated files carry the GENERATED marker; orphan cleanup only removes files
  * that carry it. Hand-made files under .pi/ that the generator does not target
@@ -97,15 +98,17 @@ const CORE_RULE_ID = "eversis-agent-core";
 const HARD_LIMITS_HEADING = "## Hard limits (implement)";
 /**
  * Pi-only note inserted into role skills flagged `review_context_note: true`
- * (AC-135; rewritten by AC-136). Pi has no sub-agents, so an in-session Review
+ * (first written as fresh-session steps, then rewritten for the separate-session
+ * review tool). Pi has no sub-agents, so an in-session Review
  * is self-review. The eversis_independent_review tool
  * (.pi/extensions/eversis-review.ts) runs the review in a separate Pi session
  * instead, and the note tells the model when to call it and how to label results.
- * Hand-offs: AC-134 keeps the flag when role skills move to on-demand loading,
- * and drops the spec-folder lookup bullet once the review flow resolves the
- * folder itself on every host. AC-136 (done) replaced the fresh-session wording
- * with the tool call and kept the fresh-session steps as the fallback line.
- * AC-141 may reuse runCleanRole from eversis-review.ts for other roles.
+ * Hand-offs: the flag is kept now that role skills load on demand, and the
+ * spec-folder lookup bullet is dropped once the review flow resolves the
+ * folder itself on every host. The separate-session review tool (done) replaced
+ * the fresh-session wording with the tool call and kept the fresh-session steps
+ * as the fallback line. A later runner for other process roles may reuse
+ * runCleanRole from eversis-review.ts.
  */
 const REVIEW_CONTEXT_NOTE = [
   "> **Pi host note — review independence (AC-135, AC-136).** Pi has no sub-agents, so a Review stage inside an Implement run would use the same context that wrote the code: that is self-review, not independent verification. The extension tool `eversis_independent_review` runs the review in a separate Pi session that has not seen this conversation (file-editing tools removed, writing shell commands blocked).",

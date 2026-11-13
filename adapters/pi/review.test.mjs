@@ -1,5 +1,5 @@
 /**
- * Tests for adapters/pi/assets/eversis-review.ts (AC-136).
+ * Tests for adapters/pi/assets/eversis-review.ts.
  * Imports the .ts asset directly via Node's native type stripping
  * (Node >= 22.18; dev-only — the installer itself keeps Node >= 18).
  * The tool runs against a fake Pi and a fake SDK; Pi is never started and no

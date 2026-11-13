@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/setup-agent-collections/area-scope.sh — monorepo area profiles (TASK-530).
+# lib/setup-agent-collections/area-scope.sh — monorepo area profiles.
 
 apply_area_scope() {
   # Map domain profile → default area scope id (isolation §5).
