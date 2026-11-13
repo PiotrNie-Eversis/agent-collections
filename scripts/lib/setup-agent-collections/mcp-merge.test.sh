@@ -275,7 +275,7 @@ mkdir -p "${TARGET_DIR}/.cursor"
 cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
 {
   "mcpServers": {
-    "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } },
+    "atlassian": { "url": "https://mcp.atlassian.com/v2/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } },
     "eversis-collections": { "command": "stale", "args": [] },
     "my-private-server": { "command": "node", "args": ["./tools/mcp.js"] }
   },
@@ -343,7 +343,7 @@ fi
 
 # Case 6c: regression guard — preserve false still prunes deselected catalog ids.
 cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
-{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http" }, "my-private-server": { "command": "node" } } }
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v2/mcp", "type": "http" }, "my-private-server": { "command": "node" } } }
 EOF
 MCP_SELECTED_IDS="eversis-collections"
 MCP_PRESERVE_EXISTING="false"

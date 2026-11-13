@@ -65,7 +65,7 @@ All servers are configured in **`.cursor/mcp.json`** at the repository root (Cur
       "type": "http"
     },
     "atlassian": {
-      "url": "https://mcp.atlassian.com/v1/mcp",
+      "url": "https://mcp.atlassian.com/v2/mcp",
       "type": "http"
     },
     "pdf-reader": {

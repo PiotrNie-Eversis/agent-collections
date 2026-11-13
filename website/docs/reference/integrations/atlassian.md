@@ -7,7 +7,7 @@ title: Atlassian
 
 **Server key:** `atlassian`  
 **Type:** HTTP  
-**URL:** `https://mcp.atlassian.com/v1/mcp`
+**URL:** `https://mcp.atlassian.com/v2/mcp`
 
 Provides integration with Jira and Confluence for gathering requirements, task context, and project documentation.
 
@@ -35,7 +35,7 @@ Provides integration with Jira and Confluence for gathering requirements, task c
 ```json
 {
   "atlassian": {
-    "url": "https://mcp.atlassian.com/v1/mcp",
+    "url": "https://mcp.atlassian.com/v2/mcp",
     "type": "http"
   }
 }
