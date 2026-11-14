@@ -150,7 +150,7 @@ Write or update `*.research.md` in the **same session** before ending the turn. 
 
 - **SKIP** only when existing `*.research.md` / `*.plan.md` **adequately covers the current scope** (adequacy checklist passed), not merely because the file exists.
 - **CREATE** when no adequate artifact exists for the current scope.
-- **DELTA** when research exists but scope grew, the file addresses a **different** bugfix iteration, or the adequacy checklist fails — **update the research file** (Changelog + new section) in the same session; chat-only notes are insufficient except for trivial documentation typos.
+- **DELTA** when research exists but scope grew, the file addresses a **different** bugfix iteration, or the adequacy checklist fails — **update the research file** (Changelog + new section) in the same session; chat-only notes are insufficient except for trivial documentation typos. The Changelog row goes in the `## Changelog` section of the research template (`research.example.md`).
 - **REFRESH** when the plan exists but does not cover the current fix.
 - **Proceeding** is allowed when artifacts are ready **and** the user attached an approved plan, gave a QA fix list, or explicitly asked to implement; otherwise use **Awaiting approval** (before plan or before code as appropriate).
 - **Consumer project rules** (e.g. project-specific Jira bugfix supplements) **extend** this workflow — they do **not** override the readiness block, adequacy checklist, or human gates.
@@ -158,6 +158,8 @@ Write or update `*.research.md` in the **same session** before ending the turn. 
 #### Research artifact (same session)
 
 When readiness shows **Research: CREATE** or **DELTA**, the turn MUST end with an updated `*.research.md` on disk. The EM may run the `eversis-research` procedure inline in the same turn; deferring the file to a later turn without user approval is a workflow breach.
+
+Before the research gate, run `scripts/validate-spec-artifacts.mjs` on the research file. Show the person only a passing file, or the gaps that remain after your fixes. When the host runs the validator automatically after file edits, still run it explicitly when the file was written another way (shell command, external tool).
 
 ### Step 2 - Write the upfront execution plan
 
@@ -203,24 +205,29 @@ Check the current state before creating or executing any plan.
 | Technical Context | The plan has a populated **Technical Context** section with conventions, patterns, stack, and testing guidance relevant to implementation | Delegate to **Architect** with [`eversis-review-codebase.md`](../../../.ai/prompts/public/eversis-review-codebase.md) to populate Technical Context in the plan |
 | Plan approval state | `{task}.plan-review.md` has verdict `APPROVED` and the plan is unchanged since that review | Skip re-review |
 
+**Role subagents.** When the host provides a generated subagent for the role (its adapter README names where), delegate through it. A subagent cannot talk to the person and may not be allowed to write files. It puts questions for the person, and any file write it could not make (for example a review Changelog row), in its final message. Relay those questions to the person and write those rows yourself.
+
+**Inline research or plan.** Inline work is allowed only after you read the role prompt (`eversis-research.md` or `eversis-plan.md`), its skill, and its `*.example.md` template in full. Structure never comes from earlier `docs/specs/*` files. The first Changelog row names the template used.
+
 ### Planning sequence
 
 1. **Check for existing research and plan files** — Inspect current `*.research.md` and `*.plan.md` state first.
 2. **Adequacy check** — When artifacts exist, run the adequacy checklist; set Research/Plan to SKIP, DELTA, REFRESH, or CREATE before delegating.
 3. **Fill missing context when needed** — If research is missing or inadequate after the checklist, delegate to Context Engineer with `eversis-research.md` or update the research file in the same session.
 4. **Create or refresh the plan when needed** — If the plan is missing, stale, or not actionable, delegate to Architect with `eversis-plan.md`.
-5. **Human plan review** — Ask the user to review scope, phases, and acceptance criteria before plan validation.
-6. **Review the plan before execution** — Delegate to **Plan Reviewer** with [`eversis-review-plan.md`](../../../.ai/prompts/internal/eversis-review-plan.md) unless an approved `.plan-review.md` exists and the plan is unchanged.
-7. **Run the review loop with hard limits:**
+5. **Validate the plan structure** — Run `scripts/validate-spec-artifacts.mjs` on the plan file. Show the person only a passing plan, or the gaps that remain after your fixes. When the host runs the validator automatically after file edits, still run it explicitly when the file was written another way (shell command, external tool).
+6. **Human plan review** — Ask the user to review scope, phases, and acceptance criteria before plan validation.
+7. **Review the plan before execution** — Delegate to **Plan Reviewer** with [`eversis-review-plan.md`](../../../.ai/prompts/internal/eversis-review-plan.md) unless an approved `.plan-review.md` exists and the plan is unchanged.
+8. **Run the review loop with hard limits:**
    - `*.plan-review.md` remains the source of truth.
    - If the verdict is `REVISIONS NEEDED`, send the review back to Architect and re-run review.
    - Stop after a maximum of **3** plan-review iterations and escalate to the user if blockers remain.
-8. **Create execution todos from the plan** — Create todos per plan task, not just per phase.
-9. **Capture UI inventory early** — Find every `[REUSE]` UI task and every Figma URL in the plan and research files.
-10. **Ask for the dev server URL when UI tasks exist** — If the UI inventory is non-empty, ask the user in chat for the dev server URL before execution starts. Do not guess from port scans.
-11. **Apply the Technical Context rule** — If the plan already contains populated Technical Context, use it and skip rediscovery; otherwise delegate to Architect with `eversis-review-codebase.md`.
-12. **Conditional confirmation before execution** — Ask for confirmation before moving from planning to execution when the plan was newly created, materially changed, escalated, or not yet approved for execution in the current thread.
-13. **Rewrite the upfront execution plan after approval** — Expand the ordered agent + prompt call sequence from the approved plan before the first implementation task starts.
+9. **Create execution todos from the plan** — Create todos per plan task, not just per phase.
+10. **Capture UI inventory early** — Find every `[REUSE]` UI task and every Figma URL in the plan and research files.
+11. **Ask for the dev server URL when UI tasks exist** — If the UI inventory is non-empty, ask the user in chat for the dev server URL before execution starts. Do not guess from port scans.
+12. **Apply the Technical Context rule** — If the plan already contains populated Technical Context, use it and skip rediscovery; otherwise delegate to Architect with `eversis-review-codebase.md`.
+13. **Conditional confirmation before execution** — Ask for confirmation before moving from planning to execution when the plan was newly created, materially changed, escalated, or not yet approved for execution in the current thread.
+14. **Rewrite the upfront execution plan after approval** — Expand the ordered agent + prompt call sequence from the approved plan before the first implementation task starts.
 
 ### Execution routing
 

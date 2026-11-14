@@ -6,7 +6,7 @@ SELECTION_REL=".agent-collections/install-selection.json"
 write_install_selection() {
   local out="${TARGET_DIR}/${SELECTION_REL}"
   mkdir -p "$(dirname "$out")"
-  require_cmd node "Install Node.js ≥ 18"
+  require_cmd node "Install Node.js 22 or newer"
 
   local version="0.0.1"
   if [[ -f "${COLLECTIONS_HOME}/package.json" ]]; then

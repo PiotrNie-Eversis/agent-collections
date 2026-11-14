@@ -2,7 +2,7 @@
 # lib/setup-agent-collections/mcp-merge.sh
 
 merge_mcp_json() {
-  require_cmd node "Install Node.js ≥ 18 from https://nodejs.org"
+  require_cmd node "Install Node.js 22 or newer from https://nodejs.org"
 
   local mcp_pkg_dir="${COLLECTIONS_HOME}/mcp/eversis-collections-mcp"
   local dist_index="${mcp_pkg_dir}/dist/index.js"

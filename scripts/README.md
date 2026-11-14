@@ -75,3 +75,21 @@ bash /path/to/agent-collections/scripts/setup-agent-collections.sh \
 TASK / team default vendor mode: **`--vendor submodule`**. After clone, teammates run `git submodule update --init --recursive`. `--upgrade --sync` aligns a **clean** vendor submodule to the launching installer SHA (or fails with recovery git commands if the pin is dirty).
 
 See root [README.md](../README.md) for modes, upgrade (`--upgrade`), selection schema (`.agent-collections/`), and **deselection / recovery** (MCP prune, Claude surface cleanup, slash-command orphans).
+
+## Health check (`--doctor`)
+
+From the consumer project (or with `--target DIR`):
+
+```bash
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --doctor
+```
+
+`--doctor` checks an existing install and changes nothing: it never clones, fetches, links, syncs or writes. It prints one line per check, and every check runs even when an earlier one fails (only an unreadable `--target` stops it):
+
+- **Node** — the version first on `PATH` (Node 22 or newer passes, 18–21 gives a warning, older fails). With an unusable Node, the checks that need Node are skipped with a line saying so.
+- **Framework home** — read from the recorded vendor mode in `.agent-collections/install-selection.json` (submodule/copy → `vendor/agent-collections`, local → `.agent-collections/framework-home.txt`); with no record, `vendor/agent-collections`, then `framework-home.txt`, then the installer's own checkout.
+- **Agents** — from `--agents`, else the record, else the skills mirrors present on disk.
+- **Claude / Cursor skills mirrors** — every `.ai/skills/eversis-*` package has a readable `SKILL.md` in `.claude/skills/` / `.cursor/skills/`.
+- **Claude hook** (Claude selected) — the framework `PostToolUse` entry in `.claude/settings.json`, the launcher `.claude/hooks/eversis-validate-spec.cjs`, and its `--self-test` (which proves the spec artifact validator can be found and runs).
+
+Exit 0 when every check passes, 1 otherwise. Each failing line names the problem and a fix (usually `--upgrade --sync`).

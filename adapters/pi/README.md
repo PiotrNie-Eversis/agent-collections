@@ -207,6 +207,6 @@ GitLab CI runs the check on the pinned Pi version for framework changes and on t
 
 ## Requirements
 
-- Node.js 18+ (stdlib only; no npm install). The `node:test` suites (`node --test 'adapters/pi/*.test.mjs'`) import the `.ts` extension and need Node ≥ 22.18 (dev-only).
+- Node.js 22+ (stdlib only; no npm install). The `node:test` suites (`node --test 'adapters/pi/*.test.mjs'`) import the `.ts` extension and need Node ≥ 22.18 (dev-only).
 - Pi coding agent (`npm i -g @earendil-works/pi-coding-agent`) to use the generated tree. **Minimum Pi 1.5.0.** CI checks the pinned version (`PI_VERSION_PINNED`) and the latest release weekly (see "Load check").
 - Run from the **repository root** (directory that contains `.ai/` and `adapters/`).

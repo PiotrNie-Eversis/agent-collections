@@ -54,5 +54,18 @@
       "Bash(git reset --hard*)",
       "Bash(git clean -f*)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\""
+          }
+        ]
+      }
+    ]
   }
 }

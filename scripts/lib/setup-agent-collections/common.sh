@@ -81,6 +81,75 @@ require_cmd() {
   fi
 }
 
+# Node version policy shared by the installer and --doctor. Below the runnable
+# floor the framework scripts fail to parse (a SyntaxError that the vendor
+# flag probes would otherwise misreport as a stale vendor pin). Between the
+# runnable floor and the supported floor Node is end-of-life and untested.
+# The supported floor matches the CI image.
+NODE_MIN_RUNNABLE_MAJOR=18
+NODE_MIN_SUPPORTED_MAJOR=22
+
+# Prints "<status> <version>" for the node first on PATH and never dies, so a
+# read-only check (--doctor) can report it next to other checks.
+#   status:  ok | warn | error
+#   version: the dotted version, "missing" (no node on PATH) or "unknown"
+#            (the version query failed or printed something unexpected)
+# The query is `node -p process.versions.node`: it parses on any Node release,
+# and test stubs recognise it. Always returns 0.
+node_version_status() {
+  if ! command -v node >/dev/null 2>&1; then
+    echo "error missing"
+    return 0
+  fi
+  local version major
+  version="$(node -p process.versions.node 2>/dev/null | head -n 1 | tr -d '[:space:]')" || version=""
+  if [[ ! "$version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+    echo "error unknown"
+    return 0
+  fi
+  major="${version%%.*}"
+  if (( major < NODE_MIN_RUNNABLE_MAJOR )); then
+    echo "error ${version}"
+  elif (( major < NODE_MIN_SUPPORTED_MAJOR )); then
+    echo "warn ${version}"
+  else
+    echo "ok ${version}"
+  fi
+  return 0
+}
+
+# Prints how to put a newer Node first on PATH (nvm, or a Windows install
+# under Git Bash). Shared by require_node_version and --doctor.
+node_version_hint() {
+  echo "Put Node ${NODE_MIN_SUPPORTED_MAJOR} or newer first on PATH and re-run, for example \`nvm install ${NODE_MIN_SUPPORTED_MAJOR} && nvm use ${NODE_MIN_SUPPORTED_MAJOR}\`, or in Git Bash \`export PATH=\"/c/Program Files/nodejs:\$PATH\"\`. Check with \`node --version\`."
+}
+
+# Dies when node is missing, unreadable or older than the runnable floor, and
+# warns when it is end-of-life (runnable but older than the supported floor).
+# Called once by the entry script before any other step runs Node.
+require_node_version() {
+  local status version
+  read -r status version <<< "$(node_version_status)"
+  case "$status" in
+    ok) return 0 ;;
+    warn)
+      log_warn "Node ${version} is end-of-life and not tested; use Node ${NODE_MIN_SUPPORTED_MAJOR} or newer."
+      return 0
+      ;;
+  esac
+  case "$version" in
+    missing)
+      die "Required command 'node' not found. Install Node.js ${NODE_MIN_SUPPORTED_MAJOR} or newer from https://nodejs.org. $(node_version_hint)"
+      ;;
+    unknown)
+      die "Could not read the Node version (\`node -p process.versions.node\` failed); Agent Collections needs Node ${NODE_MIN_SUPPORTED_MAJOR} or newer. $(node_version_hint)"
+      ;;
+    *)
+      die "Node ${version} found, Agent Collections needs Node ${NODE_MIN_SUPPORTED_MAJOR} or newer. $(node_version_hint)"
+      ;;
+  esac
+}
+
 _ensure_inquirer_prompt_deps() {
   # Shared by agents + MCP checkbox prompts (LIB_DIR set by setup entrypoint).
   local deps_marker="${LIB_DIR}/node_modules/@inquirer/prompts/package.json"

@@ -79,6 +79,7 @@ Before broad implementation (after plan approval), check whether a skill package
 
 - Prefer **complete** changes over `TODO` / "insert logic here".
 - Prefer **existing** project patterns; read `docs/context/*.md` before large architectural shifts.
+- "Existing project patterns" applies to code. SDD artifact structure (`*.research.md`, `*.plan.md`) comes only from the framework templates, never from earlier `docs/specs/*` files.
 - **Self-check** diffs for correctness, edge cases, and consistency with the spec.
 
 ## Hard limits (implement)
@@ -148,6 +149,7 @@ Optional additional lines, any subset, appended after the four required lines in
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.
+6. Artifact structure comes from the skill template, never from earlier `docs/specs/*`.
 
 **Self-check before treating a mid-thread gate as cleared:**
 

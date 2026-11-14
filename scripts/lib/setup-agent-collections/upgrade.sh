@@ -11,7 +11,7 @@ load_selection_or_fail() {
   Do not invent a full multi-agent install without an explicit selection."
   fi
 
-  require_cmd node "Install Node.js ≥ 18"
+  require_cmd node "Install Node.js 22 or newer"
   local parsed
   if ! parsed="$(node -e "
     const fs = require('fs');

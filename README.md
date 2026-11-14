@@ -63,7 +63,7 @@ Canonical content lives under **`.ai/`**. Adapters, the installer, and MCP **con
 
 - **Agent tool:** [Cursor](https://cursor.com/), Claude Code and/or the [Pi coding agent](https://pi.dev/) (`npm i -g @earendil-works/pi-coding-agent`) (OpenCode packaging is placeholder only).
 - **Docker Engine + Compose v2** — to **run** the local **`eversis-collections`** MCP server.
-- **Node.js** ≥ 18 — needed only to **develop** the **`eversis-collections`** MCP package itself, not to run it.
+- **Node.js** ≥ 22 — needed to run the installer (`scripts/setup-agent-collections.sh`) and to **develop** the **`eversis-collections`** MCP package. Running the MCP server itself needs only Docker.
 - **Git** — clone and consumer install.
 
 Recommended: capable models (Claude Sonnet or GPT-4 class) for structured rules and prompts.

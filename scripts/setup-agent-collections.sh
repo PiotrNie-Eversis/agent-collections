@@ -69,6 +69,14 @@
 #                             one-time AS-IS import (eversis-import-confluence-knowledge
 #                             skill, run manually afterward — the installer itself never
 #                             calls Confluence). Omitting this never blocks install.
+#   --doctor                  Read-only health check of an existing install, then
+#                             exit: Node version, the framework home, the selected
+#                             agents, the Claude / Cursor skills mirrors and, with
+#                             Claude selected, the spec artifact hook (settings
+#                             entry, launcher, launcher --self-test). Never clones,
+#                             fetches, links, syncs or writes. Prints one line per
+#                             check; exit 0 when every check passes, 1 otherwise.
+#                             Honours --target and --agents; other flags are ignored.
 #   --help                    Show this help and exit.
 #
 # Environment variables:
@@ -90,6 +98,8 @@
 #     --vendor submodule
 #
 #   bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --upgrade --sync
+#
+#   bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --doctor
 #
 # Interactive installs prompt for agents, domain profile, and MCP servers on a TTY
 # (no --build-mcp required for the MCP checklist).
@@ -121,6 +131,7 @@ ARG_CONFLUENCE_SPACE_KEY=""
 ARG_CONFLUENCE_SPACE_KEY_PASSED="false"
 ARG_PROJECT_NAME=""
 ARG_PROJECT_NAME_PASSED="false"
+ARG_DOCTOR="false"
 # Set to "true" only by load_selection_or_fail (record reused, no --mcp-servers);
 # start from "false" so a stray value in the caller's env never turns a fresh
 # install into preserve mode.
@@ -132,7 +143,7 @@ export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_VENDOR_PASSE
        ARG_GITIGNORE_AGENT_ARTIFACTS ARG_MCP_SERVERS ARG_AGENTS ARG_PROFILE \
        ARG_SSOT_SOURCE ARG_SSOT_SOURCE_PASSED ARG_SSOT_BRANCH \
        ARG_CONFLUENCE_SPACE_KEY ARG_CONFLUENCE_SPACE_KEY_PASSED \
-       ARG_PROJECT_NAME ARG_PROJECT_NAME_PASSED \
+       ARG_PROJECT_NAME ARG_PROJECT_NAME_PASSED ARG_DOCTOR \
        MCP_PRESERVE_EXISTING \
        SETUP_SCRIPT_DIR="${SCRIPT_DIR}" LIB_DIR="${LIB_DIR}"
 
@@ -207,6 +218,7 @@ while [[ $# -gt 0 ]]; do
       ARG_PROJECT_NAME="${1#*=}"
       ARG_PROJECT_NAME_PASSED="true"
       shift ;;
+    --doctor) ARG_DOCTOR="true"; shift ;;
     --help|-h)
       awk '/^# setup-agent-collections.sh/,/^[^#]/ { if ($0 ~ /^#/) { sub(/^# ?/, ""); print } }' "$0"
       exit 0 ;;
@@ -273,6 +285,8 @@ source "${LIB_DIR}/upgrade.sh"
 source "${LIB_DIR}/area-scope.sh"
 # shellcheck source=lib/setup-agent-collections/summary.sh
 source "${LIB_DIR}/summary.sh"
+# shellcheck source=lib/setup-agent-collections/doctor.sh
+source "${LIB_DIR}/doctor.sh"
 
 # --project-name must leave a usable folder name once kebab-cased (ssot.sh).
 if [[ "$ARG_PROJECT_NAME_PASSED" == "true" ]] && [[ -z "$(_ssot_kebab "$ARG_PROJECT_NAME")" ]]; then
@@ -286,6 +300,23 @@ record_fail() { FAILED_STEPS+=("$1"); }
 
 log_info "Starting agent-collections setup …"
 detect_os
+
+# Read-only health check branch goes here: it runs right after detect_os and
+# before require_node_version, so it reports an unsupported Node (without
+# dying) and never reaches the steps below that clone, fetch or write.
+# run_doctor never dies; its return value is the exit code.
+if [[ "$ARG_DOCTOR" == "true" ]]; then
+  if run_doctor; then
+    exit 0
+  fi
+  exit 1
+fi
+
+# Node version gate: before resolve_collections_home, the selection replay,
+# vendor setup, the MCP build and every other step that runs Node. Without it
+# an old Node fails to parse adapters/sync.mjs and the vendor flag probes
+# misreport that as a stale vendor pin.
+require_node_version
 
 resolve_collections_home
 ensure_framework_checkout

@@ -14,6 +14,19 @@
  *    record): `enabledMcpjsonServers` is the selection plus every catalog id
  *    already present in `.mcp.json` (CS_MCP_JSON_PATH), so servers that
  *    mcp-merge.mjs kept on disk stay enabled in Claude Code.
+ *  - Every run: exactly one framework-owned entry under `hooks.PostToolUse`
+ *    (matcher `Write|Edit|MultiEdit`, command FRAMEWORK_HOOK_COMMAND), the
+ *    spec artifact guard. It is written only when the launcher exists in
+ *    the target (CS_HOOK_LAUNCHER_PATH), and removed otherwise, so the
+ *    settings never point at a missing file. The framework entry is found by
+ *    the launcher path in its command: a stale framework entry is replaced
+ *    in place, every consumer hook (other events, other PostToolUse entries)
+ *    is kept in order. A removal that empties `PostToolUse` or `hooks` drops
+ *    that key.
+ *  - Remove-hook mode (CS_MODE=remove-hook, Claude deselected): only the
+ *    framework hook entry is dropped from CS_EXISTING_JSON; nothing else is
+ *    regenerated and no template or .claudeignore is read. Prints nothing
+ *    when there is no existing file.
  */
 import fs from 'node:fs';
 
@@ -29,6 +42,104 @@ const mcpServersCsv = process.env.CS_MCP_SERVER_IDS ?? '';
 const preserveExisting = process.env.CS_PRESERVE_EXISTING === 'true';
 const mcpJsonPath = process.env.CS_MCP_JSON_PATH ?? '';
 const serverListPath = process.env.CS_SERVER_LIST_PATH ?? '';
+const hookLauncherPath = process.env.CS_HOOK_LAUNCHER_PATH ?? '';
+const mode = process.env.CS_MODE ?? '';
+
+/** Launcher location as Claude Code sees it; identifies the framework entry. */
+const FRAMEWORK_HOOK_LAUNCHER = '.claude/hooks/eversis-validate-spec.cjs';
+const FRAMEWORK_HOOK_COMMAND = `node "\${CLAUDE_PROJECT_DIR}/${FRAMEWORK_HOOK_LAUNCHER}"`;
+const FRAMEWORK_HOOK_MATCHER = 'Write|Edit|MultiEdit';
+
+function frameworkHookEntry() {
+  return {
+    matcher: FRAMEWORK_HOOK_MATCHER,
+    hooks: [{ type: 'command', command: FRAMEWORK_HOOK_COMMAND }],
+  };
+}
+
+function isFrameworkHook(hook) {
+  return (
+    hook !== null &&
+    typeof hook === 'object' &&
+    typeof hook.command === 'string' &&
+    hook.command.replace(/\\/g, '/').includes(FRAMEWORK_HOOK_LAUNCHER)
+  );
+}
+
+/**
+ * Bring `settings.hooks.PostToolUse` to the wanted state: one framework
+ * entry when `wanted`, none otherwise. Inner hooks that run the framework
+ * launcher are stripped from every entry; an entry left with no hooks by that
+ * strip is dropped. The framework entry goes where the first stripped entry
+ * was (or at the end), so re-runs are byte-identical and consumer order is
+ * kept. Mutates `settings`.
+ */
+function applyFrameworkHook(settings, wanted) {
+  if (settings.hooks === undefined) {
+    if (!wanted) return;
+    settings.hooks = {};
+  } else if (
+    typeof settings.hooks !== 'object' ||
+    settings.hooks === null ||
+    Array.isArray(settings.hooks)
+  ) {
+    fail(
+      '.claude/settings.json "hooks" is not an object — refusing to merge (fix the file by hand, then re-run).',
+    );
+  }
+  const hadPostToolUse = settings.hooks.PostToolUse !== undefined;
+  const current = hadPostToolUse ? settings.hooks.PostToolUse : [];
+  if (!Array.isArray(current)) {
+    fail(
+      '.claude/settings.json "hooks.PostToolUse" is not an array — refusing to merge (fix the file by hand, then re-run).',
+    );
+  }
+
+  const next = [];
+  let insertAt = -1;
+  let removedAny = false;
+  for (const entry of current) {
+    const inner = entry && typeof entry === 'object' && Array.isArray(entry.hooks) ? entry.hooks : null;
+    if (!inner || !inner.some(isFrameworkHook)) {
+      next.push(entry);
+      continue;
+    }
+    removedAny = true;
+    if (insertAt === -1) insertAt = next.length;
+    const kept = inner.filter((hook) => !isFrameworkHook(hook));
+    if (kept.length > 0) next.push({ ...entry, hooks: kept });
+  }
+  if (wanted) {
+    next.splice(insertAt === -1 ? next.length : insertAt, 0, frameworkHookEntry());
+  }
+
+  if (next.length > 0 || (hadPostToolUse && !removedAny)) {
+    settings.hooks.PostToolUse = next;
+  } else {
+    delete settings.hooks.PostToolUse;
+  }
+  if (removedAny && Object.keys(settings.hooks).length === 0) {
+    delete settings.hooks;
+  }
+}
+
+if (mode === 'remove-hook') {
+  if (!existingJson.trim()) process.exit(0);
+  let parsed;
+  try {
+    parsed = JSON.parse(existingJson);
+  } catch {
+    fail('Existing .claude/settings.json is not valid JSON.');
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    fail('Existing .claude/settings.json is not a JSON object.');
+  }
+  applyFrameworkHook(parsed, false);
+  process.stdout.write(`${JSON.stringify(parsed, null, 2)}\n`);
+  process.exit(0);
+} else if (mode !== '') {
+  fail(`Unknown CS_MODE: ${mode}`);
+}
 
 if (!templatePath || !claudeignorePath) {
   fail('Missing required environment variables for Claude settings merge.');
@@ -134,5 +245,7 @@ if (preserveExisting) {
   }
 }
 result.enabledMcpjsonServers = enabled;
+
+applyFrameworkHook(result, Boolean(hookLauncherPath) && fs.existsSync(hookLauncherPath));
 
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

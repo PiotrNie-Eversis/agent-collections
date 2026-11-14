@@ -62,7 +62,7 @@ _run_checkbox_mcp_prompt() {
 }
 
 _run_interactive_mcp_prompt() {
-  require_cmd node "Install Node.js ≥ 18 from https://nodejs.org"
+  require_cmd node "Install Node.js 22 or newer from https://nodejs.org"
 
   if [[ "${MCP_PROMPT_UI:-checkbox}" != "toggle" ]]; then
     if _ensure_mcp_prompt_deps && _run_checkbox_mcp_prompt; then

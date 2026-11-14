@@ -23,8 +23,50 @@ Each stage shows what the process does and which Claude Code tools do the work. 
 | `.claude/rules/eversis-accessibility.md` | The accessibility rule, loaded for matching UI files |
 | `.claude/commands/eversis-*.md` | Thin pointers to the prompts in `.ai/prompts/` |
 | `.claude/skills/eversis-*/` | Skill packages, linked or copied by the installer |
+| `.claude/agents/eversis-*.md` | The three role subagents — see [Role subagents](#role-subagents) |
+| `.claude/hooks/eversis-validate-spec.cjs` | The spec artifact hook — see [Spec artifact hook](#spec-artifact-hook) |
+| `.claude/settings.json` | One framework hook entry that runs the hook after file writes; your own settings and hooks are kept |
 | `.mcp.json` | MCP servers, including `eversis-collections` |
 
 These files are generated. Do not edit them by hand: the next sync overwrites them.
+
+## Role subagents {#role-subagents}
+
+A subagent is a separate Claude Code worker with its own context that the main session hands one job to. The framework installs three, so research, planning and review each start from the right instructions instead of from memory or an old file:
+
+| Subagent | Stage | What it does |
+| --- | --- | --- |
+| `eversis-context-engineer` | Research | Reads the research prompt, skill and template, then writes or updates the research file |
+| `eversis-architect` | Plan | Reads the plan prompt, skill and template, then writes or refreshes the implementation plan |
+| `eversis-code-reviewer` | Review | Reads the review prompt and skill, then reports PASS / BLOCKER / SUGGESTION. It can read files and run checks, but cannot edit anything |
+
+A subagent cannot talk to you. When it has a question, or needs a file change it is not allowed to make (such as the reviewer's row in the plan Changelog), it puts that in its final message, and the Engineering Manager (the main session) asks you or makes the change. Approval gates stay with the main session.
+
+Cursor also reads `.claude/agents/`. The reviewer carries `readonly: true` for Cursor next to its Claude Code tool list.
+
+## Spec artifact hook {#spec-artifact-hook}
+
+A hook is a command Claude Code runs automatically after a tool call. The framework's hook, `eversis-validate-spec`, checks every research (`*.research.md`) and plan (`*.plan.md`) file under `docs/specs/` right after Claude writes or edits it, so a file that does not follow the framework template is caught before you are asked to approve it.
+
+- It runs after `Write`, `Edit` and `MultiEdit`, including writes made by the subagents. Every other file is ignored.
+- It compares the file with the framework's research or plan template: required sections, the `[CREATE]` / `[MODIFY]` / `[REUSE]` marker and the **Files** and **Definition of Done** parts of every task, and a Code Review phase at the end of a plan.
+- Files written through a shell command do not trigger it. Before a research or plan approval gate, the Engineering Manager runs the same check by hand when needed.
+
+**What you see when a file fails.** The write has already happened. Claude Code shows the hook's output in the session, Claude fixes the file, and the hook runs again on the next write. The output lists each gap, for example:
+
+```text
+docs/specs/proj-123-context-management/proj-123-context-management.plan.md: 2 gaps
+  - missing section: ## Human gates
+  - last phase is not Code Review: ### Phase 3: Rollout (line 120)
+A section missing from an existing file may be added with one line such as "No data — section added during DELTA <date>" instead of invented content; record it in a Changelog row.
+```
+
+As the last line says, an older file that lacks a section may get that one filler line plus a Changelog row, instead of invented content. If the hook cannot find the framework's checker, it says `validator not found at …` instead of passing silently.
+
+**Node version.** The hook runs `node`, so it follows the [Node.js 22](../getting-started/installation.mdx#nodejs-22) rule: with Node older than 18 it reports that the check cannot run, and with Node 18–21 it still checks and adds an end-of-life warning.
+
+**Windows.** Claude Code on Windows needs **Git Bash** for the hook — the same tool the installer already needs. Without Git Bash, Claude Code runs hook commands in PowerShell, where the hook's project path may not resolve.
+
+To check that the hook is installed and working, run the installer's [`--doctor`](../getting-started/installation.mdx#doctor).
 
 For setup, see [Installation](../getting-started/installation.mdx) and [MCP Setup](../getting-started/mcp-setup.mdx).

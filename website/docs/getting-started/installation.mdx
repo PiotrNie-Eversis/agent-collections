@@ -14,6 +14,8 @@ Install **Agent Collections** into your project in about **three steps**: downlo
 
 :::tip Before you start
 Finish **[Prerequisites](./prerequisites)** first — especially **Docker Desktop** (or an IT-approved Compose-compatible runtime) with the engine **running**. If the installer fails with something like “Cannot connect to the Docker daemon,” start Docker and try again.
+
+The installer also needs **Node.js 22** or newer on your `PATH` — see [Node.js 22](#nodejs-22) in Step 2.
 :::
 
 Installation turns on the assistant’s built-in tools and skills for that project — structured research/plan/review workflows and a library of reusable prompts. The **`eversis-collections`** skills server (an MCP server — the connection that lets your editor call those tools) runs in **Docker**, so Docker must be installed and running before you run the installer.
@@ -74,6 +76,52 @@ In the terminal, go to **your consumer project** (or create an empty sample fold
 :::tip Docker must be running
 Open Docker Desktop and confirm the engine is running (whale icon in the menu bar / system tray). If the command below fails with “Cannot connect to the Docker daemon,” start Docker and retry. Full tooling checklist: [Prerequisites](./prerequisites).
 :::
+
+### Node.js 22 {#nodejs-22}
+
+The installer runs the framework's Node.js scripts (Node.js is the JavaScript runtime behind the `node` command), so it checks the Node version **before any other step**. It uses whichever `node` comes first on your `PATH` in the shell where you run it.
+
+| `node --version` | What the installer does |
+| --- | --- |
+| 22 or newer | Continues |
+| 18–21 | Warns `Node X is end-of-life and not tested; use Node 22 or newer.` and continues |
+| Older than 18 | Stops with `Node X found, Agent Collections needs Node 22 or newer.` and a hint to put a newer Node first on `PATH` |
+| No `node` on `PATH` | Stops with `Required command 'node' not found. Install Node.js 22 or newer from https://nodejs.org.` and the same hint |
+
+**Project pinned to an older Node?** You do not have to change the project's own Node version. Put Node 22 first on `PATH` only in the shell where you run the installer, then switch back.
+
+<Tabs groupId="operating-system">
+<TabItem value="macos" label="macOS / Linux" default>
+
+With [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager):
+
+```bash
+nvm install 22 && nvm use 22
+node --version   # v22.x or newer
+
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --upgrade --sync --non-interactive
+
+nvm use          # back to the version in the project's .nvmrc
+```
+
+</TabItem>
+<TabItem value="windows" label="Windows (Git Bash)">
+
+Install Node 22 from [nodejs.org](https://nodejs.org/) (or with your Node version manager), then put its folder first on `PATH` for this Git Bash session only. Adjust the folder to where your Node 22 is installed:
+
+```bash
+export PATH="/c/Program Files/nodejs:$PATH"
+node --version   # v22.x or newer
+
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --upgrade --sync --non-interactive
+```
+
+Closing the Git Bash window drops the change.
+
+</TabItem>
+</Tabs>
+
+Use the command for your case — the recommended first-install command below, or `--upgrade --sync` for an existing install. Claude Code also runs `node` for the [spec artifact hook](../coding-agents/claude-code.mdx#spec-artifact-hook), so start Claude Code from a shell where Node 22 is first on `PATH` too.
 
 <Tabs groupId="operating-system">
 <TabItem value="macos" label="macOS / Linux" default>
@@ -185,6 +233,37 @@ Confirm the install worked in your **consumer project** before you leave for MCP
 - You ran the installer from the **consumer project** folder (not inside `agent-collections`).
 - **`AGENT_COLLECTIONS_HOME`** points at your framework checkout (re-export it in the same shell if needed).
 - **Docker** is running — see [Prerequisites](./prerequisites).
+- **Node.js 22** or newer is first on `PATH` — see [Node.js 22](#nodejs-22).
+- The installer reported an **incomplete skills mirror** — see [Skills mirror and the copy fallback](#skills-mirror).
+
+To check an existing install without changing anything, run [`--doctor`](#doctor).
+
+### Skills mirror and the copy fallback {#skills-mirror}
+
+The installer puts every framework skill package into `.claude/skills/eversis-*/` and `.cursor/skills/eversis-*/` as a link (symlink) or a copy, depending on `--link-mode`. If a link cannot be created for a skill (for example on a Windows machine that does not allow links), the installer copies that skill instead, logs `Link failed for <name> — copied instead`, and counts the copies in its summary line.
+
+After every run the installer checks that each skill has a readable `SKILL.md` in those folders. If any is missing, the run **fails** and lists them (`missing: .claude/skills/<name>/SKILL.md`). Fix it by re-running with copies instead of links:
+
+```bash
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+  --upgrade --sync --non-interactive --link-mode copy
+```
+
+### Check an install with `--doctor` {#doctor}
+
+`--doctor` is a read-only health check for an existing install. Run it from the consumer project:
+
+```bash
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --doctor
+```
+
+It prints one line per check and runs every check even when one fails:
+
+- the Node version (same rule as [Node.js 22](#nodejs-22));
+- the Claude Code and Cursor skills mirrors;
+- with Claude Code selected: the spec artifact hook entry in `.claude/settings.json`, the hook file, and the hook's own self-test.
+
+It changes nothing: it does not clone, fetch or write files. It exits **0** when every check passes and **1** otherwise.
 
 When those checks pass, go to **[MCP Setup](./mcp-setup)** to connect tools in your editor (Cursor, Claude Code, or Pi).
 
@@ -272,10 +351,11 @@ Then re-run `--upgrade --sync` (and `--build-mcp` if the MCP server itself chang
 | `--agents` | `cursor`, `claude`, `pi`, `opencode` (opencode = placeholder; pi = [Pi coding agent](#pi-coding-agent)) |
 | `--mcp-servers` | Comma-separated ids; without it + `--non-interactive` → `eversis-collections` only |
 | `--profile` | `frontend` \| `backend` \| `fullstack` |
-| `--link-mode` | `auto` \| `symlink` \| `copy` |
+| `--link-mode` | `auto` \| `symlink` \| `copy` (a skill whose link fails is copied instead — see [Skills mirror](#skills-mirror)) |
 | `--sync` | Refresh framework-managed surfaces |
 | `--upgrade` | Reuse selection (fail-safe if missing/corrupt) |
 | `--non-interactive` | No prompts — defaults + flags |
+| `--doctor` | Read-only health check of an existing install; changes nothing, exit 0 / 1 — see [`--doctor`](#doctor) |
 | `--target DIR` | Consumer path when not running from that repo |
 | `--collections-home DIR` | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion) |
 | `--ssot-source URL` | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit on **first** install to start empty). On `--upgrade` / `--sync`, omit to **keep** the URL already in `install-selection.json`; pass `--ssot-source ""` or `--ssot-source=` to **clear** it. |

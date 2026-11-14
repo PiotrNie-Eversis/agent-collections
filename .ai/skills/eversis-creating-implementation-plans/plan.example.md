@@ -225,4 +225,4 @@ Numbered list of every human-approval gate this task passes through, in order. S
 
 | Date   | Change Description   |
 | ------ | -------------------- |
-| <date> | Initial plan created |
+| <date> | Initial plan created from plan.example.md |

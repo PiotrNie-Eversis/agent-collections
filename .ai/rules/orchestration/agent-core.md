@@ -64,6 +64,7 @@ Before broad implementation (after plan approval), check whether a skill package
 
 - Prefer **complete** changes over `TODO` / "insert logic here".
 - Prefer **existing** project patterns; read `docs/context/*.md` before large architectural shifts.
+- "Existing project patterns" applies to code. SDD artifact structure (`*.research.md`, `*.plan.md`) comes only from the framework templates, never from earlier `docs/specs/*` files.
 - **Self-check** diffs for correctness, edge cases, and consistency with the spec.
 
 ## Hard limits (implement)

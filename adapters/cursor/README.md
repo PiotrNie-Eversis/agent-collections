@@ -68,5 +68,5 @@ Stable prompt id under `.ai/prompts/` remains SSOT. Claude Code does **not** con
 
 ## Requirements
 
-- Node.js 18+ (stdlib only; no npm install)
+- Node.js 22+ (stdlib only; no npm install)
 - Run from the **repository root** (directory that contains `.ai/` and `adapters/`)

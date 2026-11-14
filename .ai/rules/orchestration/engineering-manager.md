@@ -33,6 +33,7 @@ Optional additional lines, any subset, appended after the four required lines in
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.
+6. Artifact structure comes from the skill template, never from earlier `docs/specs/*`.
 
 **Self-check before treating a mid-thread gate as cleared:**
 

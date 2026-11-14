@@ -1,0 +1,33 @@
+# Role subagent map (host-neutral role data; read by adapters/claude/generate-agents.mjs)
+# Each row is one delegated role of the Implement workflow:
+#   id           generated agent name and file name (<id>.md)
+#   description  one line: when the Engineering Manager delegates to this role
+#   reads        framework files (repo-relative) the role reads in full first;
+#                the generator prefixes them with --framework-prefix
+#   tools        optional allow-list of tools; omitted = the host default
+#   readonly     optional; true = the role must not write files
+version: 1
+agents:
+  - id: eversis-context-engineer
+    description: "Research stage: gathers task context and writes the research artifact from the research template. Delegate when research must be created or updated."
+    reads:
+      - .ai/prompts/internal/eversis-research.md
+      - .ai/skills/eversis-task-analysing/SKILL.md
+      - .ai/skills/eversis-task-analysing/research.example.md
+  - id: eversis-architect
+    description: "Plan stage: writes or refreshes the implementation plan from the plan template. Delegate when a plan must be created or updated."
+    reads:
+      - .ai/prompts/internal/eversis-plan.md
+      - .ai/skills/eversis-creating-implementation-plans/SKILL.md
+      - .ai/skills/eversis-creating-implementation-plans/plan.example.md
+  - id: eversis-code-reviewer
+    description: "Review stage: checks the implementation against the research, plan and acceptance criteria and reports PASS / BLOCKER / SUGGESTION without changing files. Delegate after implementation and quality checks."
+    reads:
+      - .ai/prompts/public/eversis-review.md
+      - .ai/skills/eversis-code-reviewing/SKILL.md
+    tools:
+      - Read
+      - Grep
+      - Glob
+      - Bash
+    readonly: true
