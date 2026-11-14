@@ -622,6 +622,8 @@ _write_pi_skills_manifest() {
   local helper="${LIB_DIR:-}/pi-skills-manifest.mjs"
   local manifest="${TARGET_DIR}/${PI_SKILLS_MANIFEST_REL}"
   local -a names=()
+  # Splitting on spaces is safe: the names are framework eversis-* folder
+  # names, which never contain spaces.
   read -ra names <<< "${PI_MIRROR_COPIED_NAMES:-}"
   if [[ -n "${LIB_DIR:-}" ]] && [[ -f "$helper" ]] && command -v node >/dev/null 2>&1 \
     && node "$helper" write "$manifest" "${TARGET_DIR}/.pi/skills" ${names[@]+"${names[@]}"} >/dev/null 2>&1; then

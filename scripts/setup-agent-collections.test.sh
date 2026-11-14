@@ -990,6 +990,56 @@ grep -qF 'Legacy Pi generator found' "$HAND_PLAIN_LOG" \
   && { echo "FAIL: (h2) backup folder reported as a legacy Pi finding"; cat "$HAND_PLAIN_LOG"; exit 1; }
 _assert_selection_agents "$TARGET_HAND" '["cursor"]' "(h2) plain upgrade after deselect"
 
+# (h4) explicit Pi deselect that removes every legacy-marked .pi/ file: a Pi
+# install gets two legacy-marked skill entries (a folder and a regular file
+# under a mirror name), and --agents cursor backs them up and removes them.
+# The count goes from 2 at the start to 0, so the summary has no marker line
+# and never says "migrated"; with no other legacy finding there is no
+# "Legacy Pi:" block at all.
+TARGET_DESEL_ZERO="${TMP}/consumer-pi-deselect-zero"
+mkdir -p "$TARGET_DESEL_ZERO"
+(cd "$TARGET_DESEL_ZERO" && git init -q)
+env -u AGENT_COLLECTIONS_HOME bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_DESEL_ZERO" \
+  --non-interactive \
+  --agents=cursor,pi \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy \
+  > "${TMP}/consumer-pi-deselect-zero-install.log" 2>&1 \
+  || { echo "FAIL: (h4) --agents=cursor,pi install failed"; cat "${TMP}/consumer-pi-deselect-zero-install.log"; exit 1; }
+mkdir -p "${TARGET_DESEL_ZERO}/.pi/skills/eversis-code-reviewer"
+printf -- '---\nname: eversis-code-reviewer\n---\n%s\nlegacy reviewer\n' "$LEGACY_PI_MARKER_LINE" \
+  > "${TARGET_DESEL_ZERO}/.pi/skills/eversis-code-reviewer/SKILL.md"
+printf '%s\nlegacy notes file\n' "$LEGACY_PI_MARKER_LINE" > "${TARGET_DESEL_ZERO}/.pi/skills/eversis-notes.md"
+DESEL_ZERO_LOG="${TMP}/consumer-pi-deselect-zero.log"
+_rc=0
+env -u AGENT_COLLECTIONS_HOME bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_DESEL_ZERO" \
+  --upgrade --sync --non-interactive \
+  --agents cursor \
+  > "$DESEL_ZERO_LOG" 2>&1 || _rc=$?
+[[ "$_rc" -eq 0 ]] || { echo "FAIL: (h4) explicit Pi deselect exited ${_rc}, expected 0"; cat "$DESEL_ZERO_LOG"; exit 1; }
+grep -qF 'Done.' "$DESEL_ZERO_LOG" \
+  || { echo "FAIL: (h4) deselect run did not reach its final Done. line"; cat "$DESEL_ZERO_LOG"; exit 1; }
+# Start count > 0: the start-of-run warning reports both marked entries.
+grep -qF -- '- 2 .pi/ file(s) still carry the legacy marker' "$DESEL_ZERO_LOG" \
+  || { echo "FAIL: (h4) start-of-run warning does not report the 2 legacy-marked files"; cat "$DESEL_ZERO_LOG"; exit 1; }
+# End count 0: no legacy-marked file is left under .pi/.
+_left_legacy="$(TARGET_DIR="$TARGET_DESEL_ZERO" bash -c 'source "$1/common.sh"; source "$1/legacy-pi.sh"; _legacy_pi_marked_files' _ "${ROOT}/scripts/lib/setup-agent-collections")"
+[[ -z "$_left_legacy" ]] \
+  || { echo "FAIL: (h4) legacy-marked files after the deselect: ${_left_legacy}"; exit 1; }
+_desel_summary="$(_legacy_summary_block "$DESEL_ZERO_LOG")"
+grep -qF 'still carry' <<< "$_desel_summary" \
+  && { echo "FAIL: (h4) summary shows a legacy marker line after the deselect removed every marked file"; cat "$DESEL_ZERO_LOG"; exit 1; }
+grep -qF 'migrated' <<< "$_desel_summary" \
+  && { echo "FAIL: (h4) summary says migrated after a Pi deselect"; cat "$DESEL_ZERO_LOG"; exit 1; }
+[[ -z "$_desel_summary" ]] \
+  || { echo "FAIL: (h4) summary has a Legacy Pi: block with no legacy finding left"; cat "$DESEL_ZERO_LOG"; exit 1; }
+_assert_selection_agents "$TARGET_DESEL_ZERO" '["cursor"]' "(h4) Pi deselect"
+
 # (h3) vendored install, hand-ported .pi/, upgrade run from the project root
 # with the vendored installer and no --target. The stop commands use the
 # project-relative installer path, which works from the project root (the
