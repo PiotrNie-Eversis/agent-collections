@@ -788,6 +788,13 @@ _tree_checksum() {
   done; find . -path ./.git -prune -o -type l -print | LC_ALL=C sort)
 }
 
+# Prints only the "Legacy Pi:" block of the end-of-run summary in log $1. The
+# start-of-run warning ("Legacy Pi generator found") prints its own marker
+# count into the same log, so summary assertions must not read the whole log.
+_legacy_summary_block() {
+  sed -n '/Legacy Pi:/,/Next steps:/p' "$1"
+}
+
 # (h) hand-ported .pi/ + record ["cursor"] + --upgrade --sync → stop before any
 # write; then an explicit --agents cursor,pi migrates with .bak copies.
 TARGET_HAND="${TMP}/consumer-pi-hand-port"
@@ -834,7 +841,9 @@ _assert_only_hand_made_backups() {
 HAND_BEFORE="$(_tree_checksum "$TARGET_HAND")"
 HAND_STOP_LOG="${TMP}/consumer-pi-hand-port-stop.log"
 _rc=0
-bash "${ROOT}/scripts/setup-agent-collections.sh" \
+# The printed installer path depends on AGENT_COLLECTIONS_HOME, so the
+# developer's shell value is removed here and set explicitly below.
+env -u AGENT_COLLECTIONS_HOME bash "${ROOT}/scripts/setup-agent-collections.sh" \
   --collections-home "$ROOT" \
   --target "$TARGET_HAND" \
   --upgrade --sync --non-interactive \
@@ -846,6 +855,29 @@ grep -qE -- '--agents cursor$' "$HAND_STOP_LOG" \
   || { echo "FAIL: (h) stop message does not name --agents cursor"; cat "$HAND_STOP_LOG"; exit 1; }
 [[ "$(_tree_checksum "$TARGET_HAND")" == "$HAND_BEFORE" ]] \
   || { echo "FAIL: (h) stopped upgrade changed files under the target"; cat "$HAND_STOP_LOG"; exit 1; }
+# Installer outside the project, no AGENT_COLLECTIONS_HOME: both commands use
+# the quoted absolute path of the running script.
+for _cmd_agents in 'cursor,pi' 'cursor'; do
+  grep -qxF "      bash \"${ROOT}/scripts/setup-agent-collections.sh\" --upgrade --sync --agents ${_cmd_agents}" "$HAND_STOP_LOG" \
+    || { echo "FAIL: (h) stop command for --agents ${_cmd_agents} does not use the quoted absolute installer path"; cat "$HAND_STOP_LOG"; exit 1; }
+done
+# Same stop with AGENT_COLLECTIONS_HOME naming this framework: the commands
+# use "$AGENT_COLLECTIONS_HOME/…", for the person's shell to expand.
+HAND_STOP_ENV_LOG="${TMP}/consumer-pi-hand-port-stop-env.log"
+_rc=0
+AGENT_COLLECTIONS_HOME="$ROOT" bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_HAND" \
+  --upgrade --sync --non-interactive \
+  > "$HAND_STOP_ENV_LOG" 2>&1 || _rc=$?
+[[ "$_rc" -eq 1 ]] || { echo "FAIL: (h) stop with AGENT_COLLECTIONS_HOME exited ${_rc}, expected 1"; cat "$HAND_STOP_ENV_LOG"; exit 1; }
+for _cmd_agents in 'cursor,pi' 'cursor'; do
+  # shellcheck disable=SC2016
+  grep -qxF "      bash \"\$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh\" --upgrade --sync --agents ${_cmd_agents}" "$HAND_STOP_ENV_LOG" \
+    || { echo "FAIL: (h) stop command for --agents ${_cmd_agents} does not use \"\$AGENT_COLLECTIONS_HOME/…\""; cat "$HAND_STOP_ENV_LOG"; exit 1; }
+done
+[[ "$(_tree_checksum "$TARGET_HAND")" == "$HAND_BEFORE" ]] \
+  || { echo "FAIL: (h) stopped upgrade with AGENT_COLLECTIONS_HOME changed files under the target"; exit 1; }
 HAND_MIGRATE_LOG="${TMP}/consumer-pi-hand-port-migrate.log"
 bash "${ROOT}/scripts/setup-agent-collections.sh" \
   --collections-home "$ROOT" \
@@ -883,6 +915,18 @@ grep -qF 'hand-ported notes file' "${PI_SKILL_BACKUP}/eversis-notes.md" 2>/dev/n
 _left_legacy="$(TARGET_DIR="$TARGET_HAND" bash -c 'source "$1/common.sh"; source "$1/legacy-pi.sh"; _legacy_pi_marked_files' _ "${ROOT}/scripts/lib/setup-agent-collections")"
 [[ -z "$_left_legacy" ]] \
   || { echo "FAIL: (h) legacy-marked files after migration: ${_left_legacy}"; exit 1; }
+# The summary recounts after the Pi stage: the 3 legacy-marked files of the
+# fixture were migrated, so it says so instead of the start-of-run count, and
+# the run reaches its final line (a zero recount must not stop it).
+_hand_summary="$(_legacy_summary_block "$HAND_MIGRATE_LOG")"
+grep -qF -- '- 3 legacy-marked .pi/ file(s) were migrated (the old copies are in *.pre-agent-collections*.bak files and .pi/pre-agent-collections-backup/)' <<< "$_hand_summary" \
+  || { echo "FAIL: (h) summary does not say the legacy-marked files were migrated"; cat "$HAND_MIGRATE_LOG"; exit 1; }
+grep -qF 'still carry' <<< "$_hand_summary" \
+  && { echo "FAIL: (h) summary still reports the start-of-run legacy marker count"; cat "$HAND_MIGRATE_LOG"; exit 1; }
+grep -qF 'remove the old Pi generator' <<< "$_hand_summary" \
+  && { echo "FAIL: (h) summary tells to remove an old generator after a migration"; cat "$HAND_MIGRATE_LOG"; exit 1; }
+grep -qF 'Done.' "$HAND_MIGRATE_LOG" \
+  || { echo "FAIL: (h) migration run did not reach its final Done. line"; cat "$HAND_MIGRATE_LOG"; exit 1; }
 
 # (h2) explicit deselect of the migrated install: hand-made skill entries are
 # backed up (timestamped, since they differ from the first backups), identical
@@ -924,6 +968,16 @@ for _left in .pi/prompts/eversis-team-notes.md .pi/prompts/legacy-notes.md; do
   grep -qF "  ${_left}" "$HAND_DESELECT_LOG" \
     || { echo "FAIL: (h2) deselect leftovers log does not name ${_left}"; cat "$HAND_DESELECT_LOG"; exit 1; }
 done
+# Two legacy-marked files at the start (the reviewer skill and legacy-notes.md);
+# the deselect removed the skill, so the summary shows the current count 1 and
+# never says "migrated".
+_hand_summary="$(_legacy_summary_block "$HAND_DESELECT_LOG")"
+grep -qF -- "- 1 .pi/ file(s) still carry the legacy marker" <<< "$_hand_summary" \
+  || { echo "FAIL: (h2) summary does not show the current legacy marker count 1"; cat "$HAND_DESELECT_LOG"; exit 1; }
+grep -qF -- "- 2 .pi/ file(s)" <<< "$_hand_summary" \
+  && { echo "FAIL: (h2) summary shows the start-of-run legacy marker count"; cat "$HAND_DESELECT_LOG"; exit 1; }
+grep -qF 'migrated' <<< "$_hand_summary" \
+  && { echo "FAIL: (h2) summary says migrated after a Pi deselect"; cat "$HAND_DESELECT_LOG"; exit 1; }
 rm -f "${TARGET_HAND}/.pi/prompts/eversis-team-notes.md" "${TARGET_HAND}/.pi/prompts/legacy-notes.md"
 HAND_PLAIN_LOG="${TMP}/consumer-pi-hand-port-plain.log"
 bash "${ROOT}/scripts/setup-agent-collections.sh" \
@@ -935,6 +989,297 @@ bash "${ROOT}/scripts/setup-agent-collections.sh" \
 grep -qF 'Legacy Pi generator found' "$HAND_PLAIN_LOG" \
   && { echo "FAIL: (h2) backup folder reported as a legacy Pi finding"; cat "$HAND_PLAIN_LOG"; exit 1; }
 _assert_selection_agents "$TARGET_HAND" '["cursor"]' "(h2) plain upgrade after deselect"
+
+# (h3) vendored install, hand-ported .pi/, upgrade run from the project root
+# with the vendored installer and no --target. The stop commands use the
+# project-relative installer path, which works from the project root (the
+# target comes from git rev-parse, a resolved path, while the script folder is
+# not resolved: macOS /var vs /private/var). "Found" lists the skill entry
+# first, once, although 5 other findings sort before .pi/skills/.
+TARGET_VEND_HAND="${TMP}/consumer-pi-hand-port-vendored"
+mkdir -p "$TARGET_VEND_HAND"
+(cd "$TARGET_VEND_HAND" && git init -q)
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_VEND_HAND" \
+  --non-interactive \
+  --vendor=copy \
+  --agents=cursor \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy \
+  > "${TMP}/consumer-pi-hand-port-vendored-install.log" 2>&1 \
+  || { echo "FAIL: (h3) vendored cursor install failed"; cat "${TMP}/consumer-pi-hand-port-vendored-install.log"; exit 1; }
+mkdir -p "${TARGET_VEND_HAND}/.pi/extensions" "${TARGET_VEND_HAND}/.pi/prompts" \
+  "${TARGET_VEND_HAND}/.pi/skills/eversis-hand-notes"
+for _f in APPEND_SYSTEM.md extensions/legacy-a.ts extensions/legacy-b.ts \
+    prompts/eversis-implement.md prompts/eversis-review.md skills/eversis-hand-notes/SKILL.md; do
+  printf '%s\nhand-ported file\n' "$LEGACY_PI_MARKER_LINE" > "${TARGET_VEND_HAND}/.pi/${_f}"
+done
+VEND_HAND_BEFORE="$(_tree_checksum "$TARGET_VEND_HAND")"
+VEND_HAND_STOP_LOG="${TMP}/consumer-pi-hand-port-vendored-stop.log"
+_rc=0
+(cd "$TARGET_VEND_HAND" && env -u AGENT_COLLECTIONS_HOME \
+  bash vendor/agent-collections/scripts/setup-agent-collections.sh --upgrade --sync --non-interactive) \
+  > "$VEND_HAND_STOP_LOG" 2>&1 || _rc=$?
+[[ "$_rc" -eq 1 ]] || { echo "FAIL: (h3) vendored hand-port upgrade exited ${_rc}, expected 1"; cat "$VEND_HAND_STOP_LOG"; exit 1; }
+[[ "$(_tree_checksum "$TARGET_VEND_HAND")" == "$VEND_HAND_BEFORE" ]] \
+  || { echo "FAIL: (h3) stopped vendored upgrade changed files under the target"; cat "$VEND_HAND_STOP_LOG"; exit 1; }
+for _cmd_agents in 'cursor,pi' 'cursor'; do
+  grep -qxF "      bash vendor/agent-collections/scripts/setup-agent-collections.sh --upgrade --sync --agents ${_cmd_agents}" "$VEND_HAND_STOP_LOG" \
+    || { echo "FAIL: (h3) stop command for --agents ${_cmd_agents} does not use the project-relative installer path"; cat "$VEND_HAND_STOP_LOG"; exit 1; }
+done
+_vend_cmd_path="$(sed -n 's/^      bash \([^ ]*\) --upgrade --sync --agents cursor,pi$/\1/p' "$VEND_HAND_STOP_LOG" | head -n 1)"
+(cd "$TARGET_VEND_HAND" && [[ -n "$_vend_cmd_path" && -f "$_vend_cmd_path" ]]) \
+  || { echo "FAIL: (h3) printed installer path '${_vend_cmd_path}' is not a file from the project root"; exit 1; }
+_vend_found="$(sed -n '/^  Found:/,/An upgrade without --agents/p' "$VEND_HAND_STOP_LOG" | sed -n '2,6p')"
+grep -qxF '    .pi/skills/eversis-hand-notes' <<< "$_vend_found" \
+  || { echo "FAIL: (h3) skill entry is not in the first 5 Found lines"; cat "$VEND_HAND_STOP_LOG"; exit 1; }
+[[ "$(grep -c 'eversis-hand-notes' "$VEND_HAND_STOP_LOG" || true)" == "1" ]] \
+  || { echo "FAIL: (h3) skill entry is not listed exactly once in the stop message"; cat "$VEND_HAND_STOP_LOG"; exit 1; }
+grep -qxF '    … and 1 more' "$VEND_HAND_STOP_LOG" \
+  || { echo "FAIL: (h3) Found list lost its '… and N more' line"; cat "$VEND_HAND_STOP_LOG"; exit 1; }
+
+# ---------------------------------------------------------------------------
+# Pi skills manifest (.agent-collections/pi-skills-mirror.json): the installer
+# records a content hash per .pi/skills/ entry it copied, so its own outdated
+# copy is replaced or removed without a backup, while a hand-edited copy is
+# still backed up.
+# ---------------------------------------------------------------------------
+PI_MANIFEST_HELPER="${ROOT}/scripts/lib/setup-agent-collections/pi-skills-manifest.mjs"
+
+# (p0) helper properties, called directly.
+PM_DIR="${TMP}/pi-manifest-props"
+mkdir -p "${PM_DIR}/skills/tree/sub" "${PM_DIR}/skills/empty-dir"
+printf 'skill body\n' > "${PM_DIR}/skills/tree/SKILL.md"
+printf 'hidden\n' > "${PM_DIR}/skills/tree/.hidden"
+printf 'nested\n' > "${PM_DIR}/skills/tree/sub/a.txt"
+printf 'outside one\n' > "${PM_DIR}/outside-one.txt"
+printf 'outside two\n' > "${PM_DIR}/outside-two.txt"
+ln -s ../../outside-one.txt "${PM_DIR}/skills/tree/link"
+: > "${PM_DIR}/empty-file"
+PM_MANIFEST="${PM_DIR}/state/manifest.json"
+# Runs `match` for $1 against $2; asserts exit code $3 and empty stdout.
+_pm_match() {
+  local name="$1" entry="$2" want="$3" label="$4" out rc=0
+  out="$(node "$PI_MANIFEST_HELPER" match "${5:-$PM_MANIFEST}" "$name" "$entry")" || rc=$?
+  [[ "$rc" -eq "$want" ]] || { echo "FAIL: (p0) ${label}: match exited ${rc}, expected ${want}"; exit 1; }
+  [[ -z "$out" ]] || { echo "FAIL: (p0) ${label}: match printed to stdout: ${out}"; exit 1; }
+}
+node "$PI_MANIFEST_HELPER" write "$PM_MANIFEST" "${PM_DIR}/skills" tree empty-dir \
+  || { echo "FAIL: (p0) write failed (parent folder missing?)"; exit 1; }
+_pm_match tree "${PM_DIR}/skills/tree" 0 "unchanged tree"
+chmod 600 "${PM_DIR}/skills/tree/SKILL.md"
+touch -t 200001010000 "${PM_DIR}/skills/tree/SKILL.md" "${PM_DIR}/skills/tree/sub"
+_pm_match tree "${PM_DIR}/skills/tree" 0 "mode and mtime ignored"
+printf 'hidden edit\n' > "${PM_DIR}/skills/tree/.hidden"
+_pm_match tree "${PM_DIR}/skills/tree" 1 "dotfile change"
+printf 'hidden\n' > "${PM_DIR}/skills/tree/.hidden"
+_pm_match tree "${PM_DIR}/skills/tree" 0 "dotfile restored"
+printf 'outside one, edited\n' > "${PM_DIR}/outside-one.txt"
+_pm_match tree "${PM_DIR}/skills/tree" 0 "symlink target content not followed"
+ln -sfn ../../outside-two.txt "${PM_DIR}/skills/tree/link"
+_pm_match tree "${PM_DIR}/skills/tree" 1 "symlink text change"
+ln -sfn ../../outside-one.txt "${PM_DIR}/skills/tree/link"
+_pm_match tree "${PM_DIR}/skills/tree" 0 "symlink text restored"
+_pm_match empty-dir "${PM_DIR}/empty-file" 1 "file against a directory hash"
+_pm_match empty-dir "${PM_DIR}/skills/empty-dir" 0 "empty directory"
+_pm_match not-recorded "${PM_DIR}/skills/tree" 1 "name not in the manifest"
+_pm_match tree "${PM_DIR}/skills/missing" 1 "entry path missing"
+_pm_match tree "${PM_DIR}/skills/tree" 1 "manifest missing" "${PM_DIR}/no-such-manifest.json"
+sed 's/"version": 1/"version": 2/' "$PM_MANIFEST" > "${PM_DIR}/v2.json"
+_pm_match tree "${PM_DIR}/skills/tree" 1 "version 2" "${PM_DIR}/v2.json"
+echo '{not-json' > "${PM_DIR}/bad.json"
+_pm_match tree "${PM_DIR}/skills/tree" 1 "invalid JSON" "${PM_DIR}/bad.json"
+# An entry type other than file, directory or symlink fails closed: no match,
+# and `write` leaves the name out.
+mkdir -p "${PM_DIR}/skills/with-fifo"
+mkfifo "${PM_DIR}/skills/with-fifo/pipe"
+node "$PI_MANIFEST_HELPER" write "${PM_DIR}/fifo.json" "${PM_DIR}/skills" with-fifo tree \
+  || { echo "FAIL: (p0) write with a fifo entry failed"; exit 1; }
+grep -qF '"with-fifo"' "${PM_DIR}/fifo.json" && { echo "FAIL: (p0) write recorded an entry holding a fifo"; exit 1; }
+grep -qF '"tree"' "${PM_DIR}/fifo.json" || { echo "FAIL: (p0) write dropped a valid entry next to a fifo entry"; exit 1; }
+_pm_match with-fifo "${PM_DIR}/skills/with-fifo" 1 "fifo inside a tree" "${PM_DIR}/fifo.json"
+# Byte-stable output: name order and duplicates do not change the file.
+node "$PI_MANIFEST_HELPER" write "${PM_DIR}/fwd.json" "${PM_DIR}/skills" empty-dir tree
+node "$PI_MANIFEST_HELPER" write "${PM_DIR}/rev.json" "${PM_DIR}/skills" tree empty-dir
+node "$PI_MANIFEST_HELPER" write "${PM_DIR}/dup.json" "${PM_DIR}/skills" tree empty-dir tree
+cmp -s "${PM_DIR}/fwd.json" "${PM_DIR}/rev.json" && cmp -s "${PM_DIR}/fwd.json" "${PM_DIR}/dup.json" \
+  || { echo "FAIL: (p0) manifest bytes depend on name order or duplicates"; diff "${PM_DIR}/fwd.json" "${PM_DIR}/dup.json" || true; exit 1; }
+[[ "$(tail -c 1 "${PM_DIR}/fwd.json" | od -An -c | tr -d ' ')" == '\n' ]] \
+  || { echo "FAIL: (p0) manifest does not end with a newline"; exit 1; }
+node "$PI_MANIFEST_HELPER" write "${PM_DIR}/zero.json" "${PM_DIR}/skills" \
+  || { echo "FAIL: (p0) write with zero names failed"; exit 1; }
+node -e '
+  const j = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+  if (j.version !== 1 || JSON.stringify(j.skills) !== "{}") process.exit(1);
+' "${PM_DIR}/zero.json" || { echo "FAIL: (p0) zero names did not write an empty skills object"; exit 1; }
+
+# Names of the framework skills (.ai/skills/eversis-* folders), one per line.
+_framework_skill_names() {
+  local src
+  for src in "${ROOT}/.ai/skills"/eversis-*; do
+    [[ -d "$src" ]] && basename "$src"
+  done
+  return 0
+}
+# Asserts the manifest under target $1 is version 1 and its keys are exactly
+# the framework skill names.
+_assert_pi_manifest_keys() {
+  local target="$1" label="$2"
+  node -e '
+    const fs = require("fs");
+    const j = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    const want = fs.readFileSync(0, "utf8").split("\n").filter(Boolean).sort();
+    const got = Object.keys(j.skills || {}).sort();
+    if (j.version !== 1 || JSON.stringify(got) !== JSON.stringify(want)) {
+      console.error("keys=" + JSON.stringify(got));
+      process.exit(1);
+    }
+    if (!Object.values(j.skills).every((v) => /^sha256:[0-9a-f]{64}$/.test(v))) process.exit(1);
+  ' "${target}/.agent-collections/pi-skills-mirror.json" <<< "$(_framework_skill_names)" \
+    || { echo "FAIL: ${label}: .agent-collections/pi-skills-mirror.json keys are not exactly the framework skills"; exit 1; }
+}
+# Records the current .pi/skills/ content of every framework skill name plus
+# any extra names in $2… in the manifest of target $1, as if the installer had
+# copied them.
+_record_pi_manifest() {
+  local target="$1"
+  shift
+  # shellcheck disable=SC2046
+  node "$PI_MANIFEST_HELPER" write "${target}/.agent-collections/pi-skills-mirror.json" \
+    "${target}/.pi/skills" $(_framework_skill_names) "$@" \
+    || { echo "FAIL: could not record the Pi skills manifest fixture"; exit 1; }
+}
+# Runs `--upgrade --sync` on target $1 with log $2 and any extra args.
+_pm_upgrade() {
+  local target="$1" log="$2"
+  shift 2
+  bash "${ROOT}/scripts/setup-agent-collections.sh" \
+    --collections-home "$ROOT" \
+    --target "$target" \
+    --upgrade --sync --non-interactive "$@" \
+    > "$log" 2>&1 \
+    || { echo "FAIL: upgrade of ${target} failed"; cat "$log"; exit 1; }
+}
+
+TARGET_MAN="${TMP}/consumer-pi-manifest"
+mkdir -p "$TARGET_MAN"
+(cd "$TARGET_MAN" && git init -q)
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_MAN" \
+  --non-interactive \
+  --agents=cursor,pi \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy \
+  > "${TMP}/consumer-pi-manifest-install.log" 2>&1 \
+  || { echo "FAIL: (p1) --agents=cursor,pi install failed"; cat "${TMP}/consumer-pi-manifest-install.log"; exit 1; }
+MAN_FILE="${TARGET_MAN}/.agent-collections/pi-skills-mirror.json"
+MAN_BACKUP="${TARGET_MAN}/.pi/pre-agent-collections-backup/skills"
+MAN_OUTDATED="eversis-fine-handoff"
+MAN_EDITED="eversis-task-analysing"
+MAN_RETIRED="eversis-retired-example"
+[[ -d "${ROOT}/.ai/skills/${MAN_OUTDATED}" && -d "${ROOT}/.ai/skills/${MAN_EDITED}" ]] \
+  || { echo "FAIL: (p) fixture skills ${MAN_OUTDATED} / ${MAN_EDITED} are not in .ai/skills/"; exit 1; }
+[[ -e "${ROOT}/.ai/skills/${MAN_RETIRED}" ]] \
+  && { echo "FAIL: (p) fixture assumes .ai/skills/${MAN_RETIRED} does not exist"; exit 1; }
+
+# (p1) a Pi install writes the manifest with every framework skill name.
+_assert_pi_manifest_keys "$TARGET_MAN" "(p1) Pi install"
+_pm_match "$MAN_OUTDATED" "${TARGET_MAN}/.pi/skills/${MAN_OUTDATED}" 0 "installed copy matches its record" "$MAN_FILE"
+
+# (p2) outdated framework copy (recorded) → replaced, no backup, no warning.
+# (p3) recorded copy whose name left .ai/skills/ → stale-pruned, no backup.
+# (p4) copy edited after it was recorded → backed up (differs).
+echo 'line from an older framework release' >> "${TARGET_MAN}/.pi/skills/${MAN_OUTDATED}/SKILL.md"
+cp -R "${TARGET_MAN}/.pi/skills/${MAN_OUTDATED}" "${TARGET_MAN}/.pi/skills/${MAN_RETIRED}"
+_record_pi_manifest "$TARGET_MAN" "$MAN_RETIRED"
+echo 'hand edit after the install' >> "${TARGET_MAN}/.pi/skills/${MAN_EDITED}/SKILL.md"
+MAN_LOG="${TMP}/consumer-pi-manifest-upgrade.log"
+_pm_upgrade "$TARGET_MAN" "$MAN_LOG"
+cmp -s "${ROOT}/.ai/skills/${MAN_OUTDATED}/SKILL.md" "${TARGET_MAN}/.pi/skills/${MAN_OUTDATED}/SKILL.md" \
+  || { echo "FAIL: (p2) outdated copy was not replaced by the framework skill"; exit 1; }
+grep -qF "Backed up .pi/skills/${MAN_OUTDATED} " "$MAN_LOG" \
+  && { echo "FAIL: (p2) recorded outdated copy was backed up"; cat "$MAN_LOG"; exit 1; }
+ls "$MAN_BACKUP"/"${MAN_OUTDATED}"* >/dev/null 2>&1 \
+  && { echo "FAIL: (p2) backup folder holds the recorded outdated copy"; exit 1; }
+[[ -e "${TARGET_MAN}/.pi/skills/${MAN_RETIRED}" ]] \
+  && { echo "FAIL: (p3) recorded stale entry stayed in .pi/skills/"; exit 1; }
+grep -qF "Backed up .pi/skills/${MAN_RETIRED} " "$MAN_LOG" \
+  && { echo "FAIL: (p3) recorded stale entry was backed up"; cat "$MAN_LOG"; exit 1; }
+ls "$MAN_BACKUP"/"${MAN_RETIRED}"* >/dev/null 2>&1 \
+  && { echo "FAIL: (p3) backup folder holds the recorded stale entry"; exit 1; }
+grep -qF "Backed up .pi/skills/${MAN_EDITED} to .pi/pre-agent-collections-backup/skills/${MAN_EDITED} (differs from the framework skill)" "$MAN_LOG" \
+  || { echo "FAIL: (p4) hand-edited copy backup not logged"; cat "$MAN_LOG"; exit 1; }
+grep -qF 'hand edit after the install' "${MAN_BACKUP}/${MAN_EDITED}/SKILL.md" 2>/dev/null \
+  || { echo "FAIL: (p4) hand-edited copy was not backed up"; exit 1; }
+_assert_pi_manifest_keys "$TARGET_MAN" "(p2) upgrade rewrites the manifest"
+_assert_pi_tree "$TARGET_MAN" "(p2) upgrade"
+
+# (p5) no manifest → today's behaviour once (backup), then a manifest.
+rm -f "$MAN_FILE"
+echo 'edit without a manifest' >> "${TARGET_MAN}/.pi/skills/${MAN_OUTDATED}/SKILL.md"
+MAN_NONE_LOG="${TMP}/consumer-pi-manifest-none.log"
+_pm_upgrade "$TARGET_MAN" "$MAN_NONE_LOG"
+[[ "$(grep -c 'Backed up .pi/skills/' "$MAN_NONE_LOG" || true)" == "1" ]] \
+  || { echo "FAIL: (p5) expected exactly one skill backup without a manifest"; cat "$MAN_NONE_LOG"; exit 1; }
+grep -qF "Backed up .pi/skills/${MAN_OUTDATED} " "$MAN_NONE_LOG" \
+  || { echo "FAIL: (p5) copy without a manifest was not backed up"; cat "$MAN_NONE_LOG"; exit 1; }
+grep -rqF 'edit without a manifest' "$MAN_BACKUP" \
+  || { echo "FAIL: (p5) backup without a manifest does not hold the edited copy"; exit 1; }
+_assert_pi_manifest_keys "$TARGET_MAN" "(p5) upgrade without a manifest"
+
+# (p6) invalid manifest counts as absent: backup, then a valid manifest.
+echo '{not-json' > "$MAN_FILE"
+echo 'edit with an invalid manifest' >> "${TARGET_MAN}/.pi/skills/${MAN_OUTDATED}/SKILL.md"
+MAN_BAD_LOG="${TMP}/consumer-pi-manifest-invalid.log"
+_pm_upgrade "$TARGET_MAN" "$MAN_BAD_LOG"
+grep -qF "Backed up .pi/skills/${MAN_OUTDATED} " "$MAN_BAD_LOG" \
+  || { echo "FAIL: (p6) copy with an invalid manifest was not backed up"; cat "$MAN_BAD_LOG"; exit 1; }
+grep -rqF 'edit with an invalid manifest' "$MAN_BACKUP" \
+  || { echo "FAIL: (p6) backup with an invalid manifest does not hold the edited copy"; exit 1; }
+_assert_pi_manifest_keys "$TARGET_MAN" "(p6) upgrade with an invalid manifest"
+
+# (p7) a names value from the caller's environment never reaches the manifest:
+# both names survive the run (a non-eversis entry and a generated role skill).
+mkdir -p "${TARGET_MAN}/.pi/skills/my-notes"
+echo 'team notes' > "${TARGET_MAN}/.pi/skills/my-notes/SKILL.md"
+MAN_ROLE="$(basename "$(find "${TARGET_MAN}/.pi/skills" -mindepth 1 -maxdepth 1 -name 'eversis-rule-*' | LC_ALL=C sort | head -n 1)")"
+[[ -n "$MAN_ROLE" && -d "${TARGET_MAN}/.pi/skills/${MAN_ROLE}" ]] \
+  || { echo "FAIL: (p7) no generated eversis-rule-* skill to use as a fixture"; exit 1; }
+MAN_ENV_LOG="${TMP}/consumer-pi-manifest-env.log"
+PI_MIRROR_COPIED_NAMES="my-notes ${MAN_ROLE}" bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_MAN" \
+  --upgrade --sync --non-interactive \
+  > "$MAN_ENV_LOG" 2>&1 \
+  || { echo "FAIL: (p7) upgrade with pre-set names failed"; cat "$MAN_ENV_LOG"; exit 1; }
+_assert_pi_manifest_keys "$TARGET_MAN" "(p7) pre-set names in the environment"
+rm -rf "${TARGET_MAN}/.pi/skills/my-notes"
+
+# (p8) deselect: a recorded outdated copy is removed with no backup, and the
+# manifest is removed.
+echo 'line from an older framework release' >> "${TARGET_MAN}/.pi/skills/${MAN_OUTDATED}/SKILL.md"
+_record_pi_manifest "$TARGET_MAN"
+MAN_BACKUPS_BEFORE="$(ls "$MAN_BACKUP" | LC_ALL=C sort)"
+MAN_DESELECT_LOG="${TMP}/consumer-pi-manifest-deselect.log"
+_pm_upgrade "$TARGET_MAN" "$MAN_DESELECT_LOG" --agents cursor
+[[ -e "$MAN_FILE" ]] && { echo "FAIL: (p8) Pi deselect left .agent-collections/pi-skills-mirror.json"; exit 1; }
+[[ -e "${TARGET_MAN}/.pi/skills/${MAN_OUTDATED}" ]] \
+  && { echo "FAIL: (p8) Pi deselect left .pi/skills/${MAN_OUTDATED}"; exit 1; }
+grep -qF 'Backed up .pi/skills/' "$MAN_DESELECT_LOG" \
+  && { echo "FAIL: (p8) Pi deselect backed up a recorded copy"; cat "$MAN_DESELECT_LOG"; exit 1; }
+[[ "$(ls "$MAN_BACKUP" | LC_ALL=C sort)" == "$MAN_BACKUPS_BEFORE" ]] \
+  || { echo "FAIL: (p8) Pi deselect added a skill backup"; exit 1; }
+
+# (p9) deselect with .pi/ already gone still removes the manifest.
+_pm_upgrade "$TARGET_MAN" "${TMP}/consumer-pi-manifest-reselect.log" --agents cursor,pi
+[[ -f "$MAN_FILE" ]] || { echo "FAIL: (p9) Pi re-select did not write the manifest"; exit 1; }
+rm -rf "${TARGET_MAN}/.pi"
+_pm_upgrade "$TARGET_MAN" "${TMP}/consumer-pi-manifest-nopi.log" --agents cursor
+[[ -e "$MAN_FILE" ]] && { echo "FAIL: (p9) Pi deselect without .pi/ left .agent-collections/pi-skills-mirror.json"; exit 1; }
 
 # (i) linked worktree: docs/context/ is named after the main project; an
 # explicit --project-name replaces it and the recorded projectContextPath.

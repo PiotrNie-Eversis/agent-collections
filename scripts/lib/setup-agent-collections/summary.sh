@@ -52,15 +52,41 @@ print_summary() {
   fi
   # Repeat the legacy Pi generator report so it is not lost in scroll;
   # its sync:agents script would regenerate the old .pi/ tree after this run.
-  if [[ -n "${LEGACY_PI_FINDINGS:-}" ]]; then
+  # The legacy-marked .pi/ files are recounted here, after the Pi stage, not
+  # taken from the start of the run (LEGACY_PI_MARKED_AT_START):
+  #   - some still carry the marker → the current count;
+  #   - none left, Pi selected, its stage did not fail and some were marked at
+  #     the start → they were migrated, and the old copies stay in the *.bak
+  #     files and the skill backup folder;
+  #   - none left otherwise (for example an explicit Pi deselect removed them,
+  #     after the backup its log reports) → no marker line.
+  # grep -c exits 1 on a zero count, and this runs at top level under
+  # set -euo pipefail, so the count is guarded.
+  local legacy_now legacy_start="${LEGACY_PI_MARKED_AT_START:-0}" legacy_marker_line=""
+  legacy_now="$(_legacy_pi_marked_files | grep -c . || true)"
+  legacy_now="${legacy_now:-0}"
+  if [[ "$legacy_now" -gt 0 ]]; then
+    legacy_marker_line="${legacy_now} .pi/ file(s) still carry the legacy marker \"${LEGACY_PI_MARKER}\""
+  elif [[ "$pi_selected" == "true" ]] && [[ "$pi_failed" != "true" ]] && [[ "$legacy_start" -gt 0 ]]; then
+    legacy_marker_line="${legacy_start} legacy-marked .pi/ file(s) were migrated (the old copies are in *.pre-agent-collections*.bak files and .pi/pre-agent-collections-backup/)"
+  fi
+  if [[ -n "${LEGACY_PI_FINDINGS:-}" ]] || [[ "$legacy_now" -gt 0 ]]; then
     echo "  ${_YELLOW}Legacy Pi:${_RESET}     remove the old Pi generator — it would undo this install:"
+  elif [[ -n "$legacy_marker_line" ]]; then
+    echo "  ${_YELLOW}Legacy Pi:${_RESET}     migrated to the framework Pi adapter:"
+  fi
+  if [[ -n "${LEGACY_PI_FINDINGS:-}" ]] || [[ -n "$legacy_marker_line" ]]; then
     local legacy_line
     while IFS= read -r legacy_line; do
       [[ -n "$legacy_line" ]] || continue
       echo "                 - ${legacy_line}"
-    done <<< "${LEGACY_PI_FINDINGS}"
-    echo "                 setup-agent-collections.sh --upgrade --sync replaces it; find references with"
-    echo "                 git grep -nE \"sync:agents|gen-pi-adapter|pi-rule-map\""
+    done <<< "${LEGACY_PI_FINDINGS:-}
+${legacy_marker_line}"
+    # The git grep hint only helps when generator files or scripts are listed.
+    if [[ -n "${LEGACY_PI_FINDINGS:-}" ]]; then
+      echo "                 setup-agent-collections.sh --upgrade --sync replaces it; find references with"
+      echo "                 git grep -nE \"sync:agents|gen-pi-adapter|pi-rule-map\""
+    fi
     echo ""
   fi
 
