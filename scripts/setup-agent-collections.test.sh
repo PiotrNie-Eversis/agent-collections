@@ -694,6 +694,8 @@ grep -qF '.pi/settings.json and' "$PI_DESELECT_LOG" \
   || { echo "FAIL: (c) Deselection paragraph does not describe Pi surfaces"; exit 1; }
 grep -qF '.pi/extensions/eversis-review.ts' "$PI_DESELECT_LOG" \
   || { echo "FAIL: (c) Deselection paragraph does not list .pi/extensions/eversis-review.ts"; exit 1; }
+sed -n '/^Deselection:/,/See README upgrade/p' "$PI_DESELECT_LOG" | grep -qF '.agent-collections/pi-skills-mirror.json' \
+  || { echo "FAIL: (c) Deselection paragraph does not name the Pi skills manifest .agent-collections/pi-skills-mirror.json"; exit 1; }
 _assert_selection_agents "$TARGET_CURSOR_PI" '["cursor"]' "(c) Pi deselect"
 
 # (d) induced Pi generation failure (.pi is a regular file) with cursor,pi.
@@ -797,7 +799,7 @@ _tree_checksum() {
 }
 
 # Prints only the "Legacy Pi:" block of the end-of-run summary in log $1. The
-# start-of-run warning ("Legacy Pi generator found") prints its own marker
+# start-of-run warning ("Legacy-marked Pi files found") prints its own marker
 # count into the same log, so summary assertions must not read the whole log.
 _legacy_summary_block() {
   sed -n '/Legacy Pi:/,/Next steps:/p' "$1"
@@ -996,6 +998,8 @@ bash "${ROOT}/scripts/setup-agent-collections.sh" \
   || { echo "FAIL: (h2) plain upgrade after deselect stopped (backup folder counted as a hand port?)"; cat "$HAND_PLAIN_LOG"; exit 1; }
 grep -qF 'Legacy Pi generator found' "$HAND_PLAIN_LOG" \
   && { echo "FAIL: (h2) backup folder reported as a legacy Pi finding"; cat "$HAND_PLAIN_LOG"; exit 1; }
+grep -qF 'Legacy-marked Pi files found' "$HAND_PLAIN_LOG" \
+  && { echo "FAIL: (h2) backup folder reported as legacy-marked Pi files"; cat "$HAND_PLAIN_LOG"; exit 1; }
 _assert_selection_agents "$TARGET_HAND" '["cursor"]' "(h2) plain upgrade after deselect"
 
 # (h4) explicit Pi deselect that removes every legacy-marked .pi/ file: a Pi
@@ -1035,6 +1039,16 @@ grep -qF 'Done.' "$DESEL_ZERO_LOG" \
 # Start count > 0: the start-of-run warning reports both marked entries.
 grep -qF -- '- 2 .pi/ file(s) still carry the legacy marker' "$DESEL_ZERO_LOG" \
   || { echo "FAIL: (h4) start-of-run warning does not report the 2 legacy-marked files"; cat "$DESEL_ZERO_LOG"; exit 1; }
+# Marked files only, no generator: the warning has the marked-files header and
+# says what the run does with them, never "generator found" or "Remove the files".
+grep -qF 'Legacy-marked Pi files found' "$DESEL_ZERO_LOG" \
+  || { echo "FAIL: (h4) start-of-run warning lacks the legacy-marked files header"; cat "$DESEL_ZERO_LOG"; exit 1; }
+grep -qF 'With Pi, the Pi stage replaces the files it generates' "$DESEL_ZERO_LOG" \
+  || { echo "FAIL: (h4) start-of-run warning does not say what the run does with the marked files"; cat "$DESEL_ZERO_LOG"; exit 1; }
+grep -qF 'Legacy Pi generator found' "$DESEL_ZERO_LOG" \
+  && { echo "FAIL: (h4) start-of-run warning says a generator was found when there is none"; cat "$DESEL_ZERO_LOG"; exit 1; }
+grep -qF 'Remove the files' "$DESEL_ZERO_LOG" \
+  && { echo "FAIL: (h4) start-of-run warning asks to remove generator files when there are none"; cat "$DESEL_ZERO_LOG"; exit 1; }
 # End count 0: no legacy-marked file is left under .pi/.
 _left_legacy="$(TARGET_DIR="$TARGET_DESEL_ZERO" bash -c 'source "$1/common.sh"; source "$1/legacy-pi.sh"; _legacy_pi_marked_files' _ "${ROOT}/scripts/lib/setup-agent-collections")"
 [[ -z "$_left_legacy" ]] \
@@ -1097,6 +1111,38 @@ grep -qxF '    .pi/skills/eversis-hand-notes' <<< "$_vend_found" \
   || { echo "FAIL: (h3) skill entry is not listed exactly once in the stop message"; cat "$VEND_HAND_STOP_LOG"; exit 1; }
 grep -qxF '    … and 1 more' "$VEND_HAND_STOP_LOG" \
   || { echo "FAIL: (h3) Found list lost its '… and N more' line"; cat "$VEND_HAND_STOP_LOG"; exit 1; }
+
+# (v1) vendored copy install, install-selection.json deleted, upgrade run
+# from the project root with the vendored installer → the missing-selection
+# message prints the project-relative installer path, which exists from the
+# project root, never the framework-repo path.
+TARGET_VEND_NOSEL="${TMP}/consumer-vendored-no-selection"
+mkdir -p "$TARGET_VEND_NOSEL"
+(cd "$TARGET_VEND_NOSEL" && git init -q)
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_VEND_NOSEL" \
+  --non-interactive \
+  --vendor=copy \
+  --agents=cursor \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy \
+  > "${TMP}/consumer-vendored-no-selection-install.log" 2>&1 \
+  || { echo "FAIL: (v1) vendored cursor install failed"; cat "${TMP}/consumer-vendored-no-selection-install.log"; exit 1; }
+rm -f "${TARGET_VEND_NOSEL}/.agent-collections/install-selection.json"
+VEND_NOSEL_LOG="${TMP}/consumer-vendored-no-selection.log"
+_rc=0
+(cd "$TARGET_VEND_NOSEL" && env -u AGENT_COLLECTIONS_HOME \
+  bash vendor/agent-collections/scripts/setup-agent-collections.sh --upgrade --non-interactive) \
+  > "$VEND_NOSEL_LOG" 2>&1 || _rc=$?
+[[ "$_rc" -eq 1 ]] || { echo "FAIL: (v1) vendored upgrade without a selection exited ${_rc}, expected 1"; cat "$VEND_NOSEL_LOG"; exit 1; }
+grep -qF 'bash vendor/agent-collections/scripts/setup-agent-collections.sh --non-interactive \' "$VEND_NOSEL_LOG" \
+  || { echo "FAIL: (v1) missing-selection message does not use the project-relative installer path"; cat "$VEND_NOSEL_LOG"; exit 1; }
+grep -qF 'bash scripts/setup-agent-collections.sh' "$VEND_NOSEL_LOG" \
+  && { echo "FAIL: (v1) missing-selection message prints the framework-repo installer path"; cat "$VEND_NOSEL_LOG"; exit 1; }
+[[ -f "${TARGET_VEND_NOSEL}/vendor/agent-collections/scripts/setup-agent-collections.sh" ]] \
+  || { echo "FAIL: (v1) printed installer path is not a file from the project root"; exit 1; }
 
 # ---------------------------------------------------------------------------
 # Pi skills manifest (.agent-collections/pi-skills-mirror.json): the installer
@@ -1436,6 +1482,12 @@ for _finding in 'scripts/gen-pi-adapter.mjs' 'scripts/pi-rule-map.yaml' \
 done
 grep -qF 'package.json script "build"' "$LEGACY_LOG" \
   && { echo "FAIL: (j) legacy report named an unrelated script"; exit 1; }
+grep -qF 'Legacy Pi generator found' "$LEGACY_LOG" \
+  || { echo "FAIL: (j) start-of-run warning lacks the generator header"; cat "$LEGACY_LOG"; exit 1; }
+grep -qF 'Remove the files' "$LEGACY_LOG" \
+  || { echo "FAIL: (j) start-of-run warning does not ask to remove the generator files"; cat "$LEGACY_LOG"; exit 1; }
+grep -qF 'Legacy-marked Pi files found' "$LEGACY_LOG" \
+  && { echo "FAIL: (j) start-of-run warning reports legacy-marked files when there are none"; cat "$LEGACY_LOG"; exit 1; }
 grep -qF 'Legacy Pi:' "$LEGACY_LOG" \
   || { echo "FAIL: (j) summary does not repeat the legacy Pi findings"; cat "$LEGACY_LOG"; exit 1; }
 [[ -f "${TARGET_LEGACY}/scripts/gen-pi-adapter.mjs" ]] \
@@ -1457,6 +1509,34 @@ fi
 echo 'written by a legacy generator' >> "${TARGET_LEGACY}/.pi/skills/eversis-fine-handoff/SKILL.md"
 [[ "$(cksum < "${ROOT}/.ai/skills/eversis-fine-handoff/SKILL.md")" == "$FRAMEWORK_SKILL_SUM" ]] \
   || { echo "FAIL: (k) write into .pi/skills/ changed the framework copy"; exit 1; }
+
+# (j2) a legacy generator file and one legacy-marked .pi/ file in the same
+# project → the start-of-run warning prints both groups, each with its own
+# header, in one run.
+TARGET_LEGACY_BOTH="${TMP}/consumer-pi-legacy-both"
+mkdir -p "${TARGET_LEGACY_BOTH}/scripts" "${TARGET_LEGACY_BOTH}/.pi"
+(cd "$TARGET_LEGACY_BOTH" && git init -q)
+echo '// legacy' > "${TARGET_LEGACY_BOTH}/scripts/gen-pi-adapter.mjs"
+printf '%s\nlegacy notes\n' "$LEGACY_PI_MARKER_LINE" > "${TARGET_LEGACY_BOTH}/.pi/legacy-notes.md"
+LEGACY_BOTH_LOG="${TMP}/consumer-pi-legacy-both.log"
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_LEGACY_BOTH" \
+  --non-interactive \
+  --agents=cursor \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy \
+  > "$LEGACY_BOTH_LOG" 2>&1 \
+  || { echo "FAIL: (j2) install with a legacy generator and a legacy-marked file failed"; cat "$LEGACY_BOTH_LOG"; exit 1; }
+for _header in 'Legacy Pi generator found' 'Remove the files' \
+    'Legacy-marked Pi files found' '- 1 .pi/ file(s) still carry the legacy marker' \
+    'With Pi, the Pi stage replaces the files it generates'; do
+  grep -qF -- "$_header" "$LEGACY_BOTH_LOG" \
+    || { echo "FAIL: (j2) start-of-run warning lacks '${_header}'"; cat "$LEGACY_BOTH_LOG"; exit 1; }
+done
+grep -qF -- '- scripts/gen-pi-adapter.mjs' "$LEGACY_BOTH_LOG" \
+  || { echo "FAIL: (j2) legacy report does not name scripts/gen-pi-adapter.mjs"; cat "$LEGACY_BOTH_LOG"; exit 1; }
 
 # (k2) a symlinked .pi/skills/eversis-* entry from an older install becomes a
 # real directory on upgrade; the framework directory it pointed at is untouched.
@@ -1637,6 +1717,100 @@ grep -qE 'failed: +link-framework' "$LN_CP_FAIL_LOG" \
   || { echo "FAIL: (s2) failure not reported as the link-framework step"; cat "$LN_CP_FAIL_LOG"; exit 1; }
 grep -qF 'Done.' "$LN_CP_FAIL_LOG" \
   && { echo "FAIL: (s2) run reported Done. after a failed skills mirror"; exit 1; }
+
+# (v2) vendored copy install with a record (cursor, eversis-collections,
+# frontend), then an upgrade run from the project root with the vendored
+# installer, no selection flags, and a `cp` that fails for skill packages, so
+# the link-framework step fails. The "Recovery:" hint prints the
+# project-relative installer path (a file from the project root) with
+# --upgrade --sync --non-interactive and no selection flags: the record
+# supplies them, and an explicit --mcp-servers / --agents would change what
+# the re-run preserves.
+CP_FAIL_BIN="${TMP}/cp-fail-bin"
+mkdir -p "$CP_FAIL_BIN"
+cp "${LN_CP_FAIL_BIN}/cp" "${CP_FAIL_BIN}/cp"
+TARGET_VEND_RECOVER="${TMP}/consumer-vendored-recovery"
+mkdir -p "$TARGET_VEND_RECOVER"
+(cd "$TARGET_VEND_RECOVER" && git init -q)
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_VEND_RECOVER" \
+  --non-interactive \
+  --vendor=copy \
+  --agents=cursor \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy \
+  > "${TMP}/consumer-vendored-recovery-install.log" 2>&1 \
+  || { echo "FAIL: (v2) vendored cursor install failed"; cat "${TMP}/consumer-vendored-recovery-install.log"; exit 1; }
+VEND_RECOVER_LOG="${TMP}/consumer-vendored-recovery.log"
+_rc=0
+(cd "$TARGET_VEND_RECOVER" && PATH="${CP_FAIL_BIN}:${PATH}" env -u AGENT_COLLECTIONS_HOME \
+  bash vendor/agent-collections/scripts/setup-agent-collections.sh --upgrade --sync --non-interactive) \
+  > "$VEND_RECOVER_LOG" 2>&1 || _rc=$?
+[[ "$_rc" -ne 0 ]] || { echo "FAIL: (v2) upgrade with a failing cp exited 0"; cat "$VEND_RECOVER_LOG"; exit 1; }
+grep -qE 'failed: +link-framework' "$VEND_RECOVER_LOG" \
+  || { echo "FAIL: (v2) failure not reported as the link-framework step"; cat "$VEND_RECOVER_LOG"; exit 1; }
+_recover_hint="$(sed -n '/^Recovery:/,$p' "$VEND_RECOVER_LOG")"
+grep -qxF '  bash vendor/agent-collections/scripts/setup-agent-collections.sh --upgrade --sync --non-interactive' <<< "$_recover_hint" \
+  || { echo "FAIL: (v2) Recovery hint does not print the project-relative upgrade command"; cat "$VEND_RECOVER_LOG"; exit 1; }
+for _flag in '--mcp-servers=' '--agents=' '--profile=' '${agents}'; do
+  grep -qF -- "$_flag" <<< "$_recover_hint" \
+    && { echo "FAIL: (v2) Recovery hint after a record-reusing run contains ${_flag}"; cat "$VEND_RECOVER_LOG"; exit 1; }
+done
+_recover_path="$(sed -n 's/^  bash \([^ ]*\) --upgrade --sync --non-interactive$/\1/p' <<< "$_recover_hint" | head -n 1)"
+(cd "$TARGET_VEND_RECOVER" && [[ -n "$_recover_path" && -f "$_recover_path" ]]) \
+  || { echo "FAIL: (v2) printed installer path '${_recover_path}' is not a file from the project root"; exit 1; }
+
+# (v3) "Recovery:" hint on a fresh install that stopped at the vendor step,
+# called directly with common.sh alone under set -u: agents from the typed
+# flag, MCP servers and profile not set yet → named placeholders and one line
+# naming them; --vendor prints the resolved mode although the flag was bare.
+V3_TARGET="${TMP}/recovery-hint-fresh"
+mkdir -p "$V3_TARGET"
+V3_OUT="$(TARGET_DIR="$V3_TARGET" bash -c '
+  set -euo pipefail
+  source "$1/common.sh"
+  unset SELECTED_AGENTS MCP_SELECTED_IDS DOMAIN_PROFILE SELECTION_FROM_RECORD PI_STAGE_FAILED \
+    ARG_AGENTS ARG_MCP_SERVERS ARG_PROFILE ARG_VENDOR ARG_VENDOR_PASSED VENDOR_MODE \
+    ARG_LINK_MODE ARG_LINK_MODE_PASSED
+  FAILED_STEPS=(vendor)
+  COMPLETED_STEPS=()
+  ARG_AGENTS=cursor ARG_VENDOR_PASSED=true ARG_VENDOR=true VENDOR_MODE=copy
+  _print_partial_fail
+' _ "${ROOT}/scripts/lib/setup-agent-collections" 2>&1)" \
+  || { echo "FAIL: (v3) fresh-install Recovery hint check failed"; echo "$V3_OUT"; exit 1; }
+grep -qF -- '--sync --non-interactive \' <<< "$V3_OUT" \
+  || { echo "FAIL: (v3) fresh-install Recovery hint lacks --sync --non-interactive"; echo "$V3_OUT"; exit 1; }
+grep -qF -- '--upgrade' <<< "$V3_OUT" \
+  && { echo "FAIL: (v3) fresh-install Recovery hint contains --upgrade"; echo "$V3_OUT"; exit 1; }
+grep -qxF '    --agents=cursor --mcp-servers=<mcp-servers> --profile=<profile> --vendor=copy' <<< "$V3_OUT" \
+  || { echo "FAIL: (v3) fresh-install Recovery hint does not show this run's values, placeholders and --vendor=copy"; echo "$V3_OUT"; exit 1; }
+grep -qxF '  Replace <mcp-servers> and <profile> with your values (the run stopped before they were set).' <<< "$V3_OUT" \
+  || { echo "FAIL: (v3) fresh-install Recovery hint does not name the placeholders to fill in"; echo "$V3_OUT"; exit 1; }
+grep -qF '<agents>' <<< "$V3_OUT" \
+  && { echo "FAIL: (v3) fresh-install Recovery hint prints <agents> although --agents was typed"; echo "$V3_OUT"; exit 1; }
+
+# (v4) "Recovery:" hint after a record-reusing run whose Pi stage failed: the
+# record is written without pi, so --agents carries this run's agents (pi
+# included) and the re-run retries Pi; no --mcp-servers is added.
+V4_OUT="$(TARGET_DIR="$V3_TARGET" bash -c '
+  set -euo pipefail
+  source "$1/common.sh"
+  unset SELECTED_AGENTS MCP_SELECTED_IDS DOMAIN_PROFILE SELECTION_FROM_RECORD PI_STAGE_FAILED \
+    ARG_AGENTS ARG_MCP_SERVERS ARG_PROFILE ARG_VENDOR ARG_VENDOR_PASSED VENDOR_MODE \
+    ARG_LINK_MODE ARG_LINK_MODE_PASSED
+  FAILED_STEPS=(pi)
+  COMPLETED_STEPS=()
+  SELECTION_FROM_RECORD=true PI_STAGE_FAILED=true SELECTED_AGENTS=cursor,pi
+  _print_partial_fail
+' _ "${ROOT}/scripts/lib/setup-agent-collections" 2>&1)" \
+  || { echo "FAIL: (v4) Pi-failure Recovery hint check failed"; echo "$V4_OUT"; exit 1; }
+_v4_hint="$(sed -n '/^Recovery:/,$p' <<< "$V4_OUT")"
+grep -qF -- '--upgrade --sync --non-interactive --agents=cursor,pi' <<< "$_v4_hint" \
+  || { echo "FAIL: (v4) Recovery hint after a Pi failure does not retry with --agents=cursor,pi"; echo "$V4_OUT"; exit 1; }
+grep -qF -- '--mcp-servers=' <<< "$_v4_hint" \
+  && { echo "FAIL: (v4) Recovery hint after a record-reusing run contains --mcp-servers="; echo "$V4_OUT"; exit 1; }
 
 # (s3) _verify_skills_mirror on its own: one .claude/skills/eversis-* entry
 # replaced by a text file (a symlink checked out as text) → returns 1 and

@@ -10,8 +10,10 @@
 # after load_selection_or_fail, before any write:
 #   1. check_pi_hand_port_or_stop — stops (exit 1) the one ambiguous case and
 #      prints both explicit ways forward.
-#   2. report_legacy_pi_generator — warn-only list of legacy generator files
-#      and scripts to remove; print_summary repeats it (LEGACY_PI_FINDINGS)
+#   2. report_legacy_pi_generator — warn-only report in up to two groups: the
+#      legacy generator files and package.json scripts to remove (only when
+#      they exist), and the legacy-marked .pi/ files with what the run does to
+#      them. print_summary repeats the generator list (LEGACY_PI_FINDINGS)
 #      and recounts the legacy-marked .pi/ files after the Pi stage
 #      (LEGACY_PI_MARKED_AT_START holds the count from the start of the run).
 #
@@ -71,59 +73,6 @@ _pi_unmarked_framework_shaped() {
   done
 }
 
-# Prints the command that runs this installer, as the person types it in the
-# project root, for the stop message below. Every path check uses resolved
-# paths: SCRIPT_DIR is logical (pwd) while TARGET_DIR from git rev-parse is
-# physical (macOS /var vs /private/var, symlinked project folders).
-#   - Inside the project (relative-path.mjs, realpath on both sides, from
-#     TARGET_DIR to the script succeeds with no leading ../ and no absolute
-#     path): the project-relative path, for example
-#     bash vendor/agent-collections/scripts/setup-agent-collections.sh.
-#   - Otherwise, when AGENT_COLLECTIONS_HOME resolves to the framework folder
-#     that holds this script: bash "$AGENT_COLLECTIONS_HOME/scripts/…", left
-#     for the person's shell to expand.
-#   - Otherwise, and also when node or relative-path.mjs fails: the quoted
-#     absolute path of the running script.
-_installer_command() {
-  local script_dir="${SETUP_SCRIPT_DIR:-}"
-  if [[ -z "$script_dir" ]]; then
-    printf '%s' "bash scripts/setup-agent-collections.sh"
-    return 0
-  fi
-  local script="${script_dir}/setup-agent-collections.sh" rel=""
-  if [[ -n "${LIB_DIR:-}" ]] && command -v node >/dev/null 2>&1; then
-    rel="$(node "${LIB_DIR}/relative-path.mjs" "$TARGET_DIR" "$script" 2>/dev/null)" || rel=""
-  fi
-  case "$rel" in
-    ""|..|../*|/*) ;;
-    *)
-      if [[ "$rel" =~ ^[A-Za-z0-9._/+-]+$ ]]; then
-        printf 'bash %s' "$rel"
-      else
-        printf 'bash "%s"' "$(_shell_dq_escape "$rel")"
-      fi
-      return 0
-      ;;
-  esac
-  if [[ -n "${AGENT_COLLECTIONS_HOME:-}" ]]; then
-    local home_real framework_real
-    home_real="$(cd -P "${AGENT_COLLECTIONS_HOME}" 2>/dev/null && pwd -P)" || home_real=""
-    framework_real="$(cd -P "${script_dir}/.." 2>/dev/null && pwd -P)" || framework_real=""
-    if [[ -n "$home_real" ]] && [[ "$home_real" == "$framework_real" ]]; then
-      # shellcheck disable=SC2016
-      printf '%s' 'bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh"'
-      return 0
-    fi
-  fi
-  printf 'bash "%s"' "$(_shell_dq_escape "$script")"
-}
-
-# Prints $1 escaped for use inside double quotes in a shell command:
-# backslash, double quote, dollar sign and backtick get a backslash.
-_shell_dq_escape() {
-  printf '%s' "$1" | sed 's/[\\"$`]/\\&/g'
-}
-
 # Prints the "Found" lines of the stop message from the evidence lines in $1.
 # A file line under a listed .pi/skills/<name> entry is dropped, so one skill
 # takes one line. Then the .pi/skills/eversis-* lines come first and the other
@@ -154,7 +103,7 @@ _pi_hand_port_found_lines() {
   printf '%s%s' "$skills" "$others"
 }
 
-# AC1: --upgrade / --sync without an explicit --agents, pi not selected, and a
+# The stop case: --upgrade / --sync without an explicit --agents, pi not selected, and a
 # hand-ported .pi/ on disk. The record alone cannot say whether the person
 # dropped Pi or never installed it through the framework, and either guess
 # loses work (prune a working hand port, or silently rewrite ~30 files). So
@@ -210,13 +159,23 @@ check_pi_hand_port_or_stop() {
       ${installer} --upgrade --sync --agents ${current}"
 }
 
-# AC3: warn-only report of a legacy Pi generator in the consumer project. Its
+# Warn-only report of a legacy Pi generator in the consumer project. Its
 # `sync:agents` script would otherwise regenerate the old .pi/ tree after this
 # upgrade (and, through a symlinked .pi/skills mirror, write into the framework
 # copy). Only reads files; never runs a consumer script. A missing or invalid
 # package.json is not an error. Findings go to LEGACY_PI_FINDINGS for the summary;
 # the legacy-marked file count from this start of the run goes to
 # LEGACY_PI_MARKED_AT_START.
+# The warning has two independent groups, each printed only when it has
+# something to say: "Legacy Pi generator found" (generator files or scripts,
+# which would undo the install) and "Legacy-marked Pi files found" (files an
+# old generator wrote, with no generator left). The marked-files text does not
+# depend on the selection: on a fresh install this runs before the agents are
+# chosen. It says what the run does: with Pi, the Pi stage replaces the files
+# it generates and the skills mirror replaces every .pi/skills/eversis-* entry,
+# each with a backup; without Pi, _prune_deselected_pi backs up and removes the
+# .pi/skills/eversis-* entries; any other legacy-marked file stays and the
+# summary recounts it.
 report_legacy_pi_generator() {
   LEGACY_PI_FINDINGS=""
   LEGACY_PI_MARKED_AT_START=""
@@ -250,7 +209,7 @@ report_legacy_pi_generator() {
   # The marked-file count is part of the warning below but not of
   # LEGACY_PI_FINDINGS: the Pi stage may still migrate or remove those files,
   # so only the start count is kept and print_summary recounts.
-  local marked_count marked_line="" nl=$'\n'
+  local marked_count marked_line=""
   marked_count="$(_legacy_pi_marked_files | grep -c . || true)"
   LEGACY_PI_MARKED_AT_START="${marked_count:-0}"
   if [[ "${marked_count:-0}" -gt 0 ]]; then
@@ -258,13 +217,22 @@ report_legacy_pi_generator() {
   fi
 
   LEGACY_PI_FINDINGS="${findings%$'\n'}"
-  [[ -n "$LEGACY_PI_FINDINGS" ]] || [[ -n "$marked_line" ]] || return 0
-  log_warn "Legacy Pi generator found (it would undo this install on its next run):"
-  while IFS= read -r rel; do
-    [[ -n "$rel" ]] || continue
-    log_warn "  - ${rel}"
-  done <<< "${LEGACY_PI_FINDINGS}${LEGACY_PI_FINDINGS:+${nl}}${marked_line}"
-  log_warn "Remove the files and package.json scripts above; setup-agent-collections.sh --upgrade --sync replaces them."
-  log_warn "Find remaining references with: git grep -nE \"sync:agents|gen-pi-adapter|pi-rule-map\""
+  if [[ -n "$LEGACY_PI_FINDINGS" ]]; then
+    log_warn "Legacy Pi generator found (it would undo this install on its next run):"
+    while IFS= read -r rel; do
+      [[ -n "$rel" ]] || continue
+      log_warn "  - ${rel}"
+    done <<< "${LEGACY_PI_FINDINGS}"
+    log_warn "Remove the files and package.json scripts above; setup-agent-collections.sh --upgrade --sync replaces them."
+    log_warn "Find remaining references with: git grep -nE \"sync:agents|gen-pi-adapter|pi-rule-map\""
+  fi
+  if [[ -n "$marked_line" ]]; then
+    log_warn "Legacy-marked Pi files found (written by an old Pi generator):"
+    log_warn "  - ${marked_line}"
+    log_warn "With Pi, the Pi stage replaces the files it generates and every .pi/skills/eversis-* entry"
+    log_warn "(old copies in *.pre-agent-collections.bak and .pi/pre-agent-collections-backup/); without Pi,"
+    log_warn ".pi/skills/eversis-* entries are backed up and removed. Other files stay; the summary at the"
+    log_warn "end shows what is left."
+  fi
   return 0
 }

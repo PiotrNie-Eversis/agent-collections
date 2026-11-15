@@ -3,11 +3,21 @@
 
 load_selection_or_fail() {
   local sel_file="${TARGET_DIR}/.agent-collections/install-selection.json"
+  # Both messages below print a command the person pastes in the project root:
+  # the installer path from _installer_command (common.sh), plus the
+  # --vendor / --link-mode flags the person typed (a bare --vendor stays bare),
+  # so a vendored project is not told to re-run in local mode. Both are
+  # computed in locals before die, and only on the failing path, so a failing
+  # node cannot abort under set -e (_installer_command falls back to the
+  # absolute path on its own) and a good record never starts the extra node.
+  local installer="" typed_flags=""
   if [[ ! -f "$sel_file" ]]; then
+    installer="$(_installer_command)"
+    typed_flags="$(_typed_vendor_link_flags "${ARG_VENDOR:-}")"
     die "Upgrade/sync requires ${sel_file}.
   File is missing. Run the interactive wizard (or non-interactive install) first:
-    bash scripts/setup-agent-collections.sh --non-interactive \\
-      --agents=cursor --mcp-servers=eversis-collections --profile=fullstack --build-mcp
+    ${installer} --non-interactive \\
+      --agents=cursor --mcp-servers=eversis-collections --profile=fullstack --build-mcp${typed_flags}
   Do not invent a full multi-agent install without an explicit selection."
   fi
 
@@ -26,10 +36,16 @@ load_selection_or_fail() {
     if (!Array.isArray(j.agents) || !Array.isArray(j.mcpServers)) { console.error('bad arrays'); process.exit(3); }
     console.log(JSON.stringify(j));
   " "$sel_file")"; then
+    installer="$(_installer_command)"
+    typed_flags="$(_typed_vendor_link_flags "${ARG_VENDOR:-}")"
     die "Upgrade failed: install-selection.json is missing required fields or invalid JSON.
   Re-run the wizard to recreate selection:
-    bash scripts/setup-agent-collections.sh --non-interactive --agents=cursor --mcp-servers=eversis-collections --profile=fullstack"
+    ${installer} --non-interactive --agents=cursor --mcp-servers=eversis-collections --profile=fullstack${typed_flags}"
   fi
+  # The selection now comes from the record: the "Recovery:" hint of
+  # _print_partial_fail (common.sh) then repeats only the flags the person
+  # typed, so a pasted re-run keeps MCP preserve mode and agent keep.
+  SELECTION_FROM_RECORD="true"
 
   SELECTED_AGENTS="$(node -e "const j=JSON.parse(process.argv[1]); console.log(j.agents.join(','))" "$parsed")"
   MCP_SELECTED_IDS="$(node -e "const j=JSON.parse(process.argv[1]); console.log(j.mcpServers.join(','))" "$parsed")"
@@ -95,7 +111,7 @@ load_selection_or_fail() {
     ARG_CONFLUENCE_SPACE_KEY="$(node -e "const j=JSON.parse(process.argv[1]); const k=j.ssot&&j.ssot.confluenceSpaceKey; console.log(k==null||k===undefined?'':String(k))" "$parsed")"
   fi
   export SELECTED_AGENTS MCP_SELECTED_IDS DOMAIN_PROFILE VENDOR_MODE ARG_VENDOR ARG_LINK_MODE \
-    ARG_SSOT_SOURCE ARG_CONFLUENCE_SPACE_KEY MCP_PRESERVE_EXISTING \
+    ARG_SSOT_SOURCE ARG_CONFLUENCE_SPACE_KEY MCP_PRESERVE_EXISTING SELECTION_FROM_RECORD \
     MCP_CONFIGURED_SERVERS="$MCP_SELECTED_IDS"
   log_ok "Loaded install selection (agents=${SELECTED_AGENTS}, profile=${DOMAIN_PROFILE}, mcp=${MCP_SELECTED_IDS}, preserve-existing-mcp=${MCP_PRESERVE_EXISTING})"
 }

@@ -136,6 +136,10 @@ ARG_DOCTOR="false"
 # start from "false" so a stray value in the caller's env never turns a fresh
 # install into preserve mode.
 MCP_PRESERVE_EXISTING="false"
+# Set to "true" only by load_selection_or_fail (install-selection.json reused);
+# the "Recovery:" hint then repeats only the flags the person typed. Start from
+# "false" so a stray value in the caller's env never counts as a reused record.
+SELECTION_FROM_RECORD="false"
 
 export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_VENDOR_PASSED \
        ARG_LINK_MODE ARG_LINK_MODE_PASSED \
@@ -144,7 +148,7 @@ export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_VENDOR_PASSE
        ARG_SSOT_SOURCE ARG_SSOT_SOURCE_PASSED ARG_SSOT_BRANCH \
        ARG_CONFLUENCE_SPACE_KEY ARG_CONFLUENCE_SPACE_KEY_PASSED \
        ARG_PROJECT_NAME ARG_PROJECT_NAME_PASSED ARG_DOCTOR \
-       MCP_PRESERVE_EXISTING \
+       MCP_PRESERVE_EXISTING SELECTION_FROM_RECORD \
        SETUP_SCRIPT_DIR="${SCRIPT_DIR}" LIB_DIR="${LIB_DIR}"
 
 while [[ $# -gt 0 ]]; do
