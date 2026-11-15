@@ -1,30 +1,10 @@
----
-# ============================================================
-# REQUIRED FIELDS
-# ============================================================
-description: "<one-sentence description of the agent's specialization>"
-tools: ['<tool-1>', '<tool-2>', '<mcp-server>/*']
-
-# ============================================================
-# OPTIONAL FIELDS
-# ============================================================
-# name: "<override-display-name>"
-# argument-hint: "<hint text for chat input>"
-# model: "<preferred-model>"
-# user-invocable: true
-# disable-model-invocation: false
-# agents: ['<subagent-1>', '<subagent-2>']
-# handoffs:
-#   - label: <Button Label>
-#     agent: <target-agent-name>
-#     prompt: <prompt-text-for-target-agent>
-#     send: false
-#     model: <optional-model-for-handoff>
----
+# <Role title>
 
 <!-- ============================================================ -->
 <!-- TABLE OF CONTENTS                                             -->
-<!-- This template defines the structure for .agent.md files.      -->
+<!-- This template defines the structure for role rule files      -->
+<!-- under .ai/rules/<area>/<role>.md (no frontmatter: activation  -->
+<!-- fields live in the adapters' rule-map.yaml files).            -->
 <!-- Sections marked (Required) must be present in every agent.    -->
 <!-- Sections marked (Optional) can be removed if not needed.      -->
 <!-- ============================================================ -->
@@ -77,7 +57,7 @@ Before starting any task, you check all available skills and decide which one is
 
 <!-- ============================================================ -->
 <!-- REQUIRED SECTION: Tool Usage Guidelines                        -->
-<!-- Every tool listed in frontmatter MUST have an entry here.     -->
+<!-- Every tool the role uses MUST have an entry here.             -->
 <!-- ============================================================ -->
 
 <tool-usage>
