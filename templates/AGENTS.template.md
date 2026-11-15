@@ -82,3 +82,12 @@ On the **Cursor** channel, Implement can be started with either:
 - `@eversis-implement` — attach the prompt by file stem
 
 Both refer to the same prompt id `eversis-implement`. Prefer the neutral id in shared docs; use `/` or `@` as Cursor UX convenience.
+
+## Channel notes (Pi)
+
+Optional. Applies when Agent Collections is installed with `--agents=…,pi`. Remove this section when Pi is not selected.
+
+- Generated `.pi/APPEND_SYSTEM.md` is a small always-on core. The process rules are added by `.pi/extensions/eversis-process-rules.ts` after an `eversis-*` command or while a plan is active, so start ticket work with `/eversis-implement`. Role rules also load as `/skill:eversis-rule-*`; framework skills are mirrored under `.pi/skills/eversis-*/`.
+- `/eversis-implement`, `/eversis-review`, … — prompt templates generated under `.pi/prompts/` (same SSOT as `.ai/prompts/`).
+- Pi loads `.pi/` only after project trust; run `/reload` after a re-sync. Keep this root `AGENTS.md`: without it Pi loads the full `CLAUDE.md`, and the small core does not hold.
+- The context-budget extension compacts once at ~50% of the context window (Pi-only). See the Pi adapter README (`adapters/pi/README.md` in Agent Collections).

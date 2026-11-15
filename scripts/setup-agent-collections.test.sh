@@ -561,6 +561,10 @@ PATH="$PI_NO_CLI_PATH" bash "${ROOT}/scripts/setup-agent-collections.sh" \
   > "$PI_LOG" 2>&1 \
   || { echo "FAIL: (a) --agents=pi install failed"; cat "$PI_LOG"; exit 1; }
 _assert_pi_tree "$TARGET_PI" "(a) --agents=pi"
+grep -qF '## Channel notes (Pi)' "${TARGET_PI}/AGENTS.md" \
+  || { echo "FAIL: (a) scaffolded AGENTS.md has no Channel notes (Pi) section"; exit 1; }
+grep -qF 'run `/reload` after a re-sync' "${TARGET_PI}/AGENTS.md" \
+  || { echo "FAIL: (a) scaffolded AGENTS.md Pi notes miss the /reload step"; exit 1; }
 grep -qF 'vendor/agent-collections/.ai/prompts/public/eversis-implement.md' "${TARGET_PI}/.pi/prompts/eversis-implement.md" \
   || { echo "FAIL: (a) .pi/prompts SSOT pointer is not vendor-prefixed"; exit 1; }
 [[ -x "${TARGET_PI}/scripts/run-eversis-collections-mcp.sh" ]] \

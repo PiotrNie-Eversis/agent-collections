@@ -28,6 +28,7 @@ Every `AGENTS.md` produced from this standard (template, install seed, or refere
 | 6 | Delivery Standard | Recommended | Short pointer to `docs/specs/<key>-<topic>/` and Research → Plan → Implement → Review → Fine gates. |
 | 7 | Project specifics | Yes | Consumer-owned overrides; start empty with HTML comment placeholders. |
 | 8 | Channel notes (Cursor) | Optional appendix | Cursor-only UX (`/` commands, `@` attach). Must not be required to understand the map. |
+| 9 | Channel notes (Pi) | Optional appendix | Pi-only notes for installs with `--agents=…,pi`; remove when Pi is not selected. Must not be required to understand the map. |
 
 ## Project deliverables
 
@@ -87,6 +88,17 @@ Optional appendix. When present, it SHOULD state that on Cursor both of the foll
 
 - `/eversis-implement` — Cursor command (when commands are scaffolded by the Cursor adapter)
 - `@eversis-implement` — prompt attach by file stem
+
+Other tools ignore this appendix.
+
+## Channel notes (Pi)
+
+Optional appendix for consumer projects installed with `--agents=…,pi`; the template marks it as removable when Pi is not selected. When present, it SHOULD state the same facts as the root `AGENTS.md` of Agent Collections:
+
+- `.pi/APPEND_SYSTEM.md` is a small always-on core; process rules load after an `eversis-*` command or while a plan is active, so ticket work starts with `/eversis-implement`
+- `/eversis-*` prompt templates are generated under `.pi/prompts/` from the same SSOT
+- Pi loads `.pi/` only after project trust; run `/reload` after a re-sync; keep the root `AGENTS.md`, or Pi loads the full `CLAUDE.md`
+- the context-budget extension compacts once at ~50% of the context window
 
 Other tools ignore this appendix.
 
