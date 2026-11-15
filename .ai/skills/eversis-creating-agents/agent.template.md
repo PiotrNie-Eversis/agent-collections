@@ -2,7 +2,7 @@
 
 <!-- ============================================================ -->
 <!-- TABLE OF CONTENTS                                             -->
-<!-- This template defines the structure for role rule files      -->
+<!-- This template defines the structure for role rule files       -->
 <!-- under .ai/rules/<area>/<role>.md (no frontmatter: activation  -->
 <!-- fields live in the adapters' rule-map.yaml files).            -->
 <!-- Sections marked (Required) must be present in every agent.    -->

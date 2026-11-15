@@ -28,7 +28,7 @@ Use Markdown only for inline formatting (bold, code blocks, tables, lists) withi
 </xml-syntax>
 
 <minimal-scope>
-An agent should only describe what is necessary for its specific role. Avoid duplicating instructions that belong in skills, **AGENTS.md**, or other **`.mdc`** files.
+An agent should only describe what is necessary for its specific role. Avoid duplicating instructions that belong in skills, **AGENTS.md**, or other rules under **`.ai/rules/`**.
 </minimal-scope>
 </principles>
 
@@ -108,7 +108,7 @@ A rule under `.ai/rules/` reaches a host only through its `rule-map.yaml`. Packa
 |---|---|---|
 | `adapters/cursor/rule-map.yaml` | `id`, `source`, `output: .cursor/rules/eversis-<role>.mdc`, `description` | Always: `alwaysApply: true` (keep rare). Globs: `globs:` as a YAML list of patterns. On demand: `globs: []` and `alwaysApply: false`. |
 | `adapters/claude/rule-map.yaml` | `id`, `source` only (Cursor packaging fields are rejected) | Derived: a section in `CLAUDE.md`, or `.claude/rules/eversis-<role>.md` with `paths:` when the Cursor entry has non-empty `globs`. |
-| `adapters/pi/rule-map.yaml` | `id`, `source`, `target`; with `target: skill` also `skill_id` and `description` | On demand: `target: skill` with `skill_id: eversis-rule-<role>` (kebab-case, at most 64 characters, unique, and not the name of an `.ai/skills/eversis-*` directory), written as a role skill under `.pi/skills/`; optional `ui_note`, `review_context_note`, `process_bundle: true` (added with the process rules after an `eversis-*` command or while a plan is active). Or `target: none`: Pi emits nothing for the rule; an optional `skill_id` names the existing framework skill that already carries the content. |
+| `adapters/pi/rule-map.yaml` | `id`, `source`, `target`; with `target: skill` also `skill_id` and `description` (at most 1024 characters) | On demand: `target: skill` with `skill_id: eversis-rule-<role>` (kebab-case, at most 64 characters, unique, and not the name of an `.ai/skills/eversis-*` directory), written as a role skill under `.pi/skills/`; optional `ui_note`, `review_context_note`, `process_bundle: true` (added with the process rules after an `eversis-*` command or while a plan is active). Or `target: none`: Pi emits nothing for the rule; an optional `skill_id` names the existing framework skill that already carries the content. |
 
 Then run `npm run sync:adapters` and `npm run sync:adapters:check`.
 
