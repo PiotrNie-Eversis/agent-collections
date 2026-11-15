@@ -2,7 +2,8 @@
 # claude-settings-merge.test.sh — unit tests for merge_claude_settings()
 # (.claude/settings.json seed-once + permissions.deny/enabledMcpjsonServers
 # refresh-every-run split, Q8 in claude-code-setup.plan.md), the framework
-# PostToolUse spec artifact hook entry, and remove_claude_framework_hook().
+# spec artifact hook entries (PreToolUse on Bash and PostToolUse on
+# Write|Edit|MultiEdit|Bash), and remove_claude_framework_hook().
 #
 # Usage (from repo root):
 #   bash scripts/lib/setup-agent-collections/claude-settings-merge.test.sh
@@ -170,19 +171,34 @@ else
 fi
 unset MCP_PRESERVE_EXISTING
 
-# Framework PostToolUse hook entry (spec artifact guard): present only with
-# its launcher, one entry, consumer hooks kept.
+# Framework hook entries (spec artifact guard): one PreToolUse (Bash) and one
+# PostToolUse (Write|Edit|MultiEdit|Bash), present only with their launcher,
+# consumer hooks kept.
 SETTINGS="${TARGET_DIR}/.claude/settings.json"
 LAUNCHER="${TARGET_DIR}/.claude/hooks/eversis-validate-spec.cjs"
 FW_COMMAND='node "${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs"'
-# Prints: <framework entry count>|<its matcher>|<PostToolUse matchers in order>|<hook event keys>
+FW_PRE='Bash'
+FW_POST='Write|Edit|MultiEdit|Bash'
+# Prints one line per owned event, then the hook event keys:
+#   PreToolUse=<framework entry count>:<its matcher>:<matchers in order>
+#   PostToolUse=<framework entry count>:<its matcher>:<matchers in order>
+#   keys=<hook event keys in order>
+# Matchers in order are joined with ";" (a matcher may contain "|"); the
+# framework entry is shown as "FW[<matcher>]" so its position is visible.
 _hooks_summary() {
   node -e '
     const j = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
-    const post = (j.hooks && j.hooks.PostToolUse) || [];
-    const fw = post.filter((e) => (e.hooks || []).some((h) => String(h.command).includes(".claude/hooks/eversis-validate-spec.cjs")));
-    const ok = fw.length === 1 && fw[0].hooks.length === 1 && fw[0].hooks[0].type === "command" && fw[0].hooks[0].command === process.argv[2];
-    console.log([fw.length, fw.length ? fw[0].matcher + (ok ? "" : "(bad command)") : "", post.map((e) => e.matcher).join(","), Object.keys(j.hooks || {}).join(",")].join("|"));
+    const isFw = (e) => (e.hooks || []).some((h) => String(h.command).includes(".claude/hooks/eversis-validate-spec.cjs"));
+    const out = [];
+    for (const ev of ["PreToolUse", "PostToolUse"]) {
+      const arr = (j.hooks && j.hooks[ev]) || [];
+      const fw = arr.filter(isFw);
+      const ok = fw.length === 1 && fw[0].hooks.length === 1 && fw[0].hooks[0].type === "command" && fw[0].hooks[0].command === process.argv[2];
+      const order = arr.map((e) => (isFw(e) ? `FW[${e.matcher}]` : e.matcher)).join(";");
+      out.push(`${ev}=${fw.length}:${fw.length ? fw[0].matcher + (ok ? "" : "(bad command)") : ""}:${order}`);
+    }
+    out.push(`keys=${Object.keys(j.hooks || {}).join(",")}`);
+    console.log(out.join(" "));
   ' "$SETTINGS" "$FW_COMMAND"
 }
 
@@ -190,10 +206,20 @@ rm -f "$SETTINGS"
 mkdir -p "$(dirname "$LAUNCHER")"
 echo '// launcher stub' > "$LAUNCHER"
 merge_claude_settings
-if [[ "$(_hooks_summary)" == "1|Write|Edit|MultiEdit|Write|Edit|MultiEdit|PostToolUse" ]]; then
-  _pass "hook: launcher present → new file gets one framework PostToolUse entry"
+WANT="PreToolUse=1:${FW_PRE}:FW[${FW_PRE}] PostToolUse=1:${FW_POST}:FW[${FW_POST}] keys=PreToolUse,PostToolUse"
+if [[ "$(_hooks_summary)" == "$WANT" ]]; then
+  _pass "hook: launcher present → new file gets one framework PreToolUse and one PostToolUse entry"
 else
-  _fail "hook: launcher present → new file gets one framework PostToolUse entry (got: $(_hooks_summary))"
+  _fail "hook: launcher present → new file gets one framework PreToolUse and one PostToolUse entry (got: $(_hooks_summary))"
+fi
+
+# An existing file without any hooks (the empty-settings case) gets both.
+echo '{}' > "$SETTINGS"
+merge_claude_settings
+if [[ "$(_hooks_summary)" == "$WANT" ]]; then
+  _pass "hook: launcher present → empty settings file gets both framework entries"
+else
+  _fail "hook: launcher present → empty settings file gets both framework entries (got: $(_hooks_summary))"
 fi
 
 cp "$SETTINGS" "${TARGET_DIR}/settings.first"
@@ -204,13 +230,47 @@ else
   _fail "hook: second run is byte-identical"
 fi
 
-# Consumer hooks around a stale framework entry (old matcher).
+# Upgrade: an older install has only the single PostToolUse framework entry
+# with matcher Write|Edit|MultiEdit, between consumer entries.
 node -e '
   const fs = require("fs");
   const p = process.argv[1];
   const j = JSON.parse(fs.readFileSync(p, "utf8"));
   j.hooks = {
-    PreToolUse: [{ matcher: "Bash", hooks: [{ type: "command", command: "echo pre" }] }],
+    PostToolUse: [
+      { matcher: "Read", hooks: [{ type: "command", command: "echo consumer-before" }] },
+      { matcher: "Write|Edit|MultiEdit", hooks: [{ type: "command", command: process.argv[2] }] },
+      { matcher: "Glob", hooks: [{ type: "command", command: "echo consumer-after" }] },
+    ],
+  };
+  fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+' "$SETTINGS" "$FW_COMMAND"
+merge_claude_settings
+if [[ "$(_hooks_summary)" == "PreToolUse=1:${FW_PRE}:FW[${FW_PRE}] PostToolUse=1:${FW_POST}:Read;FW[${FW_POST}];Glob keys=PostToolUse,PreToolUse" ]]; then
+  _pass "hook: old single Write|Edit|MultiEdit entry upgraded in place, one PreToolUse entry added, no duplicates"
+else
+  _fail "hook: old single Write|Edit|MultiEdit entry upgraded in place, one PreToolUse entry added, no duplicates (got: $(_hooks_summary))"
+fi
+cp "$SETTINGS" "${TARGET_DIR}/settings.upgraded"
+merge_claude_settings
+if cmp -s "$SETTINGS" "${TARGET_DIR}/settings.upgraded"; then
+  _pass "hook: re-run after the upgrade is byte-identical"
+else
+  _fail "hook: re-run after the upgrade is byte-identical"
+fi
+
+# Consumer hooks around stale framework entries (old matchers) in both events,
+# including a consumer PreToolUse Bash hook.
+node -e '
+  const fs = require("fs");
+  const p = process.argv[1];
+  const j = JSON.parse(fs.readFileSync(p, "utf8"));
+  j.hooks = {
+    PreToolUse: [
+      { matcher: "Bash", hooks: [{ type: "command", command: "echo pre" }] },
+      { matcher: "Bash|Write", hooks: [{ type: "command", command: "node .claude/hooks/eversis-validate-spec.cjs" }] },
+      { matcher: "Read", hooks: [{ type: "command", command: "echo pre-last" }] },
+    ],
     PostToolUse: [
       { matcher: "Bash", hooks: [{ type: "command", command: "echo consumer-first" }] },
       { matcher: "Write", hooks: [{ type: "command", command: "node .claude/hooks/eversis-validate-spec.cjs" }] },
@@ -220,31 +280,93 @@ node -e '
   fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
 ' "$SETTINGS"
 merge_claude_settings
-if [[ "$(_hooks_summary)" == "1|Write|Edit|MultiEdit|Bash,Write|Edit|MultiEdit,Read|PreToolUse,PostToolUse" ]]; then
-  _pass "hook: stale framework entry replaced in place, consumer PostToolUse and PreToolUse kept in order"
+if [[ "$(_hooks_summary)" == "PreToolUse=1:${FW_PRE}:Bash;FW[${FW_PRE}];Read PostToolUse=1:${FW_POST}:Bash;FW[${FW_POST}];Read keys=PreToolUse,PostToolUse" ]]; then
+  _pass "hook: stale framework entries replaced in place, consumer PreToolUse and PostToolUse kept in order"
 else
-  _fail "hook: stale framework entry replaced in place, consumer PostToolUse and PreToolUse kept in order (got: $(_hooks_summary))"
+  _fail "hook: stale framework entries replaced in place, consumer PreToolUse and PostToolUse kept in order (got: $(_hooks_summary))"
 fi
-grep -qF 'echo consumer-first' "$SETTINGS" && grep -qF 'echo consumer-last' "$SETTINGS" && grep -qF 'echo pre' "$SETTINGS" \
+grep -qF 'echo consumer-first' "$SETTINGS" && grep -qF 'echo consumer-last' "$SETTINGS" \
+  && grep -qF 'echo pre' "$SETTINGS" && grep -qF 'echo pre-last' "$SETTINGS" \
   && _pass "hook: consumer hook commands unchanged" \
   || _fail "hook: consumer hook commands unchanged"
 
-# Launcher absent → framework entry removed, consumer hooks stay.
+# A consumer PreToolUse Bash hook with no framework entry yet: the framework
+# entry is appended after it.
+node -e '
+  const fs = require("fs");
+  const p = process.argv[1];
+  const j = JSON.parse(fs.readFileSync(p, "utf8"));
+  j.hooks = {
+    PreToolUse: [{ matcher: "Bash", hooks: [{ type: "command", command: "echo pre-only" }] }],
+    PostToolUse: [{ matcher: "Edit", hooks: [{ type: "command", command: "echo post-only" }] }],
+  };
+  fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+' "$SETTINGS"
+merge_claude_settings
+if [[ "$(_hooks_summary)" == "PreToolUse=1:${FW_PRE}:Bash;FW[${FW_PRE}] PostToolUse=1:${FW_POST}:Edit;FW[${FW_POST}] keys=PreToolUse,PostToolUse" ]]; then
+  _pass "hook: consumer PreToolUse Bash and PostToolUse hooks kept first, framework entries appended"
+else
+  _fail "hook: consumer PreToolUse Bash and PostToolUse hooks kept first, framework entries appended (got: $(_hooks_summary))"
+fi
+
+# Back to the mixed file for the removal cases.
+node -e '
+  const fs = require("fs");
+  const p = process.argv[1];
+  const j = JSON.parse(fs.readFileSync(p, "utf8"));
+  j.hooks = {
+    PreToolUse: [
+      { matcher: "Bash", hooks: [{ type: "command", command: "echo pre" }] },
+      { matcher: "Bash", hooks: [{ type: "command", command: process.argv[2] }] },
+    ],
+    PostToolUse: [
+      { matcher: "Bash", hooks: [{ type: "command", command: "echo consumer-first" }] },
+      { matcher: "Write|Edit|MultiEdit|Bash", hooks: [{ type: "command", command: process.argv[2] }] },
+      { matcher: "Read", hooks: [{ type: "command", command: "echo consumer-last" }] },
+    ],
+  };
+  fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+' "$SETTINGS" "$FW_COMMAND"
+
+# Launcher absent → both framework entries removed, consumer hooks stay.
 rm -f "$LAUNCHER"
 merge_claude_settings
-if [[ "$(_hooks_summary)" == "0||Bash,Read|PreToolUse,PostToolUse" ]]; then
-  _pass "hook: launcher absent → framework entry removed, consumer hooks kept"
+KEPT="PreToolUse=0::Bash PostToolUse=0::Bash;Read keys=PreToolUse,PostToolUse"
+if [[ "$(_hooks_summary)" == "$KEPT" ]]; then
+  _pass "hook: launcher absent → both framework entries removed, consumer hooks kept"
 else
-  _fail "hook: launcher absent → framework entry removed, consumer hooks kept (got: $(_hooks_summary))"
+  _fail "hook: launcher absent → both framework entries removed, consumer hooks kept (got: $(_hooks_summary))"
 fi
 merge_claude_settings
-if [[ "$(_hooks_summary)" == "0||Bash,Read|PreToolUse,PostToolUse" ]]; then
+if [[ "$(_hooks_summary)" == "$KEPT" ]]; then
   _pass "hook: launcher absent → no framework entry added"
 else
   _fail "hook: launcher absent → no framework entry added (got: $(_hooks_summary))"
 fi
 
-# Launcher absent and only the framework entry → emptied hooks key dropped.
+# Launcher absent, framework PreToolUse alone in its array next to a consumer
+# PostToolUse → the emptied PreToolUse key is dropped, hooks stays.
+node -e '
+  const fs = require("fs");
+  const p = process.argv[1];
+  const j = JSON.parse(fs.readFileSync(p, "utf8"));
+  j.hooks = {
+    PreToolUse: [{ matcher: "Bash", hooks: [{ type: "command", command: process.argv[2] }] }],
+    PostToolUse: [
+      { matcher: "Write|Edit|MultiEdit|Bash", hooks: [{ type: "command", command: process.argv[2] }] },
+      { matcher: "Read", hooks: [{ type: "command", command: "echo consumer-last" }] },
+    ],
+  };
+  fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+' "$SETTINGS" "$FW_COMMAND"
+merge_claude_settings
+if [[ "$(_hooks_summary)" == "PreToolUse=0:: PostToolUse=0::Read keys=PostToolUse" ]]; then
+  _pass "hook: removal that empties PreToolUse drops that key, consumer PostToolUse kept"
+else
+  _fail "hook: removal that empties PreToolUse drops that key, consumer PostToolUse kept (got: $(_hooks_summary))"
+fi
+
+# Launcher absent and only the framework entries → emptied hooks key dropped.
 echo '// launcher stub' > "$LAUNCHER"
 node -e '
   const fs = require("fs");
@@ -257,38 +379,54 @@ merge_claude_settings
 rm -f "$LAUNCHER"
 merge_claude_settings
 if node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")); process.exit("hooks" in j ? 1 : 0)' "$SETTINGS"; then
-  _pass "hook: removal that empties PostToolUse drops the hooks key"
+  _pass "hook: removal that empties PreToolUse and PostToolUse drops the hooks key"
 else
-  _fail "hook: removal that empties PostToolUse drops the hooks key"
+  _fail "hook: removal that empties PreToolUse and PostToolUse drops the hooks key"
 fi
 
-# "hooks": [] is refused, like a non-object "permissions".
-node -e '
-  const fs = require("fs");
-  const p = process.argv[1];
-  const j = JSON.parse(fs.readFileSync(p, "utf8"));
-  j.hooks = [];
-  fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
-' "$SETTINGS"
+# Non-array event values and "hooks": [] are refused, like a non-object
+# "permissions"; the file is left untouched.
 echo '// launcher stub' > "$LAUNCHER"
-cp "$SETTINGS" "${TARGET_DIR}/settings.array"
-HOOK_ERR="${TARGET_DIR}/hook-array.err"
-if ( merge_claude_settings ) >/dev/null 2>"$HOOK_ERR"; then
-  _fail "hook: \"hooks\": [] is refused"
-elif grep -qF '"hooks" is not an object' "$HOOK_ERR" && cmp -s "$SETTINGS" "${TARGET_DIR}/settings.array"; then
-  _pass "hook: \"hooks\": [] is refused with a clear message, file untouched"
-else
-  _fail "hook: \"hooks\": [] is refused with a clear message, file untouched ($(cat "$HOOK_ERR"))"
-fi
+_refused() {
+  # $1 = JSON value for hooks, $2 = expected message fragment, $3 = test name
+  node -e '
+    const fs = require("fs");
+    const p = process.argv[1];
+    const j = JSON.parse(fs.readFileSync(p, "utf8"));
+    j.hooks = JSON.parse(process.argv[2]);
+    fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+  ' "$SETTINGS" "$1"
+  cp "$SETTINGS" "${TARGET_DIR}/settings.refused"
+  local err="${TARGET_DIR}/hook-refused.err"
+  if ( merge_claude_settings ) >/dev/null 2>"$err"; then
+    _fail "$3"
+  elif grep -qF "$2" "$err" && cmp -s "$SETTINGS" "${TARGET_DIR}/settings.refused"; then
+    _pass "$3"
+  else
+    _fail "$3 ($(cat "$err"))"
+  fi
+}
+_refused '[]' '"hooks" is not an object' \
+  "hook: \"hooks\": [] is refused with a clear message, file untouched"
+_refused '{"PreToolUse": {}}' '"hooks.PreToolUse" is not an array' \
+  "hook: \"PreToolUse\": {} is refused with a clear message, file untouched"
+_refused '{"PostToolUse": {}}' '"hooks.PostToolUse" is not an array' \
+  "hook: \"PostToolUse\": {} is refused with a clear message, file untouched"
+_refused '{"PreToolUse": [], "PostToolUse": "x"}' '"hooks.PostToolUse" is not an array' \
+  "hook: non-array PostToolUse next to a valid PreToolUse is refused, file untouched"
 
-# CS_MODE=remove-hook (Claude deselected): only the framework entry goes.
+# CS_MODE=remove-hook (Claude deselected): only the framework entries go.
 cat > "$SETTINGS" <<'JSON'
 {
   "permissions": { "allow": ["Read", "Bash(make *)"], "deny": ["Read(./secret/**)"], "ask": ["Bash(git push*)"] },
   "enabledMcpjsonServers": ["eversis-collections", "my-private-server"],
   "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [ { "type": "command", "command": "echo consumer-pre" } ] },
+      { "matcher": "Bash", "hooks": [ { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\"" } ] }
+    ],
     "PostToolUse": [
-      { "matcher": "Write|Edit|MultiEdit", "hooks": [ { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\"" } ] },
+      { "matcher": "Write|Edit|MultiEdit|Bash", "hooks": [ { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\"" } ] },
       { "matcher": "Bash", "hooks": [ { "type": "command", "command": "echo consumer" } ] }
     ]
   }
@@ -299,10 +437,10 @@ _keys_json() {
 }
 KEYS_BEFORE="$(_keys_json)"
 remove_claude_framework_hook >/dev/null
-if [[ "$(_hooks_summary)" == "0||Bash|PostToolUse" ]] && [[ "$(_keys_json)" == "$KEYS_BEFORE" ]]; then
-  _pass "remove-hook: only the framework entry removed; permissions and enabledMcpjsonServers identical"
+if [[ "$(_hooks_summary)" == "PreToolUse=0::Bash PostToolUse=0::Bash keys=PreToolUse,PostToolUse" ]] && [[ "$(_keys_json)" == "$KEYS_BEFORE" ]]; then
+  _pass "remove-hook: both framework entries removed, consumer hooks kept; permissions and enabledMcpjsonServers identical"
 else
-  _fail "remove-hook: only the framework entry removed; permissions and enabledMcpjsonServers identical (got: $(_hooks_summary); $(_keys_json))"
+  _fail "remove-hook: both framework entries removed, consumer hooks kept; permissions and enabledMcpjsonServers identical (got: $(_hooks_summary); $(_keys_json))"
 fi
 cp "$SETTINGS" "${TARGET_DIR}/settings.removed"
 remove_claude_framework_hook >/dev/null
@@ -311,6 +449,29 @@ if cmp -s "$SETTINGS" "${TARGET_DIR}/settings.removed"; then
 else
   _fail "remove-hook: no framework entry → file not rewritten"
 fi
+
+# remove-hook on a file whose hooks are only the framework entries → the
+# emptied event arrays and the hooks key are dropped.
+cat > "$SETTINGS" <<'JSON'
+{
+  "model": "opus",
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [ { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\"" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Write|Edit|MultiEdit|Bash", "hooks": [ { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\"" } ] }
+    ]
+  }
+}
+JSON
+remove_claude_framework_hook >/dev/null
+if [[ "$(node -e 'console.log(JSON.stringify(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"))))' "$SETTINGS")" == '{"model":"opus"}' ]]; then
+  _pass "remove-hook: emptied PreToolUse, PostToolUse and hooks keys dropped"
+else
+  _fail "remove-hook: emptied PreToolUse, PostToolUse and hooks keys dropped (got: $(cat "$SETTINGS"))"
+fi
+
 rm -f "$SETTINGS"
 remove_claude_framework_hook >/dev/null
 if [[ ! -e "$SETTINGS" ]]; then

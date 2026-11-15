@@ -279,6 +279,232 @@ describe("hook launcher: hook mode", () => {
   });
 });
 
+/**
+ * Bash hook input for one event. The same session_id / tool_use_id pair
+ * links a PreToolUse run to its PostToolUse run.
+ */
+function bashInput(event, extra = {}) {
+  return JSON.stringify({
+    session_id: "sess-1",
+    tool_use_id: "toolu_01",
+    hook_event_name: event,
+    tool_name: "Bash",
+    tool_input: { command: "printf 'x' >> docs/specs/proj-123-example/proj-123-example.plan.md" },
+    ...extra,
+  });
+}
+
+/** Self-host project plus a private TMPDIR for the marker directory. */
+function bashProject() {
+  const { project, launcher } = selfHostProject();
+  const tmp = tmpDir("bash-tmp");
+  return { project, launcher, tmp };
+}
+
+function runBash(launcher, { project, tmp, event, input, extra, nodeVersion }) {
+  return runLauncher(launcher, {
+    project,
+    input: input !== undefined ? input : bashInput(event, extra),
+    env: { TMPDIR: tmp, TMP: tmp, TEMP: tmp },
+    nodeVersion,
+  });
+}
+
+function markerDirIn(tmp) {
+  const tag = typeof process.getuid === "function" ? String(process.getuid()) : os.userInfo().username.replace(/[^A-Za-z0-9_-]/g, "");
+  return path.join(tmp, `eversis-validate-spec-${tag}`);
+}
+
+function markerFiles(tmp) {
+  const dir = markerDirIn(tmp);
+  return fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+}
+
+/** Set a file's times to `ms` (epoch milliseconds). */
+function setMtime(abs, ms) {
+  fs.utimesSync(abs, ms / 1000, ms / 1000);
+}
+
+const OTHER_BAD_PLAN_REL = "docs/specs/proj-124-other/proj-124-other.plan.md";
+const LEGACY_HINT_START = "A section missing from an existing file may be added";
+
+describe("hook launcher: Bash before and after the command", () => {
+  it("PreToolUse/Bash → exit 0, no output, one private marker file", () => {
+    const { project, launcher, tmp } = bashProject();
+    const result = runBash(launcher, { project, tmp, event: "PreToolUse" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+    const files = markerFiles(tmp);
+    assert.equal(files.length, 1);
+    if (typeof process.getuid === "function") {
+      assert.equal(fs.statSync(markerDirIn(tmp)).mode & 0o777, 0o700);
+    }
+  });
+
+  it("a bad plan written between PreToolUse and PostToolUse → exit 2 naming the file, marker gone", () => {
+    const { project, launcher, tmp } = bashProject();
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse" }).status, 0);
+    writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    const result = runBash(launcher, { project, tmp, event: "PostToolUse" });
+    assert.equal(result.status, 2, result.stderr);
+    assert.ok(result.stderr.includes(`${BAD_PLAN_REL}: `), result.stderr);
+    assert.match(result.stderr, /missing section: ## /);
+    assert.equal(result.stdout, "");
+    assert.deepEqual(markerFiles(tmp), []);
+  });
+
+  it("a bad plan modified only before PreToolUse → exit 0", () => {
+    const { project, launcher, tmp } = bashProject();
+    const abs = writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    setMtime(abs, Date.now() - 60_000);
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse" }).status, 0);
+    const result = runBash(launcher, { project, tmp, event: "PostToolUse" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+  });
+
+  it("two changed failing files → both named, the legacy hint printed once at the end", () => {
+    const { project, launcher, tmp } = bashProject();
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse" }).status, 0);
+    writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    writeProjectFile(project, OTHER_BAD_PLAN_REL, BAD_PLAN);
+    const result = runBash(launcher, { project, tmp, event: "PostToolUse" });
+    assert.equal(result.status, 2, result.stderr);
+    assert.ok(result.stderr.includes(`${BAD_PLAN_REL}: `), result.stderr);
+    assert.ok(result.stderr.includes(`${OTHER_BAD_PLAN_REL}: `), result.stderr);
+    assert.equal(result.stderr.split(LEGACY_HINT_START).length - 1, 1, result.stderr);
+    assert.ok(result.stderr.trimEnd().split("\n").pop().startsWith(LEGACY_HINT_START), result.stderr);
+  });
+
+  it("Node 18-21 → the end-of-life warning once, after the hint", () => {
+    const { project, launcher, tmp } = bashProject();
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse", nodeVersion: "20.11.0" }).status, 0);
+    writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    writeProjectFile(project, OTHER_BAD_PLAN_REL, BAD_PLAN);
+    const result = runBash(launcher, { project, tmp, event: "PostToolUse", nodeVersion: "20.11.0" });
+    assert.equal(result.status, 2, result.stderr);
+    assert.equal(result.stderr.split("is past end of life").length - 1, 1, result.stderr);
+    assert.match(result.stderr.trimEnd().split("\n").pop(), /^warning: Node 20\.11\.0 is past end of life/);
+  });
+
+  it("a changed passing plan, or a changed non-spec file → exit 0 with no output", () => {
+    const { project, launcher, tmp } = bashProject();
+    const template = fs.readFileSync(path.join(REPO, FRAMEWORK_FILES[2]), "utf8");
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse" }).status, 0);
+    writeProjectFile(project, "docs/specs/proj-123-ok/proj-123-ok.plan.md", template);
+    writeProjectFile(project, "docs/specs/proj-123-x/notes.md", BAD_PLAN);
+    writeProjectFile(project, "src/app.plan.md", BAD_PLAN);
+    const result = runBash(launcher, { project, tmp, event: "PostToolUse" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+  });
+
+  it("no marker (no PreToolUse run, or another tool_use_id) → exit 0", () => {
+    const { project, launcher, tmp } = bashProject();
+    writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    let result = runBash(launcher, { project, tmp, event: "PostToolUse" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse" }).status, 0);
+    writeProjectFile(project, BAD_PLAN_REL, `${BAD_PLAN}\n`);
+    result = runBash(launcher, { project, tmp, event: "PostToolUse", extra: { tool_use_id: "toolu_02" } });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+  });
+
+  it("without tool_use_id the key is a hash of session_id and the command", () => {
+    const { project, launcher, tmp } = bashProject();
+    const extra = { tool_use_id: undefined };
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse", extra }).status, 0);
+    assert.equal(markerFiles(tmp).length, 1);
+    writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    const result = runBash(launcher, { project, tmp, event: "PostToolUse", extra });
+    assert.equal(result.status, 2, result.stderr);
+    assert.deepEqual(markerFiles(tmp), []);
+  });
+
+  it("malformed stdin on either event → exit 0 with no output", () => {
+    const { project, launcher, tmp } = bashProject();
+    writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    const inputs = [
+      "{not json",
+      "",
+      "null",
+      JSON.stringify({ hook_event_name: "PreToolUse", tool_name: "Bash" }),
+      JSON.stringify({ hook_event_name: "PostToolUse", tool_name: "Bash" }),
+      JSON.stringify({ hook_event_name: "PreToolUse", tool_name: "Bash", session_id: 42, tool_use_id: {}, tool_input: "x" }),
+      JSON.stringify({ hook_event_name: "PostToolUse", tool_name: "Bash", session_id: 42, tool_use_id: {}, tool_input: "x" }),
+      JSON.stringify({ hook_event_name: "PreToolUse", tool_name: "Bash", tool_use_id: "../../etc" }),
+      JSON.stringify({ hook_event_name: "Notification", tool_name: "Bash", session_id: "s", tool_use_id: "t" }),
+    ];
+    for (const input of inputs) {
+      const result = runBash(launcher, { project, tmp, input });
+      assert.equal(result.status, 0, `${input}: ${result.stderr}`);
+      assert.equal(result.stdout + result.stderr, "", input);
+    }
+  });
+
+  it("a symlinked directory inside docs/specs is not followed", { skip: process.platform === "win32" }, () => {
+    const { project, launcher, tmp } = bashProject();
+    const outside = tmpDir("bash-linked");
+    fs.mkdirSync(path.join(project, "docs", "specs"), { recursive: true });
+    fs.symlinkSync(outside, path.join(project, "docs", "specs", "proj-125-linked"), "dir");
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse" }).status, 0);
+    fs.writeFileSync(path.join(outside, "proj-125-linked.plan.md"), BAD_PLAN);
+    const result = runBash(launcher, { project, tmp, event: "PostToolUse" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+  });
+
+  it("PreToolUse/Bash with a symlink in place of the marker directory → exit 0, no output, nothing written", { skip: process.platform === "win32" }, () => {
+    const { project, launcher, tmp } = bashProject();
+    const target = tmpDir("bash-target");
+    fs.symlinkSync(target, markerDirIn(tmp), "dir");
+    const result = runBash(launcher, { project, tmp, event: "PreToolUse" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+    assert.deepEqual(fs.readdirSync(target), []);
+    writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    const post = runBash(launcher, { project, tmp, event: "PostToolUse" });
+    assert.equal(post.status, 0, post.stderr);
+  });
+
+  it("PreToolUse/Bash with an unwritable TMPDIR → exit 0, no output", () => {
+    const { project, launcher } = bashProject();
+    const missing = path.join(tmpDir("bash-missing"), "does", "not", "exist");
+    const result = runBash(launcher, { project, tmp: missing, event: "PreToolUse" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+  });
+
+  it("PreToolUse/Bash on Node below 18 still exits 0 with no output", () => {
+    const { project, launcher, tmp } = bashProject();
+    const result = runBash(launcher, { project, tmp, event: "PreToolUse", nodeVersion: "12.22.0" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout + result.stderr, "");
+  });
+
+  it("markers older than 24 hours are removed when a new one is written", () => {
+    const { project, launcher, tmp } = bashProject();
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse", extra: { tool_use_id: "toolu_old" } }).status, 0);
+    const old = path.join(markerDirIn(tmp), markerFiles(tmp)[0]);
+    setMtime(old, Date.now() - 25 * 60 * 60 * 1000);
+    assert.equal(runBash(launcher, { project, tmp, event: "PreToolUse" }).status, 0);
+    assert.ok(!fs.existsSync(old));
+    assert.equal(markerFiles(tmp).length, 1);
+  });
+
+  it("Write/Edit input is unaffected by the Bash handling", () => {
+    const { project, launcher, tmp } = bashProject();
+    const abs = writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    const result = runBash(launcher, { project, tmp, input: hookInput(abs, { session_id: "sess-1", tool_use_id: "toolu_01" }) });
+    assert.equal(result.status, 2, result.stderr);
+    assert.match(result.stderr, /missing section/);
+    assert.deepEqual(markerFiles(tmp), []);
+  });
+});
+
 describe("hook launcher: framework root from the generated prefix", () => {
   it("vendored prefix resolves under <project>/<prefix>; AGENT_COLLECTIONS_HOME elsewhere does not redirect it", () => {
     const project = tmpDir("vendored");
@@ -423,6 +649,53 @@ describe("hook launcher: source and exports", () => {
     assert.equal(toProjectRelative("", "/work/proj"), null);
     assert.equal(toProjectRelative(undefined, "/work/proj"), null);
   });
+
+  it("markerKey keeps [A-Za-z0-9_-] of session_id + tool_use_id, else hashes session_id + command", () => {
+    const { markerKey } = createRequire(import.meta.url)(LAUNCHER_ASSET);
+    assert.equal(markerKey({ session_id: "abc-123", tool_use_id: "toolu_01X" }), "abc-123-toolu_01X");
+    assert.equal(markerKey({ session_id: "a/../b", tool_use_id: "t.1 2" }), "ab-t12");
+    const hashed = markerKey({ session_id: "s", tool_input: { command: "ls" } });
+    assert.match(hashed, /^h-[0-9a-f]{40}$/);
+    assert.equal(markerKey({ session_id: "s", tool_input: { command: "ls" } }), hashed);
+    assert.notEqual(markerKey({ session_id: "s", tool_input: { command: "pwd" } }), hashed);
+    assert.match(markerKey({ session_id: "s".repeat(300), tool_use_id: "t" }), /^k-[0-9a-f]{40}$/);
+    assert.equal(markerKey({}), "");
+    assert.equal(markerKey(null), "");
+    assert.equal(markerKey({ session_id: 42, tool_use_id: {} }), "");
+  });
+
+  it("changedSpecArtifacts lists changed plan/research files, sorted, skipping links, dot-dirs and node_modules", () => {
+    const { changedSpecArtifacts } = createRequire(import.meta.url)(LAUNCHER_ASSET);
+    const project = tmpDir("changed");
+    const since = Date.now() - 10_000;
+    const old = writeProjectFile(project, "docs/specs/proj-123-a/proj-123-a.plan.md", "");
+    setMtime(old, since - 1000);
+    for (const rel of [
+      "docs/specs/proj-123-b/proj-123-b.research.md",
+      "docs/specs/proj-123-a/nested/proj-123-a.plan.md",
+      "docs/specs/proj-123-a/notes.md",
+      "docs/specs/.cache/proj-123-c.plan.md",
+      "docs/specs/node_modules/proj-123-d.plan.md",
+      "docs/other.plan.md",
+    ]) {
+      writeProjectFile(project, rel, "");
+    }
+    if (process.platform !== "win32") {
+      const outside = tmpDir("changed-linked");
+      fs.writeFileSync(path.join(outside, "proj-123-e.plan.md"), "");
+      fs.symlinkSync(outside, path.join(project, "docs", "specs", "proj-123-e"), "dir");
+      fs.symlinkSync(
+        path.join(outside, "proj-123-e.plan.md"),
+        path.join(project, "docs", "specs", "proj-123-b", "linked.plan.md"),
+      );
+    }
+    assert.deepEqual(changedSpecArtifacts(project, since), [
+      "docs/specs/proj-123-a/nested/proj-123-a.plan.md",
+      "docs/specs/proj-123-b/proj-123-b.research.md",
+    ]);
+    assert.deepEqual(changedSpecArtifacts(tmpDir("changed-empty"), since), []);
+    assert.deepEqual(changedSpecArtifacts("", since), []);
+  });
 });
 
 describe("hooks generator", () => {
@@ -457,31 +730,74 @@ describe("hooks generator", () => {
   });
 });
 
-describe("self-host settings entry", () => {
-  it("the command string in .claude/settings.json, run through bash from another directory, blocks a bad plan", () => {
+describe("self-host settings entries", () => {
+  const LAUNCHER_COMMAND = 'node "${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs"';
+
+  /** Framework entries (inner hook names the launcher) of one hook event in this repo's settings. */
+  function frameworkEntries(event) {
     const settings = JSON.parse(fs.readFileSync(path.join(REPO, ".claude", "settings.json"), "utf8"));
-    const entries = settings.hooks.PostToolUse.filter((e) =>
+    return (settings.hooks[event] || []).filter((e) =>
       e.hooks.some((h) => String(h.command).includes(".claude/hooks/eversis-validate-spec.cjs")),
     );
-    assert.equal(entries.length, 1);
-    assert.equal(entries[0].matcher, "Write|Edit|MultiEdit");
-    const command = entries[0].hooks[0].command;
-    assert.equal(command, 'node "${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs"');
+  }
 
-    // A copy of this repo's generated launcher in a throwaway self-host project.
+  /** A copy of this repo's generated launcher in a throwaway self-host project. */
+  function settingsProject() {
     const project = tmpDir("settings");
     installFramework(project);
     fs.mkdirSync(path.join(project, ".claude", "hooks"), { recursive: true });
     fs.copyFileSync(path.join(REPO, LAUNCHER_REL), path.join(project, LAUNCHER_REL));
-    const abs = writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
-    const result = spawnSync("bash", ["-c", command], {
+    return project;
+  }
+
+  /** Runs `command` through bash from another directory, the way Claude Code runs a hook. */
+  function runSettingsCommand(command, project, input, env = {}) {
+    return spawnSync("bash", ["-c", command], {
       cwd: ELSEWHERE,
       encoding: "utf8",
-      input: hookInput(abs),
-      env: { ...process.env, CLAUDE_PROJECT_DIR: project },
+      input,
+      env: { ...process.env, CLAUDE_PROJECT_DIR: project, ...env },
     });
+  }
+
+  it("holds exactly two framework entries: PreToolUse on Bash and PostToolUse on Write|Edit|MultiEdit|Bash", () => {
+    const pre = frameworkEntries("PreToolUse");
+    const post = frameworkEntries("PostToolUse");
+    assert.equal(pre.length, 1);
+    assert.equal(post.length, 1);
+    assert.equal(pre[0].matcher, "Bash");
+    assert.equal(post[0].matcher, "Write|Edit|MultiEdit|Bash");
+    assert.deepEqual(pre[0].hooks, [{ type: "command", command: LAUNCHER_COMMAND }]);
+    assert.deepEqual(post[0].hooks, [{ type: "command", command: LAUNCHER_COMMAND }]);
+  });
+
+  it("the PostToolUse command string, run through bash from another directory, blocks a bad plan written with Write", () => {
+    const command = frameworkEntries("PostToolUse")[0].hooks[0].command;
+    const project = settingsProject();
+    const abs = writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    const result = runSettingsCommand(command, project, hookInput(abs));
     assert.equal(result.status, 2, result.stderr);
     assert.match(result.stderr, /missing section/);
+  });
+
+  it("the PreToolUse and PostToolUse command strings, run through bash, block a bad plan written by a shell command", () => {
+    const preCommand = frameworkEntries("PreToolUse")[0].hooks[0].command;
+    const postCommand = frameworkEntries("PostToolUse")[0].hooks[0].command;
+    const project = settingsProject();
+    const tmp = tmpDir("settings-tmp");
+    const env = { TMPDIR: tmp, TMP: tmp, TEMP: tmp };
+
+    const pre = runSettingsCommand(preCommand, project, bashInput("PreToolUse"), env);
+    assert.equal(pre.status, 0, pre.stderr);
+    assert.equal(pre.stdout + pre.stderr, "");
+    assert.equal(markerFiles(tmp).length, 1);
+
+    writeProjectFile(project, BAD_PLAN_REL, BAD_PLAN);
+    const post = runSettingsCommand(postCommand, project, bashInput("PostToolUse"), env);
+    assert.equal(post.status, 2, post.stderr);
+    assert.ok(post.stderr.includes(`${BAD_PLAN_REL}: `), post.stderr);
+    assert.match(post.stderr, /missing section/);
+    assert.deepEqual(markerFiles(tmp), []);
   });
 });
 

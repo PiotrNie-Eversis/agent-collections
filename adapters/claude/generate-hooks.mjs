@@ -2,17 +2,23 @@
 /**
  * Claude Code hooks generator.
  *
- * Writes .claude/hooks/eversis-validate-spec.cjs, the PostToolUse launcher
- * that checks research and plan files under docs/specs/ against the
+ * Writes .claude/hooks/eversis-validate-spec.cjs, the spec artifact hook
+ * launcher that checks research and plan files under docs/specs/ against the
  * framework templates (see adapters/claude/assets/eversis-validate-spec.cjs
- * for its behaviour). The launcher source is copied as is, with two
- * changes: the framework prefix placeholder is replaced by --framework-prefix
+ * for its behaviour). Claude Code runs the same launcher for two hook
+ * events: PreToolUse on Bash, where it only records when a shell command
+ * starts, and PostToolUse on Write|Edit|MultiEdit|Bash, where it validates
+ * the spec artifact an edit tool wrote, or every spec artifact a shell
+ * command changed since that start.
+ *
+ * The launcher source is copied as is, with two changes: the framework
+ * prefix placeholder is replaced by --framework-prefix
  * (so the launcher finds scripts/validate-spec-artifacts.mjs in self-host,
  * vendored and local-mode installs), and the GENERATED marker comment is
  * appended. Marker-bearing .claude/hooks/eversis-*.cjs files that this
  * generator no longer writes are removed; hand-made files are kept.
  *
- * The settings entry that runs the launcher is owned by the installer's
+ * The two settings entries that run the launcher are owned by the installer's
  * settings merge (scripts/lib/setup-agent-collections/claude-settings-merge.mjs),
  * not by this generator. Zero npm dependencies.
  *

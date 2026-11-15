@@ -60,20 +60,32 @@ Read paths are rewritten through `--framework-prefix`, the GENERATED marker sits
 
 ## Generated hook
 
-`adapters/claude/generate-hooks.mjs` writes `.claude/hooks/eversis-validate-spec.cjs`, a Claude Code `PostToolUse` hook (a command Claude Code runs after a tool call). It is copied from [`assets/eversis-validate-spec.cjs`](./assets/eversis-validate-spec.cjs) with the framework prefix filled in and the GENERATED marker appended; marker-bearing `.claude/hooks/eversis-*.cjs` files it no longer writes are removed.
+`adapters/claude/generate-hooks.mjs` writes `.claude/hooks/eversis-validate-spec.cjs`, a Claude Code hook launcher (a command Claude Code runs before or after a tool call). Claude Code runs it for two events: `PreToolUse` on `Bash`, before each shell command, and `PostToolUse` on `Write`, `Edit`, `MultiEdit` and `Bash`, after file writes and shell commands. It is copied from [`assets/eversis-validate-spec.cjs`](./assets/eversis-validate-spec.cjs) with the framework prefix filled in and the GENERATED marker appended; marker-bearing `.claude/hooks/eversis-*.cjs` files it no longer writes are removed.
 
-The settings entry is owned by the installer's settings merge (`scripts/lib/setup-agent-collections/claude-settings-merge.mjs`), not by the generator. It keeps exactly one framework entry under `hooks.PostToolUse` in `.claude/settings.json`:
+The settings entries are owned by the installer's settings merge (`scripts/lib/setup-agent-collections/claude-settings-merge.mjs`), not by the generator. It keeps exactly one framework entry under each of `hooks.PostToolUse` and `hooks.PreToolUse` in `.claude/settings.json`, both with the same command:
 
 ```json
-{
-  "matcher": "Write|Edit|MultiEdit",
-  "hooks": [
-    { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\"" }
+"hooks": {
+  "PostToolUse": [
+    {
+      "matcher": "Write|Edit|MultiEdit|Bash",
+      "hooks": [
+        { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\"" }
+      ]
+    }
+  ],
+  "PreToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        { "type": "command", "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs\"" }
+      ]
+    }
   ]
 }
 ```
 
-The entry is added only when the launcher exists in the target, and removed otherwise (also when Claude is deselected). Every consumer hook is kept.
+Both entries are added only when the launcher exists in the target, and removed otherwise (also when Claude is deselected). Every consumer hook is kept, in order. An older install with the single `PostToolUse` entry (matcher `Write|Edit|MultiEdit`) gets the Bash check on its next `--upgrade --sync`: that entry is rewritten in place with the new matcher and the `PreToolUse` entry is added after it. `--doctor` fails the "Claude hook entry" check until both entries are there.
 
 What the launcher does after each `Write`, `Edit` or `MultiEdit`:
 
@@ -83,7 +95,15 @@ What the launcher does after each `Write`, `Edit` or `MultiEdit`:
 4. Finds the framework root from the generated prefix — self-host uses the project root, a vendored install uses `<project>/vendor/agent-collections`, local mode reads `.agent-collections/framework-home.txt` and then `AGENT_COLLECTIONS_HOME`. A vendored or self-host install is never redirected to another checkout.
 5. Runs the validator. Exit 0 when the file passes; exit 2 with the gap list on stderr when it does not, or when the validator cannot be found (`validator not found at …`), so the guard never switches itself off silently.
 
-Claude Code shows exit-2 stderr to the model, which fixes the file; the hook runs again on the next write. It also fires for writes made by subagents. Files written through a shell command (Bash) do not trigger it.
+Claude Code shows exit-2 stderr to the model, which fixes the file; the hook runs again on the next write. It also fires for writes made by subagents.
+
+What the launcher does around each shell (`Bash`) command, so spec artifacts changed by `printf … >>`, `sed -i`, `tee` or a script are checked too:
+
+1. `PreToolUse`: writes a start-time marker under `<os tmp>/eversis-validate-spec-<uid>/`, keyed by the hook input's `session_id` and `tool_use_id`. It never prints and never blocks; any problem (no usable temp directory, bad input) exits 0.
+2. `PostToolUse`: reads and removes that marker, then finds every `docs/specs/**/*.plan.md` and `docs/specs/**/*.research.md` modified since it (symlinks below `docs/specs` are not followed). It runs the same Node check, framework root lookup and validator as above on each of them, and exits 2 with one gap report per failing file. No changed spec artifact → exit 0.
+3. No marker → exit 0. That is the case for a settings file that has only the older single `PostToolUse` entry, without `PreToolUse`.
+
+A shell command that fails is not checked: Claude Code reports it as `PostToolUseFailure`, not `PostToolUse`, so the launcher does not run after it. Subagents' shell commands are covered like the main session's.
 
 The launcher is old-syntax CommonJS so that an unsupported Node can still parse it and print the version message instead of a syntax error. `node .claude/hooks/eversis-validate-spec.cjs --self-test` resolves the validator exactly as a hook run does, validates a built-in bad plan held in memory, and prints `eversis-validate-spec self-test: ok` (exit 0) only when gaps are reported; any problem exits 1 with the reason. It reads no project spec file and writes nothing.
 

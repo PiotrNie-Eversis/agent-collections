@@ -254,26 +254,51 @@ run_doctor() {
     local launcher="${target}/${DOCTOR_HOOK_LAUNCHER_REL}"
     local hook_fix="fix: re-run the installer with --upgrade --sync"
 
-    # Entry: a PostToolUse hook whose command names the launcher (same rule
-    # as isFrameworkHook in claude-settings-merge.mjs). grep fallback when
-    # Node cannot run.
+    # Entry: the two framework entries claude-settings-merge.mjs writes must
+    # both run the launcher (a hook whose command names the launcher, same
+    # rule as isFrameworkHook in claude-settings-merge.mjs):
+    #   - a PreToolUse entry whose matcher matches Bash (records when a shell
+    #     command starts);
+    #   - a PostToolUse entry whose matcher includes Bash (validates spec
+    #     artifacts written by Write/Edit/MultiEdit or changed by a shell
+    #     command).
+    # A matcher is split on "|"; "*" or an empty / missing matcher matches
+    # every tool. Node prints "ok" or the problems, comma-separated:
+    # "missing PreToolUse entry", "missing PostToolUse entry", or "PostToolUse
+    # matcher without Bash" (a PostToolUse entry runs the launcher, but none
+    # covers Bash, as in the older single Write|Edit|MultiEdit entry; a plain
+    # --upgrade --sync rewrites it). grep fallback when Node cannot run: a
+    # text match on the launcher path only.
     if [[ ! -f "$settings" ]]; then
       _doctor_line fail "Claude hook entry" ".claude/settings.json is missing; ${hook_fix}"
     elif [[ "$node_ok" == "true" ]]; then
-      local count
-      if count="$(node -e "
+      local entry_state
+      if entry_state="$(node -e "
         let j;
         try { j = JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8')); }
         catch (e) { process.exit(2); }
-        const post = j && j.hooks && Array.isArray(j.hooks.PostToolUse) ? j.hooks.PostToolUse : [];
-        const n = post.filter((e) => e && Array.isArray(e.hooks) && e.hooks.some((h) =>
-          h && typeof h.command === 'string' && h.command.replace(/\\\\/g, '/').includes(process.argv[2]))).length;
-        process.stdout.write(String(n));
+        const launcher = process.argv[2];
+        const hooks = j && typeof j === 'object' && j.hooks && typeof j.hooks === 'object' ? j.hooks : {};
+        const runsLauncher = (e) => e && Array.isArray(e.hooks) && e.hooks.some((h) =>
+          h && typeof h.command === 'string' && h.command.replace(/\\\\/g, '/').includes(launcher));
+        const matchesBash = (e) => {
+          const m = typeof e.matcher === 'string' ? e.matcher.trim() : '';
+          if (m === '' || m === '*') return true;
+          return m.split('|').map((s) => s.trim()).some((s) => s === 'Bash' || s === '*');
+        };
+        const framework = (event) => (Array.isArray(hooks[event]) ? hooks[event] : []).filter(runsLauncher);
+        const pre = framework('PreToolUse');
+        const post = framework('PostToolUse');
+        const missing = [];
+        if (!pre.some(matchesBash)) missing.push('missing PreToolUse entry');
+        if (post.length === 0) missing.push('missing PostToolUse entry');
+        else if (!post.some(matchesBash)) missing.push('PostToolUse matcher without Bash');
+        process.stdout.write(missing.length ? missing.join(', ') : 'ok');
       " "$settings" "$DOCTOR_HOOK_LAUNCHER_REL" 2>/dev/null)"; then
-        if [[ "$count" == "0" ]]; then
-          _doctor_line fail "Claude hook entry" "no PostToolUse hook in .claude/settings.json runs ${DOCTOR_HOOK_LAUNCHER_REL}; ${hook_fix}"
+        if [[ "$entry_state" == "ok" ]]; then
+          _doctor_line ok "Claude hook entry" ".claude/settings.json PreToolUse (Bash) and PostToolUse (with Bash) run ${DOCTOR_HOOK_LAUNCHER_REL}"
         else
-          _doctor_line ok "Claude hook entry" ".claude/settings.json PostToolUse runs ${DOCTOR_HOOK_LAUNCHER_REL}"
+          _doctor_line fail "Claude hook entry" ".claude/settings.json framework hook: ${entry_state} (both PreToolUse with Bash and PostToolUse with Bash must run ${DOCTOR_HOOK_LAUNCHER_REL}); ${hook_fix}"
         fi
       else
         _doctor_line fail "Claude hook entry" ".claude/settings.json is not valid JSON; fix the file by hand, then re-run the installer with --upgrade --sync"

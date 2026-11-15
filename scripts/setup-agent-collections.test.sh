@@ -191,15 +191,21 @@ grep -qF 'var FRAMEWORK_PREFIX = "vendor/agent-collections";' "$HOOK_LAUNCHER" \
   || { echo "FAIL: hook launcher missing or not generated with the vendor prefix"; exit 1; }
 CLAUDE_PROJECT_DIR="$TARGET_CLAUDE" node "$HOOK_LAUNCHER" --self-test | grep -qxF 'eversis-validate-spec self-test: ok' \
   || { echo "FAIL: hook launcher --self-test did not pass in the vendored install"; exit 1; }
+# Prints how many entries of hook event $1 (PreToolUse | PostToolUse) in
+# $2/.claude/settings.json run the framework launcher command, followed by
+# a space and their matchers joined with ";" (empty when there are none).
 _framework_hook_count() {
   node -e '
     const j = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
-    const post = (j.hooks && j.hooks.PostToolUse) || [];
-    console.log(post.filter((e) => (e.hooks || []).some((h) => h.command === process.argv[2])).length);
-  ' "${TARGET_CLAUDE}/.claude/settings.json" 'node "${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs"'
+    const list = (j.hooks && j.hooks[process.argv[2]]) || [];
+    const own = list.filter((e) => (e.hooks || []).some((h) => h.command === process.argv[3]));
+    console.log(`${own.length} ${own.map((e) => e.matcher).join(";")}`.trim());
+  ' "$2/.claude/settings.json" "$1" 'node "${CLAUDE_PROJECT_DIR}/.claude/hooks/eversis-validate-spec.cjs"'
 }
-[[ "$(_framework_hook_count)" == "1" ]] \
-  || { echo "FAIL: .claude/settings.json should hold exactly one framework PostToolUse entry (got $(_framework_hook_count))"; exit 1; }
+[[ "$(_framework_hook_count PreToolUse "$TARGET_CLAUDE")" == "1 Bash" ]] \
+  || { echo "FAIL: .claude/settings.json should hold exactly one framework PreToolUse entry with matcher Bash (got $(_framework_hook_count PreToolUse "$TARGET_CLAUDE"))"; exit 1; }
+[[ "$(_framework_hook_count PostToolUse "$TARGET_CLAUDE")" == "1 Write|Edit|MultiEdit|Bash" ]] \
+  || { echo "FAIL: .claude/settings.json should hold exactly one framework PostToolUse entry with matcher Write|Edit|MultiEdit|Bash (got $(_framework_hook_count PostToolUse "$TARGET_CLAUDE"))"; exit 1; }
 
 # Consumer-owned agent and hook entry that a Claude deselect must keep.
 printf -- '---\nname: my-agent\ndescription: consumer agent\n---\nHand-made.\n' > "${TARGET_CLAUDE}/.claude/agents/my-agent.md"
@@ -247,8 +253,10 @@ shopt -u nullglob
   || { echo "FAIL: .claude/hooks/eversis-*.cjs survived deselecting Claude: ${LEFTOVER_HOOKS[*]}"; exit 1; }
 [[ -f "${TARGET_CLAUDE}/.claude/agents/my-agent.md" ]] \
   || { echo "FAIL: hand-made .claude/agents/my-agent.md removed on Claude deselect"; exit 1; }
-[[ "$(_framework_hook_count)" == "0" ]] \
+[[ "$(_framework_hook_count PostToolUse "$TARGET_CLAUDE")" == "0" ]] \
   || { echo "FAIL: framework PostToolUse entry survived deselecting Claude"; exit 1; }
+[[ "$(_framework_hook_count PreToolUse "$TARGET_CLAUDE")" == "0" ]] \
+  || { echo "FAIL: framework PreToolUse entry survived deselecting Claude"; exit 1; }
 grep -qF 'echo consumer-hook' "${TARGET_CLAUDE}/.claude/settings.json" \
   || { echo "FAIL: consumer PostToolUse hook removed on Claude deselect"; exit 1; }
 # Note: .mcp.json itself is intentionally left in place on deselect — same
@@ -1750,8 +1758,8 @@ grep -qF 'Claude hook self-test: eversis-validate-spec self-test: ok' "$DOCTOR_L
 rm -f "${TARGET_DOCTOR}/.claude/skills/${DOCTOR_SKILL}"
 mv "${TMP}/doctor-skill-backup" "${TARGET_DOCTOR}/.claude/skills/${DOCTOR_SKILL}"
 
-# (d4) framework hook entry removed from .claude/settings.json → exit 1
-# naming the hook.
+# (d4) both framework hook entries removed from .claude/settings.json (the
+# whole "hooks" key) → exit 1 naming the hook launcher.
 DOCTOR_SETTINGS="${TARGET_DOCTOR}/.claude/settings.json"
 cp "$DOCTOR_SETTINGS" "${TMP}/doctor-settings-backup.json"
 node -e '
@@ -1790,6 +1798,70 @@ mv "${TMP}/doctor-validator-backup.mjs" "$DOCTOR_VALIDATOR"
 # (d7) everything restored → healthy again.
 _run_doctor_case "" "$DOCTOR_LOG" \
   || { echo "FAIL: (d7) --doctor after restoring the install should exit 0"; cat "$DOCTOR_LOG"; exit 1; }
+
+# (d8) both framework hook entries are in place on the healthy install, and
+# the doctor's entry line says so.
+[[ "$(_framework_hook_count PreToolUse "$TARGET_DOCTOR")" == "1 Bash" ]] \
+  || { echo "FAIL: (d8) healthy install lacks the framework PreToolUse (Bash) entry (got $(_framework_hook_count PreToolUse "$TARGET_DOCTOR"))"; exit 1; }
+[[ "$(_framework_hook_count PostToolUse "$TARGET_DOCTOR")" == "1 Write|Edit|MultiEdit|Bash" ]] \
+  || { echo "FAIL: (d8) healthy install lacks the framework PostToolUse (Write|Edit|MultiEdit|Bash) entry (got $(_framework_hook_count PostToolUse "$TARGET_DOCTOR"))"; exit 1; }
+grep -F 'Claude hook entry' "$DOCTOR_LOG" | grep -F 'PreToolUse' | grep -qF 'PostToolUse' \
+  || { echo "FAIL: (d8) healthy --doctor entry line does not name both events"; cat "$DOCTOR_LOG"; exit 1; }
+
+# (d9) only the framework PreToolUse entry removed → exit 1 naming PreToolUse.
+cp "$DOCTOR_SETTINGS" "${TMP}/doctor-settings-backup.json"
+node -e '
+  const fs = require("fs");
+  const p = process.argv[1];
+  const j = JSON.parse(fs.readFileSync(p, "utf8"));
+  delete j.hooks.PreToolUse;
+  fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+' "$DOCTOR_SETTINGS"
+_run_doctor_case "" "$DOCTOR_LOG" \
+  && { echo "FAIL: (d9) --doctor without the PreToolUse entry should exit 1"; cat "$DOCTOR_LOG"; exit 1; }
+grep -F 'FAIL' "$DOCTOR_LOG" | grep -F 'Claude hook entry' | grep -qF 'missing PreToolUse entry' \
+  || { echo "FAIL: (d9) --doctor did not name the missing PreToolUse entry"; cat "$DOCTOR_LOG"; exit 1; }
+grep -F 'Claude hook entry' "$DOCTOR_LOG" | grep -qF 'PostToolUse matcher without Bash' \
+  && { echo "FAIL: (d9) --doctor blamed the intact PostToolUse matcher"; cat "$DOCTOR_LOG"; exit 1; }
+
+# (d10) the older single PostToolUse entry (matcher Write|Edit|MultiEdit, no
+# PreToolUse) → exit 1 naming the matcher and the missing PreToolUse entry.
+node -e '
+  const fs = require("fs");
+  const p = process.argv[1];
+  const j = JSON.parse(fs.readFileSync(p, "utf8"));
+  delete j.hooks.PreToolUse;
+  for (const e of j.hooks.PostToolUse) {
+    if ((e.hooks || []).some((h) => String(h.command).includes(".claude/hooks/eversis-validate-spec.cjs"))) {
+      e.matcher = "Write|Edit|MultiEdit";
+    }
+  }
+  fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+' "$DOCTOR_SETTINGS"
+_run_doctor_case "" "$DOCTOR_LOG" \
+  && { echo "FAIL: (d10) --doctor with the old single Write|Edit|MultiEdit entry should exit 1"; cat "$DOCTOR_LOG"; exit 1; }
+grep -F 'FAIL' "$DOCTOR_LOG" | grep -F 'Claude hook entry' | grep -qF 'PostToolUse matcher without Bash' \
+  || { echo "FAIL: (d10) --doctor did not name the PostToolUse matcher without Bash"; cat "$DOCTOR_LOG"; exit 1; }
+grep -F 'Claude hook entry' "$DOCTOR_LOG" | grep -qF 'missing PreToolUse entry' \
+  || { echo "FAIL: (d10) --doctor did not name the missing PreToolUse entry"; cat "$DOCTOR_LOG"; exit 1; }
+grep -F 'Claude hook entry' "$DOCTOR_LOG" | grep -qF -- '--upgrade --sync' \
+  || { echo "FAIL: (d10) --doctor did not print the fix hint"; cat "$DOCTOR_LOG"; exit 1; }
+
+# (d11) a plain --upgrade --sync on that old single-entry install brings back
+# both entries (no hand restore), and --doctor passes again.
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_DOCTOR" \
+  --upgrade --sync --non-interactive \
+  > "${TMP}/consumer-doctor-upgrade.log" 2>&1 \
+  || { echo "FAIL: (d11) --upgrade --sync on the old single-entry install failed"; cat "${TMP}/consumer-doctor-upgrade.log"; exit 1; }
+[[ "$(_framework_hook_count PreToolUse "$TARGET_DOCTOR")" == "1 Bash" ]] \
+  || { echo "FAIL: (d11) --upgrade --sync did not add the PreToolUse (Bash) entry (got $(_framework_hook_count PreToolUse "$TARGET_DOCTOR"))"; exit 1; }
+[[ "$(_framework_hook_count PostToolUse "$TARGET_DOCTOR")" == "1 Write|Edit|MultiEdit|Bash" ]] \
+  || { echo "FAIL: (d11) --upgrade --sync did not upgrade the PostToolUse matcher (got $(_framework_hook_count PostToolUse "$TARGET_DOCTOR"))"; exit 1; }
+_run_doctor_case "" "$DOCTOR_LOG" \
+  || { echo "FAIL: (d11) --doctor after --upgrade --sync should exit 0"; cat "$DOCTOR_LOG"; exit 1; }
+grep -qF 'FAIL' "$DOCTOR_LOG" && { echo "FAIL: (d11) --doctor after --upgrade --sync printed a FAIL line"; cat "$DOCTOR_LOG"; exit 1; }
 
 if [[ "$ELAPSED" -gt 300 ]]; then
   echo "WARN: smoke exceeded 5 minutes (${ELAPSED}s)"

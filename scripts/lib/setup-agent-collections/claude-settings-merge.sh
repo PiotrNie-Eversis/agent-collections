@@ -11,7 +11,8 @@ merge_claude_settings() {
   local template_path="${COLLECTIONS_HOME}/templates/claude-settings.json"
   local merge_mjs="${LIB_DIR}/claude-settings-merge.mjs"
   # Written by the adapter sync (link_framework_files) earlier in the run;
-  # the merge adds the framework PostToolUse entry only when it exists.
+  # the merge adds the framework PreToolUse (Bash) and PostToolUse
+  # (Write|Edit|MultiEdit|Bash) entries only when it exists.
   local hook_launcher="${TARGET_DIR}/.claude/hooks/eversis-validate-spec.cjs"
 
   # Prefer this consumer's own merged .claudeignore (written earlier in the
@@ -50,16 +51,17 @@ merge_claude_settings() {
 
   echo "$merged" > "$settings_file"
   if [[ -f "$hook_launcher" ]]; then
-    log_ok "Wrote ${settings_file} (permissions.deny + enabledMcpjsonServers + spec artifact hook refreshed)."
+    log_ok "Wrote ${settings_file} (permissions.deny + enabledMcpjsonServers + spec artifact hook entries PreToolUse + PostToolUse refreshed)."
   else
-    log_ok "Wrote ${settings_file} (permissions.deny + enabledMcpjsonServers refreshed; no hook launcher in .claude/hooks/, framework hook entry not set)."
+    log_ok "Wrote ${settings_file} (permissions.deny + enabledMcpjsonServers refreshed; no hook launcher in .claude/hooks/, framework hook entries not set)."
   fi
 }
 
-# Claude deselected: drop only the framework PostToolUse entry (and a
-# PostToolUse / hooks key the removal empties) from .claude/settings.json.
+# Claude deselected: drop only the framework PreToolUse and PostToolUse
+# entries (and a PreToolUse / PostToolUse / hooks key the removal empties)
+# from .claude/settings.json.
 # permissions, enabledMcpjsonServers and every consumer hook stay as they
-# are. No-op when the file is absent; the file is rewritten only when the
+# are. No-op when the file is absent; the file is rewritten only when an
 # entry was there.
 remove_claude_framework_hook() {
   local settings_file="${TARGET_DIR}/.claude/settings.json"
@@ -74,7 +76,7 @@ remove_claude_framework_hook() {
     CS_MODE=remove-hook \
     CS_EXISTING_JSON="$existing_json" \
     node "$merge_mjs"
-  )" || die "Failed to remove the framework hook entry from ${settings_file}."
+  )" || die "Failed to remove the framework hook entries from ${settings_file}."
 
   [[ -n "$updated" ]] || return 0
   local before after
