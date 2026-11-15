@@ -13,14 +13,19 @@ For features that need end-to-end test coverage, use the E2E testing workflow. T
 1️⃣ @eversis-implement <JIRA_ID or task description>
    ↳ 🔍 Engineering Manager delegates to Context Engineer for research
    ↳ 📖 Review research doc – understand feature scope and user journeys
-   ↳ ✅ Identify critical paths that need E2E coverage
+   ↳ 💡 Check that the research names the critical paths that need E2E coverage
+   ↳ ✅ Approve research
    ↳ 🧱 Engineering Manager delegates to Architect for planning
-   ↳ 📖 Review plan – confirm test scenarios and acceptance criteria
-   ↳ ✅ Ensure E2E testing is included in the plan
+   ↳ 🧪 Engineering Manager delegates to Plan Reviewer for plan review
+   ↳ 📖 Review plan and review summary – confirm test scenarios and acceptance criteria
+   ↳ 💡 Check that E2E testing is included in the plan
+   ↳ ✅ Approve plan
    ↳ 🧪 Engineering Manager delegates E2E tasks to the E2E Engineer agent
    ↳ 📖 Implements Page Objects, test files, and fixtures
-   ↳ ✅ Run tests locally, verify they pass
+   ↳ 🧪 E2E Engineer runs the tests
    ↳ 🔄 Iterate on flaky or failing tests
+   ↳ 🔍 Code review in the same run
+   ↳ 🏁 PASS → Fine + QA comment draft
 ```
 
 :::tip

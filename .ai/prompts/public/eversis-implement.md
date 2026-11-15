@@ -30,7 +30,7 @@ Load **`eversis-engineering-manager`** (core: `.ai/rules/orchestration/engineeri
 Delegates to **`eversis-orchestrating-implementation`**, which owns:
 
 - **Quick vs Full flow** selection (Figma/UI always forces Full)
-- Research → plan → plan validation → implementation → review gates
+- Research (approval) → plan → plan review → plan approval → implementation → same-session review
 - Per-task todos, routing table, and UI verification gate
 - **Continuity:** same-session `eversis-review` → **Fine** + QA draft (unless opt-out)
 - **Fine** + mandatory QA comment draft via `eversis-fine-handoff`

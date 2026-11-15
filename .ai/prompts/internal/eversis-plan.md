@@ -60,10 +60,10 @@ docs/specs/
 
 The plan includes Wildly Important Goal, Technical Context, checklist-style phases, tasks with `[CREATE]`/`[MODIFY]`/`[REUSE]` action types, `Files:` per task, acceptance criteria, and security considerations.
 
-After human review of the plan draft, the Engineering Manager delegates plan validation via [`eversis-review-plan.md`](./eversis-review-plan.md).
+The Engineering Manager first runs plan review via [`eversis-review-plan.md`](./eversis-review-plan.md); the person then approves the plan together with the review summary.
 
 :::tip
-Review the plan thoroughly. Confirm scope, phases, and acceptance criteria before plan validation and implementation.
+Review the plan thoroughly, together with the plan-review summary. Confirm scope, phases, and acceptance criteria before implementation.
 :::
 
 ---

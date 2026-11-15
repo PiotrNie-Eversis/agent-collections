@@ -7,7 +7,7 @@ Mandatory delivery contract for Agent Collections (and consumer projects that ad
 ```text
 Ideate
   → Research   → human gate (approve research before plan)
-  → Plan       → human gate (approve plan before broad code)
+  → Plan       → plan review → human gate (approve plan + review summary before broad code)
 Implement      → focused changes + quality commands
 Review         → independent check (PASS / BLOCKER / SUGGESTION) — same session as Implement by default
 Fine           → QA comment draft same turn; publish only with explicit human OK
@@ -22,7 +22,7 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 | Stage | Human approval gate? |
 |-------|----------------------|
 | Research | **Yes** — approve before plan |
-| Plan | **Yes** — approve before broad code |
+| Plan | **Yes** — approve before broad code, together with the plan-review summary |
 | Implement | No (after plan approval / Proceeding) |
 | Review (code) | **No** — runs inside the Implement session by default (Continuity); not a separate human attach gate |
 | Fine (QA draft) | Draft is automatic with Fine; **publish to Jira** needs explicit human OK |

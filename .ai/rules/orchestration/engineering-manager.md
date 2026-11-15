@@ -8,7 +8,7 @@ Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `evers
 
 ## Human gates
 
-Follow **`agent-core.md`**: approve research and plan before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
+Follow **`agent-core.md`**: approve research and plan before broad code changes unless Quick Flow criteria are met and the user accepts Quick. The plan gate comes after plan review: the person approves the plan and the plan-review summary together, then code starts.
 
 On the **first response** of every Implement run (`eversis-implement`), output the Implement readiness block (four required lines, plus any optional lines that apply) as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
 
@@ -38,7 +38,7 @@ Optional additional lines, any subset, appended after the four required lines in
 **Self-check before treating a mid-thread gate as cleared:**
 
 1. Does the user's message **directly respond to the specific gate** that was declared (not a different, earlier question, and not a message sent before that gate existed)?
-2. If I just declared **any** `Next gate` in this turn — not only a flow/gate change proposal — did I **stop** there, instead of also acting on it (implementing, delegating, or otherwise progressing) in this same turn?
+2. If I just declared **any** `Next gate` in this turn — not only a flow/gate change proposal — did I **stop** there, instead of also acting on it (implementing, delegating, or otherwise progressing) in this same turn? The readiness `Next gate` names the gate this turn ends at; preparing the artifact that gate covers (research file; plan, structure check and plan review) is part of reaching it, not acting on it.
 3. If the answer to #1 isn't a clean yes **and the reply is plausibly an uncertain approval attempt**, did I **ask an explicit clarifying question** instead of proceeding on a plausible reading? (Not needed when the reply is clearly something else — a question, a requested change, a clarification — just handle it directly and leave the gate open.)
 
 See orchestration skill **Gate-closing rule** for the full rule.

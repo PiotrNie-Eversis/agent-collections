@@ -186,7 +186,7 @@ If your workspace includes **`.cursor/commands/`**, you may have thin wrappers s
 This workflow **does not replace** backlog or code delivery. Typical separation:
 
 - **Ideate / backlog** — [`eversis-analyze-materials`](./workshop-flow) and Jira refinement.
-- **Code delivery** — [`eversis-implement`](./standard-flow) → [`eversis-review`](./overview#3-review).
+- **Code delivery** — [`eversis-implement`](./standard-flow), with [code review](./overview#3-review) inside the same run.
 - **Regulatory or BA Word docs after release** — **Business Manager Docs** (this page).
 
 :::warning Important

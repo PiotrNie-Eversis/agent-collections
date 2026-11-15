@@ -35,8 +35,8 @@ The Engineering Manager is bound to the public prompt **`@eversis-implement`**. 
 | **E2E Engineer** | Playwright E2E | Task requires writing or updating E2E test suites |
 | **DevOps Engineer** | Infrastructure, CI/CD, deployments | Task involves infrastructure changes or pipeline configuration |
 | **Architect** | Codebase analysis, technical context, planning | Before implementation when plan or Technical Context is missing (via [Plan](../prompts/internal/plan)) |
-| **Plan Reviewer** | Plan stress-test before coding | After human plan review, before broad implementation (via [Review Plan](../prompts/internal/review-plan)) |
-| **Code Reviewer** | Code quality, best practices | After implementation completes, or when no review phase is defined |
+| **Plan Reviewer** | Plan stress-test before coding | After the Architect writes the plan, before you approve it (via [Review Plan](../prompts/internal/review-plan)) |
+| **Code Reviewer** | Code quality, best practices | After implementation and quality checks, in the same run |
 | **Prompt Engineer** | LLM application prompts | Task involves designing, optimizing, or securing LLM prompts |
 | **UI Reviewer** | Figma verification, visual correctness | After UI implementation, to verify against design specifications |
 
@@ -61,12 +61,12 @@ See also the [Implement](../prompts/public/implement) workflow documentation pag
 - **Delegates every task** — Never writes code itself; all implementation is routed to specialized agents.
 - **Routes based on task type** — Application code → Software Engineer, E2E tests → E2E Engineer, infrastructure → DevOps Engineer, LLM prompts → Prompt Engineer.
 - **Packages context automatically** — Each delegation includes structured context from the implementation plan.
-- **Runs plan validation** — Delegates to the [Plan Reviewer](./plan-reviewer) after human plan review unless an approved `.plan-review.md` already exists.
+- **Runs plan review** — Delegates to the [Plan Reviewer](./plan-reviewer) before showing you the plan, unless an approved `.plan-review.md` exists for the unchanged plan.
 - **Uses Technical Context from the plan** — Skips redundant codebase discovery when the plan's Technical Context section is thorough.
 - **Runs codebase analysis when needed** — Invokes the [Architect](./architect) when Technical Context is incomplete.
-- **Respects human gates** — Stops for approval after research, after planning, and after plan validation before broad code changes (`eversis-agent-core.mdc`).
+- **Respects human gates** — Stops for approval after research and after planning (the plan comes with the review summary) before broad code changes (`eversis-agent-core.mdc`). Plan review stops the run only on blockers. It asks again only when your approval is missing or the plan changed after you approved it.
 - **Outputs Implement readiness first** — On every `@eversis-implement` / `/eversis-implement` run, the readiness block is the **first content** — four required lines (Flow / Research / Plan / Next gate) plus optional `Resume`, `Context`, and `Reason` (the orchestration skill is the norm for any further optional line, including `Audit`) — before artifacts or code. Runs **adequacy checklist** before Research SKIP when artifacts exist (orchestration skill Step 1).
-- **Auto-triggers Code Reviewer** — Automatically runs the Code Reviewer at the end of implementation if no review phase is defined in the plan.
+- **Runs code review in the same run** — After implementation and checks, runs the Code Reviewer; on PASS declares Fine. Opt-out: `pause before review` / `review later`.
 - **Tracks progress** — Updates plan checkboxes after each completed task.
 - **Asks before deviating** — Requests user confirmation before deviating from the implementation plan.
 - **Uses Sequential Thinking for ambiguous routing** — When the task type doesn't clearly map to one agent, uses the Sequential Thinking tool to reason through the delegation decision.

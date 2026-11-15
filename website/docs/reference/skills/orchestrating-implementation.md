@@ -77,7 +77,7 @@ You do **not** need to type “Research” in the prompt — the agent inspects 
 | | Quick Flow | Full Flow |
 | --- | --- | --- |
 | **When** | Narrow scope, ≤3 files, no ambiguity, no Figma/UI, planning readiness met | Cross-domain, ambiguous, missing/inadequate research/plan, >3 files, or any Figma/UI |
-| **Skips** | Full research/plan/plan-review when criteria met and artifacts exist | Nothing — runs research → plan → plan validation → execution when gaps exist |
+| **Skips** | Full research/plan/plan-review when criteria met and artifacts exist | Nothing — runs research → plan → plan review → execution when gaps exist |
 | **Ends with** | Validation → **same-session** `eversis-review` → Fine + fine-handoff | Per-task execution → UI gate → **same-session** review → Fine + fine-handoff |
 
 **Hard rule:** Any Figma or `[REUSE]` UI verification task **forces Full Flow**.
@@ -89,8 +89,8 @@ The Engineering Manager recommends a flow in chat; the user may override.
 ## Full Flow highlights
 
 1. **Check existing artifacts first** — adequacy checklist before SKIP; create or DELTA when missing or stale.
-2. Human plan review → Plan Reviewer (`@eversis-review-plan`) → max 3 iterations.
-3. Use plan **Technical Context** when populated; otherwise delegate codebase discovery.
+2. Use plan **Technical Context** when populated; otherwise delegate codebase discovery.
+3. Plan Reviewer (`@eversis-review-plan`, max 3 iterations; only blockers start another round) → you approve the plan with the review summary — the one plan gate; code starts after it. The agent asks again only when your approval is missing or the plan changed after you approved it.
 4. Route each plan task via the execution routing table (Software Engineer, DevOps, E2E, Prompt Engineer, UI Reviewer).
 5. **Domain skills gate** — load stack-specific skills only when `eversis-project-stack.mdc` § Agent skills policy and the plan allow it.
 6. Enforce per-item UI verification before code review.

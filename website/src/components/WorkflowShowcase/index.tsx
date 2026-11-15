@@ -24,7 +24,8 @@ export default function WorkflowShowcase(): React.JSX.Element {
       </div>
 
       <p className={styles.flowCaption}>
-        Every step requires your review. In Cursor, attach prompts with{' '}
+        You approve the research, the plan and the QA comment; code review
+        runs inside the Implement run. In Cursor, attach prompts with{' '}
         <code>@</code> in Chat or Agent (e.g. <code>@eversis-implement</code>)
         or use <code>/eversis-*</code> project commands from{' '}
         <code>.cursor/commands/</code> — each loads the canonical prompt file.

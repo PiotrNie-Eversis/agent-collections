@@ -147,8 +147,10 @@ The agent fetches existing issues from Jira, converts them into the local format
 After workshop analysis, individual tasks can flow into the standard delivery workflow:
 
 ```text
-/eversis-analyze-materials  →  /eversis-implement PROJ-123  →  /eversis-review
+/eversis-analyze-materials  →  /eversis-implement PROJ-123
 ```
+
+Code review runs inside the `/eversis-implement` run, before Fine; a separate `/eversis-review` is optional.
 
 Use the **Deep-dive Research per Task** handoff to transition a specific task to the Context Engineer for detailed requirements gathering, or the **Prepare Implementation Plan** handoff to send it to the Architect.
 

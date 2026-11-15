@@ -23,7 +23,7 @@ Gartner found that only **10% of software engineers** see meaningful productivit
 
 When engineers use AI ad-hoc the results vary by individual. You get pockets of acceleration alongside unchanged delivery speed, inconsistent code quality, and a team that's learned to trust AI selectively and unpredictably.
 
-**Agent Collections** is a structured response to this problem. It doesn't replace your existing tools or process. It gives AI a consistent place in your delivery workflow with **defined inputs, expected outputs, and human review at every step**.
+**Agent Collections** is a structured response to this problem. It doesn't replace your existing tools or process. It gives AI a consistent place in your delivery workflow with **defined inputs, expected outputs, and human approval of the research, the plan and the QA comment**.
 
 ---
 

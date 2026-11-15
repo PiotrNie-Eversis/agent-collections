@@ -77,7 +77,7 @@ Each role defines:
 #### Architect
 
 - **Focus:** solution design and **implementation plans** with phases, Technical Context, and acceptance checks.
-- Produces **`*.plan.md`** — human approval required before plan validation and broad code changes.
+- Produces **`*.plan.md`** — the Plan Reviewer checks it, then you approve it before broad code changes.
 
 #### Plan Reviewer
 
@@ -87,7 +87,7 @@ Each role defines:
 
 #### Engineering Manager
 
-- **Focus:** **orchestrating** the Implement phase — research → plan → plan validation → code → review handoff.
+- **Focus:** **orchestrating** the Implement phase — research → plan → plan review → code → code review in the same run → Fine.
 - Delegates by task type; enforces human gates and **Fine → QA comment draft**.
 - **Invoke:** `@eversis-implement` or `/eversis-implement` + `eversis-engineering-manager.mdc`.
 
