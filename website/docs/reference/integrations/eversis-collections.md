@@ -55,7 +55,7 @@ When adding or changing MCP tools, update this section and the matching **Tool r
 
 - **Focus:** Discover all `eversis-*` skill packages under `.ai/skills/`.
 - **How to use:** Enabled MCP; Agent calls at the start of implement/review when `eversis-agent-core` instructs skill discovery.
-- **Outcome:** JSON list of `{ name, description }` from each `SKILL.md` frontmatter.
+- **Outcome:** JSON list of `{ id, name, description, userInvocable }` from each `SKILL.md` frontmatter. `userInvocable` is `false` when the skill is hidden from the person's `/` menu (`user-invocable: false`); a skill without the key reports `true`. The deprecated `userInvokable` field carries the same value for one release.
 
 #### `eversis_skills_get`
 
@@ -67,7 +67,7 @@ When adding or changing MCP tools, update this section and the matching **Tool r
 
 - **Focus:** CI-quality validation of every skill package.
 - **How to use:** Call from Agent or run `npm run validate` / `node dist/cli.js validate`; set `treatWarningsAsErrors: true` (or `--strict`) in CI.
-- **Outcome:** JSON report of errors and warnings (frontmatter, directory name match, `SKILL.md` presence, length hints).
+- **Outcome:** JSON report of errors and warnings (frontmatter, directory name match, `SKILL.md` presence, length hints, deprecated frontmatter keys).
 
 #### `eversis_skill_run_script`
 

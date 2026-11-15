@@ -29,7 +29,7 @@ export async function runMcpServer(): Promise<void> {
     "eversis_skills_list",
     {
       description:
-        "List all eversis-* skill packages under .ai/skills/ with name and description from SKILL.md frontmatter.",
+        "List all eversis-* skill packages under .ai/skills/ with name and description from SKILL.md frontmatter, plus userInvocable (false = hidden from the person's / menu; default true).",
     },
     async () => {
       const skills = listSkills(startDir);

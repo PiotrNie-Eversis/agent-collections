@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { parseSkillFrontmatter } from "./frontmatter.js";
+import { parseSkillFrontmatter, resolveUserInvocable } from "./frontmatter.js";
 import { assertUnderRoot, findRepoRoot } from "./resolveRoot.js";
 
 const SKILL_ID_PREFIX = "eversis-";
@@ -10,6 +10,9 @@ export type SkillSummary = {
   id: string;
   name: string;
   description: string;
+  /** `false` = hidden from the person's `/` menu; a skill without the key reports `true`. */
+  userInvocable?: boolean;
+  /** Deprecated alias of userInvocable, same value, one release (removal: AC-175). */
   userInvokable?: boolean;
 };
 
@@ -41,15 +44,13 @@ export function listSkills(startDir: string): SkillSummary[] {
     }
     const raw = fs.readFileSync(skillMd, "utf8");
     const { frontmatter } = parseSkillFrontmatter(raw);
-    const userInvokable =
-      typeof frontmatter["user-invokable"] === "boolean"
-        ? frontmatter["user-invokable"]
-        : frontmatter["user-invokable"] === "true";
+    const userInvocable = resolveUserInvocable(frontmatter);
     out.push({
       id,
       name: frontmatter.name ?? id,
       description: frontmatter.description ?? "",
-      userInvokable,
+      userInvocable,
+      userInvokable: userInvocable,
     });
   }
   return out;

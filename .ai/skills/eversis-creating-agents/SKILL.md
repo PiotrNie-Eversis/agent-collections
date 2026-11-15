@@ -1,7 +1,7 @@
 ---
 name: eversis-creating-agents
 description: "Create Agent Collections role rules under .ai/rules/ (neutral Markdown). Cursor adapters may also emit .cursor/rules/eversis-*.mdc packaging. Maps legacy agent-identity content into rule bodies; use with skills and .ai/prompts. Not .github/agents."
-user-invokable: false
+user-invocable: false
 ---
 
 # Creating agents (role rules)

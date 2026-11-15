@@ -71,6 +71,14 @@ function validateOneSkill(
       message: "Frontmatter must include 'description:'",
     });
   }
+  if (frontmatter["user-invokable"] !== undefined) {
+    issues.push({
+      level: "warning",
+      path: path.join(relBase, "SKILL.md"),
+      message:
+        "Frontmatter key 'user-invokable' is deprecated; rename it to 'user-invocable' (the old key is accepted for one more release)",
+    });
+  }
   if (lineCount > MAX_BODY_LINES_RECOMMENDED) {
     issues.push({
       level: "warning",

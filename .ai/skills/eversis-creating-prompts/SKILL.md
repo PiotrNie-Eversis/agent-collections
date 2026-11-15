@@ -1,7 +1,7 @@
 ---
 name: eversis-creating-prompts
 description: "Create attachable prompts: .ai/prompts/public|internal/eversis-*.md (Docusaurus frontmatter + body). Replaces legacy .github/prompts/*.prompt.md. Use when creating or reviewing prompt markdown in this framework."
-user-invokable: false
+user-invocable: false
 ---
 
 # Creating prompts (Markdown)

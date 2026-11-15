@@ -1,7 +1,7 @@
 ---
 name: eversis-creating-skills
 description: "Create new Agent Skills (SKILL.md) under .ai/skills/eversis-*. Provides naming (gerund), description, body structure, progressive disclosure, templates, validation. For Agent Collections."
-user-invokable: false
+user-invocable: false
 ---
 
 # Creating skills
@@ -218,6 +218,21 @@ description: "Processes data from various sources."
 
 </description-guidelines>
 
+### Optional: hide the skill from the `/` menu (`user-invocable`)
+
+Add `user-invocable: false` to the frontmatter when the person should not call the skill by hand.
+
+- **Effect:** Claude Code (and VS Code `.agent.md`) hides the skill from the person's `/` menu and refuses `/name`. The model can still load the skill.
+- **Default:** `true`. Omit the key for normal skills.
+- **Use it for:** agent-only skills, such as orchestration, template owners and sub-skills.
+- **Not the same as `disable-model-invocation`:** that key blocks the model from loading the skill, which is the opposite intent.
+- **Hosts:** Cursor and Pi do not read this key.
+- **Not access control:** the skill stays listed and readable; the flag only hides it from the menu.
+
+```yaml
+user-invocable: false
+```
+
 **Step 4: Write the skill body**
 
 The Markdown body after the frontmatter contains the skill instructions. There are no strict format restrictions — write whatever helps the agent perform the task effectively.
@@ -307,6 +322,7 @@ Validation:
 - [ ] Frontmatter: `description` describes WHAT the skill does and WHEN to use it
 - [ ] Frontmatter: `description` is in third person (no "I", "you", "we")
 - [ ] Frontmatter: `description` includes specific trigger keywords
+- [ ] Frontmatter: to hide the skill from the `/` menu, the key is spelled exactly `user-invocable: false` (omit it otherwise)
 - [ ] Body: Under 500 lines total
 - [ ] Body: Introduction is 1-2 sentences
 - [ ] Body: Process/workflow has a trackable checklist

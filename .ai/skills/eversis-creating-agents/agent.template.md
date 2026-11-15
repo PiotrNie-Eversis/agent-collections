@@ -11,7 +11,7 @@ tools: ['<tool-1>', '<tool-2>', '<mcp-server>/*']
 # name: "<override-display-name>"
 # argument-hint: "<hint text for chat input>"
 # model: "<preferred-model>"
-# user-invokable: true
+# user-invocable: true
 # disable-model-invocation: false
 # agents: ['<subagent-1>', '<subagent-2>']
 # handoffs:
