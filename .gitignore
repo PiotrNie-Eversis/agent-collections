@@ -4,8 +4,8 @@
 # Consumer selection + local install metadata (framework tree may keep docs only)
 # Selection is written in consumer projects; do not commit sample selection here.
 
-# develop branch: docs/specs, docs/context and docs/reports are tracked
-# (master keeps them local-only).
+# develop branch: docs/specs, docs/context, docs/reports, docs/plans and docs/decisions are tracked
+# (master removes the work-only files listed in .release-exclude; their READMEs stay).
 
 # MCP package
 mcp/eversis-collections-mcp/node_modules/

@@ -5,7 +5,7 @@ title: For CTOs
 
 # For CTOs
 
-**Agent Collections** is an AI product engineering framework for **Cursor** — structured workflows from ideation through implementation, review, and quality gates.
+**Agent Collections** is an AI product engineering framework for coding agents — **Cursor**, **Claude Code** and **Pi** — with structured workflows from ideation through implementation, review, and quality gates.
 
 :::brand TL;DR:
 
@@ -13,7 +13,7 @@ title: For CTOs
 - Agent Collections restructures your delivery workflow around AI, rather than adding AI on top of it
 - Teams use it to compress context gathering, planning, and review while keeping human judgment in the loop
 - Covers the full lifecycle: discovery workshop → structured backlog → implementation → code review
-- Runs in **Cursor** (rules, prompts, MCP, Agent Skills) — team licensing per your Cursor plan
+- Runs in **Cursor**, **Claude Code** or **Pi** (rules, prompts, skills, MCP) — licensing per your coding agent or model plan
 - Open source, MIT licence
 :::
 
@@ -71,7 +71,7 @@ The structured nature of the framework makes it approachable at any level.
 
 ## What adoption looks like
 
-The framework is open source and layers on your existing **Cursor** workflow. **There's no separate framework runtime to procure beyond your editor and MCP tools.**
+The framework is open source and layers on your existing **Cursor**, **Claude Code** or **Pi** workflow. **There's no separate framework runtime to procure beyond your coding agent and MCP tools.**
 
 A typical rollout runs in three phases:
 
@@ -79,7 +79,7 @@ A typical rollout runs in three phases:
 - **First sprint** (week 1–2) — one team runs the full Ideate → Implement → Review loop on a real project. Friction points surface and get resolved.
 - **Team-wide adoption** (week 3–4) — framework becomes the default way of working. Leads review output quality, calibrate to project standards.
 
-The framework is designed to be self-explanatory for engineers who already use **Cursor** with rules and prompts.
+The framework is designed to be self-explanatory for engineers who already use **Cursor**, **Claude Code** or **Pi** with rules and prompts.
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: eversis-functional-testing
 user-invocable: false
-description: "Shared QA foundations — severity matrix, bug report template, and test plan templates. Referenced by eversis-planning-tests, eversis-analyzing-regression-risk, and eversis-verifying-acceptance-criteria."
+description: "Shared QA foundations — severity matrix, bug report template, and test plan templates. Referenced by the eversis-qa-workflow prompt and eversis-accessibility-auditing."
 ---
 
 # Functional Testing — Shared Foundations

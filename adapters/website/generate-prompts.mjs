@@ -151,10 +151,10 @@ const GITHUB_REPO_BASE =
 function rewriteCrossTreeLinks(body) {
   return body
     .replace(
-      /\(\.\.\/\.\.\/\.\.\/website\/docs\/agents\/([^)]+?)\.md\)/g,
+      /\(\.\.\/\.\.\/\.\.\/website\/docs\/reference\/agents\/([^)]+?)\.md\)/g,
       "(../../agents/$1)",
     )
-    .replace(/\(\.\.\/\.\.\/\.\.\/(?!website\/docs\/agents)([^)]+)\)/g, (_m, target) => {
+    .replace(/\(\.\.\/\.\.\/\.\.\/(?!website\/docs\/reference\/agents)([^)]+)\)/g, (_m, target) => {
       const kind = target.endsWith("/") ? "tree" : "blob";
       const cleanTarget = target.endsWith("/") ? target.slice(0, -1) : target;
       return `(${GITHUB_REPO_BASE}/-/${kind}/master/${cleanTarget})`;

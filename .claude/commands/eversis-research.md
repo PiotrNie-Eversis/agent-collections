@@ -12,7 +12,7 @@ Prepare a context for a specific task or feature from a context engineering pers
 **SSOT:** `.ai/prompts/internal/eversis-research.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

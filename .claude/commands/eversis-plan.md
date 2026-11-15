@@ -12,7 +12,7 @@ Prepare detailed implementation plan for given feature.
 **SSOT:** `.ai/prompts/internal/eversis-plan.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

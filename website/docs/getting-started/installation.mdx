@@ -260,7 +260,10 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --doctor
 It prints one line per check and runs every check even when one fails:
 
 - the Node version (same rule as [Node.js 22](#nodejs-22));
-- the Claude Code and Cursor skills mirrors;
+- the target folder (`--target`, else the git root, else the current folder);
+- the framework home: `vendor/agent-collections` for submodule and copy installs, `.agent-collections/framework-home.txt` for local installs, else the installer's own checkout — it must contain `.ai/skills`;
+- the selected agents (from `--agents`, else `.agent-collections/install-selection.json`, else the skills mirrors found on disk);
+- the Claude Code and Cursor skills mirrors (skipped for an agent that is not selected);
 - with Claude Code selected: the spec artifact hook entry in `.claude/settings.json`, the hook file, and the hook's own self-test.
 
 It changes nothing: it does not clone, fetch or write files. It exits **0** when every check passes and **1** otherwise.
@@ -355,8 +358,12 @@ Then re-run `--upgrade --sync` (and `--build-mcp` if the MCP server itself chang
 | `--sync` | Refresh framework-managed surfaces |
 | `--upgrade` | Reuse selection (fail-safe if missing/corrupt) |
 | `--non-interactive` | No prompts — defaults + flags |
-| `--doctor` | Read-only health check of an existing install; changes nothing, exit 0 / 1 — see [`--doctor`](#doctor) |
+| `--doctor` | Read-only health check of an existing install; changes nothing, exit 0 / 1. Honours `--target` and `--agents` only — see [`--doctor`](#doctor) |
 | `--target DIR` | Consumer path when not running from that repo |
+| `--vendor submodule\|copy` | Vendor the framework into the project under `vendor/agent-collections`; default is local (framework outside the repo) — see [Vendor modes](#vendor-modes) |
+| `--force` | Allow setup even when the framework home looks incomplete |
+| `--gitignore-agent-artifacts` | Local mode only: add `docs/specs/*/` and `docs/context/*/` to `.gitignore` |
+| `--project-name NAME` | Folder name for `docs/context/<NAME>/` (kebab-cased). Default: `SSOT_PROJECT_SLUG`, else the recorded path, else the main worktree's name (in a linked git worktree), else the target folder name. On `--upgrade` / `--sync`, a passed value replaces the recorded path |
 | `--collections-home DIR` | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion) |
 | `--ssot-source URL` | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit on **first** install to start empty). On `--upgrade` / `--sync`, omit to **keep** the URL already in `install-selection.json`; pass `--ssot-source ""` or `--ssot-source=` to **clear** it. |
 | `--ssot-branch NAME` | Branch to pull from `--ssot-source` (default `main`) |
@@ -367,10 +374,10 @@ Interactive runs (TTY, without `--non-interactive`) prompt for agents × domain 
 </details>
 
 <details>
-<summary><strong>Skills, prompts, and stack customisation (MVP)</strong></summary>
+<summary><strong>Skills, prompts, and stack customisation</strong></summary>
 
-- **Skills** resolve from **`.ai/skills/`** (SSOT). Prefer MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or read `SKILL.md` directly. Both adapters also get a local mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Claude Code can use its native skills mirror without MCP. Pi gets the same mirror under `.pi/skills/eversis-*/` when selected.
-- **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced. Both adapters generate thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`). Pi gets prompt templates under `.pi/prompts/` (installer with `--agents=…,pi`).
+- **Skills** resolve from **`.ai/skills/`** (SSOT). Prefer MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or read `SKILL.md` directly. Cursor and Claude Code also get a local mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Claude Code can use its native skills mirror without MCP. Pi gets the same mirror under `.pi/skills/eversis-*/` when selected (always a copy).
+- **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced. Cursor and Claude Code get thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`). Pi gets prompt templates under `.pi/prompts/` (installer with `--agents=…,pi`).
 - **Domain context** (durable, cross-task knowledge — see [Domain Context (SSOT)](../domain-context)) is scaffolded on **every** install: `docs/context/<project>/INDEX.md` is created if missing. If `--ssot-source` is reachable, the installer also best-effort seeds `docs/context/global/` from it — this step never blocks or fails the install.
 
 | Channel | Customise |

@@ -35,7 +35,7 @@ Delegates to **`eversis-orchestrating-implementation`**, which owns:
 - **Continuity:** same-session `eversis-review` → **Fine** + QA draft (unless opt-out)
 - **Fine** + mandatory QA comment draft via `eversis-fine-handoff`
 
-Load **`eversis-orchestrating-implementation`** for the full workflow (docs: `website/docs/skills/orchestrating-implementation.md`).
+Load **`eversis-orchestrating-implementation`** for the full workflow (docs: `website/docs/reference/skills/orchestrating-implementation.md`).
 
 ## Output
 

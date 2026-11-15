@@ -12,7 +12,7 @@ Create a new Agent Skill: SKILL.md under .ai/skills/ with gerund-style folder na
 **SSOT:** `.ai/prompts/public/eversis-create-custom-skill.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

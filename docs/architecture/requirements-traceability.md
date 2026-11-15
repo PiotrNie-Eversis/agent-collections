@@ -1,13 +1,13 @@
 # Requirements traceability (WF / WNF)
 
-Maps wildly important functional (WF) and non-functional (WNF) goals for Agent Collections to documentation and Wave D stories. Inspectable from the root README and [getting-started start-here](../../website/docs/getting-started/start-here.md).
+Maps wildly important functional (WF) and non-functional (WNF) goals for Agent Collections to documentation and Wave D stories. Inspectable from the root README and [getting-started start-here](../../website/docs/getting-started/start-here.mdx).
 
 | ID | Intent (summary) | Primary docs | Wave |
 |----|------------------|--------------|------|
-| **WF-01** | Vendor-neutral core (`.ai/`) with tool adapters | [Framework reference](../../documentation/agent-collection.md), [adapter mapping](./adapter-mapping.md), [AGENTS.md](../../AGENTS.md) | Waves A–C; docs + validation |
+| **WF-01** | Vendor-neutral core (`.ai/`) with tool adapters | [Framework reference](../../website/docs/reference/framework-reference.md), [adapter mapping](./adapter-mapping.md), [AGENTS.md](../../AGENTS.md) | Waves A–C; docs + validation |
 | **WF-02** | Consumer install (local / submodule / copy) + selection | [Installation](../../website/docs/getting-started/installation.mdx), [install-selection](./install-selection.md), README | Wave C; docs + validation |
 | **WF-03** | Skills discoverability via MCP + `AGENT_COLLECTIONS_HOME` | [MCP setup](../../website/docs/getting-started/mcp-setup.mdx), MCP package README | Wave C; docs + validation |
-| **WF-04** | Multi-agent packaging (Cursor + Claude MVP; OpenCode placeholder) | [Prerequisites](../../website/docs/getting-started/prerequisites.md), [adapter mapping](./adapter-mapping.md), [migration guide](../../website/docs/getting-started/migration-from-cursor-collections.md) | Waves B–D; multi-agent packaging closeout |
+| **WF-04** | Multi-agent packaging (Cursor + Claude MVP; Pi opt-in; OpenCode placeholder) | [Prerequisites](../../website/docs/getting-started/prerequisites.mdx), [adapter mapping](./adapter-mapping.md), [migration guide](../../website/docs/advanced/migration-from-cursor-collections.md) | Waves B–D; multi-agent packaging closeout |
 | **WF-05** | Spec-driven delivery (research → plan → implement → review → Fine) | README Delivery standard, [AGENTS.md](../../AGENTS.md), orchestration rules under `.ai/rules/orchestration/` | Framework-wide; docs + validation |
 | **WNF-02** | Cross-tool packaging isolation (ignore triad) | [Isolation strategy](./isolation-strategy.md) §4 | Isolation strategy + ignore triad; pilot empirical validation |
 | **WNF-03** | Context reduction ≥30% vs unscoped (proxy §7.2) or justified estimate | [Isolation strategy](./isolation-strategy.md) §7, migration / EOG context | Empirical validation (pilot) |

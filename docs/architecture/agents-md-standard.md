@@ -6,7 +6,7 @@ Normative standard for the root **`AGENTS.md`** orientation file in Agent Collec
 
 ## Purpose
 
-`AGENTS.md` is a **small, high-value context map** for any AI agent (Cursor, Claude Code, OpenCode, others). It tells the agent where project areas live, which framework roles exist, and how to enter the Delivery Standard — without dumping the whole monorepo into the session.
+`AGENTS.md` is a **small, high-value context map** for any AI agent (Cursor, Claude Code, Pi, OpenCode, others). It tells the agent where project areas live, which framework roles exist, and how to enter the Delivery Standard — without dumping the whole monorepo into the session.
 
 It is **not** a constitution, stack doc, or procedural skill. Put stack/commands in the consumer project-stack rule; put how-to in skills; put long policies in `.ai/rules/`.
 
@@ -92,7 +92,7 @@ Other tools ignore this appendix.
 
 ## Install contract (AC #3)
 
-For future installer / bootstrap (Work Stream 5; **not implemented in this standard**):
+The installer bootstrap follows this contract (`scaffold_project` in `scripts/lib/setup-agent-collections/scaffolding.sh`, run by `scripts/setup-agent-collections.sh`):
 
 | Rule | Detail |
 |------|--------|

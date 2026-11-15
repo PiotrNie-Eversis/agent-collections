@@ -8,10 +8,10 @@ prompt_description: "Create new Cursor role packaging — typically `.ai/rules/`
 
 # eversis-create-custom-agent
 
-**Role:** [Cursor customization orchestrator](../../../website/docs/agents/cursor-customization-orchestrator.md) (workflow pattern)  
+**Role:** [Cursor customization orchestrator](../../../website/docs/reference/agents/cursor-customization-orchestrator.md) (workflow pattern)  
 **File:** `.ai/prompts/public/eversis-create-custom-agent.md`
 
-Creates **role behavior**: prefer core guidance under **`.ai/rules/`** (neutral Markdown); Cursor adapter may generate **`.cursor/rules/eversis-*.mdc`** (YAML frontmatter, scoped globs) plus optional **documentation** under `website/docs/agents/` in this monorepo. This repository does **not** ship GitHub Copilot `*.agent.md` files.
+Creates **role behavior**: prefer core guidance under **`.ai/rules/`** (neutral Markdown); Cursor adapter may generate **`.cursor/rules/eversis-*.mdc`** (YAML frontmatter, scoped globs) plus optional **documentation** under `website/docs/reference/agents/` in this monorepo. This repository does **not** ship GitHub Copilot `*.agent.md` files.
 
 ## Usage
 
@@ -24,7 +24,7 @@ In **Cursor**, attach the file above (or open it and reference it with `@`) plus
 
 ## What it does
 
-1. **Research** — Review existing **`.ai/rules/`** (and adapter `.mdc` if present) and [AGENTS.md](../../../AGENTS.md) for patterns; optionally read the [Agents overview](../../../website/docs/agents/overview.md).
+1. **Research** — Review existing **`.ai/rules/`** (and adapter `.mdc` if present) and [AGENTS.md](../../../AGENTS.md) for patterns; optionally read the [Agents overview](../../../website/docs/reference/agents/overview.md).
 2. **Clarify** — Scope, responsibilities, which prompts attach this rule, and globs (`alwaysApply` vs `globs`).
 3. **Design** — File name, description, section outline, and how the role composes with `eversis-agent-core.mdc`.
 4. **Create** — Write the `.mdc` (and short agent doc if needed) following **`eversis-creating-agents`** (skill path: `.ai/skills/eversis-creating-agents/SKILL.md`).
@@ -38,9 +38,9 @@ In **Cursor**, attach the file above (or open it and reference it with `@`) plus
 
 ## Output
 
-New or updated **`.ai/rules/`** content (and optional adapter `.mdc`) (and optional doc under `website/docs/agents/` for this framework).
+New or updated **`.ai/rules/`** content (and optional adapter `.mdc`) (and optional doc under `website/docs/reference/agents/` for this framework).
 
-For large efforts, follow the phased **research → create → review** pattern in [Cursor customization orchestrator](../../../website/docs/agents/cursor-customization-orchestrator.md).
+For large efforts, follow the phased **research → create → review** pattern in [Cursor customization orchestrator](../../../website/docs/reference/agents/cursor-customization-orchestrator.md).
 
 ---
 

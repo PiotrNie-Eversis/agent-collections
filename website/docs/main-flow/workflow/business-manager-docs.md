@@ -63,7 +63,7 @@ The `.docx` engine automatically handles two common issues with non-English Word
 Following **Agent Collections** convention, we separate:
 
 - **Public prompt** — **`.ai/prompts/public/eversis-*.md`**: **executable workflow** content (SSOT; optional Docusaurus copies under `website/docs/prompts/`). In Cursor, use **`/eversis-ba-docs-planner`** or load-by-id / **`@`** when the SSOT or generated slash shim is surfaced.
-- **Role rule** — **`.cursor/rules/eversis-*.mdc`** when emitted by the adapter: **who the agent is**, boundaries, MCP tool behavior; attach on demand. **BA Docs `.mdc` rules are not shipped in MVP** — prompts + skills + slash commands carry the workflow.
+- **Role rule** — **`.cursor/rules/eversis-*.mdc`** when emitted by the adapter: **who the agent is**, boundaries, MCP tool behavior; attach on demand. **BA Docs `.mdc` rules are not shipped** — prompts + skills + slash commands carry the workflow.
 
 In practice for this workflow the **prompt + skills** are normative; attach **`/eversis-ba-docs-planner`** then **`/eversis-ba-docs-writer`**. See [AGENTS.md](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/AGENTS.md) for channel notes.
 
@@ -85,7 +85,7 @@ The workflow relies on two specialized agents communicating through a shared art
 ### 1. Planner — Lead Analyst (BA Docs / Word)
 
 - **Prompt (workflow):** **`.ai/prompts/public/eversis-ba-docs-planner.md`** — **`/eversis-ba-docs-planner`** or load-by-id
-- **Role rule:** optional **`.cursor/rules/eversis-ba-docs-planner.mdc`** — **not shipped in MVP** (prompt + skills sufficient)
+- **Role rule:** optional **`.cursor/rules/eversis-ba-docs-planner.mdc`** — **not shipped** (prompt + skills sufficient)
 - **Responsibility:** Understand the Release scope, verify Confluence guidelines, and map changes to the appropriate document sections.
 - **Input:** Jira Release ID + Confluence page title with update rules + `summary.md` (or path to `.docx` to generate a map first).
 - **Output:** **`docs-update-plan.md`**
@@ -100,7 +100,7 @@ The workflow relies on two specialized agents communicating through a shared art
 ### 2. Writer — Technical Writer (BA Docs / Word)
 
 - **Prompt (workflow):** **`.ai/prompts/public/eversis-ba-docs-writer.md`** — **`/eversis-ba-docs-writer`** or load-by-id
-- **Role rule:** optional **`.cursor/rules/eversis-ba-docs-writer.mdc`** — **not shipped in MVP**
+- **Role rule:** optional **`.cursor/rules/eversis-ba-docs-writer.mdc`** — **not shipped**
 - **Responsibility:** Physical content update in the `.docx` file using **`eversis-collections` MCP** `.docx` tools.
 - **Input:** Approved **`docs-update-plan.md`**
 - **Output:** Modified document ready for verification.

@@ -1,7 +1,7 @@
 # .cursorignore — patterns excluded from Cursor's file indexing.
 # Agent Collections ignore triad (TASK-529). Same path *classes* as
 # .claudeignore / .opencodeignore; see docs/architecture/isolation-strategy.md §4 / §8.1.
-# Future installer (5.x) should merge missing framework classes — never wipe consumer entries without opt-in.
+# The installer (merge-ignore-triad.mjs) merges missing framework classes — never wipes consumer entries without opt-in.
 
 # --- Agent Collections: secrets / build ---
 node_modules/

@@ -8,14 +8,17 @@ Primary file:
 .agent-collections/install-selection.json
 ```
 
-Related helper files may also appear (for example `domain-profile.txt`, `area-profile.txt`). They are small install hints — not the framework SSOT (SSOT remains under `AGENT_COLLECTIONS_HOME/.ai/` or `vendor/agent-collections/.ai/`).
+Related helper files may also appear (for example `domain-profile.txt`, `area-profile.txt`, `framework-home.txt` and `pi-skills-mirror.json`). They are small install hints — not the framework SSOT (SSOT remains under `AGENT_COLLECTIONS_HOME/.ai/` or `vendor/agent-collections/.ai/`).
+
+- `framework-home.txt` — local mode only: the absolute framework path on this machine (gitignored). Vendor `submodule` / `copy` installs do not write it and remove an old copy.
+- `pi-skills-mirror.json` — Pi only: a content hash for each `.pi/skills/eversis-*` entry the installer copied, so a later run can tell its own outdated copy from a hand-edited one.
 
 ## Schema (Q3)
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `frameworkVersion` | string | SemVer from framework `package.json` at install time |
-| `agents` | string[] | Selected adapters: `cursor`, `claude`, `opencode` |
+| `agents` | string[] | Selected adapters: `cursor`, `claude`, `opencode`, `pi` |
 | `mcpServers` | string[] | Selected MCP server ids from catalog |
 | `domainProfile` | string | `frontend` \| `backend` \| `fullstack` |
 | `vendorMode` | string | `local` \| `submodule` \| `copy` |

@@ -9,7 +9,7 @@ upstream_agent: "eversis-software-engineer"
 # eversis-implement-common-task
 
 :::info
-Not invoked directly by users. To trigger implementation, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/agents/engineering-manager.md) will automatically delegate to the [Software Engineer](../../../website/docs/agents/software-engineer.md).
+Not invoked directly by users. To trigger implementation, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/reference/agents/engineering-manager.md) will automatically delegate to the [Software Engineer](../../../website/docs/reference/agents/software-engineer.md).
 :::
 
 **Agent:** Software Engineer

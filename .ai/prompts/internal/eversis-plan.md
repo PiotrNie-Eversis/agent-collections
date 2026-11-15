@@ -9,7 +9,7 @@ upstream_agent: "eversis-architect"
 # eversis-plan
 
 :::info
-Not invoked directly by users. To trigger implementation planning, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/agents/engineering-manager.md) will automatically delegate to the [Architect](../../../website/docs/agents/architect.md) when a plan is needed.
+Not invoked directly by users. To trigger implementation planning, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/reference/agents/engineering-manager.md) will automatically delegate to the [Architect](../../../website/docs/reference/agents/architect.md) when a plan is needed.
 :::
 
 **Agent:** Architect 

@@ -40,7 +40,7 @@ Re-run after core or map changes. **Do not hand-edit** the generated `CLAUDE.md`
 
 ## Generated skills
 
-`.claude/skills/` is **not generated** by a Node script — it's linked (symlink) or copied by the installer's `_link_claude_skills` (`scripts/lib/setup-agent-collections/link-framework.sh`), one entry per `.ai/skills/eversis-*/` directory, following the same `EFFECTIVE_LINK_MODE` decision as the rest of framework materialisation. Content is never rewritten, so a skill's own frontmatter is preserved exactly — including `user-invocable: false` on orchestration-only skills (e.g. `eversis-orchestrating-implementation`), which keeps them out of the `/` menu while remaining loadable by the model.
+`.claude/skills/` has no generated content — each entry mirrors one `.ai/skills/eversis-*/` directory. In a consumer project the installer's `_link_claude_skills` (`scripts/lib/setup-agent-collections/link-framework.sh`) links (symlink) or copies them, following the same `EFFECTIVE_LINK_MODE` decision as the rest of framework materialisation. In the framework root, `adapters/sync.mjs` (`npm run sync:adapters`) refreshes them as relative symlinks and removes stale ones; `--check` reports a missing or wrong link. Content is never rewritten, so a skill's own frontmatter is preserved exactly — including `user-invocable: false` on orchestration-only skills (e.g. `eversis-orchestrating-implementation`), which keeps them out of the `/` menu while remaining loadable by the model.
 
 ## Generated agents
 

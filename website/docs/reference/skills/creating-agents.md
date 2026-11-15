@@ -31,4 +31,4 @@ Build **role behavior rules** under **`.ai/rules/`** (SSOT — the Cursor adapte
 
 ## See also
 
-- [Framework reference](../../framework) — packaging and mappings (source: `documentation/agent-collection.md` on [GitHub](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/documentation/agent-collection.md))
+- [Framework reference](../../framework) — packaging and mappings

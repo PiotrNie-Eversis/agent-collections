@@ -87,8 +87,8 @@ When running **Implement** (`eversis-implement`):
 
 ## Related
 
-- [`agent-core.md`](./agent-core.md) — always-on lifecycle, hard limits, skills discovery
-- [`engineering-manager.md`](./engineering-manager.md) — readiness block and gates
-- [`fine-handoff.md`](./fine-handoff.md) — Fine → QA draft contract
+- [`agent-core.md`](./eversis-agent-core.mdc) — always-on lifecycle, hard limits, skills discovery
+- [`engineering-manager.md`](./eversis-engineering-manager.mdc) — readiness block and gates
+- [`fine-handoff.md`](./eversis-fine-handoff.mdc) — Fine → QA draft contract
 - Skill: `eversis-orchestrating-implementation`
 - Prompts: `eversis-implement`, `eversis-review`

@@ -8,7 +8,7 @@ Use this folder for outputs from standalone analysis prompts (for example `/ever
 
 | Artifact | Canonical path |
 |----------|----------------|
-| Code quality report | [`code-quality-report.md`](./code-quality-report.md) |
+| Code quality report | `docs/reports/code-quality-report.md` (in this repository: on `develop` only) |
 
 Do **not** put these under `docs/specs/` — specs hold SDD research and implementation plans only.
 

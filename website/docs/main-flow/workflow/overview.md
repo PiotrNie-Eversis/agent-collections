@@ -111,10 +111,10 @@ import SdlcDiagram from '@site/src/components/SdlcDiagram';
 
 <SdlcDiagram />
 
-## Human review at every step
+## Human approval gates
 
 :::warning Important
-Each step requires your review. Open generated documents, iterate until correct, then approve before proceeding. AI output is always a draft.
+You approve three things: the research, the plan, and posting the Fine QA comment to the ticket. Code review runs in the same Implement session and needs no separate approval. AI output is always a draft until you approve it.
 :::
 
 ## Workflow variants

@@ -12,7 +12,7 @@ Create Terraform modules and provision cloud infrastructure safely.
 **SSOT:** `.ai/prompts/internal/eversis-implement-terraform.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

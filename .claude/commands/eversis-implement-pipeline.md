@@ -12,7 +12,7 @@ Create or modify CI/CD pipelines with deployment stages and environment protecti
 **SSOT:** `.ai/prompts/internal/eversis-implement-pipeline.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

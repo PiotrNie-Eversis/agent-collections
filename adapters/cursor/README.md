@@ -53,7 +53,7 @@ Source of packaging metadata: [`rule-map.yaml`](./rule-map.yaml). Mapping contra
 | Orphans | Generated `eversis-*.md` under `.cursor/commands/` not in inventory are removed on sync |
 | Drift check | Included in `npm run sync:adapters:check` |
 
-Stable prompt id under `.ai/prompts/` remains SSOT. Claude Code does **not** consume `.cursor/commands/` (separate channel; native Claude slash emit deferred).
+Stable prompt id under `.ai/prompts/` remains SSOT. Claude Code does **not** consume `.cursor/commands/` (separate channel; the Claude adapter emits its own slash commands to `.claude/commands/`, see [`adapters/claude/README.md`](../claude/README.md)).
 
 **Continuity:** `/eversis-implement` embeds same-session Review → Fine; `/eversis-review` is optional standalone (see `AGENTS.md` Channel notes).
 

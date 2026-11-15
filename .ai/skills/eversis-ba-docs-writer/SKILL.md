@@ -1,6 +1,6 @@
 ---
 name: eversis-ba-docs-writer
-description: "Apply an approved docs-update-plan.md to a Word .docx file via eversis-collections MCP. BA Docs (Word) channel only — not README, CHANGELOG, or website markdown (use eversis-repo-docs-writer when available)."
+description: "Apply an approved docs-update-plan.md to a Word .docx file via eversis-collections MCP. BA Docs (Word) channel only — not README, CHANGELOG, or website markdown (use eversis-repo-docs-writer)."
 ---
 
 # eversis-ba-docs-writer

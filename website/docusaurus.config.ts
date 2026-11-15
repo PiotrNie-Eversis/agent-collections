@@ -52,7 +52,7 @@ const config: Config = {
 
             type SidebarItem = (typeof items)[number];
             const isOverview = (item: SidebarItem) =>
-              item.type === 'doc' && item.id === 'skills/overview';
+              item.type === 'doc' && item.id === 'reference/skills/overview';
             const titleOf = (item: SidebarItem): string => {
               if (item.type === 'doc') {
                 return titleById.get(item.id) ?? item.id;

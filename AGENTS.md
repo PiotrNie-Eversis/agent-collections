@@ -23,18 +23,18 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 | [`docs/context/`](./docs/context/) | Internal knowledge, task baselines |
 | [`docs/plans/`](./docs/plans/) | Optional flat plans; prefer specs for Implement |
 | [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<key>-<topic>/`; tracked on `develop`, removed from `master` by `.release-exclude`) |
-| [`docs/decisions/`](./docs/decisions/) | Architecture decisions — one file per decision plus `INDEX.md` |
-| [`docs/reports/`](./docs/reports/) | Agent-generated reports (e.g. `code-quality-report.md` from `eversis-review-codebase`) |
+| [`docs/decisions/`](./docs/decisions/) | Architecture decisions — one file per decision plus `INDEX.md` (decision files and `INDEX.md` on `develop` only; `master` keeps only the README (see `.release-exclude`)) |
+| [`docs/reports/`](./docs/reports/) | Agent-generated reports (e.g. `code-quality-report.md` from `eversis-review-codebase`; reports on `develop` only; `master` keeps only the README (see `.release-exclude`)) |
 
 ## Monorepo / Areas
 
 | Area | Path | Notes |
 |------|------|-------|
 | Core SSOT | `.ai/` | Rules, skills, prompts |
-| Adapters | `adapters/` | Tool packaging + `sync.mjs` + `profiles/` |
+| Adapters | `adapters/` | Tool packaging + `sync.mjs` + `profiles/`; `adapters/website/` generates the docs-site prompt pages |
 | MCP | `mcp/eversis-collections-mcp/` | Skills MCP; build with `npm run mcp:build` |
-| Installer | `scripts/` | `setup-agent-collections.sh` + lib |
-| Templates | `templates/` | AGENTS / stack / MCP seed |
+| Installer and repo scripts | `scripts/` | `setup-agent-collections.sh` + lib; release `release-master.mjs` / `release-to-master.sh` / `check-release-tree.sh`; `sync-changelog.mjs`; `validate-spec-artifacts.mjs` |
+| Templates | `templates/` | AGENTS / stack / MCP seed; Claude templates (`claude-CLAUDE.template.md`, `claude-settings.json`); MCP launcher |
 | Architecture docs | `docs/architecture/` | Mapping, isolation, AGENTS standard, selection schema |
 
 ## Role matrix

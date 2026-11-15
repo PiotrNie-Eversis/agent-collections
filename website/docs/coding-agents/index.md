@@ -22,7 +22,7 @@ Agent Collections keeps one process and packages it for each coding agent. The s
 | **Skills** | `.claude/skills/` | `.cursor/skills/` | `.pi/skills/` |
 | **MCP config** | `.mcp.json` | `.cursor/mcp.json` | `.pi/mcp.json` |
 | **Delegation** | Sub-agents | Sub-agents | One session |
-| **Independent review** | Sub-agent, in the same run | Sub-agent, in the same run | New session, started by a person |
+| **Independent review** | Sub-agent, in the same run | Sub-agent, in the same run | Separate Pi session, started automatically in the same run |
 | **Compaction by budget** | No | No | Yes, once at 50% by default |
 
 All three are installed with the same installer. See [Installation](../getting-started/installation.mdx).

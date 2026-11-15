@@ -8,11 +8,15 @@ Consumer install / upgrade entry for **Agent Collections**.
 | `setup-agent-collections.test.sh` | Non-interactive smoke test |
 | `lib/setup-agent-collections/` | Shared bash/node helpers |
 | `release-to-master.sh` | Publish `develop` to `master` by copying core commits (`--snapshot`: one filtered snapshot; maintainers) |
+| `release-master.mjs` | Guided wrapper around `release-to-master.sh` (`npm run release:master`; see below) |
 | `release-to-master.test.sh` | Tests for the release script and `.githooks/pre-commit` |
 | `lib/release-paths.sh` | Reads `.release-exclude` (work-only paths) for the release script and hook |
 | `check-release-tree.sh` | Fails when a commit carries `.release-exclude` paths (CI guard for `master`) |
 | `pi-load-check.mjs` | Pi load check: installs the framework for Pi into a temp project and fails when Pi does not load a generated prompt, skill or extension, or reports a `.pi/mcp.json` config error (`npm run pi:load-check`; details in [`adapters/pi/README.md`](../adapters/pi/README.md) "Load check") |
 | `pi-load-check.test.mjs` | Tests for the Pi load check (`node --test scripts/pi-load-check.test.mjs`; integration tests need `pi` on PATH) |
+| `sync-changelog.mjs` | Writes `website/src/pages/changelog.md` from `CHANGELOG.md` (`npm run website:changelog:sync`; `--check` = `npm run website:changelog:check`) |
+| `validate-spec-artifacts.mjs` | Checks that a `*.research.md` or `*.plan.md` follows the framework template (`node scripts/validate-spec-artifacts.mjs <file>...`; also run by the Claude Code spec artifact hook) |
+| `validate-spec-artifacts.test.mjs` | Tests for the spec artifact validator |
 
 ## Branches and releases (framework repository)
 

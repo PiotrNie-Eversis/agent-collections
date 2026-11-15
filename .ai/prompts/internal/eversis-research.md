@@ -9,7 +9,7 @@ upstream_agent: "eversis-context-engineer"
 # eversis-research
 
 :::info
-Not invoked directly by users. To trigger research, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/agents/engineering-manager.md) will automatically delegate to the [Context Engineer](../../../website/docs/agents/context-engineer.md) when research is needed.
+Not invoked directly by users. To trigger research, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/reference/agents/engineering-manager.md) will automatically delegate to the [Context Engineer](../../../website/docs/reference/agents/context-engineer.md) when research is needed.
 :::
 
 **Agent:** Context Engineer  

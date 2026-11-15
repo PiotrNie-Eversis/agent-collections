@@ -7,7 +7,7 @@ Implement feature according to the plan.
 **SSOT:** `.ai/prompts/public/eversis-implement.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

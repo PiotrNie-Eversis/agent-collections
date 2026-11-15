@@ -9,7 +9,7 @@ upstream_agent: "eversis-engineering-manager"
 # eversis-implement-ui
 
 :::info
-Not invoked directly by users. The UI implementation workflow is triggered via the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/agents/engineering-manager.md) uses this internal prompt to orchestrate UI tasks with Figma verification.
+Not invoked directly by users. The UI implementation workflow is triggered via the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/reference/agents/engineering-manager.md) uses this internal prompt to orchestrate UI tasks with Figma verification.
 :::
 
 **Agent:** Engineering Manager  
@@ -35,7 +35,7 @@ Everything from the [eversis-implement](../public/eversis-implement.md) public p
 1. **Extracts Figma URLs** from the research and plan files.
 2. **Confirms dev server URL** with the user before the first verification.
 3. **Delegates UI implementation** to the Software Engineer with Figma design context.
-4. **Delegates UI verification** to the `eversis-ui-reviewer` subagent after each UI component:
+4. **Delegates UI verification** to the **UI Reviewer** through the `eversis-review-ui` prompt after each UI component:
    - If PASS → moves to next component.
    - If FAIL → delegates fix to Software Engineer, then re-runs verification.
    - Maximum **5 iterations** per component, then escalates.
@@ -48,13 +48,13 @@ BEFORE starting:
     0. Ensure Figma URL is available → if not, ASK user
 
 REPEAT (max 5 iterations):
-    1. Run eversis-ui-reviewer subagent to verify current implementation
+    1. Run UI Reviewer (eversis-review-ui) to verify current implementation
     2. If PASS → done, exit loop
     3. If FAIL → fix reported differences → go to step 1
 ```
 
 :::warning
-The Software Engineer never verifies UI itself. It delegates to the `eversis-ui-reviewer` subagent which uses Figma MCP and Playwright to extract and compare data. Mental comparison or code reading is not verification.
+The Software Engineer never verifies UI itself. It delegates to the **UI Reviewer** through the `eversis-review-ui` prompt, which uses Figma MCP and Playwright to extract and compare data. Mental comparison or code reading is not verification.
 :::
 
 ### Confidence Levels

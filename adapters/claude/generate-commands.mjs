@@ -306,7 +306,7 @@ function buildCommandContent(prompt, sourceBody, frameworkPrefix) {
     `**SSOT:** \`${ssotPath}\``,
     "",
     "Load and follow the Agent Collections prompt at the SSOT path above.",
-    "Prefer that file over any docs-site copy under `website/docs/prompts/`.",
+    "Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.",
     "",
   ];
 

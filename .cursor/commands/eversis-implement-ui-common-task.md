@@ -7,7 +7,7 @@ Implement UI feature according to the plan with frontend-specific setup and desi
 **SSOT:** `.ai/prompts/internal/eversis-implement-ui-common-task.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

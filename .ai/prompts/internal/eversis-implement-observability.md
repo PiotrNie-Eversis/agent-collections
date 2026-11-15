@@ -9,7 +9,7 @@ upstream_agent: "eversis-devops-engineer"
 # eversis-implement-observability
 
 :::info
-Not invoked directly by users. To trigger observability implementation, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/agents/engineering-manager.md) will automatically delegate to the [DevOps Engineer](../../../website/docs/agents/devops-engineer.md).
+Not invoked directly by users. To trigger observability implementation, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/reference/agents/engineering-manager.md) will automatically delegate to the [DevOps Engineer](../../../website/docs/reference/agents/devops-engineer.md).
 :::
 
 **Agent:** DevOps Engineer

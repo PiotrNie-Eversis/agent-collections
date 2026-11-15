@@ -121,6 +121,8 @@ function runFixture(transformMap = (map) => map, transformAsset = null) {
   const dir = path.join(mkTmp(), "adapter");
   fs.mkdirSync(dir);
   fs.copyFileSync(GENERATOR, path.join(dir, "generate.mjs"));
+  // The generator imports ../lib/rule-links.mjs; keep that layout beside the copy.
+  fs.cpSync(path.join(__dirname, "..", "lib"), path.join(dir, "..", "lib"), { recursive: true });
   fs.cpSync(path.join(__dirname, "assets"), path.join(dir, "assets"), { recursive: true });
   const mapText = fs.readFileSync(path.join(__dirname, "rule-map.yaml"), "utf8");
   fs.writeFileSync(path.join(dir, "rule-map.yaml"), transformMap(mapText));
@@ -230,6 +232,8 @@ test("review_context_note on a rule that is not target skill fails with a named 
   const dir = path.join(mkTmp(), "adapter");
   fs.mkdirSync(dir);
   fs.copyFileSync(GENERATOR, path.join(dir, "generate.mjs"));
+  // The generator imports ../lib/rule-links.mjs; keep that layout beside the copy.
+  fs.cpSync(path.join(__dirname, "..", "lib"), path.join(dir, "..", "lib"), { recursive: true });
   const map = fs
     .readFileSync(path.join(__dirname, "rule-map.yaml"), "utf8")
     .replace(
@@ -296,6 +300,18 @@ test("new role skills: rule body generated, and only the accessibility skill car
   for (const dir of fs.readdirSync(path.join(fresh, ".pi", "skills"))) {
     if (dir !== "eversis-rule-accessibility") assert.ok(!read(dir).includes(UI_NOTE), dir);
   }
+});
+
+test("role skills: a relative link to another rule points at that rule's emitted skill", () => {
+  const agentCore = fs.readFileSync(
+    path.join(fresh, ".pi", "skills", "eversis-rule-agent-core", "SKILL.md"),
+    "utf8",
+  );
+  assert.ok(
+    agentCore.includes("](../eversis-rule-spec-driven-development/SKILL.md)"),
+    "agent-core links to the spec-driven-development role skill",
+  );
+  assert.ok(!agentCore.includes("](./spec-driven-development.md)"), "no source-relative link left");
 });
 
 test("prompts: JSON-quoted front matter (incl. descriptions with ': '), marker, SSOT pointer, live input line", () => {

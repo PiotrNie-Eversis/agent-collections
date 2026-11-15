@@ -24,7 +24,7 @@ eversis-ba-docs-writer
 @docs-update-plan.md | path to .docx
 ```
 
-Attach the **approved** plan. Optionally load role rule `eversis-ba-docs-writer` (adapter packaging) and **`.ai/skills/eversis-ba-docs-writer/SKILL.md`**. Ensure **eversis-collections** MCP is enabled (includes `.docx` tools). Enable **Atlassian** only if you need to re-fetch context — Writer normally does not edit Confluence rules.
+Attach the **approved** plan. Load **`.ai/skills/eversis-ba-docs-writer/SKILL.md`**. Ensure **eversis-collections** MCP is enabled (includes `.docx` tools). Enable **Atlassian** only if you need to re-fetch context — Writer normally does not edit Confluence rules.
 
 <workflow>
 
@@ -61,6 +61,6 @@ Attach the **approved** plan. Optionally load role rule `eversis-ba-docs-writer`
 
 - **Planner prompt:** `eversis-ba-docs-planner`
 - **Writer skill:** `.ai/skills/eversis-ba-docs-writer/SKILL.md`
-- **Spec:** `docs/specs/business-docs-workflow/business-docs-workflow.spec.md`
+- **Workflow:** skills `eversis-ba-docs-planner` and `eversis-ba-docs-writer` (`.ai/skills/eversis-ba-docs-planner/SKILL.md`, `.ai/skills/eversis-ba-docs-writer/SKILL.md`)
 
 <!-- Eversis — BA documentation relay -->

@@ -18,7 +18,7 @@ Single entrypoint for **manual QA practice** — test plans, test cases, regress
 :::
 
 :::note Not E2E automation
-Automated Playwright coverage uses **`eversis-e2e-engineer`** / **`eversis-e2e-testing`** via `eversis-implement`. This workflow focuses on **manual QA** artifacts and Jira/Confluence delivery.
+Automated Playwright coverage uses **`eversis-implement-e2e`** / **`eversis-e2e-testing`** via `eversis-implement`. This workflow focuses on **manual QA** artifacts and Jira/Confluence delivery.
 :::
 
 ## Usage

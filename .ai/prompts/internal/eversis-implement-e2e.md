@@ -9,7 +9,7 @@ upstream_agent: "eversis-e2e-engineer"
 # eversis-implement-e2e
 
 :::info
-Not invoked directly by users. To trigger E2E test implementation, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/agents/engineering-manager.md) will automatically delegate to the [E2E Engineer](../../../website/docs/agents/e2e-engineer.md).
+Not invoked directly by users. To trigger E2E test implementation, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/reference/agents/engineering-manager.md) will automatically delegate to the [E2E Engineer](../../../website/docs/reference/agents/e2e-engineer.md).
 :::
 
 **Agent:** E2E Engineer  

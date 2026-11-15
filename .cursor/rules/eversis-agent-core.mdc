@@ -19,7 +19,7 @@ Work moves through these stages:
 5. **Review** — An independent quality check; fix blockers before calling the work finished.
 6. **Fine** — QA comment draft in the same turn; ticket publish only with explicit human approval.
 
-**Mandatory Delivery Standard:** follow [`spec-driven-development.md`](./spec-driven-development.md) (spec folder convention, gates, copy-ready Jira block, adequacy before SKIP).
+**Mandatory Delivery Standard:** follow [`spec-driven-development.md`](./eversis-spec-driven-development.mdc) (spec folder convention, gates, copy-ready Jira block, adequacy before SKIP).
 
 ## Human gates (plain language)
 
@@ -59,7 +59,7 @@ When acting as Engineering Manager or running the **Implement** prompt (`eversis
 Before broad implementation (after plan approval), check whether a skill package exists for the task domain:
 
 1. **Read the consumer project stack policy** (project-owned stack / skills policy document) — respect **Do not load** rows; prefer **Load when** rows over keyword guessing.
-2. **Read `docs/context/*.md`** when present — project patterns override generic skill defaults.
+2. **Read `docs/context/<project>/INDEX.md`** when present, then only the one component that matches the task (same order as Orchestration step 1) — project patterns override generic skill defaults.
 3. **Prefer** the **`eversis-collections` MCP** tools (`eversis_skills_list` / `eversis_skills_get`) when the server is running — only for skills allowed by the stack policy and the approved plan.
 4. **Otherwise** read the matching `SKILL.md` directly (file read or tool-native attachment) for domain-specific work — in a consumer install, both Claude Code (`.claude/skills/<id>/SKILL.md`) and Cursor (`.cursor/skills/<id>/SKILL.md`) get a real, install-time local mirror of every `.ai/skills/eversis-*` package (symlink or copy, kept in sync by the installer), so this fallback works without MCP for either host.
 5. Skill packages belong under **`.ai/skills/eversis-<topic>/`**. The per-host mirrors above are a plain local-file fallback, not a vendor-specific “Agent Skills” UI registration — do **not** register the skills folder as that kind of UI path unless the adapter docs say so.
@@ -69,7 +69,7 @@ Before broad implementation (after plan approval), check whether a skill package
 ## Quality bar
 
 - Prefer **complete** changes over `TODO` / "insert logic here".
-- Prefer **existing** project patterns; read `docs/context/*.md` before large architectural shifts.
+- Prefer **existing** project patterns; read `docs/context/<project>/INDEX.md` and the one matching component (Orchestration step 1) before large architectural shifts.
 - "Existing project patterns" applies to code. SDD artifact structure (`*.research.md`, `*.plan.md`) comes only from the framework templates, never from earlier `docs/specs/*` files.
 - **Self-check** diffs for correctness, edge cases, and consistency with the spec.
 

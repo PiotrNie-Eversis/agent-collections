@@ -8,7 +8,7 @@ Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `evers
 
 ## Human gates
 
-Follow **`agent-core.md`**: approve research, plan, and plan validation before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
+Follow **`agent-core.md`**: approve research and plan before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
 
 On the **first response** of every Implement run (`eversis-implement`), output the Implement readiness block (four required lines, plus any optional lines that apply) as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
 

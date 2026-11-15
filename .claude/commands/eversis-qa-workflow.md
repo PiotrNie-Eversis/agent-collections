@@ -12,7 +12,7 @@ Single QA entrypoint — test planning, regression, AC verification, bug reports
 **SSOT:** `.ai/prompts/public/eversis-qa-workflow.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 
