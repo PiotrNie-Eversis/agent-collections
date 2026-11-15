@@ -23,6 +23,14 @@ write_install_selection() {
   local drop_pi="false"
   [[ "${PI_STAGE_FAILED:-false}" == "true" ]] && drop_pi="true"
   agents_json="$(node -e "console.log(JSON.stringify(String(process.argv[1]||'cursor').split(',').map(s=>s.trim()).filter(Boolean).filter(s=>!(process.argv[2]==='true'&&s==='pi'))))" "${SELECTED_AGENTS:-cursor}" "$drop_pi")"
+  # deselectedAgents: ["pi"] only when this run decided the person explicitly
+  # dropped Pi (PI_DESELECTED, set by decide_pi_deselect in legacy-pi.sh). The
+  # record is rewritten from scratch, so this is also how the field is carried
+  # forward (decide_pi_deselect keeps the recorded value on a run without
+  # --agents) and cleared. With "false" the key is left out, so records of
+  # projects that never dropped Pi keep the same shape as before.
+  local deselected_json="[]"
+  [[ "${PI_DESELECTED:-false}" == "true" ]] && deselected_json='["pi"]'
   local mcp_json
   mcp_json="$(node -e "console.log(JSON.stringify(String(process.argv[1]||'eversis-collections').split(',').map(s=>s.trim()).filter(Boolean)))" "${MCP_SELECTED_IDS:-eversis-collections}")"
 
@@ -62,9 +70,12 @@ write_install_selection() {
         confluenceSpaceKey: process.argv[11] || null,
       },
     };
+    const deselected = JSON.parse(process.argv[12]);
+    if (deselected.length > 0) sel.deselectedAgents = deselected;
     fs.writeFileSync(process.argv[7], JSON.stringify(sel, null, 2) + '\n');
   " "$version" "$agents_json" "$mcp_json" "${DOMAIN_PROFILE:-fullstack}" "$vendor_mode" "$link_mode" "$out" \
-    "$ssot_repo" "$project_context_path" "$global_context_path" "${ARG_CONFLUENCE_SPACE_KEY:-}"
+    "$ssot_repo" "$project_context_path" "$global_context_path" "${ARG_CONFLUENCE_SPACE_KEY:-}" \
+    "$deselected_json"
 
   log_ok "Wrote ${SELECTION_REL}"
   return 0

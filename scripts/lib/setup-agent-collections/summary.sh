@@ -60,6 +60,10 @@ print_summary() {
   #     files and the skill backup folder;
   #   - none left otherwise (for example an explicit Pi deselect removed them,
   #     after the backup its log reports) → no marker line.
+  # With a recorded Pi deselect and no --agents (_pi_recorded_deselect_applies)
+  # the run keeps the legacy-marked files on purpose, so when no generator file
+  # or script was found the header says they are kept because Pi was dropped,
+  # not "remove the old Pi generator" (there is none).
   # grep -c exits 1 on a zero count, and this runs at top level under
   # set -euo pipefail, so the count is guarded.
   local legacy_now legacy_start="${LEGACY_PI_MARKED_AT_START:-0}" legacy_marker_line=""
@@ -70,7 +74,13 @@ print_summary() {
   elif [[ "$pi_selected" == "true" ]] && [[ "$pi_failed" != "true" ]] && [[ "$legacy_start" -gt 0 ]]; then
     legacy_marker_line="${legacy_start} legacy-marked .pi/ file(s) were migrated (the old copies are in *.pre-agent-collections*.bak files and .pi/pre-agent-collections-backup/)"
   fi
-  if [[ -n "${LEGACY_PI_FINDINGS:-}" ]] || [[ "$legacy_now" -gt 0 ]]; then
+  local pi_kept=false
+  if _pi_recorded_deselect_applies; then
+    pi_kept=true
+  fi
+  if [[ -z "${LEGACY_PI_FINDINGS:-}" ]] && [[ "$legacy_now" -gt 0 ]] && [[ "$pi_kept" == "true" ]]; then
+    echo "  ${_YELLOW}Legacy Pi:${_RESET}     kept — Pi was dropped earlier (recorded in install-selection.json):"
+  elif [[ -n "${LEGACY_PI_FINDINGS:-}" ]] || [[ "$legacy_now" -gt 0 ]]; then
     echo "  ${_YELLOW}Legacy Pi:${_RESET}     remove the old Pi generator — it would undo this install:"
   elif [[ -n "$legacy_marker_line" ]]; then
     echo "  ${_YELLOW}Legacy Pi:${_RESET}     migrated to the framework Pi adapter:"
@@ -156,7 +166,10 @@ ${legacy_marker_line}"
   echo "skills), .pi/extensions/eversis-context-budget.ts, .pi/extensions/eversis-process-rules.ts,"
   echo ".pi/extensions/eversis-review.ts, .pi/eversis-state/ and the skills manifest"
   echo ".agent-collections/pi-skills-mirror.json are removed; .pi/settings.json and .pi/mcp.json"
-  echo "stay. See README upgrade / recovery notes."
+  echo "stay. An explicit Pi omission is recorded (deselectedAgents in install-selection.json) when"
+  echo "Pi was in the record or .pi/ held Pi content, so later runs without --agents keep Pi out"
+  echo "and leave the rest of .pi/ in place; --agents …,pi clears it. See README upgrade / recovery"
+  echo "notes."
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""

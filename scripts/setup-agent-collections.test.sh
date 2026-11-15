@@ -1066,6 +1066,100 @@ grep -qF 'migrated' <<< "$_desel_summary" \
   || { echo "FAIL: (h4) summary has a Legacy Pi: block with no legacy finding left"; cat "$DESEL_ZERO_LOG"; exit 1; }
 _assert_selection_agents "$TARGET_DESEL_ZERO" '["cursor"]' "(h4) Pi deselect"
 
+# Prints the recorded deselectedAgents of target $1 as JSON, or "absent".
+_selection_deselected() {
+  node -e '
+    const j = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+    console.log(j.deselectedAgents === undefined ? "absent" : JSON.stringify(j.deselectedAgents));
+  ' "${1}/.agent-collections/install-selection.json"
+}
+
+# (h5) explicit Pi deselect with the hand port kept: the deselect is recorded,
+# so a later plain upgrade neither stops nor prunes the kept .pi/ again; an
+# explicit --agents cursor,pi still migrates and clears the record; a fresh
+# --agents cursor install with no Pi records nothing.
+TARGET_KEEP="${TMP}/consumer-pi-hand-port-kept"
+mkdir -p "$TARGET_KEEP"
+(cd "$TARGET_KEEP" && git init -q)
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_KEEP" \
+  --non-interactive \
+  --agents=cursor \
+  --mcp-servers=eversis-collections \
+  --profile=frontend \
+  --link-mode=copy \
+  > "${TMP}/consumer-pi-hand-port-kept-install.log" 2>&1 \
+  || { echo "FAIL: (h5) cursor install failed"; cat "${TMP}/consumer-pi-hand-port-kept-install.log"; exit 1; }
+[[ "$(_selection_deselected "$TARGET_KEEP")" == "absent" ]] \
+  || { echo "FAIL: (h5) fresh --agents=cursor install with no Pi recorded a Pi deselect"; exit 1; }
+mkdir -p "${TARGET_KEEP}/.pi/prompts" "${TARGET_KEEP}/.pi/skills/eversis-fine-handoff"
+printf '%s\n# hand-ported always-on prompt\n' "$LEGACY_PI_MARKER_LINE" > "${TARGET_KEEP}/.pi/APPEND_SYSTEM.md"
+printf '%s\n# hand-ported implement command\n' "$LEGACY_PI_MARKER_LINE" > "${TARGET_KEEP}/.pi/prompts/eversis-implement.md"
+printf -- '---\nname: eversis-fine-handoff\n---\nhand-ported copy, no marker\n' > "${TARGET_KEEP}/.pi/skills/eversis-fine-handoff/SKILL.md"
+# 1. Explicit deselect: exit 0, the deselect is recorded.
+KEEP_DESELECT_LOG="${TMP}/consumer-pi-hand-port-kept-deselect.log"
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_KEEP" \
+  --upgrade --sync --non-interactive \
+  --agents cursor \
+  > "$KEEP_DESELECT_LOG" 2>&1 \
+  || { echo "FAIL: (h5) explicit --agents cursor on a hand-ported .pi/ failed"; cat "$KEEP_DESELECT_LOG"; exit 1; }
+_assert_selection_agents "$TARGET_KEEP" '["cursor"]' "(h5) explicit deselect"
+[[ "$(_selection_deselected "$TARGET_KEEP")" == '["pi"]' ]] \
+  || { echo "FAIL: (h5) explicit deselect did not record deselectedAgents [\"pi\"] (got $(_selection_deselected "$TARGET_KEEP"))"; cat "$KEEP_DESELECT_LOG"; exit 1; }
+# 2. The kept port writes again; a plain upgrade leaves .pi/ as it is.
+echo 'kept hand-port notes' > "${TARGET_KEEP}/.pi/skills/eversis-notes.md"
+_keep_sums="$(cd "$TARGET_KEEP" && cksum .pi/APPEND_SYSTEM.md .pi/prompts/eversis-implement.md .pi/skills/eversis-notes.md)"
+_keep_backups="$(cd "$TARGET_KEEP" && find .pi/pre-agent-collections-backup 2>/dev/null | LC_ALL=C sort || true)"
+KEEP_PLAIN_LOG="${TMP}/consumer-pi-hand-port-kept-plain.log"
+_rc=0
+# The printed installer path depends on AGENT_COLLECTIONS_HOME (see (h)).
+env -u AGENT_COLLECTIONS_HOME bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_KEEP" \
+  --upgrade --sync --non-interactive \
+  > "$KEEP_PLAIN_LOG" 2>&1 || _rc=$?
+[[ "$_rc" -eq 0 ]] || { echo "FAIL: (h5) plain upgrade after a recorded Pi deselect exited ${_rc}, expected 0"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+grep -qF 'Stopped before any change' "$KEEP_PLAIN_LOG" \
+  && { echo "FAIL: (h5) plain upgrade printed the hand-ported Pi stop"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+grep -qF 'backed up and removed' "$KEEP_PLAIN_LOG" \
+  && { echo "FAIL: (h5) plain upgrade says the kept .pi/ entries are backed up and removed"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+grep -qF 'remove the old Pi generator' "$KEEP_PLAIN_LOG" \
+  && { echo "FAIL: (h5) plain upgrade tells to remove an old Pi generator that does not exist"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+grep -qF 'Pi was dropped earlier' "$KEEP_PLAIN_LOG" \
+  || { echo "FAIL: (h5) plain upgrade does not say Pi was dropped earlier"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+# The start warning and the generated-only prune line both print the exact
+# migrate command with this run's agents, never a <current> placeholder.
+_keep_cmd="bash \"${ROOT}/scripts/setup-agent-collections.sh\" --upgrade --sync --agents cursor,pi"
+[[ "$(grep -cF -- "$_keep_cmd" "$KEEP_PLAIN_LOG" || true)" -ge 2 ]] \
+  || { echo "FAIL: (h5) start warning and prune line do not both print the exact migrate command"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+grep -qF -- '<current>' "$KEEP_PLAIN_LOG" \
+  && { echo "FAIL: (h5) plain upgrade prints a <current> placeholder"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+[[ "$(cd "$TARGET_KEEP" && cksum .pi/APPEND_SYSTEM.md .pi/prompts/eversis-implement.md .pi/skills/eversis-notes.md)" == "$_keep_sums" ]] \
+  || { echo "FAIL: (h5) plain upgrade changed the kept hand-made .pi/ files"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+[[ "$(cd "$TARGET_KEEP" && find .pi/pre-agent-collections-backup 2>/dev/null | LC_ALL=C sort || true)" == "$_keep_backups" ]] \
+  || { echo "FAIL: (h5) plain upgrade made a new backup under .pi/pre-agent-collections-backup/"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+_assert_selection_agents "$TARGET_KEEP" '["cursor"]' "(h5) plain upgrade"
+[[ "$(_selection_deselected "$TARGET_KEEP")" == '["pi"]' ]] \
+  || { echo "FAIL: (h5) plain upgrade lost deselectedAgents [\"pi\"]"; exit 1; }
+grep -qF 'Done.' "$KEEP_PLAIN_LOG" \
+  || { echo "FAIL: (h5) plain upgrade did not reach its final Done. line"; cat "$KEEP_PLAIN_LOG"; exit 1; }
+# 3. Selecting Pi again migrates and clears the record.
+KEEP_MIGRATE_LOG="${TMP}/consumer-pi-hand-port-kept-migrate.log"
+bash "${ROOT}/scripts/setup-agent-collections.sh" \
+  --collections-home "$ROOT" \
+  --target "$TARGET_KEEP" \
+  --upgrade --sync --non-interactive \
+  --agents cursor,pi \
+  > "$KEEP_MIGRATE_LOG" 2>&1 \
+  || { echo "FAIL: (h5) --agents cursor,pi after a recorded deselect failed"; cat "$KEEP_MIGRATE_LOG"; exit 1; }
+_assert_pi_tree "$TARGET_KEEP" "(h5) --agents cursor,pi migration"
+_assert_selection_agents "$TARGET_KEEP" '["cursor","pi"]' "(h5) --agents cursor,pi migration"
+[[ "$(_selection_deselected "$TARGET_KEEP")" == "absent" ]] \
+  || { echo "FAIL: (h5) --agents cursor,pi did not clear deselectedAgents"; exit 1; }
+
 # (h3) vendored install, hand-ported .pi/, upgrade run from the project root
 # with the vendored installer and no --target. The stop commands use the
 # project-relative installer path, which works from the project root (the

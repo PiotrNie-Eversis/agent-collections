@@ -16,6 +16,12 @@
 #      them. print_summary repeats the generator list (LEGACY_PI_FINDINGS)
 #      and recounts the legacy-marked .pi/ files after the Pi stage
 #      (LEGACY_PI_MARKED_AT_START holds the count from the start of the run).
+# An explicit Pi deselect is remembered in install-selection.json
+# ("deselectedAgents": ["pi"]) so a person who keeps a hand port is not stopped
+# on every later run: snapshot_pi_deselect_inputs (read-only, before any
+# write) and decide_pi_deselect (after the agents are resolved) set what
+# write_install_selection records; the stop and the start warning read the
+# recorded value.
 #
 # Sourced by setup-agent-collections.sh after link-framework.sh (uses
 # PI_GENERATED_MARKER). Bash 3.2 compatible.
@@ -115,12 +121,20 @@ _pi_hand_port_found_lines() {
 # inside the project, "$AGENT_COLLECTIONS_HOME/…" when that names this
 # framework, else the quoted absolute path. "Found" lists the skill entries
 # first (_pi_hand_port_found_lines).
+# No stop when the record already says the person dropped Pi
+# (RECORDED_PI_DESELECTED, read by load_selection_or_fail): that is the answer
+# the stop would ask for, so the run keeps Pi out and run_pi_stage leaves the
+# hand port in place. A record without that field (never deselected, or written
+# by an older installer) keeps the stop.
 check_pi_hand_port_or_stop() {
   [[ "${ARG_UPGRADE:-false}" == "true" ]] || [[ "${ARG_SYNC:-false}" == "true" ]] || return 0
   [[ -z "${ARG_AGENTS:-}" ]] || return 0
   case ",${SELECTED_AGENTS:-}," in
     *,pi,*) return 0 ;;
   esac
+  if [[ "${RECORDED_PI_DESELECTED:-false}" == "true" ]]; then
+    return 0
+  fi
   [[ -d "${TARGET_DIR}/.pi" ]] || return 0
 
   local evidence=""
@@ -159,6 +173,95 @@ check_pi_hand_port_or_stop() {
       ${installer} --upgrade --sync --agents ${current}"
 }
 
+# Read-only snapshot for decide_pi_deselect, taken in setup-agent-collections.sh
+# right after the upgrade block and before report_legacy_pi_generator,
+# run_vendor_setup and every other step that writes under TARGET_DIR. It must
+# run before the first write because the evidence it looks for is what the Pi
+# deselect prune (run_pi_stage) removes later in the same run; read after that,
+# an explicit --agents without pi could no longer tell "the person dropped Pi"
+# from "Pi was never here".
+# Sets PI_CONTENT_AT_START=true when the record on disk listed pi in "agents"
+# or "deselectedAgents", or .pi/ holds Pi content: a generated
+# .pi/APPEND_SYSTEM.md, a legacy-marked file (_legacy_pi_marked_files) or a
+# framework-shaped entry the framework did not write
+# (_pi_unmarked_framework_shaped) — the same evidence the hand-ported Pi stop
+# uses. It reads install-selection.json itself, not SELECTED_AGENTS:
+# load_selection_or_fail replaces SELECTED_AGENTS with --agents, and a run
+# without --upgrade / --sync never loads the record. For the same reason it
+# sets RECORDED_PI_DESELECTED from the file when load_selection_or_fail did not
+# run (SELECTION_FROM_RECORD is not "true"). A missing, unreadable or invalid
+# record counts as listing nothing.
+snapshot_pi_deselect_inputs() {
+  PI_CONTENT_AT_START="false"
+  RECORDED_PI_DESELECTED="${RECORDED_PI_DESELECTED:-false}"
+  local sel_file="${TARGET_DIR}/.agent-collections/install-selection.json"
+  local listed="" agents_pi="false" deselected_pi="false"
+  if [[ -f "$sel_file" ]] && command -v node >/dev/null 2>&1; then
+    listed="$(node -e '
+      let j;
+      try { j = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); } catch { process.exit(0); }
+      const has = (v) => Array.isArray(v) && v.includes("pi");
+      console.log((has(j && j.agents) ? "true" : "false") + " " + (has(j && j.deselectedAgents) ? "true" : "false"));
+    ' "$sel_file" 2>/dev/null)" || listed=""
+  fi
+  if [[ -n "$listed" ]]; then
+    agents_pi="${listed%% *}"
+    deselected_pi="${listed##* }"
+  fi
+  if [[ "${SELECTION_FROM_RECORD:-false}" != "true" ]]; then
+    RECORDED_PI_DESELECTED="$deselected_pi"
+  fi
+
+  if [[ "$agents_pi" == "true" ]] || [[ "$deselected_pi" == "true" ]]; then
+    PI_CONTENT_AT_START="true"
+  elif [[ -d "${TARGET_DIR}/.pi" ]]; then
+    local append_system="${TARGET_DIR}/.pi/APPEND_SYSTEM.md"
+    if [[ -f "$append_system" ]] && grep -qF "$PI_GENERATED_MARKER" "$append_system" 2>/dev/null; then
+      PI_CONTENT_AT_START="true"
+    elif [[ -n "$(_legacy_pi_marked_files; _pi_unmarked_framework_shaped)" ]]; then
+      PI_CONTENT_AT_START="true"
+    fi
+  fi
+  export PI_CONTENT_AT_START RECORDED_PI_DESELECTED
+}
+
+# Sets PI_DESELECTED (what write_install_selection records as
+# "deselectedAgents": ["pi"]). Called right after resolve_agents_selection and
+# again just before write_install_selection, because the Pi stage result is
+# known only then. Rules, first match wins:
+#   1. a failed Pi stage (PI_STAGE_FAILED=true) → false, so the next plain
+#      upgrade meets the hand-ported Pi stop again and retries; this also drops
+#      a recorded value after a failed prune, which is safe (the stop returns);
+#   2. pi in the effective selection → false (an explicit --agents …,pi, or a
+#      generated Pi setup that load_selection_or_fail kept) — clears the field;
+#   3. an explicit --agents without pi → true only when Pi was in the record or
+#      in .pi/ at the start of the run (PI_CONTENT_AT_START), so a fresh
+#      --agents cursor in a project with no Pi records nothing and a hand port
+#      added later is still protected by the stop;
+#   4. no --agents → keep the recorded value (RECORDED_PI_DESELECTED).
+# The interactive wizard path (no --agents) never records a new deselect.
+decide_pi_deselect() {
+  PI_DESELECTED="false"
+  if [[ "${PI_STAGE_FAILED:-false}" == "true" ]]; then
+    PI_DESELECTED="false"
+  else
+    case ",${SELECTED_AGENTS// /}," in
+      *,pi,*) PI_DESELECTED="false" ;;
+      *)
+        if [[ -n "${ARG_AGENTS:-}" ]]; then
+          if [[ "${PI_CONTENT_AT_START:-false}" == "true" ]]; then
+            PI_DESELECTED="true"
+          fi
+        elif [[ "${RECORDED_PI_DESELECTED:-false}" == "true" ]]; then
+          PI_DESELECTED="true"
+        fi
+        ;;
+    esac
+  fi
+  export PI_DESELECTED
+  return 0
+}
+
 # Warn-only report of a legacy Pi generator in the consumer project. Its
 # `sync:agents` script would otherwise regenerate the old .pi/ tree after this
 # upgrade (and, through a symlinked .pi/skills mirror, write into the framework
@@ -176,6 +279,13 @@ check_pi_hand_port_or_stop() {
 # each with a backup; without Pi, _prune_deselected_pi backs up and removes the
 # .pi/skills/eversis-* entries; any other legacy-marked file stays and the
 # summary recounts it.
+# When the person dropped Pi in an earlier run and this run has no --agents
+# (_pi_recorded_deselect_applies), the run keeps every legacy-marked file and
+# .pi/skills/eversis-* entry, so the marked-files text says that instead of
+# "backed up and removed". It depends only on the recorded deselect, not on
+# whether a generator was found: the generator group keeps its own text.
+# It ends with the exact migrate command (_pi_migrate_command, the same one the
+# generated-only prune prints), not a placeholder.
 report_legacy_pi_generator() {
   LEGACY_PI_FINDINGS=""
   LEGACY_PI_MARKED_AT_START=""
@@ -229,6 +339,12 @@ report_legacy_pi_generator() {
   if [[ -n "$marked_line" ]]; then
     log_warn "Legacy-marked Pi files found (written by an old Pi generator):"
     log_warn "  - ${marked_line}"
+    if _pi_recorded_deselect_applies; then
+      log_warn "Pi was dropped earlier (recorded in .agent-collections/install-selection.json), so this run"
+      log_warn "keeps them and the rest of .pi/ as they are. To migrate to the framework Pi adapter, re-run:"
+      log_warn "  $(_pi_migrate_command)"
+      return 0
+    fi
     log_warn "With Pi, the Pi stage replaces the files it generates and every .pi/skills/eversis-* entry"
     log_warn "(old copies in *.pre-agent-collections.bak and .pi/pre-agent-collections-backup/); without Pi,"
     log_warn ".pi/skills/eversis-* entries are backed up and removed. Other files stay; the summary at the"

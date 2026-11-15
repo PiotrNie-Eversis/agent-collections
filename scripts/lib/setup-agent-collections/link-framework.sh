@@ -352,6 +352,35 @@ _pi_selected() {
   echo ",${SELECTED_AGENTS:-}," | grep -q ',pi,'
 }
 
+# Prints the command that migrates to the framework Pi adapter after a
+# recorded Pi deselect, ready to paste in the project root: the installer path
+# from _installer_command, then --upgrade --sync --agents with this run's
+# agents plus pi. Shared by the start-of-run warning
+# (report_legacy_pi_generator) and the generated-only prune info line, so
+# both print the same command. The agents use the same fallback as
+# check_pi_hand_port_or_stop (${SELECTED_AGENTS:-cursor}): on a run without
+# --upgrade / --sync the selection may still be empty at the start warning.
+# pi is dropped from the list first so it is never named twice.
+_pi_migrate_command() {
+  local current installer
+  current="$(_agents_without_pi "${SELECTED_AGENTS:-cursor}")"
+  current="${current:-cursor}"
+  installer="$(_installer_command)"
+  printf '%s' "${installer} --upgrade --sync --agents ${current},pi"
+}
+
+# True when the person dropped Pi in an earlier run (RECORDED_PI_DESELECTED,
+# from install-selection.json "deselectedAgents"), this run has no --agents
+# and pi is not selected. Then the run keeps a hand-ported .pi/ as it is:
+# run_pi_stage removes only generated files, and the start warning and the
+# summary say the legacy-marked files are kept. An explicit --agents is a new
+# choice and keeps the full deselect prune.
+_pi_recorded_deselect_applies() {
+  [[ "${RECORDED_PI_DESELECTED:-false}" == "true" ]] || return 1
+  [[ -z "${ARG_AGENTS:-}" ]] || return 1
+  ! _pi_selected
+}
+
 # True when pi is selected and no other agent is (Pi-only install).
 _pi_only_selected() {
   _pi_selected && [[ -z "$(_agents_without_pi "${SELECTED_AGENTS:-}")" ]]
@@ -537,13 +566,24 @@ _run_pi_adapter_sync() {
 # (PI_SKILLS_MANIFEST_REL) is removed after the mirror entries, because their
 # backup check still reads it, and also when .pi/ no longer exists. Returns
 # non-zero when a removal fails.
+# Optional $1 "generated-only" (run_pi_stage passes it when
+# _pi_recorded_deselect_applies): the person dropped Pi in an earlier run and
+# kept a hand-ported .pi/, so only the marker-gated removals (generated
+# APPEND_SYSTEM.md, extensions, prompts and eversis-rule-* role skills) and
+# .pi/eversis-state/ run; the by-name removal and backup of
+# .pi/skills/eversis-* and the leftovers log are skipped, and one info line
+# says the rest of .pi/ is left in place. The manifest is still removed (it
+# describes installer copies only; after the recorded deselect it is normally
+# already gone). The log reason then fits a run without --agents.
 _prune_deselected_pi() {
+  local mode="${1:-full}"
   local pi_dir="${TARGET_DIR}/.pi"
   if [[ ! -d "$pi_dir" ]]; then
     _remove_pi_skills_manifest
     return
   fi
   local reason="Pi not in --agents"
+  [[ "$mode" != "generated-only" ]] || reason="Pi dropped earlier"
 
   local append_system="${pi_dir}/APPEND_SYSTEM.md"
   if [[ -f "$append_system" ]] && grep -qF "$PI_GENERATED_MARKER" "$append_system" 2>/dev/null; then
@@ -568,7 +608,9 @@ _prune_deselected_pi() {
 
   _prune_marker_gated_dir "${pi_dir}/prompts" "$PI_GENERATED_MARKER" \
     ".pi/prompts/*.md" "eversis-*.md" "$reason"
-  _log_pi_deselect_leftovers
+  if [[ "$mode" != "generated-only" ]]; then
+    _log_pi_deselect_leftovers
+  fi
 
   local skills_dir="${pi_dir}/skills"
   if [[ -d "$skills_dir" ]]; then
@@ -585,6 +627,9 @@ _prune_deselected_pi() {
           removed_roles=$((removed_roles + 1))
           ;;
         *)
+          # A recorded Pi deselect leaves hand-made mirror-named entries
+          # alone: no removal, no backup.
+          [[ "$mode" != "generated-only" ]] || continue
           # An entry that is neither an identical framework copy nor the
           # installer's own recorded copy is copied aside first.
           _backup_hand_made_pi_skill "$entry" || return 1
@@ -601,6 +646,9 @@ _prune_deselected_pi() {
     fi
   fi
   _remove_pi_skills_manifest || return 1
+  if [[ "$mode" == "generated-only" ]]; then
+    log_info "Pi was dropped earlier (recorded in .agent-collections/install-selection.json), so the rest of .pi/ is left in place. To use the framework Pi adapter, re-run: $(_pi_migrate_command)"
+  fi
   return 0
 }
 
@@ -716,8 +764,12 @@ _pi_same_entry() {
 
 # After a deselect, unmarked .pi/prompts/eversis-*.md (and files that
 # still carry the legacy hand-port marker) stay — they are not framework files.
-# They are also what makes the next --upgrade / --sync without --agents stop
-# (check_pi_hand_port_or_stop), so name them for the person to delete.
+# They are also what made the next --upgrade / --sync without --agents stop
+# (check_pi_hand_port_or_stop) before the deselect was recorded. They are
+# hand-port evidence, so this explicit deselect is recorded in
+# install-selection.json (decide_pi_deselect) and later runs without --agents
+# keep them; name them so the person knows what was kept and can delete them
+# when Pi is no longer used.
 _log_pi_deselect_leftovers() {
   local pi_dir="${TARGET_DIR}/.pi" f left=""
   for f in "${pi_dir}/prompts"/eversis-*.md; do
@@ -739,7 +791,7 @@ _log_pi_deselect_leftovers() {
     done <<< "$(_legacy_pi_marked_files)"
   fi
   if [[ -n "$left" ]]; then
-    log_info "Left in place (not framework-generated; delete them if Pi is no longer used, or a later --upgrade without --agents stops):${left}"
+    log_info "Left in place (not framework-generated; kept, and the Pi deselect is recorded in .agent-collections/install-selection.json, so later runs without --agents leave them alone; delete them if Pi is no longer used):${left}"
   fi
   return 0
 }
@@ -748,9 +800,17 @@ _log_pi_deselect_leftovers() {
 # link_framework_files. Returns 1 when the Pi stage failed (flag + reason set,
 # "pi" failure recorded); never dies for a Pi-caused error. Every sub-step is
 # checked explicitly because set -e is inactive inside `… || …` callers.
+# With pi not selected, a Pi deselect recorded in an earlier run and no
+# --agents (_pi_recorded_deselect_applies), the prune runs in generated-only
+# mode so a kept hand port is not pruned again; an explicit --agents without
+# pi keeps the full prune.
 run_pi_stage() {
   if ! _pi_selected; then
-    if ! _prune_deselected_pi; then
+    local prune_mode="full"
+    if _pi_recorded_deselect_applies; then
+      prune_mode="generated-only"
+    fi
+    if ! _prune_deselected_pi "$prune_mode"; then
       mark_pi_stage_failed "could not remove generated .pi/ files after deselecting Pi"
       return 1
     fi

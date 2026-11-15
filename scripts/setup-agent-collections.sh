@@ -38,7 +38,13 @@
 #                             omitted, pi is not selected and .pi/ holds a Pi setup
 #                             the framework did not generate (hand port); re-run with
 #                             --agents <current>,pi to migrate or --agents <current>
-#                             to keep Pi out. A legacy Pi generator
+#                             to keep Pi out. That explicit --agents without pi
+#                             is recorded ("deselectedAgents": ["pi"] in
+#                             install-selection.json) when Pi was in the record or
+#                             in .pi/, so later runs without --agents do not stop,
+#                             keep Pi out and remove only generated Pi files;
+#                             --agents <current>,pi migrates and clears it.
+#                             A legacy Pi generator
 #                             (scripts/gen-pi-adapter.mjs, scripts/pi-rule-map.yaml,
 #                             sync:agents scripts) is reported, never run or removed.
 #   --non-interactive         Skip all prompts; use defaults / flags.
@@ -51,6 +57,8 @@
 #                             coding agent surfaces (.pi/) in an isolated stage: a
 #                             Pi failure keeps the other agents' output, omits pi
 #                             from the recorded selection and exits 1 at the end.
+#                             A list without pi, in a project that had Pi, is
+#                             remembered as a Pi deselect (see --upgrade).
 #   --profile NAME            Domain profile: frontend | backend | fullstack
 #   --ssot-source URL         GitLab domain-context project to seed docs/context/global/
 #                             from (git subtree add, best-effort — never blocks install).
@@ -140,6 +148,18 @@ MCP_PRESERVE_EXISTING="false"
 # the "Recovery:" hint then repeats only the flags the person typed. Start from
 # "false" so a stray value in the caller's env never counts as a reused record.
 SELECTION_FROM_RECORD="false"
+# Explicit Pi deselect (install-selection.json "deselectedAgents"). All three
+# start from "false" so a stray value in the caller's env never skips the
+# hand-ported Pi stop or records a deselect:
+#   RECORDED_PI_DESELECTED — the record at the start of the run lists pi in
+#     deselectedAgents (load_selection_or_fail, or snapshot_pi_deselect_inputs
+#     when the record was not loaded);
+#   PI_CONTENT_AT_START — .pi/ held Pi content, or the record listed pi, before
+#     any write (snapshot_pi_deselect_inputs);
+#   PI_DESELECTED — what write_install_selection records (decide_pi_deselect).
+RECORDED_PI_DESELECTED="false"
+PI_CONTENT_AT_START="false"
+PI_DESELECTED="false"
 
 export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_VENDOR_PASSED \
        ARG_LINK_MODE ARG_LINK_MODE_PASSED \
@@ -149,6 +169,7 @@ export ARG_BUILD_MCP ARG_COLLECTIONS_HOME ARG_TARGET ARG_VENDOR ARG_VENDOR_PASSE
        ARG_CONFLUENCE_SPACE_KEY ARG_CONFLUENCE_SPACE_KEY_PASSED \
        ARG_PROJECT_NAME ARG_PROJECT_NAME_PASSED ARG_DOCTOR \
        MCP_PRESERVE_EXISTING SELECTION_FROM_RECORD \
+       RECORDED_PI_DESELECTED PI_CONTENT_AT_START PI_DESELECTED \
        SETUP_SCRIPT_DIR="${SCRIPT_DIR}" LIB_DIR="${LIB_DIR}"
 
 while [[ $# -gt 0 ]]; do
@@ -345,6 +366,10 @@ if [[ "$ARG_UPGRADE" == "true" ]] || { [[ "$ARG_SYNC" == "true" ]] && [[ -f "${T
   # run_vendor_setup or anything else writes under TARGET_DIR.
   check_pi_hand_port_or_stop
 fi
+# Read-only snapshot of Pi content and of the record (fresh installs too), for
+# decide_pi_deselect. It must run before run_vendor_setup (the first write)
+# and run_pi_stage (the Pi deselect prune), or the evidence is already gone.
+snapshot_pi_deselect_inputs
 # Warn-only (fresh installs too): a legacy Pi generator would undo this install.
 report_legacy_pi_generator
 
@@ -352,6 +377,9 @@ run_vendor_setup || { record_fail "vendor"; _print_partial_fail; exit 1; }
 record_ok "vendor"
 
 resolve_agents_selection
+# What the record says about an explicit Pi deselect; re-checked before
+# write_install_selection, once the Pi stage result is known.
+decide_pi_deselect
 resolve_domain_profile
 
 maybe_build_mcp "$COLLECTIONS_HOME" || { record_fail "build-mcp"; _print_partial_fail; exit 1; }
@@ -408,6 +436,8 @@ seed_ssot_global
 note_confluence_space_key
 record_ok "ssot"
 
+# A Pi stage that failed after the first decision never records a deselect.
+decide_pi_deselect
 write_install_selection || { record_fail "selection"; _print_partial_fail; exit 1; }
 record_ok "selection"
 

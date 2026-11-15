@@ -118,6 +118,58 @@ else
   _fail "rewrite preserves confluence key and custom projectContextPath"
 fi
 
+# Recorded Pi deselect: written only when PI_DESELECTED=true, read back on
+# load, and a missing or invalid value loads as "not deselected".
+_deselected_field() {
+  node -e "const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')); console.log(JSON.stringify(j.deselectedAgents===undefined?'absent':j.deselectedAgents));" "$SEL"
+}
+
+PI_DESELECTED="true"
+write_install_selection >/dev/null
+if [[ "$(_deselected_field)" == '["pi"]' ]]; then
+  _pass "PI_DESELECTED=true writes deselectedAgents [\"pi\"]"
+else
+  _fail "PI_DESELECTED=true writes deselectedAgents [\"pi\"]"
+fi
+RECORDED_PI_DESELECTED="false"
+load_selection_or_fail >/dev/null
+if [[ "$RECORDED_PI_DESELECTED" == "true" ]]; then
+  _pass "load reads deselectedAgents [\"pi\"] as RECORDED_PI_DESELECTED=true"
+else
+  _fail "load reads deselectedAgents [\"pi\"] as RECORDED_PI_DESELECTED=true"
+fi
+
+PI_DESELECTED="false"
+write_install_selection >/dev/null
+if [[ "$(_deselected_field)" == '"absent"' ]]; then
+  _pass "PI_DESELECTED=false leaves deselectedAgents out of the record"
+else
+  _fail "PI_DESELECTED=false leaves deselectedAgents out of the record"
+fi
+RECORDED_PI_DESELECTED="true"
+load_selection_or_fail >/dev/null
+if [[ "$RECORDED_PI_DESELECTED" == "false" ]]; then
+  _pass "load without deselectedAgents sets RECORDED_PI_DESELECTED=false"
+else
+  _fail "load without deselectedAgents sets RECORDED_PI_DESELECTED=false"
+fi
+
+for _bad in '"pi"' '{"pi":true}' 'null' '["cursor"]'; do
+  node -e "
+    const fs=require('fs');
+    const p=process.argv[1];
+    const j=JSON.parse(fs.readFileSync(p,'utf8'));
+    j.deselectedAgents=JSON.parse(process.argv[2]);
+    fs.writeFileSync(p, JSON.stringify(j,null,2)+'\n');
+  " "$SEL" "$_bad"
+  RECORDED_PI_DESELECTED="true"
+  if load_selection_or_fail >/dev/null && [[ "$RECORDED_PI_DESELECTED" == "false" ]]; then
+    _pass "deselectedAgents ${_bad} loads without error as not deselected"
+  else
+    _fail "deselectedAgents ${_bad} loads without error as not deselected"
+  fi
+done
+
 if bash "${COLLECTIONS_HOME}/scripts/setup-agent-collections.sh" --ssot-source >/dev/null 2>&1; then
   _fail "bare --ssot-source (no value) still errors"
 else

@@ -47,6 +47,14 @@ load_selection_or_fail() {
   # typed, so a pasted re-run keeps MCP preserve mode and agent keep.
   SELECTION_FROM_RECORD="true"
 
+  # Optional deselectedAgents (an explicit Pi deselect the person made in an
+  # earlier run, see decide_pi_deselect in legacy-pi.sh). It is not a required
+  # key: a missing key, a non-array value or an array without "pi" all mean
+  # "not deselected" and never fail the load, so a record from an older
+  # installer keeps the hand-ported Pi stop (check_pi_hand_port_or_stop).
+  # Read here, before the stop check, because that check needs it.
+  RECORDED_PI_DESELECTED="$(node -e "const j=JSON.parse(process.argv[1]); const d=j.deselectedAgents; console.log(Array.isArray(d)&&d.includes('pi')?'true':'false')" "$parsed")"
+
   SELECTED_AGENTS="$(node -e "const j=JSON.parse(process.argv[1]); console.log(j.agents.join(','))" "$parsed")"
   MCP_SELECTED_IDS="$(node -e "const j=JSON.parse(process.argv[1]); console.log(j.mcpServers.join(','))" "$parsed")"
   # Per-field contract (same as ssot.* below): an explicit flag replaces the
@@ -112,6 +120,7 @@ load_selection_or_fail() {
   fi
   export SELECTED_AGENTS MCP_SELECTED_IDS DOMAIN_PROFILE VENDOR_MODE ARG_VENDOR ARG_LINK_MODE \
     ARG_SSOT_SOURCE ARG_CONFLUENCE_SPACE_KEY MCP_PRESERVE_EXISTING SELECTION_FROM_RECORD \
+    RECORDED_PI_DESELECTED \
     MCP_CONFIGURED_SERVERS="$MCP_SELECTED_IDS"
   log_ok "Loaded install selection (agents=${SELECTED_AGENTS}, profile=${DOMAIN_PROFILE}, mcp=${MCP_SELECTED_IDS}, preserve-existing-mcp=${MCP_PRESERVE_EXISTING})"
 }
