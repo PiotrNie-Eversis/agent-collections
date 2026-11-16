@@ -32,12 +32,18 @@ The **Engineering Manager** (the framework's orchestrator role) inspects `docs/s
 
 ## How you connect to other roles
 
-```mermaid
-flowchart LR
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
+export const rolesFlow = `flowchart TD
     BA[Business Analyst] -->|Jira story + AC| BD[Backend Developer]
     BD -->|API/service ready| DO[DevOps]
-    BD -->|Implementation| QA[QA Engineer]
-```
+    BD -->|Implementation| QA[QA Engineer]`;
+
+<PeleDiagram
+  id="backend-developer-roles"
+  source={rolesFlow}
+  label="How the Backend Developer connects to other roles: the Business Analyst hands over a Jira story with acceptance criteria. The Backend Developer passes a ready API or service to DevOps and the implementation to the QA Engineer."
+/>
 
 | Your output | Goes to role | As artifact |
 | --- | --- | --- |

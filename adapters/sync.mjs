@@ -25,6 +25,12 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  findRuleRegistryProblems,
+  listRuleFiles,
+  parseNotEmittedYaml,
+} from "./lib/rule-registry.mjs";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CURSOR_GENERATE = path.join(__dirname, "cursor", "generate.mjs");
 const CLAUDE_GENERATE = path.join(__dirname, "claude", "generate.mjs");
@@ -47,6 +53,8 @@ const PI_GENERATE = path.join(__dirname, "pi", "generate.mjs");
 const CURSOR_MAP = path.join(__dirname, "cursor", "rule-map.yaml");
 const CLAUDE_MAP = path.join(__dirname, "claude", "rule-map.yaml");
 const PI_MAP = path.join(__dirname, "pi", "rule-map.yaml");
+const NOT_EMITTED_MAP = path.join(__dirname, "rules-not-emitted.yaml");
+const FRAMEWORK_ROOT = path.resolve(__dirname, "..");
 const ALLOWED_AGENTS = ["cursor", "claude", "opencode", "pi"];
 
 function fail(message) {
@@ -128,7 +136,9 @@ function parseArgs(argv) {
           "                              [--framework-prefix <path>]\n" +
           "  Default: regenerate Cursor (.mdc) then Claude (CLAUDE.md) from core.\n" +
           "  --check: compare fresh generation to disk; exit 0 if no drift (also checks\n" +
-          "           Cursor↔Claude id/source map parity). Does not write in-place.\n" +
+          "           Cursor↔Claude id/source map parity, and that every .ai/rules/**/*.md\n" +
+          "           file except README.md is mapped or listed in\n" +
+          "           adapters/rules-not-emitted.yaml). Does not write in-place.\n" +
           "  --out: pass through to generators (write or compare under <dir>).\n" +
           "  --agents: only run selected adapters (default: cursor,claude).\n" +
           "            opencode is placeholder-only (copies opencode.jsonc when present).\n" +
@@ -568,6 +578,37 @@ function compareGeneratedDir(expectedRoot, actualRoot, dirRel, namePattern, mark
 }
 
 /**
+ * Rule registry: every .ai/rules/**\/*.md file (README.md excluded) is a
+ * source in the Cursor map or listed with a reason in
+ * adapters/rules-not-emitted.yaml. Without this, a rule left out of the maps
+ * is silently not emitted and the drift comparison still passes.
+ */
+function assertRuleRegistry(cursorMap) {
+  if (!fs.existsSync(NOT_EMITTED_MAP)) {
+    fail(`rule registry: exception list not found: ${NOT_EMITTED_MAP}`);
+  }
+  let notEmitted;
+  try {
+    notEmitted = parseNotEmittedYaml(fs.readFileSync(NOT_EMITTED_MAP, "utf8"));
+  } catch (err) {
+    fail(`rule registry: ${err.message}`);
+  }
+  if (notEmitted.version !== 1) {
+    fail(
+      `rule registry: unsupported adapters/rules-not-emitted.yaml version: ${notEmitted.version} (expected 1)`,
+    );
+  }
+  const problems = findRuleRegistryProblems({
+    ruleFiles: listRuleFiles(FRAMEWORK_ROOT),
+    mappedSources: cursorMap.rules.map((rule) => rule.source),
+    notEmitted: notEmitted.entries,
+  });
+  if (problems.length > 0) {
+    fail(`rule registry check failed —\n  ${problems.join("\n  ")}`);
+  }
+}
+
+/**
  * @param {Set<string>|null} agents null = today's default check (Cursor + Claude);
  *   otherwise only the named agents are checked (opencode has nothing to check).
  */
@@ -581,6 +622,7 @@ function runCheck(repoRoot, outRoot, frameworkPrefix, agents) {
   const claudeMap = loadRuleMap(CLAUDE_MAP, "Claude");
   assertIdSourceParity(cursorMap, claudeMap);
   assertPiIdSourceParity(claudeMap, loadRuleMap(PI_MAP, "Pi"));
+  assertRuleRegistry(cursorMap);
 
   for (const rule of cursorMap.rules) {
     if (!rule.output) {
@@ -811,7 +853,7 @@ function runCheck(repoRoot, outRoot, frameworkPrefix, agents) {
       process.exit(1);
     }
 
-    console.log("adapter sync check: OK (no drift; id/source parity OK)");
+    console.log("adapter sync check: OK (no drift; id/source parity OK; rule registry OK)");
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

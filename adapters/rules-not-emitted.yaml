@@ -1,0 +1,15 @@
+# Rule files under .ai/rules/ that no adapter emits, on purpose.
+# `node adapters/sync.mjs --check` fails on a .ai/rules/**/*.md file (other
+# than README.md) that is neither a `source` in adapters/cursor/rule-map.yaml
+# nor listed here. Each entry needs a `reason`.
+# Read only by adapters/sync.mjs (adapters/lib/rule-registry.mjs).
+version: 1
+not_emitted:
+  - source: .ai/rules/architecture/architecture-design.md
+    reason: "Seed excerpt of skill eversis-architecture-designing; the skill carries the content"
+  - source: .ai/rules/backend/backend-principles.md
+    reason: "Seed excerpt of skill eversis-implementing-backend; the skill carries the content"
+  - source: .ai/rules/devops/devops-principles.md
+    reason: "Seed excerpt of skills eversis-implementing-ci-cd, eversis-implementing-kubernetes and eversis-managing-secrets; the skills carry the content"
+  - source: .ai/rules/shared-types/data-and-contracts.md
+    reason: "Seed excerpt of skill eversis-sql-and-database-understanding; the skill carries the content"

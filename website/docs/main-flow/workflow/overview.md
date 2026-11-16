@@ -98,7 +98,7 @@ export const fineFlow = `flowchart TD
 <PeleDiagram
   id="fine-handoff-flow"
   source={fineFlow}
-  label="Fine handoff: after code review passes, the agent declares Fine and always writes a QA comment draft; it is posted to Jira only after you approve it. When the task found durable, cross-task knowledge, a second draft proposes a domain-knowledge promotion, written to docs/context/ for the project in this repo only after its own approval; most tasks have no second draft. When the promotion target has a confluence_url, a third draft proposes an inline As-Is Pack comment, posted to Confluence only after its own approval, with the page body unchanged."
+  label="Fine handoff: after code review passes, the agent declares Fine and always writes a QA comment draft; it is posted to Jira only after you approve it. When the task found durable, cross-task knowledge, a second draft proposes a domain-knowledge promotion, written to docs/context/ for the project in this repo only after its own approval; most tasks have no second draft. When the promotion target has a confluence_url, a third draft proposes an inline As-Is Pack comment, posted to Confluence only after its own approval, with the page body unchanged. Without a confluence_url there is no As-Is Pack comment."
 />
 
 ## Workflow diagram

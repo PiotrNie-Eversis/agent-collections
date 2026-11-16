@@ -32,11 +32,17 @@ The **Business Analyst** agent (a specialized role the framework hands this work
 
 ## How you connect to other roles
 
-```mermaid
-flowchart LR
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
+export const rolesFlow = `flowchart TD
     BA[Business Analyst] -->|Jira story + AC| WD[Web/Backend Developer]
-    BA -->|Backlog| PM[Project Manager]
-```
+    BA -->|Backlog| PM[Project Manager]`;
+
+<PeleDiagram
+  id="business-analyst-roles"
+  source={rolesFlow}
+  label="How the Business Analyst connects to other roles: the Business Analyst hands a Jira story with acceptance criteria to the Web or Backend Developer and the backlog to the Project Manager."
+/>
 
 | Your output | Goes to role | As artifact |
 | --- | --- | --- |

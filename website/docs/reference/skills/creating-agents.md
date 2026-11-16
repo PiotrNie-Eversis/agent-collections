@@ -28,7 +28,7 @@ Build **role behavior rules** under **`.ai/rules/`** (SSOT — the Cursor adapte
 
 - Not duplicating `eversis-agent-core.mdc` or stack rules
 - Globs are minimal and accurate
-- Registered in `adapters/cursor/rule-map.yaml`, `adapters/claude/rule-map.yaml` and `adapters/pi/rule-map.yaml` (same `id` and `source`), then `npm run sync:adapters` and `npm run sync:adapters:check`; the check does not report an unregistered rule, so confirm the rule appears in each host output
+- Registered in `adapters/cursor/rule-map.yaml`, `adapters/claude/rule-map.yaml` and `adapters/pi/rule-map.yaml` (same `id` and `source`), then `npm run sync:adapters` and `npm run sync:adapters:check`; the check fails on a rule file under `.ai/rules/` that no map lists (unless `adapters/rules-not-emitted.yaml` lists it with a reason), and you still confirm the rule appears in each host output
 
 ## See also
 

@@ -47,3 +47,5 @@ node adapters/sync.mjs --check --agents cursor,claude,pi --out /path/to/project
 | [OpenCode](./opencode/) | — (placeholder) | `opencode.jsonc` / stub |
 
 Prefer `adapters/sync.mjs` after changing `.ai/rules` or any `rule-map.yaml` (add `--agents …,pi` when the target uses Pi).
+
+`node adapters/sync.mjs --check` also fails, naming the file, on a `.ai/rules/**/*.md` file (other than `README.md`) that is neither a `source` in [`cursor/rule-map.yaml`](./cursor/rule-map.yaml) nor listed in [`rules-not-emitted.yaml`](./rules-not-emitted.yaml). That list holds the rule files no host emits on purpose (today the four "seed" excerpts of skills), each with a `reason`. An entry whose file is gone, that has no reason, or that is also in the Cursor map fails the check too. The Claude and Pi maps are held to the Cursor map by the id/source parity checks, so the Cursor map is the one compared.

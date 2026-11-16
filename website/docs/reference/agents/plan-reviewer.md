@@ -48,6 +48,6 @@ The Plan Reviewer is an internal role that stress-tests implementation plans bef
 
 ## Handoffs
 
-- **From** [Architect](./architect) — `.plan.md` ready for validation.
+- **From** [Architect](./architect) — `.plan.md` ready for plan review.
 - **To** [Architect](./architect) — when revisions are required.
 - **To** [Engineering Manager](./engineering-manager) — when verdict is `APPROVED` and implementation may proceed.

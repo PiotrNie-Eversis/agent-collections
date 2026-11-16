@@ -4,6 +4,8 @@ description: A technical deep dive into how Agent Collections eliminates context
 slug: context-reads-session-and-upgrade-contract
 ---
 
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
 When teams deploy AI coding agents on real-world repositories, they quickly discover that the hardest problem is rarely code generation itself. The hardest problem is **context governance**: controlling what enters the model's limited attention window, preventing historical drift from corrupting implementation, and keeping the development lifecycle coherent across multi-step tasks.
 
 Our latest framework update tackles these challenges head-on. If you caught our team update, you saw the highlights: leaner context reads, smoother multi-step sessions, a dedicated home for architecture decisions, and rock-solid MCP container tooling.
@@ -25,24 +27,28 @@ Previously, when an agent began an implementation task, it performed broad direc
 2. **Attention Dilution & Hallucination:** Large language models suffer from attention degradation when relevant instructions are surrounded by dense historical prose (the well-documented *Lost in the Middle* phenomenon). Agents would frequently follow obsolete schema designs or superseded conventions from months ago.
 3. **Loss of Task Focus:** The prompt space became dominated by historical task post-mortems rather than the active task's acceptance criteria.
 
-```mermaid
-flowchart TD
+export const contextReadFlow = `flowchart TD
   subgraph Old["Old Behavior: Unbounded Read"]
     O_Task["Task: Update Auth"] --> O_Search["Broad Search: 'auth'"]
-    O_Search --> O_Read1["Load spec-auth-v1.md (30k tokens)"]
-    O_Search --> O_Read2["Load spec-oauth-migration.md (25k tokens)"]
-    O_Search --> O_Read3["Load spec-session-token.md (20k tokens)"]
-    O_Read1 & O_Read2 & O_Read3 --> O_Fail["Bloated Window: Attention diluted, hallucinations, token exhaustion"]
+    O_Search --> O_Read1["Load spec-auth-v1.md<br/>(30k tokens)"]
+    O_Search --> O_Read2["Load spec-oauth-migration.md<br/>(25k tokens)"]
+    O_Search --> O_Read3["Load spec-session-token.md<br/>(20k tokens)"]
+    O_Read1 & O_Read2 & O_Read3 --> O_Fail["Bloated Window: Attention diluted,<br/>hallucinations, token exhaustion"]
   end
 
   subgraph New["New Architecture: Bounded Two-Cost Model"]
-    N_Task["Task: Update Auth"] --> N_Router["Single Router: docs/context/<project>/INDEX.md"]
+    N_Task["Task: Update Auth"] --> N_Router["Single Router:<br/>docs/context/<project>/INDEX.md"]
     N_Router --> N_One["Read EXACTLY 1 Component File"]
-    N_Task --> N_Disc["Discovery (Filename search across docs/specs/**)"]
-    N_Disc --> N_Cap["Consumption Cap: Max 1–2 spec files total"]
-    N_One & N_Cap --> N_Success["Focused Window: High attention sharpness, clean execution"]
-  end
-```
+    N_Task --> N_Disc["Discovery (Filename search<br/>across docs/specs/**)"]
+    N_Disc --> N_Cap["Consumption Cap:<br/>Max 1–2 spec files total"]
+    N_One & N_Cap --> N_Success["Focused Window: High attention<br/>sharpness, clean execution"]
+  end`;
+
+<PeleDiagram
+  id="context-read-budget"
+  source={contextReadFlow}
+  label="Old and new context reads. Old behavior, an unbounded read: a task such as updating auth runs a broad search for auth and loads three spec files of 30k, 25k and 20k tokens, which leaves a bloated window with diluted attention, hallucinations and token exhaustion. New architecture, a bounded two-cost model: the task goes through a single router, docs/context/<project>/INDEX.md, and reads exactly one component file; discovery searches file names across docs/specs, and consumption is capped at one or two spec files in total. Both lead to a focused window and clean execution."
+/>
 
 ### The Solution: A Strict Two-Cost Retrieval Model
 To eliminate this failure mode, the framework introduces an explicit separation between **Discovery** and **Consumption**, governed by a single deterministic entry point:
@@ -73,8 +79,7 @@ Previously, workflows attempted to prevent token overflow by interrupting sessio
 ### The Solution: In-Session Progression with Checkpoint Anchors
 The update replaces arbitrary stops with an observable, deterministic state machine:
 
-```mermaid
-sequenceDiagram
+export const checkpointFlow = `sequenceDiagram
   autonumber
   actor Human as Developer / EM
   participant Agent as Implementing Agent
@@ -91,8 +96,13 @@ sequenceDiagram
   Agent->>Agent: Run tests & verify
   Agent->>Review: Run Code Review (Continuity Default)
   Review-->>Agent: PASS (0 blockers)
-  Agent-->>Human: Fine + Draft QA Comment
-```
+  Agent-->>Human: Fine + Draft QA Comment`;
+
+<PeleDiagram
+  id="checkpoint-sequence"
+  source={checkpointFlow}
+  label="Checkpoint sequence. The developer or EM starts /eversis-implement. The implementing agent runs task 1 of the plan and verifies it with tests. Because task 1 is complete and tested and more tasks remain, the agent writes a CHECKPOINT entry with state, diffs and the next task to the plan changelog, then writes a RESUMED entry and continues in the same turn. It runs task 2 and its tests, runs code review by default, gets PASS with no blockers, and returns Fine with a draft QA comment to the developer."
+/>
 
 1. **The Single Observable Trigger:** A checkpoint is written only when a plan task reaches a **completed and tested state while further tasks remain in the plan**, and the session is not already in Review or Fine.
 2. **In-Turn Checkpointing:** When the trigger fires, the agent appends a structured `CHECKPOINT:` entry into the plan's `Changelog` (recording completed state, modified files, and the next scheduled task). In the **very same response**, it writes a `RESUMED:` entry and immediately proceeds to the next task. The active session does not halt or ask the developer to open a new chat.
@@ -121,19 +131,23 @@ When these two streams were mixed together inside `docs/context/`, domain compon
 | **External Sync** | Proposed inline comments to Confluence As-Is Pack | In-repo only; never auto-published externally |
 | **Human Gate** | Explicit human approval required before local disk write | Explicit human confirmation required during research/plan/code |
 
-```mermaid
-flowchart LR
+export const knowledgeFlow = `flowchart LR
   subgraph KnowledgeStreams["Separation of Concerns"]
-    Fact["Business Rule / Domain Fact<br/>(e.g., Copyright attribution required)"] -->|eversis-add-domain-knowledge| Context["docs/context/<project>/<component>/index.md"]
+    Fact["Business Rule / Domain Fact<br/>(e.g., Copyright attribution required)"] -->|eversis-add-domain-knowledge| Context["docs/context/<project>/<br/><component>/index.md"]
     Dec["Architectural Choice<br/>(e.g., PostgreSQL chosen over Redis)"] -->|eversis-record-decision| ADR["docs/decisions/<id>.md"]
   end
 
   subgraph Governance["Human Approval Boundary"]
     Context -.->|Human Approval| LocalContext["Committed to Repository"]
     ADR -.->|Human Approval| LocalADR["Committed to Repository"]
-    LocalContext -.->|Separate Authorization| Conf["Confluence As-Is Pack (Inline Comment)"]
-  end
-```
+    LocalContext -.->|Separate Authorization| Conf["Confluence As-Is Pack<br/>(Inline Comment)"]
+  end`;
+
+<PeleDiagram
+  id="knowledge-separation"
+  source={knowledgeFlow}
+  label="Separation of concerns. A business rule or domain fact, such as copyright attribution being required, goes through eversis-add-domain-knowledge into docs/context/<project>/<component>/index.md. An architectural choice, such as PostgreSQL chosen over Redis, goes through eversis-record-decision into docs/decisions/<id>.md. At the human approval boundary, each is committed to the repository only after human approval. The committed domain context can go to the Confluence As-Is Pack as an inline comment only with a separate authorization."
+/>
 
 By keeping `docs/decisions/` strictly decoupled, developers can record an ADR at any point during research, planning, or implementation using `eversis-record-decision`. The decision file is saved in Git alongside the code, while `docs/context/` remains lean, focusing exclusively on active business capabilities.
 

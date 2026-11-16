@@ -4,7 +4,6 @@ title: Pi
 ---
 
 import PeleDiagram from '@site/src/components/PeleDiagram';
-import AgentWorkflowDiagram from '@site/src/components/AgentWorkflowDiagram';
 
 export const rulesFlow = `flowchart TB
     start(["Session starts"]) --> check{"Saved command,<br/>or active plan?"}
@@ -24,6 +23,21 @@ export const rulesFlow = `flowchart TB
     edit -- Yes --> pointer["Path saved in<br/>active-plan.json"]
     pointer -. next session .-> check`;
 
+export const piCycle = `flowchart TD
+    ticket(["Ticket or request"]) --> start["Start<br/>/eversis-implement<br/>eversis-process-rules"]
+    ticket -.-> ideate["Ideate (optional)<br/>/eversis-analyze-materials"]
+    ideate -.-> start
+    start --> research["Research<br/>eversis-orchestrating-implementation<br/>same session"]
+    research --> gate1{"You approve<br/>research"}
+    gate1 --> plan["Plan<br/>eversis-creating-implementation-plans"]
+    plan --> planReview["Plan review<br/>Plan Reviewer checks the plan<br/>before you see it, same session"]
+    planReview --> gate2{"You approve<br/>the plan"}
+    gate2 --> implement["Implement<br/>edit, write, bash<br/>eversis-context-budget"]
+    implement --> review["Review<br/>eversis_independent_review<br/>separate Pi session"]
+    review -- BLOCKER --> implement
+    review -- PASS --> fine["Fine<br/>eversis-fine-handoff<br/>atlassian MCP"]
+    fine --> gate3{"You approve<br/>publishing"}`;
+
 # Agent Collections in Pi
 
 Agent Collections gives Pi the process: the gates, the role rules and the skills. Pi gives Agent Collections the runtime: commands, extensions, tools and MCP.
@@ -32,7 +46,41 @@ Agent Collections gives Pi the process: the gates, the role rules and the skills
 
 Each stage shows what the process does and which Pi tools do the work. Quick Flow can skip Research and Plan.
 
-<AgentWorkflowDiagram agent="pi" />
+<PeleDiagram
+  id="pi-cycle"
+  source={piCycle}
+  label="The delivery cycle in Pi. A ticket or request, optionally after Ideate with /eversis-analyze-materials, starts with /eversis-implement and the eversis-process-rules extension. Research runs in the same session with eversis-orchestrating-implementation, and you approve it. The plan is written with eversis-creating-implementation-plans, the Plan Reviewer checks it in the same session before you see it, and you approve the plan. Implement uses edit, write and bash, with eversis-context-budget. Review runs in a separate Pi session through the eversis_independent_review tool: a BLOCKER goes back to Implement, PASS goes on to Fine. Fine uses eversis-fine-handoff and the atlassian MCP, and you approve publishing."
+/>
+
+### Tools at each stage
+
+| Stage | Kind | Tool | Note |
+| --- | --- | --- | --- |
+| Ideate | Process | Agent Collections | Turns workshop materials into Jira-ready stories. |
+| Ideate | Command | `/eversis-analyze-materials` | Optional. Starts from workshop materials. |
+| Start | Process | Agent Collections | Prints the Implement readiness block and picks Quick or Full. |
+| Start | Command | `/eversis-implement <ticket>` | — |
+| Start | Extension | `eversis-process-rules` | Adds five rule skills and shows a notice. |
+| Start | File | `.pi/APPEND_SYSTEM.md` | The small core, always on. |
+| Research | Process | Agent Collections | Gathers context and writes `*.research.md`. You approve research before Plan starts. |
+| Research | Skill | `eversis-orchestrating-implementation` | Pi has no sub-agents, so this runs in the same session. |
+| Research | MCP | `eversis-collections`, `atlassian` | Skills, domain context and the ticket. |
+| Plan | Process | Agent Collections | Writes `*.plan.md` with phases and acceptance checks. |
+| Plan | Skill | `eversis-creating-implementation-plans` | — |
+| Plan | Extension | `eversis-process-rules` | Saves `.pi/eversis-state/active-plan.json`, so a new session starts with the rules on. |
+| Plan review | Process | Agent Collections | Checks the plan before you see it. Only a BLOCKER sends it back to Plan, at most three rounds. You approve the plan before Implement starts. |
+| Plan review | Role | Plan Reviewer | Runs the `eversis-review-plan` prompt and writes `*.plan-review.md`. Pi has no sub-agents, so this runs in the same session. |
+| Implement | Process | Agent Collections | Changes the code, then runs lint, typecheck and tests. |
+| Implement | Tools | edit, write, bash | — |
+| Implement | Skill | `.pi/skills/eversis-*` | Domain skills the plan calls for. |
+| Implement | Extension | `eversis-context-budget` | Compacts once at 50% and resumes the task. |
+| Review | Process | Agent Collections | Reports PASS, BLOCKER or SUGGESTION against the plan. BLOCKER goes back to Implement; PASS goes on to Fine. |
+| Review | Extension | `eversis-review` | Runs `/eversis-review` automatically in a separate, clean Pi session via the `eversis_independent_review` tool. |
+| Review | Command | `/new, then /eversis-review <ticket>` | Fallback when the separate session cannot start. |
+| Review | Skill | `eversis-rule-code-reviewer` | — |
+| Fine | Process | Agent Collections | Writes the QA comment draft in the same turn. You approve publishing. |
+| Fine | Skill | `eversis-fine-handoff` | — |
+| Fine | MCP | `atlassian` | Posts the comment only after approval. |
 
 ## When the process rules turn on
 

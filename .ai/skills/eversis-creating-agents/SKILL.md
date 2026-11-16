@@ -112,7 +112,7 @@ A rule under `.ai/rules/` reaches a host only through its `rule-map.yaml`. Packa
 
 Then run `npm run sync:adapters` and `npm run sync:adapters:check`.
 
-The sync check compares generated files with the maps; it does **not** report a rule file that no map lists. A rule left out of the maps is silently not emitted, so confirm the output exists (Step 10).
+The sync check compares generated files with the maps. It also fails, naming the file, on a `.ai/rules/**/*.md` file (other than `README.md`) that is neither a `source` in `adapters/cursor/rule-map.yaml` nor listed in `adapters/rules-not-emitted.yaml`. That list holds the rule files no host emits on purpose, each with a `reason`; add a rule there only when it must not reach any host. Still confirm the output exists (Step 10): the check does not show how each host activates the rule.
 
 **Step 10: Validate the agent file**
 
@@ -120,7 +120,7 @@ Verify the agent file against this checklist:
 - [ ] The file is `.ai/rules/<area>/<role>.md` without an `eversis-` prefix and without frontmatter
 - [ ] The Cursor map entry has a concise `description` and exactly one activation choice (`alwaysApply: true`, a `globs` list, or `globs: []` with `alwaysApply: false`)
 - [ ] All three `rule-map.yaml` files list the rule with the same `id` and `source`
-- [ ] `npm run sync:adapters:check` passes
+- [ ] `npm run sync:adapters:check` passes (it fails on a rule file that is neither in the maps nor in `adapters/rules-not-emitted.yaml`)
 - [ ] The rule appears in every host output: `.cursor/rules/eversis-<role>.mdc`; a `## eversis-<role>` section in `CLAUDE.md` or `.claude/rules/eversis-<role>.md`; and, for Pi with `target: skill`, `.pi/skills/eversis-rule-<role>/SKILL.md` (check with `node adapters/sync.mjs --agents cursor,claude,pi --out <tmp-dir>`)
 - [ ] Tool usage is documented in `<tool-usage>` (behavioral, not a Copilot tool manifest)
 - [ ] All skills referenced in `<skills-usage>` are existing skills in the project

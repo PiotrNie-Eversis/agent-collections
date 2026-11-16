@@ -16,10 +16,6 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
-  markdown: {
-    mermaid: true,
-  },
-
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
@@ -125,7 +121,6 @@ const config: Config = {
   ],
 
   themes: [
-    '@docusaurus/theme-mermaid',
     [
       '@easyops-cn/docusaurus-search-local',
       {
@@ -274,17 +269,7 @@ const config: Config = {
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
-    mermaid: {
-      theme: {
-        light: 'default',
-        dark: 'default',
-      },
-    },
-  } satisfies Preset.ThemeConfig & {
-    mermaid: {
-      theme: { light: 'default'; dark: 'default' };
-    };
-  },
+  } satisfies Preset.ThemeConfig,
 };
 
 export default config;

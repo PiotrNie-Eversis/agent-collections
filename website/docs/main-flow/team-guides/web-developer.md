@@ -32,11 +32,17 @@ The **Engineering Manager** (the framework's orchestrator role) posts a 4-line r
 
 ## How you connect to other roles
 
-```mermaid
-flowchart LR
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
+export const rolesFlow = `flowchart TD
     BA[Business Analyst] -->|Jira story + AC| WD[Web Developer]
-    WD -->|Implemented + Figma-verified UI| QA[QA Engineer]
-```
+    WD -->|Implemented + Figma-verified UI| QA[QA Engineer]`;
+
+<PeleDiagram
+  id="web-developer-roles"
+  source={rolesFlow}
+  label="How the Web Developer connects to other roles: the Business Analyst hands a Jira story with acceptance criteria to the Web Developer, and the Web Developer hands implemented, Figma-verified UI to the QA Engineer."
+/>
 
 | Your output | Goes to role | As artifact |
 | --- | --- | --- |

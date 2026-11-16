@@ -184,6 +184,19 @@ rules:
 3. Re-run must refresh generated files without hand-editing `.mdc` bodies.
 4. Replace symlink-only bootstrap in consumer/framework Cursor trees.
 
+### 4.4 Rule registry (`--check`)
+
+Every `.ai/rules/**/*.md` file except `README.md` must be either a `rules[].source` in this map or an entry in [`adapters/rules-not-emitted.yaml`](../../adapters/rules-not-emitted.yaml). `node adapters/sync.mjs --check` fails, naming the file, otherwise; without it, a rule left out of the maps is silently not emitted and the drift comparison still passes. The Claude and Pi maps follow from the id/source parity checks, so this map is the one compared.
+
+| Key (`adapters/rules-not-emitted.yaml`) | Required | Description |
+|-----|----------|-------------|
+| `version` | Yes | `1` |
+| `not_emitted` | Yes | List of rule files no host emits on purpose (may be `[]`) |
+| `not_emitted[].source` | Yes | Repo-relative path of an existing `.ai/rules/**/*.md` file that is not in this map |
+| `not_emitted[].reason` | Yes | Why the file is not emitted (for example a seed excerpt whose skill carries the content) |
+
+Only `adapters/sync.mjs` (via `adapters/lib/rule-registry.mjs`) reads the file; the generators do not.
+
 ---
 
 ## 5. Claude Code adapter mapping

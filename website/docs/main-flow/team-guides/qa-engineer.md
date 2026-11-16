@@ -32,11 +32,17 @@ State what you need — AC verification, a bug report, a test plan, or a quality
 
 ## How you connect to other roles
 
-```mermaid
-flowchart LR
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
+export const rolesFlow = `flowchart TD
     WD[Web/Backend Developer] -->|Implementation| QA[QA Engineer]
-    QA -->|Review result| PM[Project Manager]
-```
+    QA -->|Review result| PM[Project Manager]`;
+
+<PeleDiagram
+  id="qa-engineer-roles"
+  source={rolesFlow}
+  label="How the QA Engineer connects to other roles: the Web or Backend Developer hands the implementation to the QA Engineer, and the QA Engineer hands the review result to the Project Manager."
+/>
 
 | Your output | Goes to role | As artifact |
 | --- | --- | --- |

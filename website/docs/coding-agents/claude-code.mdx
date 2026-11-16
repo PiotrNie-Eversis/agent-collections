@@ -3,17 +3,64 @@ sidebar_position: 1
 title: Claude Code
 ---
 
-import AgentWorkflowDiagram from '@site/src/components/AgentWorkflowDiagram';
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
+export const claudeCycle = `flowchart TD
+    ticket(["Ticket or request"]) --> start["Start<br/>/eversis-implement<br/>CLAUDE.md rules"]
+    ticket -.-> ideate["Ideate (optional)<br/>/eversis-analyze-materials"]
+    ideate -.-> start
+    start --> research["Research<br/>Context Engineer sub-agent"]
+    research --> gate1{"You approve<br/>research"}
+    gate1 --> plan["Plan<br/>Architect sub-agent"]
+    plan --> planReview["Plan review<br/>Plan Reviewer checks the plan<br/>before you see it"]
+    planReview --> gate2{"You approve<br/>the plan"}
+    gate2 --> implement["Implement<br/>Software Engineer<br/>file edits and terminal"]
+    implement --> review["Review<br/>Code Reviewer sub-agent"]
+    review -- BLOCKER --> implement
+    review -- PASS --> fine["Fine<br/>eversis-fine-handoff<br/>atlassian MCP"]
+    fine --> gate3{"You approve<br/>publishing"}`;
 
 # Agent Collections in Claude Code
 
-Claude Code reads the process rules from `CLAUDE.md` on every session. The Engineering Manager role delegates research, planning, implementation and review to sub-agents, so review runs in a separate context by default.
+Claude Code reads the process rules from `CLAUDE.md` on every session. The Engineering Manager role delegates research, planning and code review to the role subagents (Context Engineer, Architect, Code Reviewer), so review runs in a separate context by default. Implementation is delegated with the `eversis-implement-common-task` prompt; it has no dedicated subagent file.
 
 ## The delivery cycle
 
 Each stage shows what the process does and which Claude Code tools do the work. Quick Flow can skip Research and Plan.
 
-<AgentWorkflowDiagram agent="claude" />
+<PeleDiagram
+  id="claude-code-cycle"
+  source={claudeCycle}
+  label="The delivery cycle in Claude Code. A ticket or request, optionally after Ideate with /eversis-analyze-materials, starts with /eversis-implement and the CLAUDE.md rules. The Context Engineer sub-agent writes research, and you approve it. The Architect sub-agent writes the plan, the Plan Reviewer checks it before you see it, and you approve the plan. The Software Engineer implements with file edits and the terminal. The Code Reviewer sub-agent reviews: a BLOCKER goes back to Implement, PASS goes on to Fine. Fine uses eversis-fine-handoff and the atlassian MCP, and you approve publishing."
+/>
+
+### Tools at each stage
+
+| Stage | Kind | Tool | Note |
+| --- | --- | --- | --- |
+| Ideate | Process | Agent Collections | Turns workshop materials into Jira-ready stories. |
+| Ideate | Command | `/eversis-analyze-materials` | Optional. Starts from workshop materials. |
+| Start | Process | Agent Collections | Prints the Implement readiness block and picks Quick or Full. |
+| Start | Command | `/eversis-implement <ticket>` | A thin pointer in `.claude/commands/` to the prompt in `.ai/prompts/`. |
+| Start | File | `CLAUDE.md` | Six rules, always on. |
+| Start | Rule | `.claude/rules/eversis-accessibility.md` | Loads for matching UI files. |
+| Research | Process | Agent Collections | Gathers context and writes `*.research.md`. You approve research before Plan starts. |
+| Research | Sub-agent | `eversis-context-engineer` | Context Engineer. Runs the `eversis-research` prompt. |
+| Research | Skill | `.claude/skills/eversis-orchestrating-implementation` | — |
+| Research | MCP | `eversis-collections`, `atlassian` | Skills, domain context and the ticket. |
+| Plan | Process | Agent Collections | Writes `*.plan.md` with phases and acceptance checks. |
+| Plan | Sub-agent | `eversis-architect` | Architect. Runs the `eversis-plan` prompt. |
+| Plan | Skill | `.claude/skills/eversis-creating-implementation-plans` | — |
+| Plan review | Process | Agent Collections | Checks the plan before you see it. Only a BLOCKER sends it back to Plan, at most three rounds. You approve the plan before Implement starts. |
+| Plan review | Role | Plan Reviewer | Runs the `eversis-review-plan` prompt and writes `*.plan-review.md`. There is no generated sub-agent file for this role: the Engineering Manager delegates it. |
+| Implement | Process | Agent Collections | Changes the code, then runs lint, typecheck and tests. |
+| Implement | Role | Software Engineer | Runs the `eversis-implement-common-task` prompt. There is no generated sub-agent file for this role: the Engineering Manager delegates it. |
+| Implement | Tools | file edits and terminal | — |
+| Review | Process | Agent Collections | Reports PASS, BLOCKER or SUGGESTION against the plan. BLOCKER goes back to Implement; PASS goes on to Fine. |
+| Review | Sub-agent | `eversis-code-reviewer` | Code Reviewer. Runs `eversis-review` in a separate context, in the same Implement run. It can read files and run checks, but has no edit tools and is read-only. |
+| Fine | Process | Agent Collections | Writes the QA comment draft in the same turn. You approve publishing. |
+| Fine | Skill | `.claude/skills/eversis-fine-handoff` | — |
+| Fine | MCP | `atlassian` | Posts the comment only after approval. |
 
 ## What gets installed
 
@@ -38,7 +85,7 @@ A subagent is a separate Claude Code worker with its own context that the main s
 | --- | --- | --- |
 | `eversis-context-engineer` | Research | Reads the research prompt, skill and template, then writes or updates the research file |
 | `eversis-architect` | Plan | Reads the plan prompt, skill and template, then writes or refreshes the implementation plan |
-| `eversis-code-reviewer` | Review | Reads the review prompt and skill, then reports PASS / BLOCKER / SUGGESTION. It can read files and run checks, but cannot edit anything |
+| `eversis-code-reviewer` | Review | Reads the review prompt and skill, then reports PASS / BLOCKER / SUGGESTION. It can read files and run checks, but has no edit tools and is read-only |
 
 A subagent cannot talk to you. When it has a question, or needs a file change it is not allowed to make (such as the reviewer's row in the plan Changelog), it puts that in its final message, and the Engineering Manager (the main session) asks you or makes the change. Approval gates stay with the main session.
 

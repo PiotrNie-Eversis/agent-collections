@@ -32,11 +32,17 @@ This is a directly runnable command — no plan required. It checks infrastructu
 
 ## How you connect to other roles
 
-```mermaid
-flowchart LR
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
+export const rolesFlow = `flowchart TD
     BD[Backend Developer] -->|Deployable change| DO[DevOps]
-    DO -->|Running infrastructure| PM[Project Manager]
-```
+    DO -->|Running infrastructure| PM[Project Manager]`;
+
+<PeleDiagram
+  id="devops-roles"
+  source={rolesFlow}
+  label="How DevOps connects to other roles: the Backend Developer hands a deployable change to DevOps, and DevOps hands running infrastructure to the Project Manager."
+/>
 
 | Your output | Goes to role | As artifact |
 | --- | --- | --- |

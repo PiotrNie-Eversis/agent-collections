@@ -21,7 +21,7 @@ You are helping the user add a **new role** to their agent setup (core under `.a
 1. Load **`eversis-creating-agents`** from `.ai/skills/eversis-creating-agents/SKILL.md` and follow its workflow.
 2. Read existing rules in **`.ai/rules/`** (and adapter packaging if present) to match tone, heading and section order.
 3. Propose a **single-purpose** rule file `.ai/rules/<area>/<role>.md` (neutral Markdown, no `eversis-` prefix — the adapters add it); avoid duplicating `eversis-agent-core`. Do not hand-write `.cursor/rules/*.mdc`.
-4. Register the rule in `adapters/cursor/rule-map.yaml`, `adapters/claude/rule-map.yaml` and `adapters/pi/rule-map.yaml` (same `id` and `source`; activation per host as in the skill's Step 9), then run `npm run sync:adapters` and `npm run sync:adapters:check`. The check does not report an unregistered rule, so confirm the rule appears in each host output.
+4. Register the rule in `adapters/cursor/rule-map.yaml`, `adapters/claude/rule-map.yaml` and `adapters/pi/rule-map.yaml` (same `id` and `source`; activation per host as in the skill's Step 9), then run `npm run sync:adapters` and `npm run sync:adapters:check`. The check fails on a rule file that no map lists (unless it is in `adapters/rules-not-emitted.yaml`); still confirm the rule appears in each host output.
 5. After authoring, self-review: activation (`alwaysApply` / `globs`) correct, `description` accurate, no conflicting always-on rules.
 6. If the user’s message is incomplete, ask clarifying questions before writing files.
 

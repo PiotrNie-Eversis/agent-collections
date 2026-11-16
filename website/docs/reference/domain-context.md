@@ -81,21 +81,24 @@ The setup above is written for rolling the framework out to a group's repos one 
 
 The constraint that shapes this is in [MCP Setup](./getting-started/mcp-setup#domain-context-needs-the-project-volume-not-just-the-framework-volume): the container's project volume is resolved from the working directory of whatever process starts it — one process, one repo's `docs/context/`. There is no session that reads or writes across several repos at once; that's a property of how the MCP server is invoked, not a missing setting.
 
-```mermaid
-flowchart TD
-    parent["Local parent folder\n(convenience only — never where\nyou launch an IDE / agent session)"] --> a["proj-a/ (git clone)"]
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
+export const groupSessionsFlow = `flowchart TD
+    parent["Local parent folder<br/>(convenience only — never where<br/>you launch an IDE / agent session)"] --> a["proj-a/ (git clone)"]
     parent --> b["proj-b/ (git clone)"]
     parent --> c["proj-c/ (git clone)"]
 
-    a -->|"cd proj-a/ -> its own session"| sa["Session 1\ncwd = proj-a/"]
-    b -->|"cd proj-b/ -> its own session"| sb["Session 2\ncwd = proj-b/"]
-    c -->|"cd proj-c/ -> its own session"| sc["Session 3\ncwd = proj-c/"]
+    a -->|"cd proj-a/ -><br/>its own session"| sa["Session 1<br/>cwd = proj-a/"]
+    b -->|"cd proj-b/ -><br/>its own session"| sb["Session 2<br/>cwd = proj-b/"]
+    c -->|"cd proj-c/ -><br/>its own session"| sc["Session 3<br/>cwd = proj-c/"]
 
-    dc[("domain-context")] -."same --ssot-source in all three,\neach synced independently".-> sa & sb & sc
+    dc[("domain-context")] -."same --ssot-source<br/>in all three,<br/>each synced<br/>independently".-> sa & sb & sc`;
 
-    style dc fill:#BBDEFB
-    style parent fill:#ECEFF1,stroke-dasharray: 3 3
-```
+<PeleDiagram
+  id="group-sessions"
+  source={groupSessionsFlow}
+  label="A local parent folder holds the git clones proj-a, proj-b and proj-c. It is for convenience only and is never where you launch an IDE or agent session. You change into each clone and start its own session there, so session 1 runs in proj-a, session 2 in proj-b and session 3 in proj-c. The same domain-context source, set with --ssot-source, feeds all three sessions, and each one syncs independently."
+/>
 
 Practical setup:
 
@@ -139,90 +142,81 @@ Decisions about the project index from Research through Fine. Each phase is its 
 
 The agent reads the project index first, then one matching component. Discovery of older task files is always allowed. This phase does not write the index.
 
-```mermaid
-%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
-flowchart TD
-    r0{"Domain knowledge needed?"}
-    r0 -->|no| rNo["Do not scan docs/context/. No index write."]
-    r0 -->|yes| rRead["Read INDEX.md, then one component"]
-    rRead --> rSpec{"Need history from docs/specs?"}
-    rSpec -->|names only| rDisc["Discovery is always allowed. File bodies stay unloaded."]
+export const researchFlow = `flowchart TD
+    r0{"Domain knowledge<br/>needed?"}
+    r0 -->|no| rNo["Do not scan docs/context/.<br/>No index write."]
+    r0 -->|yes| rRead["Read INDEX.md,<br/>then one component"]
+    rRead --> rSpec{"Need history<br/>from docs/specs?"}
+    rSpec -->|names only| rDisc["Discovery is always allowed.<br/>File bodies stay unloaded."]
     rSpec -->|full file| rCap["At most 1-2 files"]
-    rRead --> rSearch{"Full-text, semantic, or graph search?"}
-    rSearch -->|yes| rP6["Phase 6 is not built. The index read stays."]
-    rDisc --> rExit["Research does not write the project index"]
+    rRead --> rSearch{"Full-text, semantic,<br/>or graph search?"}
+    rSearch -->|yes| rP6["Phase 6 is not built.<br/>The index read stays."]
+    rDisc --> rExit["Research does not write<br/>the project index"]
     rCap --> rExit
     rP6 --> rExit
-    rNo --> rExit
+    rNo --> rExit`;
 
-    style rRead fill:#BBDEFB
-    style rNo fill:#ECEFF1
-    style rExit fill:#ECEFF1
-    style rDisc fill:#ECEFF1
-    style rCap fill:#ECEFF1
-    style rP6 fill:#ECEFF1
-```
+<PeleDiagram
+  id="research-index"
+  source={researchFlow}
+  label="Research and the project index: when no domain knowledge is needed, do not scan docs/context and write nothing to the index. When it is needed, read INDEX.md, then one component. History from docs/specs: discovery of names is always allowed and file bodies stay unloaded; full files are capped at one or two. Full-text, semantic or graph search is Phase 6, not built, so the index read stays. In every case, Research does not write the project index."
+/>
 
 #### Plan
 
 The project index stays unchanged. Implementation starts only after both research and the plan are approved.
 
-```mermaid
-%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
-flowchart TD
+export const planFlow = `flowchart TD
     p0{"Research approved?"}
     p0 -->|no| pStop["Stop. No code. No index write."]
     p0 -->|yes| p1{"Plan approved?"}
     p1 -->|no| pWait["Wait. Project index unchanged."]
-    p1 -->|yes| pGo["Start Implement. The plan does not write the project index."]
+    p1 -->|yes| pGo["Start Implement. The plan does not write the project index."]`;
 
-    style pStop fill:#ECEFF1
-    style pWait fill:#ECEFF1
-    style pGo fill:#ECEFF1
-```
+<PeleDiagram
+  id="plan-index"
+  source={planFlow}
+  label="Plan and the project index: if research is not approved, stop, with no code and no index write. If the plan is not approved, wait, and the project index stays unchanged. Once the plan is approved, Implement starts; the plan does not write the project index."
+/>
 
 #### Implement
 
 A checkpoint is a row in the plan changelog when this task is done and tested and later tasks remain. The same turn writes RESUMED and this session continues through the remaining tasks, Review, and Fine, unless the person asks to stop. The checkpoint does not update the project index.
 
-```mermaid
-%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
-flowchart TD
+export const implementFlow = `flowchart TD
     i0{"This task completed and tested?"}
     i0 -->|no| iWork["Keep working. No checkpoint. No index write."]
     i0 -->|yes| iMore{"Further plan tasks remain?"}
     iMore -->|no| iLast["Last task: no checkpoint. Continue to Review."]
     iMore -->|yes| iCkpt["CHECKPOINT row, then RESUMED in the same turn. This session continues. No index write."]
-    iCkpt --> iGo["Remaining tasks, then Review and Fine, unless the person asks to stop."]
+    iCkpt --> iGo["Remaining tasks, then Review and Fine, unless the person asks to stop."]`;
 
-    style iWork fill:#ECEFF1
-    style iCkpt fill:#ECEFF1
-    style iLast fill:#ECEFF1
-    style iGo fill:#ECEFF1
-```
+<PeleDiagram
+  id="implement-index"
+  source={implementFlow}
+  label="Implement and the project index: while the current task is not completed and tested, keep working, with no checkpoint and no index write. When it is done and it is the last task, there is no checkpoint and work continues to Review. When further plan tasks remain, write a CHECKPOINT row, then a RESUMED row in the same turn; the session continues with no index write, through the remaining tasks, Review and Fine, unless the person asks to stop."
+/>
 
 #### Review
 
 A blocker sends the work back for a fix. A pass moves on to Fine. Neither writes the project index.
 
-```mermaid
-%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
-flowchart TD
+export const reviewFlow = `flowchart TD
     v0{"Verdict?"}
     v0 -->|BLOCKER| vFix["Fix and review again. No index write."]
-    v0 -->|PASS| vPass["Review does not write the project index. Continue to Fine."]
+    v0 -->|PASS| vPass["Review does not write the project index. Continue to Fine."]`;
 
-    style vFix fill:#ECEFF1
-    style vPass fill:#ECEFF1
-```
+<PeleDiagram
+  id="review-index"
+  source={reviewFlow}
+  label="Review and the project index: on a BLOCKER verdict, fix and review again, with no index write. On PASS, Review does not write the project index and work continues to Fine."
+/>
 
 #### Fine — durable fact
 
 A new index row is written only when a future task would need this fact and the promotion draft is approved. Sharing it with the whole GitLab group is a later step and does not change this index.
 
-```mermaid
-%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
-flowchart TD
+export const fineFactFlow = `flowchart TD
     fFact{"Durable fact for a future task?"}
     fFact -->|no| fNoRow["No new row"]
     fFact -->|yes| fDraft{"Promotion draft approved?"}
@@ -230,72 +224,68 @@ flowchart TD
     fDraft -->|yes| fRow["Updates a project-index row"]
     fRow --> fGroup{"True for the whole GitLab group?"}
     fGroup -->|no| fLocal["Stays in this repo project index"]
-    fGroup -->|yes| fGlobal["Later publish to docs/context/global/. That step does not update the project index."]
+    fGroup -->|yes| fGlobal["Later publish to docs/context/global/. That step does not update the project index."]`;
 
-    style fRow fill:#C8E6C9
-    style fNoRow fill:#ECEFF1
-    style fHold fill:#ECEFF1
-    style fLocal fill:#ECEFF1
-    style fGlobal fill:#ECEFF1
-```
+<PeleDiagram
+  id="fine-fact-index"
+  source={fineFactFlow}
+  label="Fine, durable fact: with no durable fact for a future task, no new row is added. With one, nothing is written until the promotion draft is approved; after approval it updates a project-index row. If the fact is not true for the whole GitLab group, it stays in this repo's project index. If it is, a later step publishes it to docs/context/global/, and that step does not update the project index."
+/>
 
 #### Fine — audit count
 
 When the index already lists a component, Fine adds 1 to the audit count in the file header, even if no new row was written. An empty or missing index is left alone.
 
-```mermaid
-%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
-flowchart TD
+export const fineAuditFlow = `flowchart TD
     fCount{"INDEX.md already has a component row?"}
     fCount -->|yes| fInc["Add 1 to tasks_since_audit in the file header. Even when no new row was written. Not a column. Does not start an audit."]
-    fCount -->|no| fSkip["Do nothing. Do not create INDEX.md."]
+    fCount -->|no| fSkip["Do nothing. Do not create INDEX.md."]`;
 
-    style fInc fill:#C8E6C9
-    style fSkip fill:#ECEFF1
-```
+<PeleDiagram
+  id="fine-audit-count"
+  source={fineAuditFlow}
+  label="Fine, audit count: if INDEX.md already has a component row, add 1 to tasks_since_audit in the file header, even when no new row was written; it is not a column and it does not start an audit. If it has no component row, do nothing and do not create INDEX.md."
+/>
 
 #### Fine — As-Is Pack comment
 
 This is a separate close-out note about the product as it is now. It does not update the project index.
 
-```mermaid
-%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
-flowchart TD
+export const finePackFlow = `flowchart TD
     fPack{"Promotion draft has a confluence_url?"}
     fPack -->|yes| fAsis["As-Is Pack comment: a separate draft. Does not update the project index."]
-    fPack -->|no| fNoPack["No As-Is Pack comment"]
+    fPack -->|no| fNoPack["No As-Is Pack comment"]`;
 
-    style fAsis fill:#ECEFF1
-    style fNoPack fill:#ECEFF1
-```
+<PeleDiagram
+  id="fine-pack-comment"
+  source={finePackFlow}
+  label="Fine, As-Is Pack comment: if the promotion draft has a confluence_url, the As-Is Pack comment is a separate draft that does not update the project index. Without a confluence_url there is no As-Is Pack comment."
+/>
 
 ### Outside one ticket
 
 Add-a-fact, import, and architecture decisions. These are not a phase of one delivery.
 
-```mermaid
-%%{init: {'themeVariables': {'clusterBkg': 'transparent', 'primaryColor': 'transparent'}}}%%
-flowchart TD
-    a0{"Add-a-fact: a known durable fact, and no ticket is closing?"}
-    a0 -->|yes| a1{"Summary new or changed?"}
-    a1 -->|yes| aRow["Updates a project-index row"]
+export const outsideTicketFlow = `flowchart TD
+    a0{"Add-a-fact:<br/>a known durable fact,<br/>and no ticket is closing?"}
+    a0 -->|yes| a1{"Summary new<br/>or changed?"}
+    a1 -->|yes| aRow["Updates a<br/>project-index row"]
     a1 -->|no| aSame["Row unchanged"]
 
-    m0{"Import: a person asks to seed one As-Is Pack page?"}
-    m0 -->|yes| mRow["Updates a row and writes the component file"]
+    m0{"Import: a person<br/>asks to seed one<br/>As-Is Pack page?"}
+    m0 -->|yes| mRow["Updates a row<br/>and writes the<br/>component file"]
     m0 -->|no| mNo["Import does not run"]
 
-    d0{"Recording how the system is built?"}
-    d0 -->|yes| dFile["docs/decisions/INDEX.md. Not a project-index row."]
+    d0{"Recording how<br/>the system is built?"}
+    d0 -->|yes| dFile["docs/decisions/INDEX.md.<br/>Not a project-index row."]`;
 
-    style aRow fill:#C8E6C9
-    style mRow fill:#C8E6C9
-    style aSame fill:#ECEFF1
-    style mNo fill:#ECEFF1
-    style dFile fill:#ECEFF1
-```
+<PeleDiagram
+  id="outside-ticket-index"
+  source={outsideTicketFlow}
+  label="Writes outside one ticket. Add-a-fact, for a known durable fact when no ticket is closing: a new or changed summary updates a project-index row, otherwise the row stays unchanged. Import, when a person asks to seed one As-Is Pack page: it updates a row and writes the component file; otherwise import does not run. Recording how the system is built goes to docs/decisions/INDEX.md, not to a project-index row."
+/>
 
-**Legend:** green updates the project index (a row, or `tasks_since_audit` in the file header); blue is a read of that index; gray does not update it. The Implement checkpoint is a completed-and-tested task while further plan tasks remain. The same turn writes RESUMED and the session continues. It does not update the project index, and it is not a window-fill check and not an exchange-count check.
+**Legend:** a step that updates the project index (a row, or `tasks_since_audit` in the file header) says so in its label; every other step only reads the index or leaves it unchanged. The Implement checkpoint is a completed-and-tested task while further plan tasks remain. The same turn writes RESUMED and the session continues. It does not update the project index, and it is not a window-fill check and not an exchange-count check.
 
 ## Tools and skills
 

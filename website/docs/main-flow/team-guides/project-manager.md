@@ -31,12 +31,18 @@ There's no single command to run. Your first concrete step is a **gate review**,
 
 ## How you connect to other roles
 
-```mermaid
-flowchart LR
+import PeleDiagram from '@site/src/components/PeleDiagram';
+
+export const rolesFlow = `flowchart TD
     BA[Business Analyst] -->|Backlog| PM[Project Manager]
     PM -->|Approved plan| EM[Engineering Manager]
-    EM -->|Draft QA comment| PM
-```
+    EM -->|Draft QA comment| PM`;
+
+<PeleDiagram
+  id="project-manager-roles"
+  source={rolesFlow}
+  label="How the Project Manager connects to other roles: the Business Analyst hands the backlog to the Project Manager. The Project Manager hands an approved plan to the Engineering Manager, who returns a draft QA comment."
+/>
 
 | Your output | Goes to role | As artifact |
 | --- | --- | --- |
