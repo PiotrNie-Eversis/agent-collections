@@ -1,5 +1,5 @@
 /**
- * Tests for adapters/pi/assets/eversis-context-budget.ts (AC-14).
+ * Tests for adapters/pi/assets/eversis-context-budget.ts.
  * Imports the .ts asset directly via Node's native type stripping
  * (Node >= 22.18; dev-only — the installer itself keeps Node >= 18).
  *

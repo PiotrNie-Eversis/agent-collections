@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Pi load check (AC-138).
+ * Pi load check.
  *
  * Proves that the Pi coding agent on PATH loads the `.pi/` tree the framework
  * installer writes, and names what it dropped. Steps:
@@ -450,7 +450,7 @@ function writeExecutable(file, content) {
 
 /** Installer-only stub: answers `compose … config --images` and `image inspect`. */
 const INSTALL_DOCKER_STUB = `#!/bin/sh
-# AC-138 pi-load-check: stub docker for the installer only (no real image is built).
+# pi-load-check: stub docker for the installer only (no real image is built).
 case "$*" in
   *"config --images"*) echo "eversis-collections:stub" ;;
 esac
@@ -459,7 +459,7 @@ exit 0
 
 /** Pi-time stub: every docker call fails, so no MCP container is ever started. */
 const PI_DOCKER_STUB = `#!/bin/sh
-# AC-138 pi-load-check: docker always fails while Pi runs (no MCP containers).
+# pi-load-check: docker always fails while Pi runs (no MCP containers).
 echo "docker disabled by pi-load-check" >&2
 exit 1
 `;

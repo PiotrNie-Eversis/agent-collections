@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # scripts/lib/release-paths.sh — shared helpers for the work-only path list.
 #
-# Sourced by scripts/release-to-master.sh and .githooks/pre-commit. The list of
+# Sourced by scripts/release-to-master.sh (copy mode: sorts each commit into
+# core / work-only; --snapshot: filters the tree), scripts/check-release-tree.sh
+# and .githooks/pre-commit. The list of
 # work-only paths lives in <repo>/.release-exclude (one git pathspec per line);
 # these helpers read it and report which files in a tree or in the index match.
 # Callers must run from inside the repository.

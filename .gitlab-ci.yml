@@ -2,9 +2,11 @@
 #
 # master is production and must contain only the framework core (see
 # scripts/README.md, "Branches and releases"). Pushes to master are limited to
-# Maintainers by branch protection; this job additionally fails the master
-# pipeline when a commit carries work-only paths from .release-exclude
-# (e.g. a direct push made without the local .githooks/pre-commit hook).
+# Maintainers by branch protection; master changes through
+# scripts/release-to-master.sh (copied core commits, or a --snapshot repair
+# commit). This job additionally fails the master pipeline when a commit
+# carries work-only paths from .release-exclude (e.g. a direct push made
+# without the local .githooks/pre-commit hook).
 # It detects and alerts — it cannot reject the push itself.
 #
 # verify stage (AC-138): the Pi load check (scripts/pi-load-check.mjs) installs
@@ -60,6 +62,7 @@ master-work-only-paths:
     # Unit tests import the .ts extensions: they need Node >= 22.18. The
     # integration test uses a local stub model, with no keys and no real provider.
     - node --test 'adapters/pi/*.test.mjs'
+    - node --test 'adapters/lib/*.test.mjs'
     - node --test adapters/pi/process-rules.integration.mjs
 
 # Pinned Pi on framework changes. Each rule names its pipeline source, because
@@ -73,6 +76,7 @@ pi-load-check:pinned:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes: &pi-load-check-paths
         - adapters/pi/**/*
+        - adapters/lib/**/*
         - .ai/prompts/**/*
         - .ai/skills/**/*
         - .ai/rules/**/*

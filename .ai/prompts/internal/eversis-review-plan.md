@@ -9,7 +9,7 @@ upstream_agent: "eversis-plan-reviewer"
 # eversis-review-plan
 
 :::info
-Not invoked directly by users. To trigger plan validation, use [eversis-implement](../public/eversis-implement.md) — the Engineering Manager delegates to the Plan Reviewer after the Architect produces or updates a plan (unless an approved `.plan-review.md` already exists and the plan is unchanged).
+Not invoked directly by users. To trigger plan review, use [eversis-implement](../public/eversis-implement.md) — the Engineering Manager delegates to the Plan Reviewer after the Architect produces or updates a plan (unless a `.plan-review.md` with verdict `APPROVED`, or `REVISIONS NEEDED` with no BLOCKER finding, already exists and the plan is unchanged).
 :::
 
 **Agent:** Plan Reviewer 
@@ -24,7 +24,7 @@ eversis-implement
 <JIRA_ID or task description>
 ```
 
-The Engineering Manager attaches this internal prompt after the Architect creates or updates a `.plan.md` file and the human has reviewed the plan draft. Skip when `<key>-<topic>.plan-review.md` exists with verdict `APPROVED` and the plan file is unchanged since that review.
+The Engineering Manager attaches this internal prompt after the Architect creates or updates a `.plan.md` file and it passes the structure check, before the person approves the plan; the review summary is shown at the plan gate. Skip when `<key>-<topic>.plan-review.md` exists with verdict `APPROVED`, or `REVISIONS NEEDED` with no BLOCKER finding, and the plan file is unchanged since that review.
 
 ## What It Does
 
@@ -33,7 +33,7 @@ The Engineering Manager attaches this internal prompt after the Architect create
 3. Runs challenge-domain, failure-mode, assumption, codebase-reality, and sequencing passes.
 4. Surfaces substantive execution risks (target 5–10 when evidence supports them).
 5. Saves a failure-oriented review report with binary verdict `APPROVED` or `REVISIONS NEEDED`.
-6. On `REVISIONS NEEDED`, returns findings to the Architect for revision (max **3** review iterations, then escalate to the human).
+6. Another review round starts only on BLOCKERs: the findings go back to the Architect for revision (max **3** review iterations, then escalate to the human). `REVISIONS NEEDED` without BLOCKERs goes to the plan gate summary.
 
 ## Skills Loaded
 

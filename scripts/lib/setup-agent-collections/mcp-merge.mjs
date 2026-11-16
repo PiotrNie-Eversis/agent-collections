@@ -14,7 +14,7 @@ const selectedCsv = process.env.MCP_SELECTED_IDS ?? '';
 const templatePath = process.env.MCP_TEMPLATE_PATH;
 const serverListPath = process.env.MCP_SERVER_LIST_PATH;
 // Set by load_selection_or_fail when an install record is reused without an
-// explicit --mcp-servers (AC-99). Anything but "true" (incl. unset) keeps the
+// explicit --mcp-servers. Anything but "true" (incl. unset) keeps the
 // replace/prune behaviour that fresh installs and explicit refreshes rely on.
 const preserveExisting = process.env.MCP_PRESERVE_EXISTING === 'true';
 
@@ -71,7 +71,7 @@ const regenerateEversis =
 if (regenerateEversis) {
   const composeFile = 'docker-compose.yml';
   if (host === 'pi') {
-    // Pi (AC-14) expands ${VAR} only in env / headers — never in command /
+    // Pi expands ${VAR} only in env / headers — never in command /
     // args — has no ${workspaceFolder} and never sets CLAUDE_PROJECT_DIR. Stdio
     // servers inherit the session directory, which may be a subdirectory, so a
     // bash -c locator walks up from $PWD to the nearest directory containing
@@ -274,6 +274,27 @@ if (preserveExisting) {
   mergedServers = { ...kept, ...picked };
 }
 
+// Atlassian removes the v1 endpoint on 2027-03-01. This is the one
+// exception to preserve mode besides eversis-collections: an atlassian entry
+// whose url is exactly the old framework default moves to v2, every other key
+// (type, env, headers, …) is kept. Any other URL (self-hosted proxy, already
+// v2, hand-edited) is left alone.
+const ATLASSIAN_V1_URL = 'https://mcp.atlassian.com/v1/mcp';
+const ATLASSIAN_V2_URL = 'https://mcp.atlassian.com/v2/mcp';
+const atlassianEntry = mergedServers.atlassian;
+if (
+  atlassianEntry &&
+  typeof atlassianEntry === 'object' &&
+  !Array.isArray(atlassianEntry) &&
+  atlassianEntry.url === ATLASSIAN_V1_URL
+) {
+  mergedServers.atlassian = { ...atlassianEntry, url: ATLASSIAN_V2_URL };
+  // Host and id only — never config values (env may hold tokens).
+  console.error(
+    `[mcp-merge] ${host}: atlassian URL moved from v1 to v2 — authorize the Atlassian connection again`,
+  );
+}
+
 const ALLOWED_TOP = new Set(['mcpServers', 'inputs']);
 const cleanedTop = {};
 for (const [key, value] of Object.entries(existing)) {
@@ -294,7 +315,7 @@ const result = {
 if (host === 'claude' || host === 'pi') {
   // Claude Code's .mcp.json ignores "inputs" (a VS Code/Cursor-only key) —
   // drop it even if it survived from a pre-existing hand-edited file.
-  // Pi's .pi/mcp.json has no "inputs" key either (AC-14).
+  // Pi's .pi/mcp.json has no "inputs" key either.
   delete result.inputs;
 }
 

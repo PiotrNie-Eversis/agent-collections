@@ -2,7 +2,7 @@
 
 **Status:** Canonical (committed)  
 **Story:** Work Stream 3 / Story 3.1  
-**Audience:** Implementers of synchronized ignore files, monorepo area globs, install profiles (5.x), and later WNF-03 validation
+**Audience:** Implementers of synchronized ignore files, monorepo area globs, install profiles, and later WNF-03 validation
 
 This document is the **single source of truth** for how Agent Collections isolates AI context in multi-tool, multi-area monorepos. It defines **what each tool indexes or excludes**, how **area profiles** map to path globs, and how to target **context reduction without losing project orientation**.
 
@@ -29,7 +29,7 @@ Monorepo (abstract reference layout)
         └───────┬───────┴───────┬───────┘
                 ▼               ▼
       Installed agent(s) — any combination
-      (Cursor and/or Claude Code and/or OpenCode placeholder)
+      (Cursor and/or Claude Code and/or Pi and/or OpenCode placeholder)
       + cross-tool ignore when more than one tool is present
 ```
 
@@ -70,13 +70,15 @@ Consumers rename folders freely. Map local names onto the abstract classes above
 
 When a tool is **installed**, it indexes its **own** packaging and must **exclude** packaging owned by other tools (and always exclude secrets/build). Exact ignore syntax lands in the ignore triad (§8.1); classes below are the contract.
 
-| Path class | Cursor | Claude Code | OpenCode (placeholder) |
-|------------|--------|-------------|------------------------|
-| `.cursor/**` (rules, commands, prompts mirrors if any) | **Index** (own) | **Exclude** | **Exclude** |
-| Root `CLAUDE.md` and Claude-only config fragments | **Exclude** | **Index** (own) | **Exclude** |
-| `opencode.json` / `opencode.jsonc`, `adapters/opencode/**` | **Exclude** | **Exclude** | **Index** (own) |
-| Secrets / build / `node_modules` / large artifacts | **Exclude** | **Exclude** | **Exclude** |
-| Application trees (`apps/**`, `packages/**`) | Per **area profile** (§5), not per tool brand | Same | Same (plus `instructions` → `.ai/rules` as configured) |
+| Path class | Cursor | Claude Code | OpenCode (placeholder) | Pi |
+|------------|--------|-------------|------------------------|----|
+| `.cursor/**` (rules, commands, prompts mirrors if any) | **Index** (own) | **Exclude** | **Exclude** | deferred (AC-113) |
+| Root `CLAUDE.md` and Claude-only config fragments | **Exclude** | **Index** (own) | **Exclude** | deferred (AC-113) |
+| `opencode.json` / `opencode.jsonc`, `adapters/opencode/**` | **Exclude** | **Exclude** | **Index** (own) | deferred (AC-113) |
+| Secrets / build / `node_modules` / large artifacts | **Exclude** | **Exclude** | **Exclude** | deferred (AC-113) |
+| Application trees (`apps/**`, `packages/**`) | Per **area profile** (§5), not per tool brand | Same | Same (plus `instructions` → `.ai/rules` as configured) | deferred (AC-113) |
+
+**Pi:** no Pi ignore file ships yet (deferred, AC-113), so the Pi column has no rule today.
 
 **Single-tool install:** only that tool’s packaging row applies; still apply secrets/build excludes and the chosen area profile.
 
@@ -175,19 +177,19 @@ Reduction must **cut noise**, not erase project orientation. Keep a small, dense
 
 **Scope of the framework-repo triad:** §4 cross-tool packaging + secrets/build only. **Heavy-infra** (§6) and abstract `apps/**` area excludes are **not** in the root triad (consumer follow-up — see §8.2). Align §6 defaults in consumer profiles or later templates when ignore is the right mechanism.
 
-**Installer contract (5.2 / Q5):** Framework classes are merge-friendly (labeled sections). A future installer **merges missing** framework entries into consumer ignore files and **must not wipe** consumer-owned content without explicit opt-in (same rule as project-owned stack files).
+**Installer contract (5.2 / Q5):** Framework classes are merge-friendly (labeled sections). The installer (`scripts/lib/setup-agent-collections/merge-ignore-triad.mjs`) **merges missing** framework entries into consumer ignore files for the selected tools, inside an `# agent-collections framework [begin]` / `[end]` block, and **must not wipe** consumer-owned content without explicit opt-in (same rule as project-owned stack files). Area-profile excludes are merged the same way (`apply-area-ignore.mjs`, `# agent-collections area-scope` block).
 
 **Claude Code enforcement caveat:** `.claudeignore` is **not** read by Claude Code — it is not a supported ignore file for that tool (tracked upstream: [#579](https://github.com/anthropics/claude-code/issues/579), [#4160](https://github.com/anthropics/claude-code/issues/4160), [#29455](https://github.com/anthropics/claude-code/issues/29455)). For Claude Code, `.claudeignore` now serves as the **class source of truth only** — the installer's `merge_claude_settings` reads it and regenerates `permissions.deny` in `.claude/settings.json` on every run (see `scripts/lib/setup-agent-collections/claude-settings-merge.sh` / `.mjs`), which is the mechanism Claude Code actually enforces (a hard tool-use denial, not a context-loading filter).
 
 #### Required class checklist (sync across the triad)
 
-| Class | `.cursorignore` | `.claudeignore` | `.opencodeignore` |
-|-------|-----------------|-----------------|-------------------|
-| Secrets / build (`node_modules/`, `dist/`, `build/`, `.env*`, keys, …) | Exclude | Exclude | Exclude |
-| `.cursor/` | *(own — do not exclude)* | Exclude | Exclude |
-| `CLAUDE.md` | Exclude | *(own — do not exclude)* | Exclude |
-| `opencode.json` / `opencode.jsonc`, `adapters/opencode/` | Exclude | Exclude | *(own — do not exclude)* |
-| Heavy-infra / `apps/**` area paths | **Absent** in framework root | **Absent** | **Absent** |
+| Class | `.cursorignore` | `.claudeignore` | `.opencodeignore` | Pi |
+|-------|-----------------|-----------------|-------------------|----|
+| Secrets / build (`node_modules/`, `dist/`, `build/`, `.env*`, keys, …) | Exclude | Exclude | Exclude | deferred (AC-113) |
+| `.cursor/` | *(own — do not exclude)* | Exclude | Exclude | deferred (AC-113) |
+| `CLAUDE.md` | Exclude | *(own — do not exclude)* | Exclude | deferred (AC-113) |
+| `opencode.json` / `opencode.jsonc`, `adapters/opencode/` | Exclude | Exclude | *(own — do not exclude)* | deferred (AC-113) |
+| Heavy-infra / `apps/**` area paths | **Absent** in framework root | **Absent** | **Absent** | deferred (AC-113) |
 
 Implementer check: after edits, confirm the three files still encode the same classes (not necessarily identical line text).
 ### 8.2 Monorepo area glob scoping
@@ -216,9 +218,9 @@ Deliver profile-driven path scoping that:
 |------|--------|
 | This document (`isolation-strategy.md`) | Canonical isolation strategy specification |
 | Root ignore triad materialization | **done** (root triad + §8.1 checklist) |
-| Live monorepo path globs / profile wiring | Follow-up (§8.2) |
+| Live monorepo path globs / profile wiring | Profile wiring **done** in the installer (`area-scope.sh`, `apply-area-ignore.mjs`, `adapters/profiles/area-*.yaml`); live path globs in rule maps: follow-up (§8.2) |
 | Changing `adapters/*/rule-map.yaml` for path globs in this story | **Out of scope** |
-| Installer / wizard | **5.x** |
+| Installer / wizard | **done** (`scripts/setup-agent-collections.sh`) |
 | Embedding internal project names in framework docs | **Forbidden** (§2) |
 
 ---

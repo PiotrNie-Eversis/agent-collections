@@ -1,16 +1,16 @@
 ---
 name: eversis-creating-skills
 description: "Create new Agent Skills (SKILL.md) under .ai/skills/eversis-*. Provides naming (gerund), description, body structure, progressive disclosure, templates, validation. For Agent Collections."
-user-invokable: false
+user-invocable: false
 ---
 
 # Creating skills
 
 Creates well-structured **skill packages** (`SKILL.md`) for **Agent Collections** (and compatible hosts / adapters). Skills live under **`.ai/skills/eversis-<gerund>/SKILL.md`** in this monorepo. Enforce naming, structure, and progressive disclosure per the same conventions as the broader Agent Skills ecosystem.
 
-**Consumption in this framework:** skills are consumed through the current host's native mechanism (e.g. Claude Code discovers `.ai/skills/eversis-*` natively via symlinked `.claude/skills/`, no MCP involved), or through the **`eversis-collections` MCP** server under **`mcp/eversis-collections-mcp/`** (build with `npm install && npm run build`, then enable it via `.cursor/mcp.json`) and its **`eversis_skills_*` tools** — which channel applies depends on the adapter in use.
+**Consumption in this framework:** skills are consumed through the current host's native mechanism (e.g. Claude Code discovers `.ai/skills/eversis-*` natively via symlinked `.claude/skills/`, no MCP involved), or through the **`eversis-collections` MCP** server under **`mcp/eversis-collections-mcp/`** (runs through Docker Compose; the installer adds it to the host MCP config: `.cursor/mcp.json`, `.mcp.json` or `.pi/mcp.json`) and its **`eversis_skills_*` tools** — which channel applies depends on the adapter in use.
 
-When a skill needs **deterministic automation** (e.g. validation, code generation), add a script under that skill’s `scripts/` and register a **narrow** allowlist entry in [`mcp/eversis-collections-mcp/`](../../../mcp/eversis-collections-mcp/) (exposed as **`eversis_skill_run_script`**) so the agent invokes execution instead of re-deriving steps from text. This skill’s example is script key **`eversis-creating-skills-skill-md-stats`** (JSON line counts and frontmatter flag for this folder’s `SKILL.md`). Run **`eversis_skills_validate`** in CI (see repository workflow **`eversis_skills_validate`**) or `npm run validate` in the MCP package.
+When a skill needs **deterministic automation** (e.g. validation, code generation), add a script under that skill’s `scripts/` and register a **narrow** allowlist entry in [`mcp/eversis-collections-mcp/`](../../../mcp/eversis-collections-mcp/) (exposed as **`eversis_skill_run_script`**) so the agent invokes execution instead of re-deriving steps from text. This skill’s example is script key **`eversis-creating-skills-skill-md-stats`** (JSON line counts and frontmatter flag for this folder’s `SKILL.md`). Validate skills with the **`eversis_skills_validate`** MCP tool, or locally with `npm run mcp:build` then `npm --prefix mcp/eversis-collections-mcp run validate` (add `-- --strict` to fail on warnings). No CI job runs it today.
 
 ## Core Design Principles
 
@@ -218,6 +218,21 @@ description: "Processes data from various sources."
 
 </description-guidelines>
 
+### Optional: hide the skill from the `/` menu (`user-invocable`)
+
+Add `user-invocable: false` to the frontmatter when the person should not call the skill by hand.
+
+- **Effect:** Claude Code (and VS Code `.agent.md`) hides the skill from the person's `/` menu and refuses `/name`. The model can still load the skill.
+- **Default:** `true`. Omit the key for normal skills.
+- **Use it for:** agent-only skills, such as orchestration, template owners and sub-skills.
+- **Not the same as `disable-model-invocation`:** that key blocks the model from loading the skill, which is the opposite intent.
+- **Hosts:** Cursor and Pi do not read this key.
+- **Not access control:** the skill stays listed and readable; the flag only hides it from the menu.
+
+```yaml
+user-invocable: false
+```
+
 **Step 4: Write the skill body**
 
 The Markdown body after the frontmatter contains the skill instructions. There are no strict format restrictions — write whatever helps the agent perform the task effectively.
@@ -307,6 +322,7 @@ Validation:
 - [ ] Frontmatter: `description` describes WHAT the skill does and WHEN to use it
 - [ ] Frontmatter: `description` is in third person (no "I", "you", "we")
 - [ ] Frontmatter: `description` includes specific trigger keywords
+- [ ] Frontmatter: to hide the skill from the `/` menu, the key is spelled exactly `user-invocable: false` (omit it otherwise)
 - [ ] Body: Under 500 lines total
 - [ ] Body: Introduction is 1-2 sentences
 - [ ] Body: Process/workflow has a trackable checklist

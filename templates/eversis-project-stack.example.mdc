@@ -28,7 +28,7 @@ Run from the **repo root** unless noted.
 
 ## Conventions
 
-- **Agent entry:** [AGENTS.md](../../AGENTS.md)
+- **Agent entry:** `AGENTS.md` (repository root)
 - **Framework:** Agent Collections (`.ai/` SSOT; MCP `eversis-collections`)
 - **Specs / plans:** `docs/specs/<key>-<topic>/` — `<key>-<topic>.research.md`, `<key>-<topic>.plan.md`
 

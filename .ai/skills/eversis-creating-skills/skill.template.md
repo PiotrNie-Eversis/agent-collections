@@ -28,6 +28,8 @@ description: "<What the skill does — core capabilities>. <When to use it — t
 #   author: your-org
 #   version: "1.0"
 # allowed-tools: Bash(git:*) Read
+# Hide from the person's / menu (Claude Code); default true, omit for normal skills:
+# user-invocable: false
 ---
 
 <!-- GUARD: This file defines HOW to perform a specific task. Do NOT define

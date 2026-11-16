@@ -77,15 +77,15 @@ Recommend Quick Flow or Full Flow in chat with a short reason, and allow the use
 
 #### Spec folder lookup
 
-When Implement or research starts from a ticket key, lowercase the key first (`AC-2` becomes `ac-2`) and resolve the spec folder as follows.
+When Implement or research starts from a ticket key, lowercase the key first (`PROJ-123` becomes `proj-123`) and resolve the spec folder as follows.
 
 1. If `docs/specs/<key>/` exists, use it. Sibling folders named `<key>-*` do not raise a question and do not cause a second folder to be created.
-2. Otherwise a hit is a directory whose name equals `<key>` or starts with `<key>-`. `ac-20` is not a hit for `ac-2`.
+2. Otherwise a hit is a directory whose name equals `<key>` or starts with `<key>-`. `proj-1230` is not a hit for `proj-123`.
 3. One hit: use that folder. Do not create `docs/specs/<key>/`.
 4. Two or more hits: stop and ask which folder. Do not pick in silence and do not create a third folder.
 5. Zero hits: create `docs/specs/<key>-<topic>/`. `<topic>` is at most three hyphen-separated words. Research and plan file names repeat the folder name.
 
-The canonical example is `docs/specs/ac-2-context-management/` with `ac-2-context-management.research.md` and `ac-2-context-management.plan.md`. A name that puts the topic before the key is not the pattern.
+The canonical example is `docs/specs/proj-123-context-management/` with `proj-123-context-management.research.md` and `proj-123-context-management.plan.md`. A name that puts the topic before the key is not the pattern.
 
 #### Implement readiness (mandatory first output)
 
@@ -114,7 +114,7 @@ Before creating artifacts, delegating, or writing product code, resolve the fold
 
 A declared `Next gate` closes only when the user's next message **directly responds to that specific gate** — not merely because the user replied to something else in the thread (e.g., locking research Gap Analysis answers closes the *research* gate, not a later Plan or Quick Flow gate).
 
-- **Once a `Next gate` is declared, stop — every time, not only for Quick Flow reclassification.** Do not perform any implementation action, file edit, delegation, or further workflow progression in that same turn or response, regardless of what user message initiated this turn — including a message that correctly triggered writing the very artifact the new gate now covers (e.g., an instruction to write a plan is not retroactive approval to implement it once written). Applies to every declared gate in a thread (Plan, code, Quick Flow acceptance, review→Fine), not only the readiness block in the first response.
+- **Once a `Next gate` is declared, stop — every time, not only for Quick Flow reclassification.** Do not perform any implementation action, file edit, delegation, or further workflow progression in that same turn or response, regardless of what user message initiated this turn — including a message that correctly triggered writing the very artifact the new gate now covers (e.g., an instruction to write a plan is not retroactive approval to implement it once written). Under a readiness `Next gate`, preparing the artifact that gate covers (research file; plan, structure check and plan review, Planning sequence steps 4–9) is not progression; see `#### Rules`. Applies to every declared gate in a thread (Plan, code, Quick Flow acceptance, review→Fine), not only the readiness block in the first response.
 - Treat only an explicit answer to the declared gate, arriving in the user's **next** turn *after* that gate was declared, as the acceptance signal — not silence, not an unrelated reply, not a message sent before the gate existed, not the absence of objection.
 - **When the self-check's answer isn't a clean yes, ask before proceeding — but only for a plausible-but-uncertain approval attempt, not for every non-approval message.** If the user's reply could plausibly be read as approval but isn't unambiguous, do not infer approval from that plausible reading — ask the user an explicit clarifying question (the current environment's interactive-question mechanism where one is available, or a plain clarifying chat message otherwise) before treating the gate as closed. This does **not** apply to replies that are clearly something else — an answered question, a requested change to the plan/research, a clarification, or ordinary discussion. Handle those directly (answer, edit, discuss) and leave the gate open for a later, genuine closing reply — do not additionally ask "are you approving?" when it's already obvious the reply wasn't an approval attempt at all.
 
@@ -150,14 +150,17 @@ Write or update `*.research.md` in the **same session** before ending the turn. 
 
 - **SKIP** only when existing `*.research.md` / `*.plan.md` **adequately covers the current scope** (adequacy checklist passed), not merely because the file exists.
 - **CREATE** when no adequate artifact exists for the current scope.
-- **DELTA** when research exists but scope grew, the file addresses a **different** bugfix iteration, or the adequacy checklist fails — **update the research file** (Changelog + new section) in the same session; chat-only notes are insufficient except for trivial documentation typos.
+- **DELTA** when research exists but scope grew, the file addresses a **different** bugfix iteration, or the adequacy checklist fails — **update the research file** (Changelog + new section) in the same session; chat-only notes are insufficient except for trivial documentation typos. The Changelog row goes in the `## Changelog` section of the research template (`research.example.md`).
 - **REFRESH** when the plan exists but does not cover the current fix.
-- **Proceeding** is allowed when artifacts are ready **and** the user attached an approved plan, gave a QA fix list, or explicitly asked to implement; otherwise use **Awaiting approval** (before plan or before code as appropriate).
+- **Proceeding** is allowed when artifacts are ready **and** the user attached an approved plan, gave a QA fix list, or explicitly asked to implement; otherwise use **Awaiting approval** (before plan or before code as appropriate). In Full Flow, read this together with Planning sequence step 13: an approved plan is a plan with a valid `## Human gates` record for the unchanged plan; "explicitly asked to implement" means an explicit request to implement this specific plan (for example "implement this plan"), which counts as approval of the current, unchanged plan in this thread and is recorded in `## Human gates` with the literal quote. Attaching or pointing to a plan file alone is not approval: with no valid record, readiness shows `Awaiting approval before code` and the step 13 recovery gate fires.
+- **Next gate timing** — The readiness `Next gate` names the gate this turn ends at; preparing the artifact that gate covers (research file; plan, structure check and plan review) is part of reaching it, not acting on it. In Full Flow with `Plan: CREATE` or `REFRESH`, `Awaiting approval before code` covers Planning sequence steps 4–9 in the same turn, and the stop comes with the step 10 message. Relaying questions the Architect handed back, or a review escalation, declares no new `Next gate`: the declared one stays open, and answers are not plan approval.
 - **Consumer project rules** (e.g. project-specific Jira bugfix supplements) **extend** this workflow — they do **not** override the readiness block, adequacy checklist, or human gates.
 
 #### Research artifact (same session)
 
 When readiness shows **Research: CREATE** or **DELTA**, the turn MUST end with an updated `*.research.md` on disk. The EM may run the `eversis-research` procedure inline in the same turn; deferring the file to a later turn without user approval is a workflow breach.
+
+Before the research gate, run `scripts/validate-spec-artifacts.mjs` on the research file. Show the person only a passing file, or the gaps that remain after your fixes. When the host runs the validator automatically after file edits, still run it explicitly when the file was written another way (shell command, external tool).
 
 ### Step 2 - Write the upfront execution plan
 
@@ -201,26 +204,52 @@ Check the current state before creating or executing any plan.
 | `*.research.md` | It exists for the current task, **passes the adequacy checklist**, and contains enough context for the current scope | Delegate to **Context Engineer** with [`eversis-research.md`](../../../.ai/prompts/internal/eversis-research.md) or DELTA update |
 | `*.plan.md` | It exists for the current task and contains ordered, actionable tasks that can be delegated | Delegate to **Architect** with [`eversis-plan.md`](../../../.ai/prompts/internal/eversis-plan.md) |
 | Technical Context | The plan has a populated **Technical Context** section with conventions, patterns, stack, and testing guidance relevant to implementation | Delegate to **Architect** with [`eversis-review-codebase.md`](../../../.ai/prompts/public/eversis-review-codebase.md) to populate Technical Context in the plan |
-| Plan approval state | `{task}.plan-review.md` has verdict `APPROVED` and the plan is unchanged since that review | Skip re-review |
+| Plan approval state | `{task}.plan-review.md` has verdict `APPROVED`, or `REVISIONS NEEDED` with no BLOCKER finding, and the plan is unchanged since that review (as defined in Planning sequence step 13) | Skip re-review |
+
+**Role subagents.** When the host provides a generated subagent for the role (its adapter README names where), delegate through it. A subagent cannot talk to the person and may not be allowed to write files. It puts questions for the person, and any file write it could not make (for example a review Changelog row), in its final message. Relay those questions to the person and write those rows yourself.
+
+**Inline research or plan.** Inline work is allowed only after you read the role prompt (`eversis-research.md` or `eversis-plan.md`), its skill, and its `*.example.md` template in full. Structure never comes from earlier `docs/specs/*` files. The first Changelog row names the template used.
 
 ### Planning sequence
 
 1. **Check for existing research and plan files** — Inspect current `*.research.md` and `*.plan.md` state first.
 2. **Adequacy check** — When artifacts exist, run the adequacy checklist; set Research/Plan to SKIP, DELTA, REFRESH, or CREATE before delegating.
 3. **Fill missing context when needed** — If research is missing or inadequate after the checklist, delegate to Context Engineer with `eversis-research.md` or update the research file in the same session.
-4. **Create or refresh the plan when needed** — If the plan is missing, stale, or not actionable, delegate to Architect with `eversis-plan.md`.
-5. **Human plan review** — Ask the user to review scope, phases, and acceptance criteria before plan validation.
-6. **Review the plan before execution** — Delegate to **Plan Reviewer** with [`eversis-review-plan.md`](../../../.ai/prompts/internal/eversis-review-plan.md) unless an approved `.plan-review.md` exists and the plan is unchanged.
-7. **Run the review loop with hard limits:**
+4. **Create or refresh the plan when needed** — If the plan is missing, stale, or not actionable, delegate to Architect with `eversis-plan.md`. Relay questions the Architect hands back for the person; answering them is not plan approval.
+5. **Apply the Technical Context rule** — If the plan already contains populated Technical Context, use it and skip rediscovery; otherwise delegate to Architect with `eversis-review-codebase.md`. Do this before the structure check and plan review: the Plan Reviewer checks Technical Context, and filling it can change the plan.
+6. **Validate the plan structure** — Run `scripts/validate-spec-artifacts.mjs` on the plan file after the last plan edit before review. Show the person only a passing plan, or the gaps that remain after your fixes. When the host runs the validator automatically after file edits, still run it explicitly when the file was written another way (shell command, external tool).
+7. **Review the plan before the plan gate** — Delegate to **Plan Reviewer** with [`eversis-review-plan.md`](../../../.ai/prompts/internal/eversis-review-plan.md) unless a `.plan-review.md` exists whose verdict is `APPROVED`, or `REVISIONS NEEDED` with no BLOCKER finding (step 8), and the plan is unchanged ("unchanged" as defined in step 13).
+8. **Run the review loop with hard limits:**
    - `*.plan-review.md` remains the source of truth.
-   - If the verdict is `REVISIONS NEEDED`, send the review back to Architect and re-run review.
+   - Only BLOCKER findings start another review round: send the whole review back to Architect (questions included), re-run step 6 after each Architect revision, and re-run review.
+   - WARNINGs, SUGGESTIONs and unproven assumptions never start a round and never stop the flow. They go to the step 10 gate summary.
+   - A `REVISIONS NEEDED` verdict with no BLOCKER finding ends the review loop and counts like `APPROVED` for the step 7 skip test and the `Plan approval state` readiness row. Its WARNINGs and suggestions go to the step 10 gate summary.
    - Stop after a maximum of **3** plan-review iterations and escalate to the user if blockers remain.
-8. **Create execution todos from the plan** — Create todos per plan task, not just per phase.
-9. **Capture UI inventory early** — Find every `[REUSE]` UI task and every Figma URL in the plan and research files.
-10. **Ask for the dev server URL when UI tasks exist** — If the UI inventory is non-empty, ask the user in chat for the dev server URL before execution starts. Do not guess from port scans.
-11. **Apply the Technical Context rule** — If the plan already contains populated Technical Context, use it and skip rediscovery; otherwise delegate to Architect with `eversis-review-codebase.md`.
-12. **Conditional confirmation before execution** — Ask for confirmation before moving from planning to execution when the plan was newly created, materially changed, escalated, or not yet approved for execution in the current thread.
-13. **Rewrite the upfront execution plan after approval** — Expand the ordered agent + prompt call sequence from the approved plan before the first implementation task starts.
+   - A re-review after changes requested at the gate (step 11) starts a new count: max **3** rounds per gate cycle.
+9. **Capture UI inventory** — Find every `[REUSE]` UI task and every Figma URL in the plan and research files. Do this before the plan gate, so the dev server URL request can go in the step 10 message.
+10. **Plan approval gate (the only normal plan gate)** — Show the person one message, in this fixed order:
+    - plan path;
+    - plan-review verdict and iteration count;
+    - BLOCKERs left after escalation (if any);
+    - WARNINGs;
+    - unproven assumptions;
+    - open questions the Architect handed back for the person (if any);
+    - Architect defaults marked "confirm at the plan gate" in the plan's Open Questions (if any);
+    - the dev server URL request when the UI inventory is not empty. Do not guess the URL from port scans.
+
+    When the person approves, record it in the plan's `## Human gates` (strike through the plan gate, quote the literal reply) before step 12. Approval without a dev server URL still closes the gate: non-UI tasks start, and you ask for the URL before the first `[REUSE]` UI verification item. That question is not a gate.
+11. **Changes at the gate — always ask again** — Any requested change, with or without "OK", goes back to the Architect, then steps 5–6, then the Plan Reviewer again (steps 7–8, a new count of max 3 rounds). Show what changed and the new review summary, and ask for approval again. Code starts only after a reply that approves the plan with no changes requested (see **Gate-closing rule**).
+12. **Create execution todos from the plan** — Create todos per plan task, not just per phase.
+13. **Recovery gate before execution** — Fires only when there is no valid recorded approval for the current, unchanged plan; it is never a second normal confirmation.
+    - Examples: the plan changed in substance after approval (implementation discovery, a deviation under Execution rule 1), the approval is missing from the plan's `## Human gates`, or a fresh or resumed session finds the plan not approved.
+    - Unchanged plan: recording the approval in `## Human gates`, ticking checkboxes, adding Changelog rows and similar bookkeeping do not count as a change of the plan, for this gate and for the step 7 skip test; a change of goal, scope, phases, task content, Files, DoD, verification or security does.
+    - It does not fire when the person approved the unchanged plan at step 10 (in this thread, or recorded in the plan's `## Human gates` with the literal quote). Implement starts right after that approval.
+    - An explicit request to implement this specific plan (for example "implement this plan") counts as approval of the current, unchanged plan in this thread; record it in `## Human gates` with the literal quote. Attaching or pointing to a plan file is not approval: with no valid record, this gate fires.
+    - A material change after approval invalidates the record: show the gate again with what changed.
+    - The recovery gate message has the same content and order as the step 10 message, plus what changed since the last recorded approval (if any).
+    - When approval came from an explicit implement request before any plan review existed, steps 7–8 still run. With no BLOCKER, code starts, and the progress message lists the review summary (verdict, WARNINGs, unproven assumptions).
+    - Only an explicit reply to the declared gate closes it (see **Gate-closing rule**).
+14. **Rewrite the upfront execution plan after approval** — Expand the ordered agent + prompt call sequence from the approved plan before the first implementation task starts.
 
 ### Execution routing
 
@@ -242,7 +271,7 @@ Process tasks in plan order. Consult the todo list before each task and update t
 
 ### Execution rules and gates
 
-1. **Stay inside the approved plan** — If execution requires a material deviation, stop and get confirmation before changing direction.
+1. **Stay inside the approved plan** — If execution requires a material deviation, stop and get confirmation before changing direction. A material change invalidates the recorded plan approval; ask through the Planning sequence step 13 recovery gate.
 2. **Delegate by route, not by instinct** — Use the routing table; pass the plan section, Technical Context, and latest outputs.
 3. **Domain skills gate** — Before `eversis_skills_get` for stack-specific skills (frontend, backend, filters, BA Docs, etc.), confirm **`eversis-project-stack.mdc` § Agent skills policy** and the approved plan allow that skill. Do not load domain skills from task keywords alone.
 4. **Update after every task** — After each task, update plan checkboxes, the matching todo, and run appropriate checks.

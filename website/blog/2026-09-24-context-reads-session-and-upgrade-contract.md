@@ -178,7 +178,7 @@ Maintaining system stability requires knowing what stays constant:
 
 ## Summary
 
-The AC-2 framework update transitions Agent Collections from heuristic context management to **deterministic architectural boundaries**:
+This framework update transitions Agent Collections from heuristic context management to **deterministic architectural boundaries**:
 * **Context Reads:** 1 component file from the router; max 1–2 spec files for consumption.
 * **Session Execution:** Uninterrupted implementation across sub-tasks using in-turn checkpoints.
 * **Documentation Architecture:** Clear separation between ADRs (`docs/decisions/`) and business domain rules (`docs/context/`).

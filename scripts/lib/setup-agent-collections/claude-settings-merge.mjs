@@ -6,14 +6,36 @@
  *  - First run (no existing file): seed the whole file from
  *    templates/claude-settings.json.
  *  - Every run: fully regenerate `permissions.deny` (from .claudeignore path
- *    classes — the single source of truth for path classes, TASK-529) and
+ *    classes — the single source of truth for path classes) and
  *    `enabledMcpjsonServers` (from the current MCP selection). Every other
  *    key in an existing file — including `permissions.allow` and anything a
  *    consumer added by hand — is left untouched.
- *  - Preserve mode (CS_PRESERVE_EXISTING=true, AC-99 upgrade/sync reusing the
+ *  - Preserve mode (CS_PRESERVE_EXISTING=true, upgrade/sync reusing the
  *    record): `enabledMcpjsonServers` is the selection plus every catalog id
  *    already present in `.mcp.json` (CS_MCP_JSON_PATH), so servers that
  *    mcp-merge.mjs kept on disk stay enabled in Claude Code.
+ *  - Every run: exactly one framework-owned entry under each of two hook
+ *    events, both running the spec artifact guard (command
+ *    FRAMEWORK_HOOK_COMMAND, the same launcher):
+ *      - `hooks.PreToolUse`, matcher `Bash` — records when a shell command
+ *        starts, so the post hook can find spec files it changed;
+ *      - `hooks.PostToolUse`, matcher `Write|Edit|MultiEdit|Bash` — validates
+ *        spec artifacts written by an edit tool or changed by a shell
+ *        command.
+ *    Both are written only when the launcher exists in the target
+ *    (CS_HOOK_LAUNCHER_PATH), and removed otherwise, so the settings never
+ *    point at a missing file. The same rule applies to each event on its
+ *    own: a framework entry is found by the launcher path in its command; a
+ *    stale framework entry (for example the older single `PostToolUse`
+ *    entry with matcher `Write|Edit|MultiEdit`) is replaced in place, and
+ *    every consumer hook (other events, other entries of these two events)
+ *    is kept in order. A removal that empties `PreToolUse`, `PostToolUse` or
+ *    `hooks` drops that key. A non-array `PreToolUse` or `PostToolUse` is
+ *    refused.
+ *  - Remove-hook mode (CS_MODE=remove-hook, Claude deselected): only the
+ *    framework hook entries (both events) are dropped from
+ *    CS_EXISTING_JSON; nothing else is regenerated and no template or
+ *    .claudeignore is read. Prints nothing when there is no existing file.
  */
 import fs from 'node:fs';
 
@@ -29,6 +51,135 @@ const mcpServersCsv = process.env.CS_MCP_SERVER_IDS ?? '';
 const preserveExisting = process.env.CS_PRESERVE_EXISTING === 'true';
 const mcpJsonPath = process.env.CS_MCP_JSON_PATH ?? '';
 const serverListPath = process.env.CS_SERVER_LIST_PATH ?? '';
+const hookLauncherPath = process.env.CS_HOOK_LAUNCHER_PATH ?? '';
+const mode = process.env.CS_MODE ?? '';
+
+/** Launcher location as Claude Code sees it; identifies the framework entry. */
+const FRAMEWORK_HOOK_LAUNCHER = '.claude/hooks/eversis-validate-spec.cjs';
+const FRAMEWORK_HOOK_COMMAND = `node "\${CLAUDE_PROJECT_DIR}/${FRAMEWORK_HOOK_LAUNCHER}"`;
+/**
+ * Framework-owned entry per hook event, in the order the events are written
+ * into a new `hooks` object. `PreToolUse` on Bash records the start of a
+ * shell command; `PostToolUse` validates what an edit tool or that shell
+ * command changed. Both run the same launcher command.
+ */
+const FRAMEWORK_HOOK_EVENTS = [
+  { event: 'PreToolUse', matcher: 'Bash' },
+  { event: 'PostToolUse', matcher: 'Write|Edit|MultiEdit|Bash' },
+];
+
+function frameworkHookEntry(matcher) {
+  return {
+    matcher,
+    hooks: [{ type: 'command', command: FRAMEWORK_HOOK_COMMAND }],
+  };
+}
+
+function isFrameworkHook(hook) {
+  return (
+    hook !== null &&
+    typeof hook === 'object' &&
+    typeof hook.command === 'string' &&
+    hook.command.replace(/\\/g, '/').includes(FRAMEWORK_HOOK_LAUNCHER)
+  );
+}
+
+/**
+ * Bring `settings.hooks.PreToolUse` and `settings.hooks.PostToolUse` to the
+ * wanted state: one framework entry per event (FRAMEWORK_HOOK_EVENTS) when
+ * `wanted`, none otherwise. Each event is handled on its own: inner hooks
+ * that run the framework launcher are stripped from every entry; an entry
+ * left with no hooks by that strip is dropped. The framework entry goes where
+ * the first stripped entry was (or at the end), so re-runs are
+ * byte-identical, consumer order is kept, and an older framework entry with
+ * a different matcher is upgraded in the same position. An event array or a
+ * `hooks` object emptied by removal is dropped. Mutates `settings`.
+ */
+function applyFrameworkHook(settings, wanted) {
+  if (settings.hooks === undefined) {
+    if (!wanted) return;
+    settings.hooks = {};
+  } else if (
+    typeof settings.hooks !== 'object' ||
+    settings.hooks === null ||
+    Array.isArray(settings.hooks)
+  ) {
+    fail(
+      '.claude/settings.json "hooks" is not an object — refusing to merge (fix the file by hand, then re-run).',
+    );
+  }
+  // Check every owned event before changing any, so a refusal leaves no
+  // half-merged state behind.
+  for (const { event } of FRAMEWORK_HOOK_EVENTS) {
+    const value = settings.hooks[event];
+    if (value !== undefined && !Array.isArray(value)) {
+      fail(
+        `.claude/settings.json "hooks.${event}" is not an array — refusing to merge (fix the file by hand, then re-run).`,
+      );
+    }
+  }
+
+  let removedAny = false;
+  for (const { event, matcher } of FRAMEWORK_HOOK_EVENTS) {
+    if (applyFrameworkHookEvent(settings.hooks, event, matcher, wanted)) removedAny = true;
+  }
+  if (removedAny && Object.keys(settings.hooks).length === 0) {
+    delete settings.hooks;
+  }
+}
+
+/**
+ * Apply the framework entry rule to one event array of `hooks` (see
+ * applyFrameworkHook). Returns true when a framework hook was stripped.
+ * Mutates `hooks`.
+ */
+function applyFrameworkHookEvent(hooks, event, matcher, wanted) {
+  const hadEvent = hooks[event] !== undefined;
+  const current = hadEvent ? hooks[event] : [];
+
+  const next = [];
+  let insertAt = -1;
+  let removedAny = false;
+  for (const entry of current) {
+    const inner = entry && typeof entry === 'object' && Array.isArray(entry.hooks) ? entry.hooks : null;
+    if (!inner || !inner.some(isFrameworkHook)) {
+      next.push(entry);
+      continue;
+    }
+    removedAny = true;
+    if (insertAt === -1) insertAt = next.length;
+    const kept = inner.filter((hook) => !isFrameworkHook(hook));
+    if (kept.length > 0) next.push({ ...entry, hooks: kept });
+  }
+  if (wanted) {
+    next.splice(insertAt === -1 ? next.length : insertAt, 0, frameworkHookEntry(matcher));
+  }
+
+  if (next.length > 0 || (hadEvent && !removedAny)) {
+    hooks[event] = next;
+  } else {
+    delete hooks[event];
+  }
+  return removedAny;
+}
+
+if (mode === 'remove-hook') {
+  if (!existingJson.trim()) process.exit(0);
+  let parsed;
+  try {
+    parsed = JSON.parse(existingJson);
+  } catch {
+    fail('Existing .claude/settings.json is not valid JSON.');
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    fail('Existing .claude/settings.json is not a JSON object.');
+  }
+  applyFrameworkHook(parsed, false);
+  process.stdout.write(`${JSON.stringify(parsed, null, 2)}\n`);
+  process.exit(0);
+} else if (mode !== '') {
+  fail(`Unknown CS_MODE: ${mode}`);
+}
 
 if (!templatePath || !claudeignorePath) {
   fail('Missing required environment variables for Claude settings merge.');
@@ -134,5 +285,7 @@ if (preserveExisting) {
   }
 }
 result.enabledMcpjsonServers = enabled;
+
+applyFrameworkHook(result, Boolean(hookLauncherPath) && fs.existsSync(hookLauncherPath));
 
 process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

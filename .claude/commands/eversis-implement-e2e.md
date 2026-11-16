@@ -12,7 +12,7 @@ Create, maintain, and execute E2E tests for given feature or user story.
 **SSOT:** `.ai/prompts/internal/eversis-implement-e2e.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

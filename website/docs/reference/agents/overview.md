@@ -5,13 +5,15 @@ title: Agents Overview
 
 # Agents Overview
 
-**Twelve specialized roles** plus **three internal workers** mirror a full product-engineering team across **Ideate → Implement → Review**.
+**Thirteen specialized roles** plus **three internal workers** mirror a full product-engineering team across **Ideate → Implement → Review**.
 
 In **Cursor**, roles map to **rules** (`.cursor/rules/eversis-*.mdc`), **prompts** (SSOT under **`.ai/prompts/{public,internal}/`** as `eversis-*.md`), and **skill packages** (`.ai/skills/eversis-*/`, loaded via **`eversis-collections` MCP** — `eversis_skills_*`, optional **`eversis_skill_run_script`**). **Entry:** stable prompt ids, optional **`/eversis-*`** slash shims (generated under `.cursor/commands/` by the Cursor adapter), or **`@`** attach when your IDE surfaces SSOT or generated command files.
 
-The canonical packaging and mappings are documented in the [Framework reference](../../framework) (same as **`documentation/agent-collection.md`** in the repository). Entry points for this repository are **`AGENTS.md`** (root) and the always-on rule **`.cursor/rules/eversis-agent-core.mdc`**.
+The canonical packaging and mappings are documented in the [Framework reference](../../framework). Entry points for this repository are **`AGENTS.md`** (root) and the always-on rule **`.cursor/rules/eversis-agent-core.mdc`**.
 
-**Starter rule packs in this repo:** `eversis-agent-core.mdc` (always apply), `eversis-engineering-manager.mdc` (attach with **`/eversis-implement`** or load-by-id), and `eversis-code-reviewer.mdc` (attach with **`/eversis-review`**). Other roles use the **canonical template** filenames in the table below (`eversis-role-<role>.mdc`); add those files when you split behavior out of the core packs — they are **not** all shipped in agent-collections (delegated prompts + skills carry most role behavior).
+**Starter rule packs in this repo:** seven rules ship from `adapters/cursor/rule-map.yaml`. In Cursor, `eversis-agent-core.mdc` and `eversis-testing-and-terminal.mdc` always apply. `eversis-accessibility.mdc` applies to UI files (`*.tsx`, `*.jsx`, `*.vue`, `*.html`, `*.svelte`). `eversis-engineering-manager.mdc` (with **`/eversis-implement`**), `eversis-code-reviewer.mdc` (with **`/eversis-review`**), `eversis-fine-handoff.mdc` and `eversis-spec-driven-development.mdc` are attached or loaded by id. Other roles use the **canonical template** filenames in the table below (`eversis-role-<role>.mdc`); add those files when you split behavior out of the core packs — they are **not** all shipped in agent-collections (delegated prompts + skills carry most role behavior).
+
+**Claude Code subagents:** the Claude adapter also writes three subagents under `.claude/agents/` (from `adapters/claude/agent-map.yaml`): `eversis-context-engineer` (research), `eversis-architect` (plan) and `eversis-code-reviewer` (review, read-only). The Engineering Manager delegates those stages to them.
 
 ## How roles work
 
@@ -75,7 +77,7 @@ Each role defines:
 #### Architect
 
 - **Focus:** solution design and **implementation plans** with phases, Technical Context, and acceptance checks.
-- Produces **`*.plan.md`** — human approval required before plan validation and broad code changes.
+- Produces **`*.plan.md`** — the Plan Reviewer checks it, then you approve it before broad code changes.
 
 #### Plan Reviewer
 
@@ -85,7 +87,7 @@ Each role defines:
 
 #### Engineering Manager
 
-- **Focus:** **orchestrating** the Implement phase — research → plan → plan validation → code → review handoff.
+- **Focus:** **orchestrating** the Implement phase — research → plan → plan review → code → code review in the same run → Fine.
 - Delegates by task type; enforces human gates and **Fine → QA comment draft**.
 - **Invoke:** `@eversis-implement` or `/eversis-implement` + `eversis-engineering-manager.mdc`.
 

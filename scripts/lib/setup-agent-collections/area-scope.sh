@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib/setup-agent-collections/area-scope.sh — monorepo area profiles (TASK-530).
+# lib/setup-agent-collections/area-scope.sh — monorepo area profiles.
 
 apply_area_scope() {
   # Map domain profile → default area scope id (isolation §5).
@@ -30,7 +30,7 @@ apply_area_scope() {
   cp "$area_manifest" "${TARGET_DIR}/.agent-collections/area-profile.yaml"
 
   # Apply exclude patterns into consumer ignore files (merge, never wipe).
-  require_cmd node "Install Node.js ≥ 18"
+  require_cmd node "Install Node.js 22 or newer"
   node "${LIB_DIR}/apply-area-ignore.mjs" \
     --target "${TARGET_DIR}" \
     --area-manifest "$area_manifest" \

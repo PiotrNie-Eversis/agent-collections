@@ -197,11 +197,12 @@ else
   _fail "local mode: no checkout"
 fi
 
-# --- AC-14: agent-id probe (pi) -------------------------------------------
-# A pin from before AC-14 lists only cursor,claude under --agents and has no
-# adapters/pi/generate.mjs. With --agents=pi the guard must realign a clean
-# pin, or stop with a clear "Rejected agent id" message on a dirty one —
-# never let the vendored sync.mjs print a raw "unknown agent id: pi".
+# --- agent-id probe (pi) ---------------------------------------------------
+# A pin from before Pi support was added lists only cursor,claude under
+# --agents and has no adapters/pi/generate.mjs. With --agents=pi the guard
+# must realign a clean pin, or stop with a clear "Rejected agent id" message
+# on a dirty one — never let the vendored sync.mjs print a raw
+# "unknown agent id: pi".
 write_pi_sync_mjs() {
   local root="$1"
   mkdir -p "${root}/adapters/pi"
@@ -246,11 +247,11 @@ PI_ALIGN_VENDOR="${TMP}/pi-align-vendor.git"
 init_git_repo "$PI_ALIGN_VENDOR"
 write_sync_mjs "${PI_ALIGN_VENDOR}/adapters/sync.mjs" "yes"
 git -C "$PI_ALIGN_VENDOR" add adapters/sync.mjs
-git -C "$PI_ALIGN_VENDOR" commit -qm "pre-AC-14 sync"
+git -C "$PI_ALIGN_VENDOR" commit -qm "pre-pi sync"
 pi_old_sha="$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)"
 write_pi_sync_mjs "$PI_ALIGN_VENDOR"
 git -C "$PI_ALIGN_VENDOR" add adapters
-git -C "$PI_ALIGN_VENDOR" commit -qm "AC-14 sync"
+git -C "$PI_ALIGN_VENDOR" commit -qm "pi sync"
 pi_new_sha="$(git -C "$PI_ALIGN_VENDOR" rev-parse HEAD)"
 git clone -q "$PI_ALIGN_VENDOR" "${TMP}/pi-align-installer.git"
 git -C "$PI_ALIGN_VENDOR" checkout -q "$pi_old_sha"

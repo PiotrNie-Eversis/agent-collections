@@ -7,9 +7,9 @@ title: Workflow Overview
 
 **Agent Collections** covers the **full product lifecycle**:
 
-> **Ideate → Implement → Review**
+> **Ideate → Research → Plan → Implement → Review → Fine**
 
-Attach **`@eversis-implement`** (or `/eversis-implement`) for the Implement phase — research and planning run inside that flow. Each phase produces documented artifacts with **human gates** where the prompts require them.
+Attach **`@eversis-implement`** (or `/eversis-implement`) for the Implement phase — research, planning, code review and Fine all run inside that flow. Each phase produces documented artifacts with **human gates** where the prompts require them.
 
 :::tip The relay race
 Each phase passes a reviewed deliverable to the next. Workshop materials feed the backlog; the Engineering Manager orchestrates research, planning, and implementation; implementation feeds review.
@@ -26,7 +26,7 @@ Each phase passes a reviewed deliverable to the next. Workshop materials feed th
 
 ### 2. Implement
 
-- **Role:** Engineering Manager (delegates Context Engineer, Architect, Plan Reviewer, implementers)
+- **Role:** Engineering Manager (delegates Context Engineer, Architect, Plan Reviewer, implementers, Code Reviewer)
 - **Prompt:** `@eversis-implement` with a Jira ID, task description, or `@docs/specs/.../*.plan.md`
 - The EM’s **first response** is always an **Implement readiness** block (Flow / Research / Plan / Next gate) — before any artifacts or code. See [Orchestrating Implementation](../../reference/skills/orchestrating-implementation#implement-readiness-mandatory-first-output).
 - **Entry signals** — existing adequate `*.research.md` + attached plan (after **adequacy checklist**) → skip new research/plan. No need to type “Research” in the prompt. Pure analysis without implement is also valid (chat + specs).
@@ -35,10 +35,10 @@ Each phase passes a reviewed deliverable to the next. Workshop materials feed th
 
 At Step 0 the EM recommends **Quick** or **Full** (you may override). See [Orchestrating Implementation](../../reference/skills/orchestrating-implementation).
 
-| Flow      | Steps                                                                | When to use                            |
-| --------- | -------------------------------------------------------------------- | -------------------------------------- |
-| **Quick** | implement → quality checks → `@eversis-review` → **Fine** + QA draft | Criteria pass, artifacts exist         |
-| **Full**  | research → plan → plan validation → code → **Fine** + QA draft       | Artifacts missing or scope requires it |
+| Flow      | Steps                                                                                                                         | When to use                            |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **Quick** | implement → quality checks → code review (same run) → **Fine** + QA draft                                                     | Criteria pass, artifacts exist         |
+| **Full**  | research → approve research → plan → plan review → approve plan → code + quality checks → code review (same run) → **Fine** + QA draft | Artifacts missing or scope requires it |
 
 :::info Quick vs Full
 **Hard exclusion:** Figma, UI verification tasks, cross-domain work, or likely >3 files → **Full Flow only**. Quick is for narrow, low-risk fixes after you confirm the EM recommendation.
@@ -49,22 +49,23 @@ At Step 0 the EM recommends **Quick** or **Full** (you may override). See [Orche
 ### 3. Review
 
 - **Role:** Code Reviewer
-- **Prompt:** `@eversis-review`
-- Structured review — PASS / BLOCKER / SUGGESTION.
+- **Runs:** inside the `@eversis-implement` run, after implementation and quality checks and before **Fine**, in a separate context. It is not a human approval gate.
+- Structured review — PASS / BLOCKER / SUGGESTION. On BLOCKER the Engineering Manager asks you before changing the reviewed solution, then re-runs a full review. On PASS it declares **Fine**.
+- **Optional:** attach `@eversis-review` yourself for a review-only chat or a re-review. Say `pause before review` or `review later` during Implement to stop before code review and run `@eversis-review` later.
 
 ## Implement → Review
 
-| Step              | Attach               | What happens                                                             |
-| ----------------- | -------------------- | ------------------------------------------------------------------------ |
-| Implement (Quick) | `@eversis-implement` | EM: implement → review → Fine + QA draft                                 |
-| Implement (Full)  | `@eversis-implement` | EM: research → plan → plan validation → implementation → Fine + QA draft |
-| Review            | `@eversis-review`    | Structured code review                                                   |
+| Step                         | Attach               | What happens                                                                                              |
+| ---------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------- |
+| Implement (Quick)            | `@eversis-implement` | EM: implement → quality checks → review → Fine + QA draft                                                 |
+| Implement (Full)             | `@eversis-implement` | EM: research → approve research → plan → plan review → approve plan → implementation → quality checks → review → Fine + QA draft |
+| Review (optional, standalone) | `@eversis-review`    | Separate pass for review-only chats or re-review                                                          |
 
 ## Status: Fine — handoff
 
 When Implement is complete, the Engineering Manager declares **Fine** and **must** output a **QA comment draft in the same response** (not a separate turn). Normative procedure: [`.cursor/skills/eversis-fine-handoff/SKILL.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/.cursor/skills/eversis-fine-handoff/SKILL.md) or MCP `eversis_skills_get` for `eversis-fine-handoff`. Onboarding overview: [Fine Handoff](../../reference/skills/fine-handoff).
 
-The draft is labeled **`QA comment — review before posting to Jira`**. Post to Jira only after you approve (copy-paste or explicit Atlassian MCP instruction).
+The draft is labeled **`Draft QA comment — review before posting to Jira`**. Post to Jira only after you approve (copy-paste or explicit Atlassian MCP instruction).
 
 ### Domain-knowledge promotion
 
@@ -78,32 +79,27 @@ When that promotion targets a component whose frontmatter has `confluence_url`, 
 
 This draft is labeled **`Draft: As-Is Pack comment — approve before posting to Confluence`**. Without a promotion candidate, or when `confluence_url` is null, Fine stays on the QA draft alone or QA plus promotion — it does not take the Pack-comment branch.
 
-```mermaid
-flowchart TD
-    review["Review\n(PASS)"] --> fine["Fine\n(work marked ready for QA)"]
-    fine --> qa["QA comment draft\n(always — every task)"]
-    qa --> gate1{"Human approves\nQA draft?"}
-    gate1 -->|"yes"| jira["Post comment\nto Jira"]
+import PeleDiagram from '@site/src/components/PeleDiagram';
 
-    fine --> check{"Also: durable, cross-task\nknowledge found?\n(e.g. confirmed business rule,\nreusable pattern)"}
-    check -->|"No — most tasks"| nosecond["No second draft —\nQA comment draft above\nstill applies as normal"]
-    check -->|"Yes"| promo["+ Domain-knowledge promotion draft\n(independent, second draft)"]
-    promo --> gate2{"Human approves\npromotion draft?\n(separate decision)"}
-    gate2 -->|"yes"| project["Write docs/context/<project>/\nin this repo"]
+export const fineFlow = `flowchart TD
+    review["Code review<br/>PASS"] --> fine["Fine<br/>ready for QA"]
+    fine --> qa["QA comment draft (always)"]
+    qa --> gate1{"You approve<br/>the QA draft?"}
+    gate1 -- yes --> jira["Published:<br/>Jira comment"]
+    fine --> check{"Durable, cross-task<br/>knowledge?<br/>(most tasks: no)"}
+    check -- Yes --> promo["Second draft:<br/>domain-knowledge<br/>promotion"]
+    promo --> gate2{"You approve<br/>the promotion?<br/>(own decision)"}
+    gate2 -- yes --> project["Published:<br/>docs/context/<br/>in this repo"]
+    promo --> packcheck{"Target has<br/>confluence_url?"}
+    packcheck -- Yes --> pack["Third draft:<br/>As-Is Pack<br/>comment"]
+    pack --> gate3{"You approve<br/>the comment?<br/>(own decision)"}
+    gate3 -- yes --> confluence["Published:<br/>inline comment<br/>in Confluence"]`;
 
-    promo --> packcheck{"Promotion target has\nconfluence_url?"}
-    packcheck -->|"No / null"| nopack["QA + promotion only\n(no Pack comment)"]
-    packcheck -->|"Yes"| pack["+ As-Is Pack comment draft\n(inline on Pack heading)"]
-    pack --> gate3{"Human approves\nPack comment?\n(separate decision)"}
-    gate3 -->|"yes"| confluence["Post inline comment\nto Confluence\n(page body unchanged)"]
-
-    style qa fill:#FFF9C4
-    style promo fill:#BBDEFB
-    style pack fill:#E1BEE7
-    style jira fill:#C8E6C9
-    style project fill:#C8E6C9
-    style confluence fill:#C8E6C9
-```
+<PeleDiagram
+  id="fine-handoff-flow"
+  source={fineFlow}
+  label="Fine handoff: after code review passes, the agent declares Fine and always writes a QA comment draft; it is posted to Jira only after you approve it. When the task found durable, cross-task knowledge, a second draft proposes a domain-knowledge promotion, written to docs/context/ for the project in this repo only after its own approval; most tasks have no second draft. When the promotion target has a confluence_url, a third draft proposes an inline As-Is Pack comment, posted to Confluence only after its own approval, with the page body unchanged."
+/>
 
 ## Workflow diagram
 
@@ -111,17 +107,17 @@ import SdlcDiagram from '@site/src/components/SdlcDiagram';
 
 <SdlcDiagram />
 
-## Human review at every step
+## Human approval gates
 
 :::warning Important
-Each step requires your review. Open generated documents, iterate until correct, then approve before proceeding. AI output is always a draft.
+You approve three things: the research, the plan, and posting the Fine QA comment to the ticket. Code review runs in the same Implement session and needs no separate approval. AI output is always a draft until you approve it.
 :::
 
 ## Workflow variants
 
 | Variant                                              | Entry                                            | Use when                                                    |
 | ---------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------- |
-| **Standard flow**                                    | `@eversis-implement` → `@eversis-review`         | Backend / fullstack — Quick or Full at Step 0               |
+| **Standard flow**                                    | `@eversis-implement` (review runs inside)        | Backend / fullstack — Quick or Full at Step 0               |
 | **UI + Figma**                                       | `@eversis-implement` + `@eversis-review-ui` loop | Design-driven UI                                            |
 | **[Workshop analysis](./workshop-flow)**             | `@eversis-analyze-materials`                     | Workshop → Jira only                                        |
 | **[E2E testing](./e2e-flow)**                        | `@eversis-implement` (E2E tasks in plan)         | Playwright coverage                                         |
@@ -130,7 +126,7 @@ Each step requires your review. Open generated documents, iterate until correct,
 | **[QA workflow](./qa-workflow)**                     | `@eversis-qa-workflow`                           | Manual test planning, regression, AC verify, quality health |
 
 :::info Standard flow
-Full step-by-step: [Standard Flow](./standard-flow) — **Quick vs Full** at Step 0, then research, plan, implement, review with human gates.
+Full step-by-step: [Standard Flow](./standard-flow) — **Quick vs Full** at Step 0, then research, plan, implement and review — you approve the research and the plan.
 :::
 
 :::info Frontend / UI flow

@@ -18,8 +18,8 @@ Each decision file uses these fields (no `status` field):
 
 ## Index
 
-[`INDEX.md`](./INDEX.md) is the bounded entry point: two columns only (`id`, `title`). A later Implement run reads the index, then at most 1–2 full decision files.
+`INDEX.md` in this folder is the bounded entry point: two columns only (`id`, `title`). In this repository it exists on `develop` only; `master` leaves it out (`.release-exclude`). A later Implement run reads the index, then at most 1–2 full decision files.
 
 ## Consumer content stays out of this repo
 
-Earth Online As-Is Pack decision-log rows are **not** stored in this framework repository. They belong in the consumer repo that owns that product.
+A consumer product's As-Is Pack decision-log rows are **not** stored in this framework repository. They belong in the consumer repo that owns that product.

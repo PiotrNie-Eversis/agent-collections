@@ -22,19 +22,19 @@ Short orientation map for AI agents in the **Agent Collections** framework repos
 |------|------|
 | [`docs/context/`](./docs/context/) | Internal knowledge, task baselines |
 | [`docs/plans/`](./docs/plans/) | Optional flat plans; prefer specs for Implement |
-| [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<key>-<topic>/`; `task-*` local-only / gitignored in this repo) |
-| [`docs/decisions/`](./docs/decisions/) | Architecture decisions — one file per decision plus `INDEX.md` |
-| [`docs/reports/`](./docs/reports/) | Agent-generated reports (e.g. `code-quality-report.md` from `eversis-review-codebase`) |
+| [`docs/specs/`](./docs/specs/) | SDD research / plan (`docs/specs/<key>-<topic>/`; tracked on `develop`, removed from `master` by `.release-exclude`) |
+| [`docs/decisions/`](./docs/decisions/) | Architecture decisions — one file per decision plus `INDEX.md` (decision files and `INDEX.md` on `develop` only; `master` keeps only the README (see `.release-exclude`)) |
+| [`docs/reports/`](./docs/reports/) | Agent-generated reports (e.g. `code-quality-report.md` from `eversis-review-codebase`; reports on `develop` only; `master` keeps only the README (see `.release-exclude`)) |
 
 ## Monorepo / Areas
 
 | Area | Path | Notes |
 |------|------|-------|
 | Core SSOT | `.ai/` | Rules, skills, prompts |
-| Adapters | `adapters/` | Tool packaging + `sync.mjs` + `profiles/` |
+| Adapters | `adapters/` | Tool packaging + `sync.mjs` + `profiles/`; `adapters/website/` generates the docs-site prompt pages |
 | MCP | `mcp/eversis-collections-mcp/` | Skills MCP; build with `npm run mcp:build` |
-| Installer | `scripts/` | `setup-agent-collections.sh` + lib |
-| Templates | `templates/` | AGENTS / stack / MCP seed |
+| Installer and repo scripts | `scripts/` | `setup-agent-collections.sh` + lib; release `release-master.mjs` / `release-to-master.sh` / `check-release-tree.sh`; `sync-changelog.mjs`; `validate-spec-artifacts.mjs` |
+| Templates | `templates/` | AGENTS / stack / MCP seed; Claude templates (`claude-CLAUDE.template.md`, `claude-settings.json`); MCP launcher |
 | Architecture docs | `docs/architecture/` | Mapping, isolation, AGENTS standard, selection schema |
 
 ## Role matrix
@@ -69,7 +69,7 @@ Ideate → Research → Plan → Implement → Review → Fine
 
 - This repository is the **framework** product (not a consumer app). Stack policy: [`.cursor/rules/eversis-project-stack.mdc`](./.cursor/rules/eversis-project-stack.mdc).
 - Quality commands: `npm run sync:adapters`, `npm run sync:adapters:check`, `npm run mcp:build`, `npm run mcp:test`, installer smoke `bash scripts/setup-agent-collections.test.sh`, `npm run website:build`, `npm run website:changelog:check`.
-- Skills UX: MCP + `.ai/` load-by-id / `@` attach. This repository commits relative symlinks under `.cursor/skills/` and `.claude/skills/` to `.ai/skills/eversis-*` (refreshed by `npm run sync:adapters`). Cursor also emits thin `/eversis-*` shims under `.cursor/commands/` from `.ai/prompts` (TASK-598). Consumer installs still get their skill mirror from the installer.
+- Skills UX: MCP + `.ai/` load-by-id / `@` attach. This repository commits relative symlinks under `.cursor/skills/` and `.claude/skills/` to `.ai/skills/eversis-*` (refreshed by `npm run sync:adapters`). Cursor also emits thin `/eversis-*` shims under `.cursor/commands/` from `.ai/prompts`. Consumer installs still get their skill mirror from the installer.
 - BA Docs skills: **Do not load** in this framework repo unless a plan explicitly requires them.
 
 ---
@@ -93,6 +93,6 @@ Slash files are thin HYBRID shims (SSOT pointer + Executable section). They are 
 Optional. Applies to consumer projects installed with `--agents=…,pi` (this repository does not commit a `.pi/` tree).
 
 - Generated `.pi/APPEND_SYSTEM.md` is a small always-on core. The process rules are added by `.pi/extensions/eversis-process-rules.ts` after an `eversis-*` command or while a plan is active, so start ticket work with `/eversis-implement`. Role rules also load as `/skill:eversis-rule-*`; framework skills are mirrored under `.pi/skills/eversis-*/`.
-- `/eversis-implement`, `/eversis-review`, … — prompt templates generated under `.pi/prompts/` (same SSOT as above).
+- `/eversis-implement`, `/eversis-review`, … — prompt templates generated under `.pi/prompts/` (same SSOT as `.ai/prompts/`).
 - Pi loads `.pi/` only after project trust; run `/reload` after a re-sync. Keep this root `AGENTS.md`: without it Pi loads the full `CLAUDE.md`, and the small core does not hold.
-- The context-budget extension compacts once at ~50% of the context window (Pi-only). See [`adapters/pi/README.md`](./adapters/pi/README.md).
+- The context-budget extension compacts once at ~50% of the context window (Pi-only). See the Pi adapter README ([`adapters/pi/README.md`](./adapters/pi/README.md)).

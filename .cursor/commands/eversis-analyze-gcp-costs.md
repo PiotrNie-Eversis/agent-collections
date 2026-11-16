@@ -7,7 +7,7 @@ Perform a comprehensive GCP cost optimization and labeling compliance audit — 
 **SSOT:** `.ai/prompts/public/eversis-analyze-gcp-costs.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

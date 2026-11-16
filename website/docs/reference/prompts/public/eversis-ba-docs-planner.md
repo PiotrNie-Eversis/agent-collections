@@ -20,7 +20,7 @@ eversis-ba-docs-planner
 <Jira release id or version> | Confluence page title for doc rules | path or @ to summary.md
 ```
 
-Load this prompt by stable id (tool-native attach or file read). Optionally load role rule `eversis-ba-docs-planner` (adapter packaging) and **`.ai/skills/eversis-ba-docs-planner/SKILL.md`**. Enable **Atlassian MCP** (Jira + Confluence) and **eversis-collections MCP** if a `.docx` path will be used.
+Load this prompt by stable id (tool-native attach or file read). Load **`.ai/skills/eversis-ba-docs-planner/SKILL.md`**. Enable **Atlassian MCP** (Jira + Confluence) and **eversis-collections MCP** if a `.docx` path will be used.
 
 <workflow>
 
@@ -54,7 +54,7 @@ Load this prompt by stable id (tool-native attach or file read). Optionally load
 
 ## Related
 
-- **Spec:** `docs/specs/business-docs-workflow/business-docs-workflow.spec.md`
+- **Workflow:** skills `eversis-ba-docs-planner` and `eversis-ba-docs-writer` (`.ai/skills/eversis-ba-docs-planner/SKILL.md`, `.ai/skills/eversis-ba-docs-writer/SKILL.md`)
 - **Writer prompt:** `eversis-ba-docs-writer`
 - **Planner skill:** `.ai/skills/eversis-ba-docs-planner/SKILL.md`
 

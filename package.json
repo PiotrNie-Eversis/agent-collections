@@ -16,6 +16,7 @@
     "website:install": "npm --prefix website install",
     "website:build": "npm --prefix website run build",
     "website:changelog:sync": "node scripts/sync-changelog.mjs",
-    "website:changelog:check": "node scripts/sync-changelog.mjs --check"
+    "website:changelog:check": "node scripts/sync-changelog.mjs --check",
+    "release:master": "node scripts/release-master.mjs"
   }
 }

@@ -6,12 +6,13 @@ import styles from "./styles.module.css";
 const steps = [
   {
     num: 1,
-    title: "Open in Cursor or Claude Code",
+    title: "Install into your project",
     description: (
       <>
-        Open this repository in <strong>Cursor</strong> or{" "}
-        <strong>Claude Code</strong> — canonical content under{" "}
-        <code>.ai/</code> works in either.
+        Download the framework once, then run the installer in your project
+        and pick <strong>Cursor</strong>, <strong>Claude Code</strong> or{" "}
+        <strong>Pi</strong> — canonical content under <code>.ai/</code> works
+        in each.
       </>
     ),
   },
@@ -21,8 +22,7 @@ const steps = [
     description: (
       <>
         Read <code>AGENTS.md</code> and the{" "}
-        <Link to="/docs/framework">Framework reference</Link> (or{" "}
-        <code>documentation/agent-collection.md</code> in the repo).
+        <Link to="/docs/framework">Framework reference</Link>.
       </>
     ),
   },
@@ -32,8 +32,8 @@ const steps = [
     description: (
       <>
         Attach <code>@eversis-implement</code> in Cursor, or run{" "}
-        <code>/eversis-implement</code> (Cursor project command or Claude
-        Code slash command) with your ticket or task text.
+        <code>/eversis-implement</code> (Cursor project command, Claude Code
+        slash command or Pi prompt template) with your ticket or task text.
       </>
     ),
   },
@@ -56,7 +56,7 @@ export default function GettingStartedSection(): React.JSX.Element {
             build the <code>eversis-collections</code> MCP with Docker, run{" "}
             <code>eversis-*.md</code> prompts by stable id — <code>@</code>{" "}
             attach or <code>/eversis-*</code> in Cursor, the matching slash
-            command in Claude Code.
+            command in Claude Code or Pi.
           </p>
           <div className={styles.gsActions}>
             <Link
@@ -89,7 +89,7 @@ export default function GettingStartedSection(): React.JSX.Element {
             </div>
           ))}
           <Link className={styles.fullChecklistLink} to="/docs/getting-started/start-here">
-            See the full 7-step checklist →
+            See the full setup guide →
           </Link>
         </div>
       </div>

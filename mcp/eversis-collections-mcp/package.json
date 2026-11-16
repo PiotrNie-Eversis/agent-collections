@@ -11,11 +11,11 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "node --import tsx/esm --test tests/chapters.test.ts tests/resolveRoot.test.ts tests/validate-docx.test.ts tests/context.test.ts tests/docx-path.test.ts",
+    "test": "node --import tsx/esm --test tests/chapters.test.ts tests/resolveRoot.test.ts tests/validate-docx.test.ts tests/context.test.ts tests/docx-path.test.ts tests/skills-frontmatter.test.ts",
     "validate": "node dist/cli.js validate"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

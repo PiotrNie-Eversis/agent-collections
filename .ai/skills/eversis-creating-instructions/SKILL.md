@@ -1,7 +1,7 @@
 ---
 name: eversis-creating-instructions
 description: "Create project instructions for Agent Collections: AGENTS.md, `.ai/rules/` (adapters may add `.cursor/rules/*.mdc`), optional per-folder RULE.md. No GitHub copilot-instructions.md in this framework."
-user-invokable: false
+user-invocable: false
 ---
 
 # Creating instructions

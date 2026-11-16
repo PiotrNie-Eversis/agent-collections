@@ -8,7 +8,7 @@ title: Frontend Flow
 For UI-heavy tasks with Figma designs, use the specialized frontend workflow. This extends the standard flow with iterative Figma verification to ensure the implementation matches the design within tolerance.
 
 :::warning Full Flow required
-Any Figma involvement or `[REUSE]` UI verification task **disqualifies Quick Flow**. The Engineering Manager must run **Full Flow** (research → plan → plan validation → implement with per-item UI verification).
+Any Figma involvement or `[REUSE]` UI verification task **disqualifies Quick Flow**. The Engineering Manager must run **Full Flow** (research → approve research → plan → plan review → approve plan → implement with per-item UI verification → code review → Fine).
 :::
 
 ## Command Sequence
@@ -18,20 +18,20 @@ Any Figma involvement or `[REUSE]` UI verification task **disqualifies Quick Flo
    ↳ 🔀 Engineering Manager recommends Full Flow (Figma/UI — Quick not allowed)
    ↳ 🔍 Engineering Manager delegates to Context Engineer for research
    ↳ 📖 Review research doc – verify Figma links, requirements
-   ↳ ✅ Confirm to proceed to planning
+   ↳ ✅ Approve research
    ↳ 🧱 Engineering Manager delegates to Architect for planning
-   ↳ 📖 Review plan – check component breakdown, design references
-   ↳ 🧪 Engineering Manager delegates to Plan Reviewer via @eversis-review-plan for plan validation
-   ↳ 📖 Review the implementation plan and review summary
-   ↳ ✅ Confirm the approved plan before implementation begins
+   ↳ 🧪 Engineering Manager delegates to Plan Reviewer via @eversis-review-plan for plan review
+   ↳ 📖 Review the plan and review summary – check component breakdown, design references
+   ↳ ✅ Approve plan — plan and review summary together
    ↳ 💻 Engineering Manager delegates UI tasks to Software Engineer
-   ↳ 📖 Review code changes and UI Verification Summary
-   ↳ ✅ Manually verify critical UI elements in browser
    ↳ 🔄 Engineering Manager calls /eversis-review-ui in a loop until PASS or escalation
+   ↳ 📖 You can check the UI Verification Summary and the UI in the browser (optional; the run does not wait)
+   ↳ 🔍 Code review in the same run – code quality, a11y, performance
+   ↳ 🔧 On BLOCKER: the agent asks before changing, fixes, then reviews again
+   ↳ 🏁 PASS → Fine + QA comment draft
 
-2️⃣ @eversis-review <JIRA_ID or task description>  (or /eversis-review)
-   ↳ 📖 Review findings – code quality, a11y, performance
-   ↳ ✅ Address all blockers before merging
+Optional: @eversis-review <JIRA_ID or task description> (or /eversis-review) for a review-only chat or a re-review
+   (or say `pause before review` / `review later` to stop Implement before code review)
 ```
 
 :::note Mandatory QA comment draft after Fine

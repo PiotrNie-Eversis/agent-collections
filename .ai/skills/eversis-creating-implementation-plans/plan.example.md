@@ -218,11 +218,11 @@ Potential improvements identified during planning that are not part of the curre
 Numbered list of every human-approval gate this task passes through, in order. Strike through a gate once closed, and quote the user's literal closing phrase — do not paraphrase — as evidence:
 
 1. ~~Approve research~~ — done (`<exact quote>`)
-2. Approve this plan
+2. Approve this plan (with the plan-review summary)
 3. Implement → Review → Fine
 
 ## Changelog
 
 | Date   | Change Description   |
 | ------ | -------------------- |
-| <date> | Initial plan created |
+| <date> | Initial plan created from plan.example.md |

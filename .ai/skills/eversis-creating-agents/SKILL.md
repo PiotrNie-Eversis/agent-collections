@@ -1,7 +1,7 @@
 ---
 name: eversis-creating-agents
 description: "Create Agent Collections role rules under .ai/rules/ (neutral Markdown). Cursor adapters may also emit .cursor/rules/eversis-*.mdc packaging. Maps legacy agent-identity content into rule bodies; use with skills and .ai/prompts. Not .github/agents."
-user-invokable: false
+user-invocable: false
 ---
 
 # Creating agents (role rules)
@@ -28,7 +28,7 @@ Use Markdown only for inline formatting (bold, code blocks, tables, lists) withi
 </xml-syntax>
 
 <minimal-scope>
-An agent should only describe what is necessary for its specific role. Avoid duplicating instructions that belong in skills, **AGENTS.md**, or other **`.mdc`** files.
+An agent should only describe what is necessary for its specific role. Avoid duplicating instructions that belong in skills, **AGENTS.md**, or other rules under **`.ai/rules/`**.
 </minimal-scope>
 </principles>
 
@@ -46,7 +46,8 @@ Creation progress:
 - [ ] Step 6: Add domain standards (if applicable)
 - [ ] Step 7: Add constraints (if applicable)
 - [ ] Step 8: Assemble the agent file using the template
-- [ ] Step 9: Validate the agent file
+- [ ] Step 9: Register the rule in the adapter maps
+- [ ] Step 10: Validate the agent file
 ```
 
 **Step 1: Define the agent's purpose**
@@ -97,25 +98,43 @@ If the agent has specific limitations or anti-patterns to avoid, add a `<constra
 
 **Step 8: Assemble the rule file using the template**
 
-Use `./agent.template.md` as a **structural** guide: produce **`.ai/rules/.../eversis-<role>.md`** (neutral Markdown). If targeting Cursor packaging, the adapter may also emit **`.cursor/rules/eversis-<role>.mdc`** with YAML frontmatter (`description`, `globs` or `alwaysApply`). Do **not** write `.github/agents/`.
+Use `./agent.template.md` as a **structural** guide: produce **`.ai/rules/<area>/<role>.md`** (neutral Markdown, no frontmatter, starting with a `# <Role>` heading), for example `.ai/rules/orchestration/agent-core.md` or `.ai/rules/architecture/code-reviewer.md`. Do **not** add an `eversis-` prefix to the file name: the adapters add it on emit (rule id `eversis-<role>`, outputs such as `.cursor/rules/eversis-<role>.mdc`). Do **not** write `.cursor/rules/*.mdc` or `.github/agents/` by hand.
 
-**Step 9: Validate the agent file**
+**Step 9: Register the rule in the adapter maps**
+
+A rule under `.ai/rules/` reaches a host only through its `rule-map.yaml`. Packaging metadata lives in the maps, not in the rule file. Add one entry with the same `id` (`eversis-<role>`) and `source` (`.ai/rules/<area>/<role>.md`) to all three maps, choosing the activation per host:
+
+| Map | Fields | Activation choice |
+|---|---|---|
+| `adapters/cursor/rule-map.yaml` | `id`, `source`, `output: .cursor/rules/eversis-<role>.mdc`, `description` | Always: `alwaysApply: true` (keep rare). Globs: `globs:` as a YAML list of patterns. On demand: `globs: []` and `alwaysApply: false`. |
+| `adapters/claude/rule-map.yaml` | `id`, `source` only (Cursor packaging fields are rejected) | Derived: a section in `CLAUDE.md`, or `.claude/rules/eversis-<role>.md` with `paths:` when the Cursor entry has non-empty `globs`. |
+| `adapters/pi/rule-map.yaml` | `id`, `source`, `target`; with `target: skill` also `skill_id` and `description` (at most 1024 characters) | On demand: `target: skill` with `skill_id: eversis-rule-<role>` (kebab-case, at most 64 characters, unique, and not the name of an `.ai/skills/eversis-*` directory), written as a role skill under `.pi/skills/`; optional `ui_note`, `review_context_note`, `process_bundle: true` (added with the process rules after an `eversis-*` command or while a plan is active). Or `target: none`: Pi emits nothing for the rule; an optional `skill_id` names the existing framework skill that already carries the content. |
+
+Then run `npm run sync:adapters` and `npm run sync:adapters:check`.
+
+The sync check compares generated files with the maps; it does **not** report a rule file that no map lists. A rule left out of the maps is silently not emitted, so confirm the output exists (Step 10).
+
+**Step 10: Validate the agent file**
 
 Verify the agent file against this checklist:
-- [ ] YAML frontmatter is valid and parseable
-- [ ] `description` is present and concise
-- [ ] `description` / `globs` / `alwaysApply` in `.mdc` frontmatter are correct
+- [ ] The file is `.ai/rules/<area>/<role>.md` without an `eversis-` prefix and without frontmatter
+- [ ] The Cursor map entry has a concise `description` and exactly one activation choice (`alwaysApply: true`, a `globs` list, or `globs: []` with `alwaysApply: false`)
+- [ ] All three `rule-map.yaml` files list the rule with the same `id` and `source`
+- [ ] `npm run sync:adapters:check` passes
+- [ ] The rule appears in every host output: `.cursor/rules/eversis-<role>.mdc`; a `## eversis-<role>` section in `CLAUDE.md` or `.claude/rules/eversis-<role>.md`; and, for Pi with `target: skill`, `.pi/skills/eversis-rule-<role>/SKILL.md` (check with `node adapters/sync.mjs --agents cursor,claude,pi --out <tmp-dir>`)
 - [ ] Tool usage is documented in `<tool-usage>` (behavioral, not a Copilot tool manifest)
 - [ ] All skills referenced in `<skills-usage>` are existing skills in the project
 - [ ] XML-like tags are properly opened and closed
 - [ ] No workflow-specific instructions are embedded (those belong in skills)
-- [ ] No coding standards are embedded (those belong in `AGENTS.md` or `eversis-project-stack.mdc`)
+- [ ] No coding standards are embedded (those belong in `AGENTS.md` or the project stack policy, `eversis-project-stack`)
 - [ ] Role is focused and distinct from existing rules
 - [ ] Handoffs (if present) name the next **prompt** or **rule** to use
 
-## Rule file structure (`.mdc`)
+## Rule file structure
 
 ### Frontmatter (Cursor)
+
+These fields are set in the rule's entry in `adapters/cursor/rule-map.yaml` (Step 9); the Cursor adapter writes them into the generated `.mdc` frontmatter.
 
 | Field | Required | Description |
 |---|---|---|

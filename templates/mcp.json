@@ -3,11 +3,17 @@
     "context7": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"]
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ]
     },
     "sequential-thinking": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
       "type": "stdio"
     },
     "figma": {
@@ -15,12 +21,14 @@
       "type": "http"
     },
     "atlassian": {
-      "url": "https://mcp.atlassian.com/v1/mcp",
+      "url": "https://mcp.atlassian.com/v2/mcp",
       "type": "http"
     },
     "pdf-reader": {
       "command": "npx",
-      "args": ["@sylphx/pdf-reader-mcp"],
+      "args": [
+        "@sylphx/pdf-reader-mcp"
+      ],
       "type": "stdio"
     },
     "eversis-collections": {
@@ -41,32 +49,49 @@
     },
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest"],
+      "args": [
+        "@playwright/mcp@latest"
+      ],
       "type": "stdio"
     },
     "awslabs.aws-api-mcp-server": {
       "command": "uvx",
-      "args": ["--with", "mcp<2", "awslabs.aws-api-mcp-server@latest"],
+      "args": [
+        "--with",
+        "mcp<2",
+        "awslabs.aws-api-mcp-server@latest"
+      ],
       "type": "stdio"
     },
     "awslabs.aws-documentation-mcp-server": {
       "command": "uvx",
-      "args": ["awslabs.aws-documentation-mcp-server@latest"],
+      "args": [
+        "awslabs.aws-documentation-mcp-server@latest"
+      ],
       "type": "stdio"
     },
     "gcp-gcloud": {
       "command": "npx",
-      "args": ["-y", "@google-cloud/gcloud-mcp"],
+      "args": [
+        "-y",
+        "@google-cloud/gcloud-mcp"
+      ],
       "type": "stdio"
     },
     "gcp-observability": {
       "command": "npx",
-      "args": ["-y", "@google-cloud/observability-mcp"],
+      "args": [
+        "-y",
+        "@google-cloud/observability-mcp"
+      ],
       "type": "stdio"
     },
     "gcp-storage": {
       "command": "npx",
-      "args": ["-y", "@google-cloud/storage-mcp"],
+      "args": [
+        "-y",
+        "@google-cloud/storage-mcp"
+      ],
       "type": "stdio"
     }
   },

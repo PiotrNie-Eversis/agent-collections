@@ -28,7 +28,7 @@ Do **not** start implementation without approved research and plan when SDD appl
 
 ## This repository (`agent-collections`)
 
-All `docs/specs/*/` subfolders are **gitignored** (local-only MVP), regardless of ticket prefix or naming — only this `README.md` stays tracked. Keep working copies on disk for active stories; they are not published with the framework tree.
+All `docs/specs/*/` subfolders are **tracked on `develop`**, regardless of ticket prefix or naming. `master` leaves them out (`.release-exclude`), so only this `README.md` ships with the framework tree.
 
 ## Consumer projects
 

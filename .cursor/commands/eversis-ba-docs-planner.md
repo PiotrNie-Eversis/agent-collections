@@ -7,7 +7,7 @@ Build docs-update-plan.md from Confluence rules, a Jira release, and summary.md 
 **SSOT:** `.ai/prompts/public/eversis-ba-docs-planner.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 _No `## Executable prompt` section found in SSOT — open the SSOT file and follow its workflow._
 

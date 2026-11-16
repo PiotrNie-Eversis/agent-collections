@@ -64,6 +64,8 @@ Generate a report following the `./research.example.md` structure. The H1 templa
 
 Don't add or remove any sections from the template. Follow the structure and naming conventions strictly to ensure clarity and consistency.
 
+The first Changelog row names the template used (for example `Research created from research.example.md`).
+
 ## Connected Skills
 
 - `eversis-codebase-analysing` - for analyzing the existing codebase in the context of task requirements

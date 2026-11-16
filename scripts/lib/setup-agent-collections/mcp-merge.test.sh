@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mcp-merge.test.sh — unit tests for mcp-merge.sh host branching (Cursor vs
 # Claude Code) and the Claude-native syntax transform in mcp-merge.mjs.
-# Also covers the Pi host (AC-14): .pi/mcp.json bash -c locator entries and
+# Also covers the Pi host: .pi/mcp.json bash -c locator entries and
 # Pi failure isolation.
 #
 # Usage (from repo root):
@@ -266,7 +266,7 @@ else
   _fail "AWS API uvx pins mcp<2; AWS docs server stays unpinned"
 fi
 
-# Case 6 (AC-99): preserve mode — upgrade/sync reusing the record without
+# Case 6: preserve mode — upgrade/sync reusing the record without
 # --mcp-servers. Existing entries are kept byte-equal (custom env included),
 # eversis-collections is regenerated, missing selected ids come from the
 # template, nothing is deleted.
@@ -275,7 +275,7 @@ mkdir -p "${TARGET_DIR}/.cursor"
 cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
 {
   "mcpServers": {
-    "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } },
+    "atlassian": { "url": "https://mcp.atlassian.com/v2/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } },
     "eversis-collections": { "command": "stale", "args": [] },
     "my-private-server": { "command": "node", "args": ["./tools/mcp.js"] }
   },
@@ -343,7 +343,7 @@ fi
 
 # Case 6c: regression guard — preserve false still prunes deselected catalog ids.
 cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
-{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http" }, "my-private-server": { "command": "node" } } }
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v2/mcp", "type": "http" }, "my-private-server": { "command": "node" } } }
 EOF
 MCP_SELECTED_IDS="eversis-collections"
 MCP_PRESERVE_EXISTING="false"
@@ -424,9 +424,134 @@ if node -e '
 else
   _fail "preserve: eversis-collections not added when unselected and absent"
 fi
+
+# Case 6g: Atlassian removes the v1 endpoint on 2027-03-01. Preserve
+# mode moves an atlassian entry whose url is exactly the v1 URL to v2 on every
+# host and keeps all other keys; any other URL is left byte-equal.
+_atlassian_v2='https://mcp.atlassian.com/v2/mcp'
+rm -rf "${TARGET_DIR}/.cursor" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/.pi" "${TARGET_DIR}/scripts"
+mkdir -p "${TARGET_DIR}/.cursor"
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } } } }
+EOF
+_preserve_before="$(cat "${TARGET_DIR}/.cursor/mcp.json")"
+SELECTED_AGENTS="cursor"
+VENDOR_MODE=""
+MCP_SELECTED_IDS="context7"
+MCP_PRESERVE_EXISTING="true"
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
+if node -e '
+    const fs = require("fs");
+    const [beforeJson, file, v2] = process.argv.slice(1);
+    const before = JSON.parse(beforeJson).mcpServers.atlassian;
+    const after = JSON.parse(fs.readFileSync(file, "utf8")).mcpServers.atlassian;
+    if (!after || after.url !== v2) process.exit(1);
+    if (after.type !== before.type) process.exit(1);
+    if (JSON.stringify(after.env) !== JSON.stringify(before.env)) process.exit(1);
+    if (JSON.stringify({ ...after, url: before.url }) !== JSON.stringify(before)) process.exit(1);
+  ' "$_preserve_before" "${TARGET_DIR}/.cursor/mcp.json" "$_atlassian_v2" \
+  && echo "$_preserve_log" | grep -qF '[mcp-merge] cursor: atlassian URL moved from v1 to v2 — authorize the Atlassian connection again' \
+  && ! echo "$_preserve_log" | grep -qF 'MY_ATLASSIAN_TOKEN'; then
+  _pass "preserve: exact v1 atlassian url moved to v2, type/env kept, stderr notice without config values"
+else
+  _fail "preserve: exact v1 atlassian url moved to v2, type/env kept, stderr notice without config values"
+fi
+
+cat > "${TARGET_DIR}/.cursor/mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://atlassian-proxy.example.com/mcp", "type": "http", "env": { "TOKEN": "${env:MY_ATLASSIAN_TOKEN}" } } } }
+EOF
+_preserve_before="$(cat "${TARGET_DIR}/.cursor/mcp.json")"
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
+if node -e '
+    const fs = require("fs");
+    const before = JSON.parse(process.argv[1]).mcpServers;
+    const after = JSON.parse(fs.readFileSync(process.argv[2], "utf8")).mcpServers;
+    if (JSON.stringify(after.atlassian) !== JSON.stringify(before.atlassian)) process.exit(1);
+  ' "$_preserve_before" "${TARGET_DIR}/.cursor/mcp.json" \
+  && ! echo "$_preserve_log" | grep -qF 'atlassian URL moved'; then
+  _pass "preserve: custom atlassian url (proxy) kept byte-equal, no v1→v2 notice"
+else
+  _fail "preserve: custom atlassian url (proxy) kept byte-equal, no v1→v2 notice"
+fi
+
+rm -rf "${TARGET_DIR}/.cursor"
+cat > "${TARGET_DIR}/.mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "headers": { "X-Custom": "keep" } } } }
+EOF
+SELECTED_AGENTS="claude"
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
+if node -e '
+    const a = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers.atlassian;
+    if (!a || a.url !== process.argv[2] || a.type !== "http") process.exit(1);
+    if (JSON.stringify(a.headers) !== JSON.stringify({ "X-Custom": "keep" })) process.exit(1);
+  ' "${TARGET_DIR}/.mcp.json" "$_atlassian_v2" \
+  && echo "$_preserve_log" | grep -qF '[mcp-merge] claude: atlassian URL moved from v1 to v2'; then
+  _pass "claude preserve: exact v1 atlassian url in .mcp.json moved to v2, headers kept, stderr notice"
+else
+  _fail "claude preserve: exact v1 atlassian url in .mcp.json moved to v2, headers kept, stderr notice"
+fi
+
+rm -f "${TARGET_DIR}/.mcp.json"
+mkdir -p "${TARGET_DIR}/.pi"
+cat > "${TARGET_DIR}/.pi/mcp.json" <<'EOF'
+{ "mcpServers": { "atlassian": { "url": "https://mcp.atlassian.com/v1/mcp", "type": "http", "headers": { "X-Custom": "keep" } } } }
+EOF
+SELECTED_AGENTS="pi"
+PI_STAGE_FAILED="false"
+_preserve_log="$(merge_mcp_json 2>&1 >/dev/null)"
+if [[ "$PI_STAGE_FAILED" == "false" ]] && node -e '
+    const a = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers.atlassian;
+    if (!a || a.url !== process.argv[2] || a.type !== "http") process.exit(1);
+    if (JSON.stringify(a.headers) !== JSON.stringify({ "X-Custom": "keep" })) process.exit(1);
+  ' "${TARGET_DIR}/.pi/mcp.json" "$_atlassian_v2" \
+  && echo "$_preserve_log" | grep -qF '[mcp-merge] pi: atlassian URL moved from v1 to v2'; then
+  _pass "pi preserve: exact v1 atlassian url in .pi/mcp.json moved to v2, headers kept, stderr notice"
+else
+  _fail "pi preserve: exact v1 atlassian url in .pi/mcp.json moved to v2, headers kept, stderr notice"
+fi
+
+# Replace mode (preserve=false) with an old framework template whose atlassian
+# url is still v1: the written entry must carry the v2 url. COLLECTIONS_HOME
+# points at a temp tree holding only the modified template (as in Case 4b).
+rm -rf "${TARGET_DIR}/.pi" "${TARGET_DIR}/.cursor"
+_old_home="$(mktemp -d)"
+mkdir -p "${_old_home}/templates"
+node -e '
+    const fs = require("fs");
+    const [src, dst] = process.argv.slice(1);
+    const t = JSON.parse(fs.readFileSync(src, "utf8"));
+    if (!t.mcpServers || !t.mcpServers.atlassian) process.exit(1);
+    t.mcpServers.atlassian.url = "https://mcp.atlassian.com/v1/mcp";
+    fs.writeFileSync(dst, JSON.stringify(t, null, 2) + "\n");
+  ' "${REPO_ROOT}/templates/mcp.json" "${_old_home}/templates/mcp.json"
+_saved_home="$COLLECTIONS_HOME"
+_saved_ids="$MCP_SELECTED_IDS"
+COLLECTIONS_HOME="$_old_home"
+SELECTED_AGENTS="cursor"
+MCP_SELECTED_IDS="eversis-collections,atlassian"
+MCP_PRESERVE_EXISTING="false"
+merge_mcp_json 2>/dev/null
+if node -e '
+    const a = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).mcpServers.atlassian;
+    if (!a || a.url !== process.argv[2]) process.exit(1);
+  ' "${TARGET_DIR}/.cursor/mcp.json" "$_atlassian_v2"; then
+  _pass "replace: old template with v1 atlassian url writes the v2 url"
+else
+  _fail "replace: old template with v1 atlassian url writes the v2 url"
+fi
+COLLECTIONS_HOME="$_saved_home"
+MCP_SELECTED_IDS="$_saved_ids"
+MCP_PRESERVE_EXISTING="true"
+rm -rf "$_old_home"
+unset _old_home _saved_home _saved_ids
+rm -rf "${TARGET_DIR}/.pi" "${TARGET_DIR}/.mcp.json" "${TARGET_DIR}/.cursor" "${TARGET_DIR}/scripts"
+PI_STAGE_FAILED="false"
+PI_STAGE_FAILURE_REASON=""
+SELECTED_AGENTS="cursor"
+unset _atlassian_v2
 unset MCP_PRESERVE_EXISTING _preserve_before _preserve_log
 
-# --- Pi host (AC-14) --------------------------------------------------------
+# --- Pi host ----------------------------------------------------------------
 # Asserts the Pi eversis-collections entry is a bash -c locator that walks up
 # to the nearest .pi/ and that the file has no inputs and no host variable Pi
 # cannot expand in any command / args value.

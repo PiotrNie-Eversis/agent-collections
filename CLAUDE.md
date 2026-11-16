@@ -9,7 +9,7 @@
 - Resolve skills via MCP (`eversis_skills_get` / `eversis_skills_list`) when available; otherwise read `.ai/skills/<id>/SKILL.md`.
 - Do **not** expect `.cursor/commands` or Cursor `@` attachment as the only entry — those are Cursor-channel packaging.
 - Prefer backend / system-layer trees for CLI work; do **not** load Cursor-specific packaging (`.cursor/rules/*.mdc`, slash commands) for standards — this file is the Claude Code instruction surface.
-- Full ignore-file / monorepo path isolation (`.claudeignore`, `claudeMdExcludes`) is **deferred** to TASK-528–530; until then, stay in the relevant package tree and avoid unrelated frontend/tool config when possible.
+- Stay in the relevant package tree and avoid unrelated frontend/tool config when possible.
 
 ## eversis-agent-core
 
@@ -28,7 +28,7 @@ Work moves through these stages:
 5. **Review** — An independent quality check; fix blockers before calling the work finished.
 6. **Fine** — QA comment draft in the same turn; ticket publish only with explicit human approval.
 
-**Mandatory Delivery Standard:** follow [`spec-driven-development.md`](./spec-driven-development.md) (spec folder convention, gates, copy-ready Jira block, adequacy before SKIP).
+**Mandatory Delivery Standard:** follow [`spec-driven-development.md`](#eversis-spec-driven-development) (spec folder convention, gates, copy-ready Jira block, adequacy before SKIP).
 
 ## Human gates (plain language)
 
@@ -68,7 +68,7 @@ When acting as Engineering Manager or running the **Implement** prompt (`eversis
 Before broad implementation (after plan approval), check whether a skill package exists for the task domain:
 
 1. **Read the consumer project stack policy** (project-owned stack / skills policy document) — respect **Do not load** rows; prefer **Load when** rows over keyword guessing.
-2. **Read `docs/context/*.md`** when present — project patterns override generic skill defaults.
+2. **Read `docs/context/<project>/INDEX.md`** when present, then only the one component that matches the task (same order as Orchestration step 1) — project patterns override generic skill defaults.
 3. **Prefer** the **`eversis-collections` MCP** tools (`eversis_skills_list` / `eversis_skills_get`) when the server is running — only for skills allowed by the stack policy and the approved plan.
 4. **Otherwise** read the matching `SKILL.md` directly (file read or tool-native attachment) for domain-specific work — in a consumer install, both Claude Code (`.claude/skills/<id>/SKILL.md`) and Cursor (`.cursor/skills/<id>/SKILL.md`) get a real, install-time local mirror of every `.ai/skills/eversis-*` package (symlink or copy, kept in sync by the installer), so this fallback works without MCP for either host.
 5. Skill packages belong under **`.ai/skills/eversis-<topic>/`**. The per-host mirrors above are a plain local-file fallback, not a vendor-specific “Agent Skills” UI registration — do **not** register the skills folder as that kind of UI path unless the adapter docs say so.
@@ -78,7 +78,8 @@ Before broad implementation (after plan approval), check whether a skill package
 ## Quality bar
 
 - Prefer **complete** changes over `TODO` / "insert logic here".
-- Prefer **existing** project patterns; read `docs/context/*.md` before large architectural shifts.
+- Prefer **existing** project patterns; read `docs/context/<project>/INDEX.md` and the one matching component (Orchestration step 1) before large architectural shifts.
+- "Existing project patterns" applies to code. SDD artifact structure (`*.research.md`, `*.plan.md`) comes only from the framework templates, never from earlier `docs/specs/*` files.
 - **Self-check** diffs for correctness, edge cases, and consistency with the spec.
 
 ## Hard limits (implement)
@@ -119,11 +120,11 @@ Use when running the **Implement** prompt (`eversis-implement`) or acting as the
 
 ## Canonical workflow
 
-Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` after TASK-520 / adapter resolution). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
+Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` or the adapter-resolved path). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
 
 ## Human gates
 
-Follow **`agent-core.md`**: approve research, plan, and plan validation before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
+Follow **`agent-core.md`**: approve research and plan before broad code changes unless Quick Flow criteria are met and the user accepts Quick. The plan gate comes after plan review: the person approves the plan and the plan-review summary together, then code starts.
 
 On the **first response** of every Implement run (`eversis-implement`), output the Implement readiness block (four required lines, plus any optional lines that apply) as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
 
@@ -143,16 +144,17 @@ Optional additional lines, any subset, appended after the four required lines in
 
 **Self-check before sending the first message:**
 
-1. Resolved the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `ac-20` is not a hit for `ac-2`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask), inspected that folder and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
+1. Resolved the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `proj-1230` is not a hit for `proj-123`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask), inspected that folder and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
 2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Audit`, `Reason`).
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.
+6. Artifact structure comes from the skill template, never from earlier `docs/specs/*`.
 
 **Self-check before treating a mid-thread gate as cleared:**
 
 1. Does the user's message **directly respond to the specific gate** that was declared (not a different, earlier question, and not a message sent before that gate existed)?
-2. If I just declared **any** `Next gate` in this turn — not only a flow/gate change proposal — did I **stop** there, instead of also acting on it (implementing, delegating, or otherwise progressing) in this same turn?
+2. If I just declared **any** `Next gate` in this turn — not only a flow/gate change proposal — did I **stop** there, instead of also acting on it (implementing, delegating, or otherwise progressing) in this same turn? The readiness `Next gate` names the gate this turn ends at; preparing the artifact that gate covers (research file; plan, structure check and plan review) is part of reaching it, not acting on it.
 3. If the answer to #1 isn't a clean yes **and the reply is plausibly an uncertain approval attempt**, did I **ask an explicit clarifying question** instead of proceeding on a plausible reading? (Not needed when the reply is clearly something else — a question, a requested change, a clarification — just handle it directly and leave the gate open.)
 
 See orchestration skill **Gate-closing rule** for the full rule.
@@ -182,7 +184,7 @@ Use when running the **Review** prompt (`eversis-review`).
 - Apply orchestration **`testing-and-terminal.md`** for quality commands and evidence.
 - Check against specs under `docs/specs/`, the implementation plan, and `docs/context/` as referenced in the task.
 - Output structured **PASS** / **BLOCKER** / **SUGGESTION** findings.
-- Full review methodology lives in skill **`eversis-code-reviewing`** (package body under `.ai/skills/` after TASK-520; until then resolve via MCP or adapter path).
+- Full review methodology lives in skill **`eversis-code-reviewing`** (package body under `.ai/skills/`; resolve via MCP or the adapter path).
 
 ## Hard limits (BLOCKER)
 
@@ -204,7 +206,7 @@ When implementation is declared **Fine**, produce a clear, human-friendly QA sum
 
 This contract covers **Implement handoff only** (one ticket comment draft). For full test planning or regression, use the QA workflow prompt/skill (`eversis-qa-workflow`) — do not expand this draft into a full test plan.
 
-The detailed skill package is **`eversis-fine-handoff`** (body lands under `.ai/skills/` in TASK-520). Until then, follow this contract and load the skill via MCP or adapter-resolved path when available.
+The detailed skill package is **`eversis-fine-handoff`** (`.ai/skills/eversis-fine-handoff/`). Follow this contract and load the skill via MCP or the adapter-resolved path when available.
 
 ## When to run
 
@@ -315,7 +317,7 @@ Mandatory delivery contract for Agent Collections (and consumer projects that ad
 ```text
 Ideate
   → Research   → human gate (approve research before plan)
-  → Plan       → human gate (approve plan before broad code)
+  → Plan       → plan review → human gate (approve plan + review summary before broad code)
 Implement      → focused changes + quality commands
 Review         → independent check (PASS / BLOCKER / SUGGESTION) — same session as Implement by default
 Fine           → QA comment draft same turn; publish only with explicit human OK
@@ -330,7 +332,7 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 | Stage | Human approval gate? |
 |-------|----------------------|
 | Research | **Yes** — approve before plan |
-| Plan | **Yes** — approve before broad code |
+| Plan | **Yes** — approve before broad code, together with the plan-review summary |
 | Implement | No (after plan approval / Proceeding) |
 | Review (code) | **No** — runs inside the Implement session by default (Continuity); not a separate human attach gate |
 | Fine (QA draft) | Draft is automatic with Fine; **publish to Jira** needs explicit human OK |
@@ -345,18 +347,17 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 
 | Item | Convention |
 |------|------------|
-| Folder | `docs/specs/<key>-<topic>/` — ticket key, then at most three hyphen-separated topic words (e.g. `docs/specs/ac-2-context-management/`) |
-| Research | `ac-2-context-management.research.md` — before plan when Full / SDD applies |
-| Plan | `ac-2-context-management.plan.md` — before implementation when Full / SDD applies |
+| Folder | `docs/specs/<key>-<topic>/` — ticket key, then at most three hyphen-separated topic words (e.g. `docs/specs/proj-123-context-management/`) |
+| Research | `proj-123-context-management.research.md` — before plan when Full / SDD applies |
+| Plan | `proj-123-context-management.plan.md` — before implementation when Full / SDD applies |
 | Optional | `*.plan-review.md`, manifests, inventory notes as the story requires |
 
 The topic after the key is at most three hyphen-separated words. Research and plan file names repeat the folder name. A name that puts the topic before the key is not the pattern.
 
 Do **not** start implementation without approved research and plan artifacts when this Delivery Standard applies.
 
-### This framework repository vs consumers
+### Committing spec folders
 
-- In **`agent-collections`**, all `docs/specs/*/` story folders are **gitignored**, regardless of ticket prefix or naming (local agent artifacts; MVP committed docs are README / CHANGELOG / `.ai/`).
 - **Consumer projects** choose whether to commit or ignore their own `docs/specs/` — the folder convention stays the same either way.
 
 ## Delivery Standard (copy into Jira / story descriptions)
@@ -364,11 +365,11 @@ Do **not** start implementation without approved research and plan artifacts whe
 ```text
 ## Delivery Standard
 
-This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
+This story follows full spec-driven development (Agent Collections Delivery Standard).
 
-* Spec folder: docs/specs/ac-2-context-management/
-* Research: ac-2-context-management.research.md — required before plan
-* Plan: ac-2-context-management.plan.md — required before implementation
+* Spec folder: docs/specs/proj-123-context-management/
+* Research: proj-123-context-management.research.md — required before plan
+* Plan: proj-123-context-management.plan.md — required before implementation
 * Implement: load eversis-implement (approved plan attached)
 * Review: runs inside the Implement session by default (eversis-review); standalone /eversis-review is optional
 * Fine: QA comment draft per eversis-fine-handoff (same turn as Fine); publish to tracker only with explicit human OK
@@ -389,8 +390,8 @@ When running **Implement** (`eversis-implement`):
 
 ## Related
 
-- [`agent-core.md`](./agent-core.md) — always-on lifecycle, hard limits, skills discovery
-- [`engineering-manager.md`](./engineering-manager.md) — readiness block and gates
-- [`fine-handoff.md`](./fine-handoff.md) — Fine → QA draft contract
+- [`agent-core.md`](#eversis-agent-core) — always-on lifecycle, hard limits, skills discovery
+- [`engineering-manager.md`](#eversis-engineering-manager) — readiness block and gates
+- [`fine-handoff.md`](#eversis-fine-handoff) — Fine → QA draft contract
 - Skill: `eversis-orchestrating-implementation`
 - Prompts: `eversis-implement`, `eversis-review`

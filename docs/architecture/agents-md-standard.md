@@ -6,7 +6,7 @@ Normative standard for the root **`AGENTS.md`** orientation file in Agent Collec
 
 ## Purpose
 
-`AGENTS.md` is a **small, high-value context map** for any AI agent (Cursor, Claude Code, OpenCode, others). It tells the agent where project areas live, which framework roles exist, and how to enter the Delivery Standard — without dumping the whole monorepo into the session.
+`AGENTS.md` is a **small, high-value context map** for any AI agent (Cursor, Claude Code, Pi, OpenCode, others). It tells the agent where project areas live, which framework roles exist, and how to enter the Delivery Standard — without dumping the whole monorepo into the session.
 
 It is **not** a constitution, stack doc, or procedural skill. Put stack/commands in the consumer project-stack rule; put how-to in skills; put long policies in `.ai/rules/`.
 
@@ -28,6 +28,7 @@ Every `AGENTS.md` produced from this standard (template, install seed, or refere
 | 6 | Delivery Standard | Recommended | Short pointer to `docs/specs/<key>-<topic>/` and Research → Plan → Implement → Review → Fine gates. |
 | 7 | Project specifics | Yes | Consumer-owned overrides; start empty with HTML comment placeholders. |
 | 8 | Channel notes (Cursor) | Optional appendix | Cursor-only UX (`/` commands, `@` attach). Must not be required to understand the map. |
+| 9 | Channel notes (Pi) | Optional appendix | Pi-only notes for installs with `--agents=…,pi`; remove when Pi is not selected. Must not be required to understand the map. |
 
 ## Project deliverables
 
@@ -40,7 +41,7 @@ When working with the framework in **any** repository, agent/project deliverable
 | `docs/specs/` | SDD research / plan / plan-review artifacts (`docs/specs/<key>-<topic>/`) |
 | `docs/decisions/` | Architecture decisions — one file per decision plus `INDEX.md` |
 
-**Framework repository note:** all `docs/specs/*/` subfolders are **gitignored** (local-only story work on the framework itself), regardless of naming. They are not the published product surface. Committed standards and templates live elsewhere (this file, `templates/`).
+**Framework repository note:** `docs/specs/*/` subfolders are work-only story artifacts: tracked on `develop` and removed from `master` by `.release-exclude`. They are not the published product surface. Committed standards and templates live elsewhere (this file, `templates/`).
 
 ## Role matrix
 
@@ -90,9 +91,20 @@ Optional appendix. When present, it SHOULD state that on Cursor both of the foll
 
 Other tools ignore this appendix.
 
+## Channel notes (Pi)
+
+Optional appendix for consumer projects installed with `--agents=…,pi`; the template marks it as removable when Pi is not selected. When present, it SHOULD state the same facts as the root `AGENTS.md` of Agent Collections:
+
+- `.pi/APPEND_SYSTEM.md` is a small always-on core; process rules load after an `eversis-*` command or while a plan is active, so ticket work starts with `/eversis-implement`
+- `/eversis-*` prompt templates are generated under `.pi/prompts/` from the same SSOT
+- Pi loads `.pi/` only after project trust; run `/reload` after a re-sync; keep the root `AGENTS.md`, or Pi loads the full `CLAUDE.md`
+- the context-budget extension compacts once at ~50% of the context window
+
+Other tools ignore this appendix.
+
 ## Install contract (AC #3)
 
-For future installer / bootstrap (Work Stream 5; **not implemented in this standard**):
+The installer bootstrap follows this contract (`scaffold_project` in `scripts/lib/setup-agent-collections/scaffolding.sh`, run by `scripts/setup-agent-collections.sh`):
 
 | Rule | Detail |
 |------|--------|

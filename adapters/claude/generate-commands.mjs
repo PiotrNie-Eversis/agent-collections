@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Claude Code slash-command generator (port of adapters/cursor/generate.mjs's
- * TASK-598 command emit, closing F1 from
+ * slash-command emit, closing F1 from
  * docs/specs/claude-code-setup/claude-code-setup.research.md).
  *
  * Discovers .ai/prompts/{public,internal}/eversis-*.md and writes thin
@@ -306,7 +306,7 @@ function buildCommandContent(prompt, sourceBody, frameworkPrefix) {
     `**SSOT:** \`${ssotPath}\``,
     "",
     "Load and follow the Agent Collections prompt at the SSOT path above.",
-    "Prefer that file over any docs-site copy under `website/docs/prompts/`.",
+    "Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.",
     "",
   ];
 

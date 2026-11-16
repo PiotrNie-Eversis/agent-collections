@@ -42,9 +42,9 @@ The Plan Reviewer is an internal role that stress-tests implementation plans bef
 ## How It Is Used
 
 - It is not invoked directly by users.
-- The Engineering Manager delegates plan validation via `@eversis-review-plan` after the human reviews the plan draft.
-- If the reviewer returns `REVISIONS NEEDED`, the plan goes back to the Architect and is re-reviewed until approved or escalated (max 3 iterations).
-- Skip validation when `<key>-<topic>.plan-review.md` already has verdict `APPROVED` and the plan file is unchanged.
+- The Engineering Manager delegates plan review via `@eversis-review-plan` after the Architect writes or updates the plan, before you approve it; you see the review summary at the plan gate.
+- Another review round starts only on BLOCKERs: the plan goes back to the Architect and is re-reviewed (max 3 iterations, then escalated). `REVISIONS NEEDED` without BLOCKERs goes to the plan gate summary.
+- Skip plan review when `<key>-<topic>.plan-review.md` has verdict `APPROVED`, or `REVISIONS NEEDED` with no BLOCKER finding, and the plan file is unchanged.
 
 ## Handoffs
 

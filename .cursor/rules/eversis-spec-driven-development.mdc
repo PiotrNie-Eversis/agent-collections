@@ -14,7 +14,7 @@ Mandatory delivery contract for Agent Collections (and consumer projects that ad
 ```text
 Ideate
   → Research   → human gate (approve research before plan)
-  → Plan       → human gate (approve plan before broad code)
+  → Plan       → plan review → human gate (approve plan + review summary before broad code)
 Implement      → focused changes + quality commands
 Review         → independent check (PASS / BLOCKER / SUGGESTION) — same session as Implement by default
 Fine           → QA comment draft same turn; publish only with explicit human OK
@@ -29,7 +29,7 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 | Stage | Human approval gate? |
 |-------|----------------------|
 | Research | **Yes** — approve before plan |
-| Plan | **Yes** — approve before broad code |
+| Plan | **Yes** — approve before broad code, together with the plan-review summary |
 | Implement | No (after plan approval / Proceeding) |
 | Review (code) | **No** — runs inside the Implement session by default (Continuity); not a separate human attach gate |
 | Fine (QA draft) | Draft is automatic with Fine; **publish to Jira** needs explicit human OK |
@@ -44,18 +44,17 @@ Quick Flow may SKIP new research/plan **only** after the **adequacy checklist** 
 
 | Item | Convention |
 |------|------------|
-| Folder | `docs/specs/<key>-<topic>/` — ticket key, then at most three hyphen-separated topic words (e.g. `docs/specs/ac-2-context-management/`) |
-| Research | `ac-2-context-management.research.md` — before plan when Full / SDD applies |
-| Plan | `ac-2-context-management.plan.md` — before implementation when Full / SDD applies |
+| Folder | `docs/specs/<key>-<topic>/` — ticket key, then at most three hyphen-separated topic words (e.g. `docs/specs/proj-123-context-management/`) |
+| Research | `proj-123-context-management.research.md` — before plan when Full / SDD applies |
+| Plan | `proj-123-context-management.plan.md` — before implementation when Full / SDD applies |
 | Optional | `*.plan-review.md`, manifests, inventory notes as the story requires |
 
 The topic after the key is at most three hyphen-separated words. Research and plan file names repeat the folder name. A name that puts the topic before the key is not the pattern.
 
 Do **not** start implementation without approved research and plan artifacts when this Delivery Standard applies.
 
-### This framework repository vs consumers
+### Committing spec folders
 
-- In **`agent-collections`**, all `docs/specs/*/` story folders are **gitignored**, regardless of ticket prefix or naming (local agent artifacts; MVP committed docs are README / CHANGELOG / `.ai/`).
 - **Consumer projects** choose whether to commit or ignore their own `docs/specs/` — the folder convention stays the same either way.
 
 ## Delivery Standard (copy into Jira / story descriptions)
@@ -63,11 +62,11 @@ Do **not** start implementation without approved research and plan artifacts whe
 ```text
 ## Delivery Standard
 
-This story follows full spec-driven development (mandatory under Agent Collections / epic TASK-515 when applicable).
+This story follows full spec-driven development (Agent Collections Delivery Standard).
 
-* Spec folder: docs/specs/ac-2-context-management/
-* Research: ac-2-context-management.research.md — required before plan
-* Plan: ac-2-context-management.plan.md — required before implementation
+* Spec folder: docs/specs/proj-123-context-management/
+* Research: proj-123-context-management.research.md — required before plan
+* Plan: proj-123-context-management.plan.md — required before implementation
 * Implement: load eversis-implement (approved plan attached)
 * Review: runs inside the Implement session by default (eversis-review); standalone /eversis-review is optional
 * Fine: QA comment draft per eversis-fine-handoff (same turn as Fine); publish to tracker only with explicit human OK
@@ -88,8 +87,8 @@ When running **Implement** (`eversis-implement`):
 
 ## Related
 
-- [`agent-core.md`](./agent-core.md) — always-on lifecycle, hard limits, skills discovery
-- [`engineering-manager.md`](./engineering-manager.md) — readiness block and gates
-- [`fine-handoff.md`](./fine-handoff.md) — Fine → QA draft contract
+- [`agent-core.md`](./eversis-agent-core.mdc) — always-on lifecycle, hard limits, skills discovery
+- [`engineering-manager.md`](./eversis-engineering-manager.mdc) — readiness block and gates
+- [`fine-handoff.md`](./eversis-fine-handoff.mdc) — Fine → QA draft contract
 - Skill: `eversis-orchestrating-implementation`
 - Prompts: `eversis-implement`, `eversis-review`

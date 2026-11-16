@@ -7,7 +7,7 @@ Design, optimize, audit, or review LLM application prompts for quality, security
 **SSOT:** `.ai/prompts/internal/eversis-engineer-prompt.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

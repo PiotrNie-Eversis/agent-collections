@@ -1,6 +1,6 @@
 # Backend principles (seed)
 
-> **Seed** from skill `eversis-implementing-backend` (guiding principles). Full procedures, patterns, and playbooks arrive in **TASK-520**.
+> **Seed** from skill `eversis-implementing-backend` (guiding principles). Full procedures, patterns, and playbooks live in that skill.
 
 ## Guiding principles
 

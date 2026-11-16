@@ -35,7 +35,7 @@ Before drafting, read [`./plan.example.md`](./plan.example.md) in full first —
 3. Divide the work into small phases. Each phase must have a Goal, a Description, a `**Verification:**` field listing the exact fast-running checks to run after the phase completes, and a list of tasks with checkboxes. Source checks from Technical Context → Tech Stack / Testing Patterns rather than assuming Node/npm.
 4. Define each task with Description, `**Files:**`, Definition of Done, optional `**Stop Rule:**`, and optional Clues. Label each file `create`, `modify`, or `reuse`; add inline back-references when a file was produced in an earlier task.
 5. Add the mandatory cross-cutting tasks required by the plan rules.
-6. Save the plan following `./plan.example.md` exactly. Do not add or remove sections.
+6. Save the plan following `./plan.example.md` exactly. Do not add or remove sections. The first Changelog row names the template used (for example `Initial plan created from plan.example.md`).
 
 <definition-of-done-rules>
 Each task must include a definition of done as a checkbox list with at least one objectively reviewer-verifiable check.

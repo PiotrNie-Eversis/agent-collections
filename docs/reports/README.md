@@ -8,12 +8,12 @@ Use this folder for outputs from standalone analysis prompts (for example `/ever
 
 | Artifact | Canonical path |
 |----------|----------------|
-| Code quality report | [`code-quality-report.md`](./code-quality-report.md) |
+| Code quality report | `docs/reports/code-quality-report.md` (in this repository: on `develop` only) |
 
 Do **not** put these under `docs/specs/` — specs hold SDD research and implementation plans only.
 
 ## Framework repository
 
-In **this** monorepo, `docs/reports/` is trackable (not gitignored), unlike `docs/specs/*/`. Keep this README committed so the path stays discoverable next to `docs/context/`, `docs/plans/`, `docs/specs/`, and `docs/decisions/`.
+In **this** monorepo, `docs/reports/` is work-only, like `docs/specs/*/`: tracked on `develop`, removed from `master` by `.release-exclude` (this README stays). Keep this README committed so the path stays discoverable next to `docs/context/`, `docs/plans/`, `docs/specs/`, and `docs/decisions/`.
 
 **Consumer projects** may adopt the same path when they run `eversis-review-codebase`.

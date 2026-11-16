@@ -32,7 +32,7 @@ import SdlcDiagram from '@site/src/components/SdlcDiagram';
 Teams using this exact workflow report cutting workshop-to-backlog time from **1–2 days to ~15 minutes** — see [How it works](#how-it-works) above.
 
 :::note Docs hosting
-Build this site locally (`cd website && npm run build`). **Public hosting is deferred** — no production docs URL in MVP.
+The site is hosted at [agent-collections.vercel.app](https://agent-collections.vercel.app). You can also build it locally (`cd website && npm run build`).
 :::
 
 ## What this framework provides
@@ -51,11 +51,11 @@ Build this site locally (`cd website && npm run build`). **Public hosting is def
 - **Review** — `eversis-review` / UI review prompts
 - **Fine** — QA comment draft; Jira publish only with human approval
 
-### Skills and prompts (MVP)
+### Skills and prompts
 
-Prefer MCP **`eversis-collections`** and stable prompt ids under `.ai/prompts/`. Both adapters also get a local skills mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Both adapters generate thin `/eversis-*` shims — `.cursor/commands/` and `.claude/commands/` respectively — from `.ai/prompts` (TASK-598). Claude Code can use its native skills mirror without MCP.
+Prefer MCP **`eversis-collections`** and stable prompt ids under `.ai/prompts/`. Cursor and Claude Code also get a local skills mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Cursor and Claude Code get thin `/eversis-*` shims — `.cursor/commands/` and `.claude/commands/` respectively — from `.ai/prompts`. Pi gets its own skills mirror and prompt templates (below). Claude Code can use its native skills mirror without MCP.
 
-**Pi (opt-in):** choose `pi` at install time and the installer writes a `.pi/` folder — a small always-on core in `.pi/APPEND_SYSTEM.md`, `/eversis-*` prompt templates in `.pi/prompts/`, the skills mirror plus role-rule skills in `.pi/skills/`, the `eversis-collections` MCP server in `.pi/mcp.json`, an extension that adds the process rules after an `eversis-*` command or while a plan is active, and a context-budget extension that compacts the session once it is about half full (a Pi-only feature). Pi reads `.pi/` only after you trust the project. See [Installation](./getting-started/installation).
+**Pi (opt-in):** choose `pi` at install time and the installer writes a `.pi/` folder — a small always-on core in `.pi/APPEND_SYSTEM.md`, `/eversis-*` prompt templates in `.pi/prompts/`, the skills mirror plus role-rule skills in `.pi/skills/`, the `eversis-collections` MCP server in `.pi/mcp.json`, an extension that adds the process rules after an `eversis-*` command or while a plan is active, and a context-budget extension that compacts the session once it is about half full (a Pi-only feature), and a review extension that runs code review in a separate, clean Pi session. Pi reads `.pi/` only after you trust the project. See [Installation](./getting-started/installation).
 
 ## Multi-agent and isolation
 

@@ -30,12 +30,12 @@ Load **`eversis-engineering-manager`** (core: `.ai/rules/orchestration/engineeri
 Delegates to **`eversis-orchestrating-implementation`**, which owns:
 
 - **Quick vs Full flow** selection (Figma/UI always forces Full)
-- Research → plan → plan validation → implementation → review gates
+- Research (approval) → plan → plan review → plan approval → implementation → same-session review
 - Per-task todos, routing table, and UI verification gate
 - **Continuity:** same-session `eversis-review` → **Fine** + QA draft (unless opt-out)
 - **Fine** + mandatory QA comment draft via `eversis-fine-handoff`
 
-Load **`eversis-orchestrating-implementation`** for the full workflow (docs: `website/docs/skills/orchestrating-implementation.md`).
+Load **`eversis-orchestrating-implementation`** for the full workflow (docs: `website/docs/reference/skills/orchestrating-implementation.md`).
 
 ## Output
 
@@ -58,7 +58,7 @@ Start implementation delivery for a feature based on a task description, Jira it
 
 **Input:** Provide at least one of: task description, Jira ID, or `*.plan.md`. Include `*.research.md` when available. You do **not** need to type “Research” — the agent inspects existing artifacts and decides automatically (see **Entry signals** below).
 
-**Artifacts:** Create `*.research.md`, `*.plan.md`, and `*.plan-review.md` only when a gap exists — not on every run. Existing files in the folder resolved by **Spec folder lookup** in `eversis-orchestrating-implementation` may satisfy readiness (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `ac-20` is not a hit for `ac-2`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask).
+**Artifacts:** Create `*.research.md`, `*.plan.md`, and `*.plan-review.md` only when a gap exists — not on every run. Existing files in the folder resolved by **Spec folder lookup** in `eversis-orchestrating-implementation` may satisfy readiness (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `proj-1230` is not a hit for `proj-123`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask).
 
 **Workflow:** Start at Step 0 in `eversis-orchestrating-implementation` and follow that skill through Step 5 (Fine + `eversis-fine-handoff` in the same response). Do not duplicate orchestration steps in this prompt.
 
@@ -66,7 +66,7 @@ Start implementation delivery for a feature based on a task description, Jira it
 
 ### Entry signals (automatic — no extra keywords required)
 
-Before research, planning, or code, resolve the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (or use paths attached with `@`): exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `ac-20` is not a hit for `ac-2`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask.
+Before research, planning, or code, resolve the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (or use paths attached with `@`): exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `proj-1230` is not a hit for `proj-123`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask.
 
 | Signal | Default |
 | --- | --- |

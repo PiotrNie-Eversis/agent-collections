@@ -1,7 +1,7 @@
 /**
- * Tests for scripts/pi-load-check.mjs (AC-138, AC-139).
+ * Tests for scripts/pi-load-check.mjs.
  * Unit tests feed inline JSON-lines RPC fixtures to the exported pure helpers
- * (no Pi needed). Stub-Pi tests (AC-139) need no Pi either: they put a `/bin/sh`
+ * (no Pi needed). Stub-Pi tests need no Pi either: they put a `/bin/sh`
  * script named `pi` first on PATH and run the CLI with --project against an
  * empty `.pi/` (normal exit with a background process, a failed response split
  * across two chunks, a hang that ignores SIGTERM) and check the run's exit,
@@ -244,7 +244,7 @@ test("no response without timeout fails", () => {
   assert.deepEqual(result.problems, ["Pi sent no successful get_commands response"]);
 });
 
-test("parseRpcOutput: any complete get_commands response sets responded (AC-139 R3)", () => {
+test("parseRpcOutput: any complete get_commands response sets responded", () => {
   const failed = JSON.stringify({ type: "response", command: "get_commands", success: false, error: "x" });
   const rpc = parseRpcOutput(`${failed}\n`);
   assert.equal(rpc.responded, true);
@@ -255,7 +255,7 @@ test("parseRpcOutput: any complete get_commands response sets responded (AC-139 
   assert.equal(parseRpcOutput("").responded, false);
 });
 
-test("other MCP notice lines show as info, header and hint do not (AC-139 R4)", () => {
+test("other MCP notice lines show as info, header and hint do not", () => {
   const message = notify(
     "MCP servers need attention:\n  eversis-collections: failed: MCP connection closed\n  something new from Pi\nRun /mcp to fix.",
   );
@@ -355,7 +355,7 @@ test("listExpected reads generated prompts and skills by name", () => {
   ]);
 });
 
-// --- stub Pi (AC-139; /bin/sh, no real Pi) -----------------------------------
+// --- stub Pi (/bin/sh, no real Pi) -------------------------------------------
 
 const noStub = process.platform === "win32";
 
@@ -456,7 +456,7 @@ async function assertAllGone(pidList, out) {
   assert.deepEqual(alive, [], `stub process(es) still running after the run; CLI output:\n${out}`);
 }
 
-test("stub Pi: normal exit leaves no background process and does not wait for the timeout (AC-139 R2, AC2)", { skip: noStub }, async () => {
+test("stub Pi: normal exit leaves no background process and does not wait for the timeout", { skip: noStub }, async () => {
   const ok = JSON.stringify({ type: "response", command: "get_commands", success: true, data: { commands: [] } });
   const { project, pids, env } = stubPi(
     [`printf '%s\\n' '${ok}'`, "sleep 300 &", 'echo $! > "$PIDS/sleep"', "cat > /dev/null", "exit 0"].join("\n"),
@@ -468,7 +468,7 @@ test("stub Pi: normal exit leaves no background process and does not wait for th
   assert.ok(r.elapsedMs < 10000, `CLI took ${r.elapsedMs} ms:\n${r.out}`);
 });
 
-test("stub Pi: failed response split across two chunks fails without the timeout (AC-139 R3, AC3)", { skip: noStub }, () => {
+test("stub Pi: failed response split across two chunks fails without the timeout", { skip: noStub }, () => {
   const { project, env } = stubPi(
     [
       `printf '%s' '{"type":"resp'`,
@@ -485,7 +485,7 @@ test("stub Pi: failed response split across two chunks fails without the timeout
   assert.ok(r.elapsedMs < 10000, `CLI took ${r.elapsedMs} ms:\n${r.out}`);
 });
 
-test("stub Pi: hang that ignores SIGTERM times out, exits 1 and leaves no process (AC-139 R6, AC6)", { skip: noStub }, async () => {
+test("stub Pi: hang that ignores SIGTERM times out, exits 1 and leaves no process", { skip: noStub }, async () => {
   const { project, pids, env } = stubPi(
     ["trap '' TERM", 'echo $$ > "$PIDS/pi"', "sleep 300 &", 'echo $! > "$PIDS/sleep"', "wait"].join("\n"),
   );
@@ -497,7 +497,7 @@ test("stub Pi: hang that ignores SIGTERM times out, exits 1 and leaves no proces
   assert.match(r.out, /Pi timed out before answering get_commands/);
 });
 
-test("stub Pi: pipe held open from outside the group ends at the timeout, reported as timed out (AC-139)", { skip: noPerl }, async () => {
+test("stub Pi: pipe held open from outside the group ends at the timeout, reported as timed out", { skip: noPerl }, async () => {
   const ok = JSON.stringify({ type: "response", command: "get_commands", success: true, data: { commands: [] } });
   // perl leaves Pi's process group (setsid), writes its PID, then holds the
   // inherited stdout/stderr for 30 s. The group kill cannot reach it. The
@@ -568,7 +568,7 @@ test("integration: clean install passes", { skip: !hasPi }, () => {
   assert.ok(fs.existsSync(path.join(installedProject(), ".pi", "mcp.json")));
 });
 
-test("integration: unquoted 'description: Bad: x' prompt fails and is named (AC2)", { skip: !hasPi }, () => {
+test("integration: unquoted 'description: Bad: x' prompt fails and is named", { skip: !hasPi }, () => {
   const project = brokenCopy((dir) => {
     fs.writeFileSync(
       path.join(dir, ".pi", "prompts", "eversis-zz-bad.md"),

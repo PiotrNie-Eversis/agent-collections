@@ -63,4 +63,4 @@ The Architect designs technical solutions and implementation plans from approved
 
 ## Handoffs
 
-After human approval of the plan draft, the [Plan Reviewer](./plan-reviewer) stress-tests the plan via internal [Review Plan](../prompts/internal/review-plan). After verdict `APPROVED`, implementation runs through **`@eversis-implement`** ([Implement](../prompts/public/implement)) and the [Engineering Manager](./engineering-manager), including UI flows via [Implement UI](../prompts/internal/implement-ui) when Figma is in scope.
+The [Plan Reviewer](./plan-reviewer) stress-tests the plan via internal [Review Plan](../prompts/internal/review-plan) before you see it. You then approve the plan together with the review summary, and implementation runs through **`@eversis-implement`** ([Implement](../prompts/public/implement)) and the [Engineering Manager](./engineering-manager), including UI flows via [Implement UI](../prompts/internal/implement-ui) when Figma is in scope.

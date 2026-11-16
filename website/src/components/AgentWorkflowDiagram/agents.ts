@@ -160,9 +160,14 @@ export const agents: Record<AgentId, AgentDefinition> = {
       ],
       review: [
         {
+          kind: 'Extension',
+          name: 'eversis-review',
+          note: 'Runs /eversis-review automatically in a separate, clean Pi session via the eversis_independent_review tool.',
+        },
+        {
           kind: 'Command',
           name: '/new, then /eversis-review <ticket>',
-          note: 'Only a new session gives an independent review.',
+          note: 'Fallback when the separate session cannot start.',
         },
         { kind: 'Skill', name: 'eversis-rule-code-reviewer' },
       ],

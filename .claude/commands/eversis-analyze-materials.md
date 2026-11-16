@@ -12,7 +12,7 @@ Process discovery workshop materials and create Jira-ready epics and user storie
 **SSOT:** `.ai/prompts/public/eversis-analyze-materials.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

@@ -63,7 +63,7 @@ Project knowledge lives under the path from `ssot.projectContextPath` and its `I
    ---
    ```
 
-   `code_paths` is filled when the fact names paths; otherwise it is an explicit empty array. `related_specs` stays an explicit empty array. Do not point every fact at `docs/specs/ac-22/`.
+   `code_paths` is filled when the fact names paths; otherwise it is an explicit empty array. `related_specs` stays an explicit empty array. Do not point every fact at `docs/specs/proj-123/`.
 
    Followed by a short, current-state description (what it is, how it works today) — not a diff, not a changelog entry.
 

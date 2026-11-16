@@ -1,6 +1,8 @@
 /**
  * Every eversis-* token in generated Pi prompts must resolve to a prompt or a
- * skill (AC-134). Runs the generator CLI into a temp directory; never starts Pi.
+ * skill, so a prompt never points the model at a role skill that on-demand
+ * loading cannot find. Runs the generator CLI into a temp directory; never
+ * starts Pi.
  *
  * Run: node --test 'adapters/pi/*.test.mjs'
  */

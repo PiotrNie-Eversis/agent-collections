@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installer-owned wrapper for vendored Claude Code eversis-collections MCP.
+# Installer-owned wrapper for the eversis-collections MCP in vendored Claude Code and vendored Pi.
 # Derives the consumer root from this script's location (parent of scripts/),
 # not from PWD or caller environment.
 set -euo pipefail

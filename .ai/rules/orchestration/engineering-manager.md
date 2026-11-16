@@ -4,11 +4,11 @@ Use when running the **Implement** prompt (`eversis-implement`) or acting as the
 
 ## Canonical workflow
 
-Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` after TASK-520 / adapter resolution). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
+Load and follow skill **`eversis-orchestrating-implementation`** (via MCP `eversis_skills_get`, or by reading its `SKILL.md` under `.ai/skills/` or the adapter-resolved path). That skill owns flow selection (Quick vs Full), planning readiness, task routing, todos, review gates, and Fine handoff — do not improvise a parallel workflow from this rule file alone.
 
 ## Human gates
 
-Follow **`agent-core.md`**: approve research, plan, and plan validation before broad code changes unless Quick Flow criteria are met and the user accepts Quick.
+Follow **`agent-core.md`**: approve research and plan before broad code changes unless Quick Flow criteria are met and the user accepts Quick. The plan gate comes after plan review: the person approves the plan and the plan-review summary together, then code starts.
 
 On the **first response** of every Implement run (`eversis-implement`), output the Implement readiness block (four required lines, plus any optional lines that apply) as the **first content** (orchestration skill Step 1 — Readiness output contract) before artifacts or code — even when existing plan/research allow skipping Ideate.
 
@@ -28,16 +28,17 @@ Optional additional lines, any subset, appended after the four required lines in
 
 **Self-check before sending the first message:**
 
-1. Resolved the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `ac-20` is not a hit for `ac-2`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask), inspected that folder and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
+1. Resolved the spec folder with **Spec folder lookup** in `eversis-orchestrating-implementation` (exact `docs/specs/<key>/` wins; otherwise a hit is `<key>` or `<key>-`; `proj-1230` is not a hit for `proj-123`; one `<key>-<topic>` hit is used and `docs/specs/<key>/` is not created; two or more `<key>-<topic>` hits with no exact folder stop and ask), inspected that folder and any attached research/plan paths, and scanned the plan `Changelog` from the newest row backward for an unconsumed `CHECKPOINT:` (a later `RESUMED:` row, or a later row that records that same task complete, consumes it; other later rows do not). Emit `Resume` only for an unconsumed checkpoint, using the scan in `eversis-orchestrating-implementation` Step 1.
 2. First content is `## Implement readiness` with the four required lines (Flow, Research, Plan, Next gate) plus any applicable optional lines (`Resume`, `Context`, `Audit`, `Reason`).
 3. Ran **adequacy checklist** before any `Research: SKIP` when artifacts exist.
 4. No A/B/C menu or ticket recap before the readiness block.
 5. Stopped at the correct gate (before plan or before code) unless Proceeding is allowed.
+6. Artifact structure comes from the skill template, never from earlier `docs/specs/*`.
 
 **Self-check before treating a mid-thread gate as cleared:**
 
 1. Does the user's message **directly respond to the specific gate** that was declared (not a different, earlier question, and not a message sent before that gate existed)?
-2. If I just declared **any** `Next gate` in this turn — not only a flow/gate change proposal — did I **stop** there, instead of also acting on it (implementing, delegating, or otherwise progressing) in this same turn?
+2. If I just declared **any** `Next gate` in this turn — not only a flow/gate change proposal — did I **stop** there, instead of also acting on it (implementing, delegating, or otherwise progressing) in this same turn? The readiness `Next gate` names the gate this turn ends at; preparing the artifact that gate covers (research file; plan, structure check and plan review) is part of reaching it, not acting on it.
 3. If the answer to #1 isn't a clean yes **and the reply is plausibly an uncertain approval attempt**, did I **ask an explicit clarifying question** instead of proceeding on a plausible reading? (Not needed when the reply is clearly something else — a question, a requested change, a clarification — just handle it directly and leave the gate open.)
 
 See orchestration skill **Gate-closing rule** for the full rule.

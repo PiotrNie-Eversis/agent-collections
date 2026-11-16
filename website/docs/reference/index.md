@@ -14,7 +14,7 @@ Looking something up for the first time? **[Framework reference](../framework)**
 ## In this section
 
 - **[Framework reference](../framework)** — the authoritative short guide
-- **[Agents](./agents/overview)** — the twelve specialized roles
+- **[Agents](./agents/overview)** — the thirteen specialized roles
 - **[Skills](./skills/overview)** — reusable procedures agents load on demand
 - **[Prompts](./prompts/overview)** — the workflow entry points
 - **[Integrations](./integrations/overview)** — MCP servers and tool connections

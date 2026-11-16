@@ -9,7 +9,7 @@ upstream_agent: "eversis-prompt-engineer"
 # eversis-engineer-prompt
 
 :::info
-Not invoked directly by users. To trigger prompt engineering, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/agents/engineering-manager.md) will automatically delegate to the [Prompt Engineer](../../../website/docs/agents/prompt-engineer.md).
+Not invoked directly by users. To trigger prompt engineering, use the [eversis-implement](../public/eversis-implement.md) public prompt — the [Engineering Manager](../../../website/docs/reference/agents/engineering-manager.md) will automatically delegate to the [Prompt Engineer](../../../website/docs/reference/agents/prompt-engineer.md).
 :::
 
 **Agent:** Prompt Engineer  

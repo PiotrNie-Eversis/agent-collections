@@ -7,7 +7,7 @@ Implement observability solutions including metrics, logs, traces, and alerting.
 **SSOT:** `.ai/prompts/internal/eversis-implement-observability.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

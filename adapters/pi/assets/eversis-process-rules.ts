@@ -1,5 +1,5 @@
 /**
- * Agent Collections process rules for Pi (AC-134).
+ * Agent Collections process rules for Pi.
  *
  * Shipped by the Agent Collections Pi adapter (source:
  * adapters/pi/assets/eversis-process-rules.ts, copied to

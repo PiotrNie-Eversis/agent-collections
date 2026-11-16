@@ -9,7 +9,7 @@ Safe cutover from **Cursor Collections** to **Agent Collections** without coupli
 
 ## When to migrate
 
-- You need **multi-agent** packaging (Cursor + Claude MVP) from one SemVer-tagged core (`.ai/`).
+- You need **multi-agent** packaging (Cursor, Claude Code and Pi) from one SemVer-tagged core (`.ai/`).
 - You want installer selection, domain/area profiles, and `AGENT_COLLECTIONS_HOME`-based MCP.
 - You are ready to treat Cursor Collections as a **separate channel** (dual-channel code OK; **docs fully independent**).
 
@@ -53,19 +53,19 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 
 Selection file `.agent-collections/install-selection.json` is **consumer install metadata** (read by `--upgrade`; not wiped casually).
 
-## Capability matrix (Cursor vs Claude MVP)
+## Capability matrix (Cursor, Claude Code, Pi)
 
-| Capability             | Cursor                                                                     | Claude Code                                                                                                                                |
-| ---------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Core rules packaging   | Generated `.cursor/rules/*.mdc`                                            | Root `CLAUDE.md` (mapped rules) + `.claude/rules/*.md` (glob-scoped rules, `paths:` frontmatter)                                           |
-| Skills                 | MCP `eversis-collections` → `.ai/skills` (no full `.cursor/skills` mirror) | **Native** `.claude/skills/eversis-*/` (linked by the installer, no MCP required) — Claude Code has a fuller skills story here than Cursor |
-| Prompts                | Stable id / optional `@` attach                                            | Load by id; project notes belong in `.claude/CLAUDE.md`, not `AGENTS.md` (Claude Code does not auto-read it)                               |
-| Slash commands         | Thin `.cursor/commands/` from `.ai/prompts` (TASK-598)                     | Thin `.claude/commands/` from `.ai/prompts` — same generator contract, `/eversis-*` after sync                                             |
-| Ignore triad           | `.cursorignore`                                                            | `.claudeignore` — class source only; Claude Code enforces via `.claude/settings.json` `permissions.deny` (not `.claudeignore` directly)    |
-| Settings / permissions | N/A                                                                        | `.claude/settings.json` — `permissions.deny` generated from `.claudeignore` classes, `enabledMcpjsonServers` from MCP selection            |
-| Area profiles          | Path scope via installer profile                                           | Same path profiles (tool-agnostic)                                                                                                         |
-| Domain context         | MCP `eversis-collections` → `eversis_context_get`/`list`/`sync`            | Same MCP tools (tool-agnostic — identical mechanism for both)                                                                              |
-| OpenCode               | Placeholder only                                                           | —                                                                                                                                          |
+| Capability             | Cursor                                                                     | Claude Code                                                                                                                             | Pi (opt-in)                                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Core rules packaging   | Generated `.cursor/rules/*.mdc`                                            | Root `CLAUDE.md` (mapped rules) + `.claude/rules/*.md` (glob-scoped rules, `paths:` frontmatter)                                        | Small always-on core in `.pi/APPEND_SYSTEM.md`; role rules as `.pi/skills/eversis-rule-*/SKILL.md`, added on demand     |
+| Skills                 | `.cursor/skills/eversis-*/` mirror (linked or copied by the installer); MCP `eversis-collections` → `.ai/skills` preferred | **Native** `.claude/skills/eversis-*/` (linked or copied by the installer, no MCP required)                                             | `.pi/skills/eversis-*/` (always copied by the installer); MCP optional                                                  |
+| Prompts                | Stable id / optional `@` attach                                            | Load by id; project notes belong in `.claude/CLAUDE.md`, not `AGENTS.md` (Claude Code does not auto-read it)                            | `.pi/prompts/eversis-*.md` prompt templates, with the Executable section copied in                                      |
+| Slash commands         | Thin `.cursor/commands/` from `.ai/prompts`                                | Thin `.claude/commands/` from `.ai/prompts` — same generator contract, `/eversis-*` after sync                                          | `/eversis-*` from `.pi/prompts/`                                                                                         |
+| Ignore triad           | `.cursorignore`                                                            | `.claudeignore` — class source only; Claude Code enforces via `.claude/settings.json` `permissions.deny` (not `.claudeignore` directly) | Not covered by the Pi adapter                                                                                            |
+| Settings / permissions | N/A                                                                        | `.claude/settings.json` — `permissions.deny` generated from `.claudeignore` classes, `enabledMcpjsonServers` from MCP selection         | `.pi/settings.json` seeded once, then yours; Pi reads `.pi/` only after you trust the project                           |
+| Area profiles          | Path scope via installer profile                                           | Same path profiles (tool-agnostic)                                                                                                      | Not applied: no Pi ignore file yet (AC-113); the profile is only recorded in `.agent-collections/`                       |
+| Domain context         | MCP `eversis-collections` → `eversis_context_get`/`list`/`sync`            | Same MCP tools (tool-agnostic)                                                                                                          | Same MCP tools through `.pi/mcp.json`                                                                                    |
+| OpenCode               | Placeholder only                                                           | —                                                                                                                                       | —                                                                                                                        |
 
 Full mapping: [`docs/architecture/adapter-mapping.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/docs/architecture/adapter-mapping.md).
 

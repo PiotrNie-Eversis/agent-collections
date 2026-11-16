@@ -1,5 +1,5 @@
 /**
- * Tests for adapters/pi/assets/eversis-process-rules.ts (AC-134).
+ * Tests for adapters/pi/assets/eversis-process-rules.ts.
  * Imports the .ts asset directly via Node's native type stripping
  * (Node >= 22.18; dev-only — the installer itself keeps Node >= 18).
  * Handlers run against a fake Pi in a temp project; Pi is never started.
@@ -43,7 +43,7 @@ const ASSET = path.join(
   "eversis-process-rules.ts",
 );
 const SKILL_IDS = ["eversis-rule-one", "eversis-rule-two"];
-const PLAN = "docs/specs/ac-1-topic/ac-1-topic.plan.md";
+const PLAN = "docs/specs/proj-1-topic/proj-1-topic.plan.md";
 const COMMANDS = [
   { name: "eversis-implement", source: "prompt" },
   { name: "eversis-review", source: "prompt" },
@@ -133,12 +133,12 @@ test("raw asset: valid TypeScript with an empty id list", () => {
 });
 
 test("matchProcessCommand: known prompt commands on the raw text only", () => {
-  assert.equal(matchProcessCommand("/eversis-implement AC-1", COMMANDS), "eversis-implement");
+  assert.equal(matchProcessCommand("/eversis-implement PROJ-1", COMMANDS), "eversis-implement");
   assert.equal(matchProcessCommand("/eversis-review", COMMANDS), "eversis-review");
   assert.equal(matchProcessCommand("/eversis-review\nmore", COMMANDS), "eversis-review");
   for (const text of [
     "/eversis-x",
-    "/eversis-implementation AC-1",
+    "/eversis-implementation PROJ-1",
     "/eversis-tool",
     " /eversis-implement",
     "\n/eversis-implement",
@@ -273,7 +273,7 @@ test("command: active in the same run with full listing, persisted once, stays o
   const ext = load(root);
   const ctx = fakeCtx({ root });
   start(ext, ctx);
-  assert.deepEqual(input(ext, ctx, "/eversis-implement AC-1"), { action: "continue" });
+  assert.deepEqual(input(ext, ctx, "/eversis-implement PROJ-1"), { action: "continue" });
 
   const first = beforeRun(ext, ctx);
   const section = first.systemPromptOptions.sections[SECTION_KEY];
@@ -285,7 +285,7 @@ test("command: active in the same run with full listing, persisted once, stays o
   assert.equal(first.systemPromptOptions.skills.length, 2, "full listing");
 
   input(ext, ctx, "a plain follow-up");
-  input(ext, ctx, "/eversis-review AC-1");
+  input(ext, ctx, "/eversis-review PROJ-1");
   const later = beforeRun(ext, ctx);
   assert.ok(later.systemPromptOptions.sections[SECTION_KEY], "added again on a later run");
   assert.equal(later.systemPromptOptions.skills.length, 2);
@@ -303,8 +303,8 @@ test("unknown /eversis-x and a command with leading space do not activate", () =
   const ext = load(root);
   const ctx = fakeCtx({ root });
   start(ext, ctx);
-  assert.deepEqual(input(ext, ctx, "/eversis-x AC-1"), { action: "continue" });
-  input(ext, ctx, " /eversis-implement AC-1");
+  assert.deepEqual(input(ext, ctx, "/eversis-x PROJ-1"), { action: "continue" });
+  input(ext, ctx, " /eversis-implement PROJ-1");
   input(ext, ctx, "/eversis-tool");
   assert.deepEqual(beforeRun(ext, ctx).systemPromptOptions.sections, {});
   assert.deepEqual(ext.appended, []);
@@ -320,7 +320,7 @@ test("queued command: the notice says the rules start with the next run", () => 
     const ext = load(root);
     const ctx = fakeCtx({ root, idle });
     start(ext, ctx);
-    input(ext, ctx, "/eversis-implement AC-1", extra);
+    input(ext, ctx, "/eversis-implement PROJ-1", extra);
     assert.match(ctx.notices[0].message, /start with the next run/);
   }
 });
@@ -617,7 +617,7 @@ test("tool_result: a failed edit leaves the pointer alone", () => {
   toolResult(ext, ctx, "edit", PLAN, true);
   assert.ok(!fs.existsSync(path.join(root, POINTER_REL)), "no pointer created");
 
-  const other = "docs/specs/ac-2-other/ac-2-other.plan.md";
+  const other = "docs/specs/proj-2-other/proj-2-other.plan.md";
   writeFile(root, other, "- [ ] open\n");
   writePointer(root, PLAN);
   toolResult(ext, ctx, "edit", other, true);
@@ -627,14 +627,14 @@ test("tool_result: a failed edit leaves the pointer alone", () => {
 test("tool_result: other tools, other files and a missing path change nothing", () => {
   const root = project();
   writeFile(root, PLAN, "- [ ] open\n");
-  writeFile(root, "docs/specs/ac-1-topic/notes.md", "x\n");
+  writeFile(root, "docs/specs/proj-1-topic/notes.md", "x\n");
   writeFile(root, "docs/other.plan.md", "- [ ] open\n");
   const ext = load(root);
   const ctx = fakeCtx({ root });
   toolResult(ext, ctx, "read", PLAN);
-  toolResult(ext, ctx, "edit", "docs/specs/ac-1-topic/notes.md");
+  toolResult(ext, ctx, "edit", "docs/specs/proj-1-topic/notes.md");
   toolResult(ext, ctx, "edit", "docs/other.plan.md");
-  toolResult(ext, ctx, "edit", "docs/specs/ac-1-topic/missing.plan.md");
+  toolResult(ext, ctx, "edit", "docs/specs/proj-1-topic/missing.plan.md");
   ext.handlers.tool_result({ toolName: "edit", isError: false }, ctx);
   ext.handlers.tool_result({ toolName: "edit", input: { path: 7 }, isError: false }, ctx);
   assert.ok(!fs.existsSync(path.join(root, ".pi", "eversis-state")));

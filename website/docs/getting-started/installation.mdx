@@ -14,6 +14,8 @@ Install **Agent Collections** into your project in about **three steps**: downlo
 
 :::tip Before you start
 Finish **[Prerequisites](./prerequisites)** first — especially **Docker Desktop** (or an IT-approved Compose-compatible runtime) with the engine **running**. If the installer fails with something like “Cannot connect to the Docker daemon,” start Docker and try again.
+
+The installer also needs **Node.js 22** or newer on your `PATH` — see [Node.js 22](#nodejs-22) in Step 2.
 :::
 
 Installation turns on the assistant’s built-in tools and skills for that project — structured research/plan/review workflows and a library of reusable prompts. The **`eversis-collections`** skills server (an MCP server — the connection that lets your editor call those tools) runs in **Docker**, so Docker must be installed and running before you run the installer.
@@ -75,6 +77,52 @@ In the terminal, go to **your consumer project** (or create an empty sample fold
 Open Docker Desktop and confirm the engine is running (whale icon in the menu bar / system tray). If the command below fails with “Cannot connect to the Docker daemon,” start Docker and retry. Full tooling checklist: [Prerequisites](./prerequisites).
 :::
 
+### Node.js 22 {#nodejs-22}
+
+The installer runs the framework's Node.js scripts (Node.js is the JavaScript runtime behind the `node` command), so it checks the Node version **before any other step**. It uses whichever `node` comes first on your `PATH` in the shell where you run it.
+
+| `node --version` | What the installer does |
+| --- | --- |
+| 22 or newer | Continues |
+| 18–21 | Warns `Node X is end-of-life and not tested; use Node 22 or newer.` and continues |
+| Older than 18 | Stops with `Node X found, Agent Collections needs Node 22 or newer.` and a hint to put a newer Node first on `PATH` |
+| No `node` on `PATH` | Stops with `Required command 'node' not found. Install Node.js 22 or newer from https://nodejs.org.` and the same hint |
+
+**Project pinned to an older Node?** You do not have to change the project's own Node version. Put Node 22 first on `PATH` only in the shell where you run the installer, then switch back.
+
+<Tabs groupId="operating-system">
+<TabItem value="macos" label="macOS / Linux" default>
+
+With [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager):
+
+```bash
+nvm install 22 && nvm use 22
+node --version   # v22.x or newer
+
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --upgrade --sync --non-interactive
+
+nvm use          # back to the version in the project's .nvmrc
+```
+
+</TabItem>
+<TabItem value="windows" label="Windows (Git Bash)">
+
+Install Node 22 from [nodejs.org](https://nodejs.org/) (or with your Node version manager), then put its folder first on `PATH` for this Git Bash session only. Adjust the folder to where your Node 22 is installed:
+
+```bash
+export PATH="/c/Program Files/nodejs:$PATH"
+node --version   # v22.x or newer
+
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --upgrade --sync --non-interactive
+```
+
+Closing the Git Bash window drops the change.
+
+</TabItem>
+</Tabs>
+
+Use the command for your case — the recommended first-install command below, or `--upgrade --sync` for an existing install. Claude Code also runs `node` for the [spec artifact hook](../coding-agents/claude-code.mdx#spec-artifact-hook), so start Claude Code from a shell where Node 22 is first on `PATH` too.
+
 <Tabs groupId="operating-system">
 <TabItem value="macos" label="macOS / Linux" default>
 
@@ -128,6 +176,7 @@ With Pi selected, the installer writes a `.pi/` folder in your project:
 | `.pi/skills/` | All framework skills (`eversis-*`) plus role-rule skills (`eversis-rule-*`, loaded with `/skill:<name>`) |
 | `.pi/extensions/eversis-process-rules.ts` | Adds the process rules after an `eversis-*` command or while a plan is active ([details](#pi-process-rules)). Keeps its state in `.pi/eversis-state/`, which ignores itself in git |
 | `.pi/extensions/eversis-context-budget.ts` | Context budget — compacts the session once when context use crosses **50%** of the model window and resumes an interrupted task ([details](#pi-context-budget)) |
+| `.pi/extensions/eversis-review.ts` | Independent code review — runs `/eversis-review` in a separate Pi session through the `eversis_independent_review` tool ([details](#pi-review)) |
 | `.pi/mcp.json` | The `eversis-collections` MCP server — see [MCP Setup](./mcp-setup) |
 | `.pi/settings.json` | Seeded once; yours to edit afterwards |
 
@@ -144,7 +193,7 @@ A Pi session without a command stays small: about 4,600 characters of system pro
 - After any `eversis-*` command, for the rest of that session.
 - In a new session, when Pi edited or wrote a `docs/specs/**/*.plan.md` file that still has an open checkbox. The notice names the plan and the file to delete if the work is abandoned.
 
-**Start ticket work with `/eversis-implement <ticket>`.** A plain request such as "implement AC-123" gets the hard limits and quality checks, but not the research, plan and review gates. A command run costs more than before (about 58,000 characters), because it carries the full process as text. Cursor and Claude Code keep their rules always on.
+**Start ticket work with `/eversis-implement <ticket>`.** A plain request such as "implement PROJ-123" gets the hard limits and quality checks, but not the research, plan and review gates. A command run costs more than before (about 58,000 characters), because it carries the full process as text. Cursor and Claude Code keep their rules always on.
 
 `eversis-add-domain-knowledge` is not a command, and a plain request may not find it. Run it with `/skill:eversis-add-domain-knowledge`.
 
@@ -154,9 +203,15 @@ Long sessions get slower and less accurate as the context window (the model's wo
 
 #### Code review in Pi {#pi-review}
 
-Pi has no sub-agents, so when `/eversis-implement` reaches code review in Pi, the same session that wrote the code also reviews it. That is self-review, not an independent check. Every review result in Pi says which kind it was: `Review context: same session as implementation (not independent)` or `Review context: fresh session (independent)`. The QA comment draft repeats that line.
+Pi has no sub-agents, so without help, when `/eversis-implement` reaches code review in Pi, the same session that wrote the code also reviews it. That is self-review, not an independent check. The extension `.pi/extensions/eversis-review.ts` fixes this: at the review step, and again after every blocker fix, the agent calls the `eversis_independent_review` tool, which runs `/eversis-review` in a **separate Pi session** that has not seen the implementing conversation. That session sees only the review prompt, the spec folder and the repository. It cannot use Pi's file-editing tools, and shell commands that look like they write files are blocked; it can still run tests, so it is edit-restricted, not read-only. The agent goes on to Fine only when the result is PASS.
 
-To get an independent review, start a **new** Pi session in the project root (`pi`, or `/new` in an open session) and run `/eversis-review AC-123`. With only the ticket key, the reviewer finds the task's folder under `docs/specs/` and asks if more than one matches; you can also pass the folder, for example `/eversis-review AC-123 docs/specs/ac-123-topic/`. Do not use `/fork`, `/clone` or `/tree` for this — they keep the earlier conversation. An automatic review in a separate Pi session is planned. Cursor and Claude Code are not affected.
+**Token cost:** each review is about one extra review run, repeated after each blocker fix. Pi shows a notice when it starts, and the result ends with a `Review usage:` line.
+
+Every review result in Pi says which kind it was: `Review context: separate Pi session (independent)`, `Review context: same session as implementation (not independent)` or `Review context: fresh session (independent)`. The QA comment draft repeats that line.
+
+If the separate session cannot run, the tool says `Independent review did not run` with the reason, and the steps below. One known case: a model that only a Pi extension supplies (`pi.registerProvider`) is not available to the clean session; models from Pi login, `auth.json` or `models.json` work.
+
+As a fallback, or to review yourself, start a **new** Pi session in the project root (`pi`, or `/new` in an open session) and run `/eversis-review PROJ-123`. With only the ticket key, the reviewer finds the task's folder under `docs/specs/` and asks if more than one matches; you can also pass the folder, for example `/eversis-review PROJ-123 docs/specs/proj-123-topic/`. Do not use `/fork`, `/clone` or `/tree` for this — they keep the earlier conversation. Cursor and Claude Code are not affected.
 
 Pi ignore files, subscription sign-in and an isolated workspace are not part of this release yet. Adapter details: [`adapters/pi/README.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/adapters/pi/README.md).
 
@@ -178,6 +233,40 @@ Confirm the install worked in your **consumer project** before you leave for MCP
 - You ran the installer from the **consumer project** folder (not inside `agent-collections`).
 - **`AGENT_COLLECTIONS_HOME`** points at your framework checkout (re-export it in the same shell if needed).
 - **Docker** is running — see [Prerequisites](./prerequisites).
+- **Node.js 22** or newer is first on `PATH` — see [Node.js 22](#nodejs-22).
+- The installer reported an **incomplete skills mirror** — see [Skills mirror and the copy fallback](#skills-mirror).
+
+To check an existing install without changing anything, run [`--doctor`](#doctor).
+
+### Skills mirror and the copy fallback {#skills-mirror}
+
+The installer puts every framework skill package into `.claude/skills/eversis-*/` and `.cursor/skills/eversis-*/` as a link (symlink) or a copy, depending on `--link-mode`. If a link cannot be created for a skill (for example on a Windows machine that does not allow links), the installer copies that skill instead, logs `Link failed for <name> — copied instead`, and counts the copies in its summary line.
+
+After every run the installer checks that each skill has a readable `SKILL.md` in those folders. If any is missing, the run **fails** and lists them (`missing: .claude/skills/<name>/SKILL.md`). Fix it by re-running with copies instead of links:
+
+```bash
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
+  --upgrade --sync --non-interactive --link-mode copy
+```
+
+### Check an install with `--doctor` {#doctor}
+
+`--doctor` is a read-only health check for an existing install. Run it from the consumer project:
+
+```bash
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --doctor
+```
+
+It prints one line per check and runs every check even when one fails:
+
+- the Node version (same rule as [Node.js 22](#nodejs-22));
+- the target folder (`--target`, else the git root, else the current folder);
+- the framework home: `vendor/agent-collections` for submodule and copy installs, `.agent-collections/framework-home.txt` for local installs, else the installer's own checkout — it must contain `.ai/skills`;
+- the selected agents (from `--agents`, else `.agent-collections/install-selection.json`, else the skills mirrors found on disk);
+- the Claude Code and Cursor skills mirrors (skipped for an agent that is not selected);
+- with Claude Code selected: the spec artifact hook entry in `.claude/settings.json`, the hook file, and the hook's own self-test.
+
+It changes nothing: it does not clone, fetch or write files. It exits **0** when every check passes and **1** otherwise.
 
 When those checks pass, go to **[MCP Setup](./mcp-setup)** to connect tools in your editor (Cursor, Claude Code, or Pi).
 
@@ -265,11 +354,16 @@ Then re-run `--upgrade --sync` (and `--build-mcp` if the MCP server itself chang
 | `--agents` | `cursor`, `claude`, `pi`, `opencode` (opencode = placeholder; pi = [Pi coding agent](#pi-coding-agent)) |
 | `--mcp-servers` | Comma-separated ids; without it + `--non-interactive` → `eversis-collections` only |
 | `--profile` | `frontend` \| `backend` \| `fullstack` |
-| `--link-mode` | `auto` \| `symlink` \| `copy` |
+| `--link-mode` | `auto` \| `symlink` \| `copy` (a skill whose link fails is copied instead — see [Skills mirror](#skills-mirror)) |
 | `--sync` | Refresh framework-managed surfaces |
 | `--upgrade` | Reuse selection (fail-safe if missing/corrupt) |
 | `--non-interactive` | No prompts — defaults + flags |
+| `--doctor` | Read-only health check of an existing install; changes nothing, exit 0 / 1. Honours `--target` and `--agents` only — see [`--doctor`](#doctor) |
 | `--target DIR` | Consumer path when not running from that repo |
+| `--vendor submodule\|copy` | Vendor the framework into the project under `vendor/agent-collections`; default is local (framework outside the repo) — see [Vendor modes](#vendor-modes) |
+| `--force` | Allow setup even when the framework home looks incomplete |
+| `--gitignore-agent-artifacts` | Local mode only: add `docs/specs/*/` and `docs/context/*/` to `.gitignore` |
+| `--project-name NAME` | Folder name for `docs/context/<NAME>/` (kebab-cased). Default: `SSOT_PROJECT_SLUG`, else the recorded path, else the main worktree's name (in a linked git worktree), else the target folder name. On `--upgrade` / `--sync`, a passed value replaces the recorded path |
 | `--collections-home DIR` | Framework checkout path (safer than relying on an unset `$AGENT_COLLECTIONS_HOME` expansion) |
 | `--ssot-source URL` | Git URL of a `domain-context` repo to seed `docs/context/global/` from (optional — omit on **first** install to start empty). On `--upgrade` / `--sync`, omit to **keep** the URL already in `install-selection.json`; pass `--ssot-source ""` or `--ssot-source=` to **clear** it. |
 | `--ssot-branch NAME` | Branch to pull from `--ssot-source` (default `main`) |
@@ -280,10 +374,10 @@ Interactive runs (TTY, without `--non-interactive`) prompt for agents × domain 
 </details>
 
 <details>
-<summary><strong>Skills, prompts, and stack customisation (MVP)</strong></summary>
+<summary><strong>Skills, prompts, and stack customisation</strong></summary>
 
-- **Skills** resolve from **`.ai/skills/`** (SSOT). Prefer MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or read `SKILL.md` directly. Both adapters also get a local mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Claude Code can use its native skills mirror without MCP. Pi gets the same mirror under `.pi/skills/eversis-*/` when selected.
-- **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced. Both adapters generate thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`). Pi gets prompt templates under `.pi/prompts/` (installer with `--agents=…,pi`).
+- **Skills** resolve from **`.ai/skills/`** (SSOT). Prefer MCP **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`), or read `SKILL.md` directly. Cursor and Claude Code also get a local mirror under `.cursor/skills/eversis-*/` and `.claude/skills/eversis-*/` (framework sync / installer) for load-by-path or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. Claude Code can use its native skills mirror without MCP. Pi gets the same mirror under `.pi/skills/eversis-*/` when selected (always a copy).
+- **Prompts** load by **stable id** under `.ai/prompts/` (e.g. `eversis-implement`). Optional Cursor `@` attach when surfaced. Cursor and Claude Code get thin slash shims from `.ai/prompts`: `.cursor/commands/` for Cursor, `.claude/commands/` for Claude Code (after `npm run sync:adapters`). Pi gets prompt templates under `.pi/prompts/` (installer with `--agents=…,pi`).
 - **Domain context** (durable, cross-task knowledge — see [Domain Context (SSOT)](../domain-context)) is scaffolded on **every** install: `docs/context/<project>/INDEX.md` is created if missing. If `--ssot-source` is reachable, the installer also best-effort seeds `docs/context/global/` from it — this step never blocks or fails the install.
 
 | Channel | Customise |

@@ -13,12 +13,6 @@ Authoritative short guide for **Agent Collections**: a vendor-neutral multi-agen
 
 **Delivery standard:** Ideate → Research → Plan → Implement → Review → Fine.
 
-Repo source: [`documentation/agent-collection.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/documentation/agent-collection.md).
-
-:::info Hosting
-This site builds locally (`npm run build` in `website/`). **Public hosting is deferred** — there is no production docs URL in MVP.
-:::
-
 ## Model
 
 The repo splits into five top-level concerns: canonical content, tool packaging, the MCP server, the installer, and shared templates.
@@ -85,7 +79,7 @@ Skills are the reusable procedures an agent loads on demand rather than keeping 
 
 Skills live under `.ai/skills/eversis-*/`. Prefer MCP server **`eversis-collections`** (`eversis_skills_list` / `eversis_skills_get`). Respect the consumer **project stack** skills policy. Includes 4 domain-context skills: `eversis-add-domain-knowledge`, `eversis-promote-domain-knowledge`, `eversis-import-confluence-knowledge`, `eversis-audit-domain-knowledge`.
 
-Both adapters mirror skill packages under `.cursor/skills/eversis-*` and `.claude/skills/eversis-*` (and `.pi/skills/eversis-*` when Pi is selected) (framework sync / installer) for load-by-path or `@` attach. Prefer MCP for discovery; do **not** register `.cursor/skills` as Cursor **Agent Skills** UI.
+The installer mirrors skill packages under `.cursor/skills/eversis-*` and `.claude/skills/eversis-*` (and `.pi/skills/eversis-*` when Pi is selected) for load-by-path or `@` attach. Prefer MCP for discovery; do **not** register `.cursor/skills` as Cursor **Agent Skills** UI.
 
 The same MCP server also exposes a separate tool group, `eversis_context_*`, for reading and syncing **domain context** — see [Domain Context (SSOT)](./domain-context) and the [full tool inventory](./reference/integrations/eversis-collections#domain-context).
 

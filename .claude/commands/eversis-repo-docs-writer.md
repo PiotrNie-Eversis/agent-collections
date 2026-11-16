@@ -12,7 +12,7 @@ Author or update repository documentation (README, CHANGELOG, docs/, website/) â
 **SSOT:** `.ai/prompts/public/eversis-repo-docs-writer.md`
 
 Load and follow the Agent Collections prompt at the SSOT path above.
-Prefer that file over any docs-site copy under `website/docs/prompts/`.
+Prefer that file over any docs-site copy under `website/docs/reference/prompts/`.
 
 ## Executable prompt (attach in Cursor)
 

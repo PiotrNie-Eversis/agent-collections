@@ -50,7 +50,7 @@ There is **no** `status` field. Do not add one.
 - Adding a `status` field
 - Writing under `docs/context/`
 - Filing the decision via `eversis-promote-domain-knowledge`
-- Copying Earth Online As-Is Pack decision-log rows into the framework repo
+- Copying a consumer product's As-Is Pack decision-log rows into the framework repo
 
 ## What this skill does NOT do
 

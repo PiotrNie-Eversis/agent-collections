@@ -7,7 +7,7 @@ title: Atlassian
 
 **Server key:** `atlassian`  
 **Type:** HTTP  
-**URL:** `https://mcp.atlassian.com/v1/mcp`
+**URL:** `https://mcp.atlassian.com/v2/mcp`
 
 Provides integration with Jira and Confluence for gathering requirements, task context, and project documentation.
 
@@ -35,11 +35,15 @@ Provides integration with Jira and Confluence for gathering requirements, task c
 ```json
 {
   "atlassian": {
-    "url": "https://mcp.atlassian.com/v1/mcp",
+    "url": "https://mcp.atlassian.com/v2/mcp",
     "type": "http"
   }
 }
 ```
+
+:::note
+Atlassian removes the old endpoint `https://mcp.atlassian.com/v1/mcp` on 2027-03-01. Run `setup-agent-collections.sh --upgrade --sync` to move an unchanged v1 entry to v2. A custom URL is not changed. After the switch, authorize the Atlassian connection again.
+:::
 
 ## Authentication
 

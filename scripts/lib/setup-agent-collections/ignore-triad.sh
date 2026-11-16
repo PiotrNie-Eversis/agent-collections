@@ -2,7 +2,7 @@
 # lib/setup-agent-collections/ignore-triad.sh — merge framework ignore classes without wipe.
 
 merge_ignore_triad() {
-  require_cmd node "Install Node.js ≥ 18"
+  require_cmd node "Install Node.js 22 or newer"
   node "${LIB_DIR}/merge-ignore-triad.mjs" \
     --home "${COLLECTIONS_HOME}" \
     --target "${TARGET_DIR}" \

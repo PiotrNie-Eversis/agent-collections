@@ -18,8 +18,8 @@ const HeroSection = () => {
           An opinionated <strong>vendor-neutral multi-agent</strong> product engineering
           framework — rules, prompts, MCP, and skills for the full SDLC.
           <br />
-          <strong>Ideate → Implement → Review</strong> — with human gates at
-          every step.
+          <strong>Ideate → Implement → Review</strong> — you approve the
+          research, the plan and the QA comment.
         </p>
         <div className={styles.heroActions}>
           <Link

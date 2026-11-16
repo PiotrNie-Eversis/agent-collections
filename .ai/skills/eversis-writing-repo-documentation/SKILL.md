@@ -68,7 +68,6 @@ Documentation progress:
 **Step 5: Validate links and the documentation build.** Run quality commands from **`eversis-project-stack.mdc`** (or the consumer project's stack rule). For **cursor-collections** and repos mirroring it:
 
 ```bash
-node scripts/validate-cursor-markdown-links.mjs --context=source
 cd website && npm run build
 ```
 

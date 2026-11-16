@@ -1,5 +1,5 @@
 /**
- * Integration test for .pi/extensions/eversis-process-rules.ts on real Pi (AC-134).
+ * Integration test for .pi/extensions/eversis-process-rules.ts on real Pi.
  *
  * Runs `pi --mode rpc --approve` in temp projects and reads what Pi really sent
  * to a local stub model. event.systemPrompt keeps the pre-mutation length, so
@@ -33,7 +33,10 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 const GENERATOR = path.join(REPO_ROOT, "adapters", "pi", "generate.mjs");
 const SKILLS_SOURCE = path.join(REPO_ROOT, ".ai", "skills");
 
-/** System prompt size of a full install before AC-134 (research, Pi 1.5.0). */
+/**
+ * System prompt size of a full install before the process rules moved to
+ * on-demand loading (measured during research, Pi 1.5.0).
+ */
 const BASELINE_CHARS = 45_996;
 const SECTION_OPEN = "<eversis_process_rules>";
 const SECTION_CLOSE = "</eversis_process_rules>";
@@ -47,7 +50,7 @@ const BUNDLE = [
   "eversis-rule-engineering-manager",
   "eversis-rule-spec-driven-development",
 ];
-const PLAN_REL = "docs/specs/ac-1-demo/ac-1-demo.plan.md";
+const PLAN_REL = "docs/specs/proj-1-demo/proj-1-demo.plan.md";
 const POINTER_REL = ".pi/eversis-state/active-plan.json";
 const OPEN_BOX = "- [ ] first task";
 const DONE_BOX = "- [x] first task";
@@ -349,7 +352,7 @@ describe("process rules on real Pi", describeOptions, () => {
 
   test("plain session, then a command, then a later message", { timeout: TEST_TIMEOUT_MS }, async (t) => {
     const project = newProject();
-    const { requests, notifications } = await run(project, ["hello", "/eversis-implement AC-1", "and then"]);
+    const { requests, notifications } = await run(project, ["hello", "/eversis-implement PROJ-1", "and then"]);
     assert.equal(requests.length, 3);
     const [plain, command, later] = requests;
 
@@ -359,18 +362,18 @@ describe("process rules on real Pi", describeOptions, () => {
     assert.ok(plain.system.length < BASELINE_CHARS, `${plain.system.length} is below ${BASELINE_CHARS}`);
 
     assertActive(project, command);
-    assert.ok(command.user.length > "/eversis-implement AC-1".length, "Pi expanded the prompt");
+    assert.ok(command.user.length > "/eversis-implement PROJ-1".length, "Pi expanded the prompt");
     assertActive(project, later);
 
     // A normal command is not queued: the notice must not say "next run".
     const seen = fs.readFileSync(path.join(project, ".pi", "zz-input.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line));
-    assert.deepEqual(seen[1], { text: "/eversis-implement AC-1", idle: true, streamingBehavior: null });
+    assert.deepEqual(seen[1], { text: "/eversis-implement PROJ-1", idle: true, streamingBehavior: null });
     assert.ok(notifications.includes("Agent Collections process rules on: /eversis-implement."), notifications.join("\n"));
   });
 
   test("/eversis-review carries the Review context note in its first request", { timeout: TEST_TIMEOUT_MS }, async () => {
     const project = newProject();
-    const { requests } = await run(project, ["/eversis-review AC-1"]);
+    const { requests } = await run(project, ["/eversis-review PROJ-1"]);
     assert.equal(requests.length, 1);
     assertActive(project, requests[0]);
     assert.match(requests[0].system, /Review context:/);

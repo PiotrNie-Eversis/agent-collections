@@ -7,17 +7,17 @@ title: Agent Collections MCP
 
 **Server key:** `eversis-collections`  
 **Type:** stdio  
-**Package:** [`mcp/eversis-collections-mcp/`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/main/mcp/eversis-collections-mcp) — **not published to npm**; build from a clone.
+**Package:** [`mcp/eversis-collections-mcp/`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/master/mcp/eversis-collections-mcp) — **not published to npm**; build from a clone.
 
-The **local first-party MCP (Model Context Protocol) bridge** for Agent Collections. It connects **Cursor Agent** to procedural **skills** (`.cursor/skills/eversis-*/SKILL.md`), **Word `.docx` chapter tools** (Business Manager Docs), and **allowlisted repository scripts** — in one server alongside third-party MCPs in [`.cursor/mcp.json`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/.cursor/mcp.json).
+The **local first-party MCP (Model Context Protocol) bridge** for Agent Collections. It connects your coding agent — **Cursor**, **Claude Code** or **Pi** — to procedural **skills** (source: `.ai/skills/eversis-*/SKILL.md`), **Word `.docx` chapter tools** (Business Manager Docs), and **allowlisted repository scripts** — in one server alongside third-party MCPs. The installer writes the entry into each selected host's MCP file: `.cursor/mcp.json` (Cursor), `.mcp.json` (Claude Code) or `.pi/mcp.json` (Pi).
 
-Unlike third-party servers that run via `npx`, this server **must be built** before Agent can call its tools.
+Unlike third-party servers that run via `npx`, this server **must be built** before the agent can call its tools.
 
 ## Capabilities
 
-- **Skills in Agent** — List, read, and validate `eversis-*` skill packages; run allowlisted per-skill scripts.
+- **Skills in the agent** — List, read, and validate `eversis-*` skill packages; run allowlisted per-skill scripts.
 - **Business Manager Docs** — Read and edit Word `.docx` release documentation by chapter (summary maps, append/update, table cells).
-- **Repo automation** — Run allowlisted root scripts (`sync-prompts`, `sync-framework-doc`) and skill validation from Agent or CI.
+- **Repo automation** — Run the allowlisted root script `sync-adapters` and skill validation from the agent or CI.
 
 ## Which Agents and Prompts Use It
 
@@ -32,18 +32,18 @@ Unlike third-party servers that run via `npx`, this server **must be built** bef
 | **Any agent (on request)**                                                   | `eversis-import-confluence-knowledge` (seed domain context from an existing Confluence page), `eversis-audit-domain-knowledge` (periodic review)            |
 | **Contributors**                                                             | `eversis_skills_validate` (same checks as `npm run validate` in the MCP package)                                                                            |
 
-## Tool inventory (17 tools)
+## Tool inventory (18 tools)
 
 | Group              | Tools                                                                                                                                                                                      | Count |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- |
 | **Skills**         | `eversis_skills_list`, `eversis_skills_get`, `eversis_skills_validate`, `eversis_skill_run_script`                                                                                         | 4     |
-| **Repo**           | `eversis_repo_run_script` (`sync-prompts`, `sync-framework-doc`)                                                                                                                           | 1     |
+| **Repo**           | `eversis_repo_run_script` (`sync-adapters`)                                                                                                                                                | 1     |
 | **Domain context** | `eversis_context_get`, `eversis_context_list`, `eversis_context_sync`                                                                                                                      | 3     |
-| **Word / BA Docs** | `generate_summary_map`, `read_chapter`, `append_chapter`, `update_chapter`, `update_table_cell`, `list_section_elements`, `inspect_document`, `backup_docx`, `upload_to_sharepoint` (stub) | 9     |
+| **Word / BA Docs** | `generate_summary_map`, `read_chapter`, `append_chapter`, `update_chapter`, `update_table_cell`, `list_section_elements`, `inspect_document`, `validate_docx`, `backup_docx`, `upload_to_sharepoint` (stub) | 10    |
 
 ## Tool reference
 
-Each entry: **Focus** (goal), **How to use** (when Agent calls it), **Outcome** (what you get back).
+Each entry: **Focus** (goal), **How to use** (when the agent calls it), **Outcome** (what you get back).
 
 :::note Keep in sync
 When adding or changing MCP tools, update this section and the matching **Tool reference** in [`mcp/eversis-collections-mcp/README.md`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/blob/master/mcp/eversis-collections-mcp/README.md). The package README also documents document compatibility, environment variables, and tests.
@@ -53,9 +53,9 @@ When adding or changing MCP tools, update this section and the matching **Tool r
 
 #### `eversis_skills_list`
 
-- **Focus:** Discover all `eversis-*` skill packages under `.cursor/skills/`.
+- **Focus:** Discover all `eversis-*` skill packages under `.ai/skills/`.
 - **How to use:** Enabled MCP; Agent calls at the start of implement/review when `eversis-agent-core` instructs skill discovery.
-- **Outcome:** JSON list of `{ name, description }` from each `SKILL.md` frontmatter.
+- **Outcome:** JSON list of `{ id, name, description, userInvocable }` from each `SKILL.md` frontmatter. `userInvocable` is `false` when the skill is hidden from the person's `/` menu (`user-invocable: false`); a skill without the key reports `true`. The deprecated `userInvokable` field carries the same value for one release.
 
 #### `eversis_skills_get`
 
@@ -67,18 +67,18 @@ When adding or changing MCP tools, update this section and the matching **Tool r
 
 - **Focus:** CI-quality validation of every skill package.
 - **How to use:** Call from Agent or run `npm run validate` / `node dist/cli.js validate`; set `treatWarningsAsErrors: true` (or `--strict`) in CI.
-- **Outcome:** JSON report of errors and warnings (frontmatter, directory name match, `SKILL.md` presence, length hints).
+- **Outcome:** JSON report of errors and warnings (frontmatter, directory name match, `SKILL.md` presence, length hints, deprecated frontmatter keys).
 
 #### `eversis_skill_run_script`
 
-- **Focus:** Run deterministic, allowlisted scripts bundled under `.cursor/skills/eversis-*/scripts/`.
+- **Focus:** Run deterministic, allowlisted scripts bundled under `.ai/skills/eversis-*/scripts/`.
 - **How to use:** Agent passes a script key from the MCP allowlist (e.g. stats helpers for skill authoring).
 - **Outcome:** JSON with `exitCode`, `stdout`, and `stderr`.
 
 #### `eversis_repo_run_script`
 
 - **Focus:** Run allowlisted maintenance scripts at the repository root.
-- **How to use:** Agent passes `script`: `sync-prompts` or `sync-framework-doc`.
+- **How to use:** Agent passes `script`: `sync-adapters` (the only allowlisted key; it runs `adapters/sync.mjs`).
 - **Outcome:** JSON with `exitCode`, `stdout`, and `stderr`.
 
 ### Domain context {#domain-context}
@@ -149,6 +149,12 @@ Read, list, and refresh **domain context** — durable, cross-task knowledge (a 
 - **How to use:** Especially when plan status is UNVERIFIED; pass `docx_path` only.
 - **Outcome:** JSON with BOM flag, heading locale, per-section `content_type` summary, warnings, and `READY` / `WARNINGS` / `ERROR` status.
 
+#### `validate_docx`
+
+- **Focus:** OOXML health check — confirm Word can still open the file.
+- **How to use:** Call after every edit that changes a `.docx`; pass `docx_path`. Do not rely on `unzip -t` alone.
+- **Outcome:** JSON with `status` (`PASS` or `FAIL`), reasons and warnings.
+
 #### `backup_docx`
 
 - **Focus:** Timestamped binary backup before any modification.
@@ -170,7 +176,7 @@ Read, list, and refresh **domain context** — durable, cross-task knowledge (a 
 ```text
 @eversis-implement <ticket>
   ↳ Agent calls eversis_skills_list / eversis_skills_get (e.g. eversis-fine-handoff on Fine)
-  ↳ You review research, plan, and code at human gates
+  ↳ You approve research and plan at human gates, and approve before the Fine QA comment is posted
 ```
 
 ### Business Manager Docs
@@ -232,9 +238,9 @@ Enable **`eversis-collections`** in **Cursor → Settings → MCP**, then restar
 
 ### Consumer project (framework outside workspace)
 
-1. Clone the framework once and set **`AGENT_COLLECTIONS_HOME`** to that checkout (must contain `.cursor/skills` and `docker-compose.yml`).
+1. Clone the framework once and set **`AGENT_COLLECTIONS_HOME`** to that checkout (must contain `.ai/skills` and `docker-compose.yml`).
 2. Bootstrap with `setup-agent-collections.sh --build-mcp` — see [Installation — Step 2](../../getting-started/installation#step-2--install-into-your-project).
-3. Enable **`eversis-collections`** in Cursor MCP settings and restart.
+3. Enable **`eversis-collections`** in Cursor MCP settings, approve the project server when Claude Code asks, or trust the project in Pi. Then restart the agent.
 
 The setup script writes `docker compose -f ${env:AGENT_COLLECTIONS_HOME}/docker-compose.yml run --rm -T eversis-collections` in your project's `.cursor/mcp.json` (local mode) — the `-f` path is the only place `AGENT_COLLECTIONS_HOME` is used; Compose resolves the `.:/repo` bind mount relative to that file's own directory. For Cursor, the second volume uses host `CONSUMER_PROJECT_ROOT` `${workspaceFolder}`. Absolute (non-vendored) Claude Code still uses `${CLAUDE_PROJECT_DIR:-.}` in MCP `env`. Vendored Claude uses the wrapper above, not an env token. Pi uses the `bash -c` locator above. `${PWD}` is only a fallback. Export `AGENT_COLLECTIONS_HOME` where the Cursor process can see it — see [Installation](../../getting-started/installation).
 
@@ -244,13 +250,13 @@ For this framework, consume skills through **`eversis_skills_*` MCP tools** — 
 
 ## Verify
 
-After restart, open **Agent** and confirm tools such as **`eversis_skills_list`** appear. If tools are missing, rebuild the image with `docker compose build eversis-collections` and check that it built successfully.
+After restart, confirm tools such as **`eversis_skills_list`** appear in Cursor **Agent** or in Claude Code `/mcp`. In Pi, check the server with `pi mcp list`. If tools are missing, rebuild the image with `docker compose build eversis-collections` and check that it built successfully.
 
 ## Authentication
 
-No OAuth or API keys. The server **runs in a Docker container**; Node.js is only needed to develop the package itself (see [`mcp/eversis-collections-mcp/`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/main/mcp/eversis-collections-mcp)'s build/test scripts). A **Docker Compose build step is required** before tools are available — unlike `npx`-based third-party MCPs.
+No OAuth or API keys. The server **runs in a Docker container**; Node.js is only needed to develop the package itself (see [`mcp/eversis-collections-mcp/`](https://gitlab3.eversis.com/eversis-ai/agent-collections/-/tree/master/mcp/eversis-collections-mcp)'s build/test scripts). A **Docker Compose build step is required** before tools are available — unlike `npx`-based third-party MCPs.
 
-Optional: set **`AGENT_COLLECTIONS_HOME`** when walk-up auto-detection cannot find `.cursor/skills` from your workspace — it is used only to locate the right `docker-compose.yml` via `-f`, never passed into the container itself.
+Optional: set **`AGENT_COLLECTIONS_HOME`** when walk-up auto-detection cannot find `.ai/skills` from your workspace — it is used only to locate the right `docker-compose.yml` via `-f`, never passed into the container itself.
 
 ## Official Documentation
 
@@ -259,6 +265,6 @@ Optional: set **`AGENT_COLLECTIONS_HOME`** when walk-up auto-detection cannot fi
 
 ## When NOT to Use
 
-- Projects that **do not** vendor Agent Collections skills and never run `@eversis-implement`, `@eversis-review`, or BA Docs prompts (you may omit this server from `.cursor/mcp.json`).
+- Projects that **do not** vendor Agent Collections skills and never run `@eversis-implement`, `@eversis-review`, or BA Docs prompts (you may omit this server from your host's MCP file).
 - Loading a single `SKILL.md` once by hand — you can **`@`-attach** the file or read it directly without MCP when you are not running the full orchestration workflow.
 - Registering `.cursor/skills/` in Cursor **Agent Skills** UI — use this MCP instead.

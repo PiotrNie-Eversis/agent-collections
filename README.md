@@ -63,7 +63,7 @@ Canonical content lives under **`.ai/`**. Adapters, the installer, and MCP **con
 
 - **Agent tool:** [Cursor](https://cursor.com/), Claude Code and/or the [Pi coding agent](https://pi.dev/) (`npm i -g @earendil-works/pi-coding-agent`) (OpenCode packaging is placeholder only).
 - **Docker Engine + Compose v2** — to **run** the local **`eversis-collections`** MCP server.
-- **Node.js** ≥ 18 — needed only to **develop** the **`eversis-collections`** MCP package itself, not to run it.
+- **Node.js** ≥ 22 — needed to run the installer (`scripts/setup-agent-collections.sh`) and to **develop** the **`eversis-collections`** MCP package. Running the MCP server itself needs only Docker.
 - **Git** — clone and consumer install.
 
 Recommended: capable models (Claude Sonnet or GPT-4 class) for structured rules and prompts.
@@ -158,9 +158,9 @@ npm run sync:adapters:check
 
 6. Try a short task: load **`eversis-implement`** with a ticket id or a sentence describing the work.
 
-**Skills UX:** Prefer MCP **`eversis-collections`** + load-by-id under `.ai/skills/` / `.ai/prompts/`. Both adapters also mirror skill packages under `.cursor/skills/eversis-*` and `.claude/skills/eversis-*` (and `.pi/skills/eversis-*` when Pi is selected) (framework sync / installer) for direct file read or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. The Cursor adapter generates thin `/eversis-*` slash shims under `.cursor/commands/` from `.ai/prompts` (stable id remains SSOT).
+**Skills UX:** Prefer MCP **`eversis-collections`** + load-by-id under `.ai/skills/` / `.ai/prompts/`. The installer mirrors skill packages under `.cursor/skills/eversis-*` and `.claude/skills/eversis-*` (and `.pi/skills/eversis-*` when Pi is selected) for direct file read or `@` attach — do **not** register `.cursor/skills` as Cursor **Agent Skills** UI. The Cursor adapter generates thin `/eversis-*` slash shims under `.cursor/commands/` from `.ai/prompts` (stable id remains SSOT).
 
-First successful install checklist: [Start here](./website/docs/getting-started/start-here.md).
+First successful install checklist: [Start here](./website/docs/getting-started/start-here.mdx).
 
 ---
 
@@ -186,13 +186,13 @@ bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" \
 | **Submodule** | `--vendor submodule` | **TASK / team default** — teammates: `git submodule update --init --recursive` |
 | **Copy** | `--vendor copy` | Vendors tree under `vendor/agent-collections/` |
 
-Useful flags: `--collections-home`, `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`, `--build-mcp` (force MCP rebuild), `--ssot-source URL` / `--ssot-branch NAME` (seed `docs/context/global/` from a shared domain-context repo, best-effort — never blocks install), `--confluence-space-key KEY` (optional — records the key; a person runs `eversis-import-confluence-knowledge` later).
+Useful flags: `--collections-home`, `--target DIR` (project folder), `--vendor submodule|copy`, `--link-mode auto|symlink|copy`, `--sync`, `--upgrade`, `--agents`, `--mcp-servers`, `--profile frontend|backend|fullstack`, `--project-name NAME` (name of `docs/context/<NAME>/`), `--gitignore-agent-artifacts` (local mode only: gitignore `docs/specs/*/` and `docs/context/*/`), `--force` (run even when the framework home looks incomplete), `--doctor` (read-only health check of an existing install, then exit), `--build-mcp` (force MCP rebuild), `--ssot-source URL` / `--ssot-branch NAME` (seed `docs/context/global/` from a shared domain-context repo, best-effort — never blocks install), `--confluence-space-key KEY` (optional — records the key; a person runs `eversis-import-confluence-knowledge` later).
 
 Interactive wizard (TTY) prompts for agents × domain profile × MCP servers — **no `--build-mcp` required** for the MCP checklist. Re-runs are idempotent; partial failures list completed vs failed steps with recovery hints.
 
 Selection is recorded at `.agent-collections/install-selection.json` (schema: [`docs/architecture/install-selection.md`](./docs/architecture/install-selection.md)) — required for `--upgrade`.
 
-**Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `AGENTS.md` (do not hand-edit generated `CLAUDE.md`); Pi → the same `eversis-project-stack.mdc`, appended to the core in `.pi/APPEND_SYSTEM.md` once it differs from the template.
+**Stack customisation:** Cursor → `.cursor/rules/eversis-project-stack.mdc`; Claude Code → `.claude/CLAUDE.md` (seeded once with an import of the root `AGENTS.md` when that file exists; do not hand-edit generated `CLAUDE.md`); Pi → the same `eversis-project-stack.mdc`, appended to the core in `.pi/APPEND_SYSTEM.md` once it differs from the template.
 Full install guide (including Windows): [Installation](./website/docs/getting-started/installation.mdx).
 
 Migrating from Cursor Collections (`setup-cursor-local.sh` / `CURSOR_COLLECTIONS_HOME`): [Migration guide](./website/docs/advanced/migration-from-cursor-collections.md).
@@ -203,9 +203,10 @@ Add `pi` to `--agents` (for example `--agents=cursor,claude,pi`, or `--agents=pi
 
 - `.pi/APPEND_SYSTEM.md` — a small always-on core: hard limits, the quality-check line, and the line that ticket work starts with `/eversis-implement`.
 - `.pi/prompts/eversis-*.md` — `/eversis-*` slash commands.
-- `.pi/skills/eversis-*/` — framework skills mirror, plus `eversis-rule-*` role-rule skills.
+- `.pi/skills/eversis-*/` — framework skills mirror (always copied, never symlinked), plus `eversis-rule-*` role-rule skills.
 - `.pi/extensions/eversis-process-rules.ts` — adds the process rules after an `eversis-*` command or while a plan is active, so a session without a command costs close to plain Pi. Its state lives in `.pi/eversis-state/`. Details and measured sizes: [`adapters/pi/README.md`](./adapters/pi/README.md).
 - `.pi/extensions/eversis-context-budget.ts` — compacts the session once when context use crosses 50% (`EVERSIS_CONTEXT_BUDGET_PERCENT`, 1–95) and resumes an interrupted task. Pi-only: Cursor and Claude Code keep "window fill is not a trigger".
+- `.pi/extensions/eversis-review.ts` — registers the `eversis_independent_review` tool, which runs the Review stage in a separate Pi session, because Pi has no sub-agents. Details: [`adapters/pi/README.md`](./adapters/pi/README.md#review-in-pi).
 - `.pi/settings.json` (seeded once) and `.pi/mcp.json` (`eversis-collections`; check with `pi mcp list`).
 
 Start `pi` in the project root and grant **project trust** (Pi loads `.pi/` only for trusted projects); run `/reload` after a re-sync. Keep a root `AGENTS.md` so Pi does not also load `CLAUDE.md`. Pi runs as an isolated install stage: a Pi failure keeps the other agents' output, leaves `pi` out of the recorded selection and exits 1 (`agent-collections setup completed with failures (pi)`). A missing `pi` CLI is only a warning. Pi ignore files, subscription sign-in and an isolated workspace are not part of this release. Details: [`adapters/pi/README.md`](./adapters/pi/README.md).
@@ -219,6 +220,10 @@ bash scripts/setup-agent-collections.sh --upgrade --sync --non-interactive
 Reuses agents / MCP / profile / vendor / link / `ssot.externalSsotRepo` (and `ssot.confluenceSpaceKey`) from selection. Omit `--ssot-source` to keep the recorded domain-context URL; pass an empty value (`--ssot-source ""` or `--ssot-source=`) to clear it. Missing or corrupt selection **fails** with wizard instructions (no invented full install). Project-owned paths are not overwritten without opt-in (see below).
 
 Per-field contract (`--upgrade`, and `--sync` whenever the record exists): an explicit `--agents`, `--mcp-servers`, `--profile`, `--vendor` or `--link-mode` **replaces** the recorded value (spaces in lists are ignored); an omitted flag **keeps** it. An explicit empty `--vendor=` (or `--vendor ""`) also counts as an override and switches a recorded `submodule` / `copy` install to `local` mode. Without `--agents`, adapters whose framework-generated files are already on disk (marker-bearing `CLAUDE.md` / `.claude/commands/eversis-*.md`, `.cursor/commands/eversis-*.md` / `.cursor/rules/eversis-*.mdc`, `.pi/APPEND_SYSTEM.md`) are kept even if the record lacks them; a hand-written `CLAUDE.md` does not enable Claude.
+
+Hand-ported Pi: when `--agents` is omitted, `pi` is not selected and `.pi/` holds a Pi setup the framework did not generate (for example one written by a project's own `scripts/gen-pi-adapter.mjs`), the run **stops** with exit 1 before writing anything and prints both commands with your current agents and an installer path you can paste in the project root: `--agents <current>,pi` to migrate (hand-made files the Pi generator replaces get a `.pre-agent-collections.bak` copy; a `.pi/skills/eversis-*` entry that still matches the installer's recorded copy in `.agent-collections/pi-skills-mirror.json` is replaced without a backup, and every other entry that is not an identical framework copy is copied to `.pi/pre-agent-collections-backup/skills/` before the mirror replaces it) or `--agents <current>` to keep Pi out. That explicit `--agents <current>` is recorded as `"deselectedAgents": ["pi"]` in `.agent-collections/install-selection.json` (when Pi was in the record or `.pi/` held Pi content), so later runs without `--agents` do not stop again and leave the kept `.pi/` files as they are — one explicit run is enough, also for CI jobs; selecting `pi` again (`--agents <current>,pi`) migrates and clears the record. A legacy Pi generator (`scripts/gen-pi-adapter.mjs`, `scripts/pi-rule-map.yaml`, `sync:agents` scripts) is reported on every run, never run or removed; delete it, since it would undo the upgrade. Details: [`adapters/pi/README.md`](./adapters/pi/README.md#installer).
+
+Project name for `docs/context/<project>/`: `--project-name NAME` (kebab-cased), else the `SSOT_PROJECT_SLUG` environment variable, else the recorded `ssot.projectContextPath`, else — when the target is a linked git worktree (`git worktree add`) — the main worktree's folder name, else the target folder name. On `--upgrade` / `--sync` a passed `--project-name` (or a set `SSOT_PROJECT_SLUG`) replaces the recorded path; when both are omitted the recorded path is kept.
 
 Without `--mcp-servers` the run is in **preserve mode**: every server already in `.cursor/mcp.json` and `.mcp.json` (and `.pi/mcp.json` for Pi) stays in its own file with its config unchanged (only `eversis-collections` is regenerated, because its command depends on host, vendor mode and framework path); recorded servers missing from a file are added from the template; nothing is removed, and Claude keeps catalog servers found in `.mcp.json` enabled. Preserved-only servers are **not** written back to the record. To re-template servers or deselect them, pass the full list explicitly with `--mcp-servers`. This also applies to entries written by older installers in Cursor-only syntax (`${env:X}`, `${workspaceFolder}`) in `.mcp.json`: preserve mode keeps them as they are, and only an explicit `--mcp-servers` run rewrites them into Claude Code syntax.
 
@@ -367,7 +372,7 @@ Re-run the installer with a **smaller** `--agents` or `--mcp-servers` list (or c
 | **MCP servers** | With an explicit `--mcp-servers`, framework-managed (catalog) entries not in the list are **removed** from `.cursor/mcp.json` and `.mcp.json`, and listed ones are re-templated (consumer-added servers outside the catalog are kept). Without `--mcp-servers` on upgrade / sync, existing entries in both files are kept unchanged. |
 | **Slash commands** | `npm run sync:adapters` / installer adapter sync **removes orphan** generated `eversis-*.md` under `.cursor/commands/`. |
 | **Claude omitted** | Framework-generated **`CLAUDE.md`** and triad **`.claudeignore`** are removed when Claude is not in `--agents` (project-edited files are left in place). On upgrade / sync without `--agents`, Claude stays selected while generated Claude files exist. |
-| **Pi omitted** | When Pi is explicitly omitted from `--agents`, framework-generated `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-*.md`, `.pi/skills/eversis-*` (framework skills and `eversis-rule-*` role skills), `.pi/extensions/eversis-context-budget.ts`, `.pi/extensions/eversis-process-rules.ts` and `.pi/eversis-state/` are removed; `.pi/settings.json`, `.pi/mcp.json` and hand-written files stay. On upgrade / sync without `--agents`, Pi stays selected while the generated `.pi/APPEND_SYSTEM.md` exists. |
+| **Pi omitted** | When Pi is explicitly omitted from `--agents`, framework-generated `.pi/APPEND_SYSTEM.md`, `.pi/prompts/eversis-*.md`, `.pi/skills/eversis-*` (framework skills and `eversis-rule-*` role skills), `.pi/extensions/eversis-context-budget.ts`, `.pi/extensions/eversis-process-rules.ts`, `.pi/extensions/eversis-review.ts` and `.pi/eversis-state/` are removed; `.pi/settings.json`, `.pi/mcp.json` and other hand-written files stay (the log lists hand-made `.pi/prompts/eversis-*.md` and legacy-marked files left in place). Every `.pi/skills/eversis-*` entry is removed by name; one that still matches the installer's recorded copy in `.agent-collections/pi-skills-mirror.json` is removed without a backup, and any other that is not an identical framework copy (a folder or file with no matching framework skill, or with different content — a hand-edited copy, or an outdated framework copy with no recorded hash) is first copied to `.pi/pre-agent-collections-backup/skills/<name>`, outside `.pi/skills/` so Pi does not load it. The manifest is removed too. The explicit omission is recorded as `"deselectedAgents": ["pi"]` in `install-selection.json` when Pi was in the record or `.pi/` held Pi content. On upgrade / sync without `--agents`, Pi stays selected while the generated `.pi/APPEND_SYSTEM.md` exists; with the omission recorded, the run removes only marker-bearing generated Pi files and leaves every other `.pi/` entry (including hand-made `.pi/skills/eversis-*`) in place; otherwise a hand-ported `.pi/` stops the run (see [Upgrade](#upgrade)). |
 | **Hand-written `CLAUDE.md`** | When Claude is enabled and a root `CLAUDE.md` lacks the generator marker, it is copied to **`CLAUDE.md.pre-agent-collections.bak`** (or a timestamped `.bak` if a different backup already exists) before regeneration, with a warning. Move project-specific instructions into `.claude/CLAUDE.md`; do not commit the `.bak`. |
 | **Cursor rules** | Regenerated for the remaining agents; **`eversis-project-stack.mdc`** is never overwritten without opt-in. When Cursor is explicitly omitted from `--agents`, framework-generated `.cursor/rules/eversis-*.mdc` and `.cursor/commands/eversis-*.md` (generator marker) are removed; `eversis-project-stack.mdc` and hand-written files stay. |
 
@@ -395,11 +400,13 @@ Primary prompt entry = stable ids (`eversis-implement`, `eversis-review`). Optio
 
 ```text
 .ai/                 # SSOT — rules, skills, prompts
-adapters/             # cursor, claude, pi, opencode + sync.mjs + profiles/
+adapters/             # cursor, claude, pi, opencode, website (docs-site prompt pages) + sync.mjs + profiles/
 mcp/                  # eversis-collections-mcp (skills from .ai/skills)
-scripts/              # setup-agent-collections.sh
-templates/            # AGENTS, stack, mcp.json seeds
-documentation/        # Framework reference (agent-collection.md)
+scripts/              # setup-agent-collections.sh (+ lib/); release-master.mjs, release-to-master.sh,
+                      # check-release-tree.sh (develop → master); sync-changelog.mjs,
+                      # validate-spec-artifacts.mjs
+templates/            # AGENTS, stack, mcp.json seeds, Claude templates (claude-CLAUDE.template.md,
+                      # claude-settings.json), MCP launcher (run-eversis-collections-mcp.sh)
 website/              # Docusaurus docs site (Vercel: agent-collections.vercel.app)
 AGENTS.md             # Reference agent entry map
 docs/architecture/    # Mapping, isolation, AGENTS standard, selection, WF/WNF
@@ -426,8 +433,8 @@ Grouped the same way the docs site itself is now organized — by what you're tr
 
 | Resource | Purpose |
 | -------- | ------- |
-| [Start here](./website/docs/getting-started/start-here.md) | First successful install checklist |
-| [Prerequisites](./website/docs/getting-started/prerequisites.md) | Tooling requirements |
+| [Start here](./website/docs/getting-started/start-here.mdx) | First successful install checklist |
+| [Prerequisites](./website/docs/getting-started/prerequisites.mdx) | Tooling requirements |
 | [Installation](./website/docs/getting-started/installation.mdx) | Consumer install (incl. Windows) |
 | [MCP setup](./website/docs/getting-started/mcp-setup.mdx) | Workspace vs user MCP |
 | [Quick wins](./website/docs/getting-started/quick-wins.md) | Short practical scenarios |
@@ -455,7 +462,7 @@ Grouped the same way the docs site itself is now organized — by what you're tr
 | Resource | Purpose |
 | -------- | ------- |
 | [`AGENTS.md`](./AGENTS.md) | Agent entry map for this repository |
-| [Framework reference](./documentation/agent-collection.md) | Authoritative short guide |
+| [Framework reference](./website/docs/reference/framework-reference.md) | Authoritative short guide (docs site page `/docs/framework`) |
 | [Requirements traceability](./docs/architecture/requirements-traceability.md) | WF / WNF → docs / stories |
 | [MCP package README](./mcp/eversis-collections-mcp/README.md) | Skills + Word tools reference |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Notable changes |

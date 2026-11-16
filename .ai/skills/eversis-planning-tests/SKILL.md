@@ -120,7 +120,6 @@ After generating the test plan, present the user with options:
 3. Extend with desktop environment matrix
 4. Run regression scope analysis (delegates to `eversis-analyzing-regression-risk`)
 5. Verify implementation against AC (delegates to `eversis-verifying-acceptance-criteria`)
-6. Generate complex test data (delegates to `eversis-generating-test-data`)
 
 Wait for the user's choice before generating additional content.
 
@@ -172,6 +171,5 @@ A test plan is considered complete when it covers:
 
 - `eversis-analyzing-regression-risk` — for regression scope analysis
 - `eversis-verifying-acceptance-criteria` — for AC verification
-- `eversis-generating-test-data` — for complex test data sets
 - `eversis-accessibility-auditing` — for WCAG compliance testing
 - `eversis-task-analysing` — for gathering context before test planning

@@ -7,12 +7,16 @@ Consumer install / upgrade entry for **Agent Collections**.
 | `setup-agent-collections.sh` | Main installer CLI (local / submodule / copy) |
 | `setup-agent-collections.test.sh` | Non-interactive smoke test |
 | `lib/setup-agent-collections/` | Shared bash/node helpers |
-| `release-to-master.sh` | Publish `develop` to `master` as a filtered snapshot (maintainers) |
+| `release-to-master.sh` | Publish `develop` to `master` by copying core commits (`--snapshot`: one filtered snapshot; maintainers) |
+| `release-master.mjs` | Guided wrapper around `release-to-master.sh` (`npm run release:master`; see below) |
 | `release-to-master.test.sh` | Tests for the release script and `.githooks/pre-commit` |
 | `lib/release-paths.sh` | Reads `.release-exclude` (work-only paths) for the release script and hook |
 | `check-release-tree.sh` | Fails when a commit carries `.release-exclude` paths (CI guard for `master`) |
 | `pi-load-check.mjs` | Pi load check: installs the framework for Pi into a temp project and fails when Pi does not load a generated prompt, skill or extension, or reports a `.pi/mcp.json` config error (`npm run pi:load-check`; details in [`adapters/pi/README.md`](../adapters/pi/README.md) "Load check") |
 | `pi-load-check.test.mjs` | Tests for the Pi load check (`node --test scripts/pi-load-check.test.mjs`; integration tests need `pi` on PATH) |
+| `sync-changelog.mjs` | Writes `website/src/pages/changelog.md` from `CHANGELOG.md` (`npm run website:changelog:sync`; `--check` = `npm run website:changelog:check`) |
+| `validate-spec-artifacts.mjs` | Checks that a `*.research.md` or `*.plan.md` follows the framework template (`node scripts/validate-spec-artifacts.mjs <file>...`; also run by the Claude Code spec artifact hook) |
+| `validate-spec-artifacts.test.mjs` | Tests for the spec artifact validator |
 
 ## Branches and releases (framework repository)
 
@@ -21,19 +25,27 @@ Consumer install / upgrade entry for **Agent Collections**.
 - **Release:** from any branch except `master`, run
 
   ```bash
-  bash scripts/release-to-master.sh --dry-run   # preview
-  bash scripts/release-to-master.sh             # one "release: develop@<sha>" commit on local master
+  bash scripts/release-to-master.sh --dry-run   # preview: one "copy" or "skip" line per commit
+  bash scripts/release-to-master.sh             # copy the new core commits to local master
   git push origin master
   ```
 
-  The script copies the `develop` tree, removes the `.release-exclude` paths, and commits it on top of `master` (single parent), so deletions and renames carry over and work-only docs never do. It stops when `master` has commits that are neither releases nor in `develop` (a hotfix made only on `master`); bring them into `develop`, or pass `--allow-diverged` to overwrite them.
-- **Guard:** enable the hook once per clone with `git config core.hooksPath .githooks`. On `master`/`main` it rejects commits that stage `.release-exclude` paths (READMEs stay allowed).
-- **CI guard:** `.gitlab-ci.yml` runs `scripts/check-release-tree.sh` on every `master` pipeline and fails it when work-only paths are present (e.g. a push made without the hook). It detects and alerts; it cannot reject the push. To clean up, make sure the change is on `develop`, then release with `--allow-diverged`.
+  Guided alternative (run from `develop`; refuses to run on `master`): `npm run release:master` (or `node scripts/release-master.mjs`, with `--dry-run`, `--yes`, `--snapshot`, `--allow-diverged`). It fetches `origin`, stops when local `develop` or `master` differs from `origin`, shows the dry run, then asks before writing to `master` and before `git push origin master`.
+
+  **Copy mode (default).** The script copies each core commit of `develop` to `master` as its own commit, in `develop` order, like `git cherry-pick -x`: same author and author date, and the message ends with `(cherry picked from commit <full sha>)`. You are the committer. It needs git 2.40 or later.
+  - **Base:** the latest `release: develop@<sha>` commit on `master`. Its body line `Snapshot of develop <full sha>` says which `develop` commit it covers. Only commits after that one are looked at.
+  - **Already released:** commits on `master` after the base that carry the `(cherry picked from commit …)` line. They are not copied again, so a second run prints `nothing to release`.
+  - **Skipped:** commits that change only `.release-exclude` paths (`skip (work-only)`), empty commits (`skip (empty)`), and commits whose change is already on `master` (`skip (already on master)`).
+  - **Stops (nothing written, the commit is named):** a commit that mixes core and work-only paths, a merge commit, a commit that does not apply cleanly, a commit on `master` after the base without the cherry-pick line (a hotfix made only on `master`), no `release:` base on `master`, or a final tree that differs from `develop` without the work-only paths (post-check). Deletions and renames are copied like any other change.
+
+  **Snapshot mode (`--snapshot`, repair).** Copies the whole `develop` tree, removes the `.release-exclude` paths, and commits it on top of `master` (single parent) as one `release: develop@<sha>` commit. Use it once to create the first base, and to recover from any stop above; the new commit becomes the next base. It stops when `master` has commits that are neither releases nor in `develop` (copied commits count as releases); bring them into `develop`, or pass `--snapshot --allow-diverged` to overwrite them. `--allow-diverged` without `--snapshot` is refused.
+- **Guard:** enable the hook once per clone with `git config core.hooksPath .githooks`. On `master`/`main` it rejects commits that stage `.release-exclude` paths (READMEs stay allowed). On every other branch it rejects a commit that mixes work-only and core paths: commit the core first, then `docs(ac-n)`, then `docs(context)`. For a deliberate exception use `ALLOW_MIXED_COMMIT=1 git commit …` (it does not lift the `master` block); `git commit --no-verify` bypasses all hooks.
+- **CI guard:** `.gitlab-ci.yml` runs `scripts/check-release-tree.sh` on every `master` pipeline and fails it when work-only paths are present (e.g. a push made without the hook). It detects and alerts; it cannot reject the push. It prints a note when the commit is neither a `release:` snapshot nor a copied commit. To clean up, make sure the change is on `develop`, then release with `--snapshot --allow-diverged`.
 - **Branch protection (GitLab):** protect only `master` — *Allowed to merge: No one*, *Allowed to push and merge: Maintainers*, *Allowed to force push: off*.
 
 ## Pi load check in CI
 
-`.gitlab-ci.yml` has a `verify` stage with two jobs. Each installs Node 22 and Pi (`npm install -g --ignore-scripts`), runs `node --test scripts/pi-load-check.test.mjs`, then `node scripts/pi-load-check.mjs`, then the Pi adapter unit tests (`node --test 'adapters/pi/*.test.mjs'`, which need Node 22.18 or later) and `node --test adapters/pi/process-rules.integration.mjs`. That last test starts Pi with a local stub model, no keys and a temp `HOME`, and fails when the process rules section does not reach the request (AC-134). The job log starts the report with `Pi <version> (pinned)` or `Pi <version> (latest)`.
+`.gitlab-ci.yml` has a `verify` stage with two jobs. Each installs Node 22 and Pi (`npm install -g --ignore-scripts`), runs `node --test scripts/pi-load-check.test.mjs`, then `node scripts/pi-load-check.mjs`, then the Pi adapter unit tests (`node --test 'adapters/pi/*.test.mjs'`, which need Node 22.18 or later) and `node --test adapters/pi/process-rules.integration.mjs`. That last test starts Pi with a local stub model, no keys and a temp `HOME`, and fails when the process rules section does not reach the request (Pi adds the process rules on demand, only after a command or with an active plan). The job log starts the report with `Pi <version> (pinned)` or `Pi <version> (latest)`.
 
 - **`pi-load-check:pinned`** runs Pi `PI_VERSION_PINNED` (now `1.5.0`) on merge requests and on `develop` pushes that change a watched path: `adapters/pi/**`, `.ai/prompts/**`, `.ai/skills/**`, `.ai/rules/**`, `adapters/sync.mjs`, `scripts/setup-agent-collections.sh`, `scripts/lib/setup-agent-collections/**`, `templates/mcp.json`, `scripts/pi-load-check*.mjs`, `package.json`, `.gitlab-ci.yml`.
 - **`pi-load-check:latest`** runs the latest Pi release in scheduled pipelines and when someone with Developer access or higher starts a pipeline from the web UI (**Build → Pipelines → Run pipeline**). The job has no secrets or write tokens.
@@ -67,3 +79,21 @@ bash /path/to/agent-collections/scripts/setup-agent-collections.sh \
 TASK / team default vendor mode: **`--vendor submodule`**. After clone, teammates run `git submodule update --init --recursive`. `--upgrade --sync` aligns a **clean** vendor submodule to the launching installer SHA (or fails with recovery git commands if the pin is dirty).
 
 See root [README.md](../README.md) for modes, upgrade (`--upgrade`), selection schema (`.agent-collections/`), and **deselection / recovery** (MCP prune, Claude surface cleanup, slash-command orphans).
+
+## Health check (`--doctor`)
+
+From the consumer project (or with `--target DIR`):
+
+```bash
+bash "$AGENT_COLLECTIONS_HOME/scripts/setup-agent-collections.sh" --doctor
+```
+
+`--doctor` checks an existing install and changes nothing: it never clones, fetches, links, syncs or writes. It prints one line per check, and every check runs even when an earlier one fails (only an unreadable `--target` stops it):
+
+- **Node** — the version first on `PATH` (Node 22 or newer passes, 18–21 gives a warning, older fails). With an unusable Node, the checks that need Node are skipped with a line saying so.
+- **Framework home** — read from the recorded vendor mode in `.agent-collections/install-selection.json` (submodule/copy → `vendor/agent-collections`, local → `.agent-collections/framework-home.txt`); with no record, `vendor/agent-collections`, then `framework-home.txt`, then the installer's own checkout.
+- **Agents** — from `--agents`, else the record, else the skills mirrors present on disk.
+- **Claude / Cursor skills mirrors** — every `.ai/skills/eversis-*` package has a readable `SKILL.md` in `.claude/skills/` / `.cursor/skills/`.
+- **Claude hook** (Claude selected) — the two framework entries in `.claude/settings.json` that run the launcher (a `PreToolUse` entry whose matcher matches `Bash`, and a `PostToolUse` entry whose matcher includes `Bash`, so spec artifacts changed by shell commands are checked too), the launcher `.claude/hooks/eversis-validate-spec.cjs`, and its `--self-test` (which proves the spec artifact validator can be found and runs). A failing entry line names what is missing: `missing PreToolUse entry`, `missing PostToolUse entry`, or `PostToolUse matcher without Bash` (an older install with the single `Write|Edit|MultiEdit` entry; `--upgrade --sync` adds the Bash check). With an unusable Node the entry check falls back to a text match on the launcher path.
+
+Exit 0 when every check passes, 1 otherwise. Each failing line names the problem and a fix (usually `--upgrade --sync`).

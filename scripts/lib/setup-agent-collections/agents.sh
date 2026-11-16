@@ -56,7 +56,7 @@ _run_numbered_agents_prompt() {
 }
 
 _run_interactive_agents_prompt() {
-  require_cmd node "Install Node.js ≥ 18 from https://nodejs.org"
+  require_cmd node "Install Node.js 22 or newer from https://nodejs.org"
 
   if _ensure_inquirer_prompt_deps && _run_checkbox_agents_prompt; then
     return 0

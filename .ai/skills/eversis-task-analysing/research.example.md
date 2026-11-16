@@ -61,3 +61,9 @@ Numbered list of every human-approval gate this task passes through, in order. S
 1. Approve research
 2. Approve plan (once written)
 3. Implement → Review → Fine
+
+## Changelog
+
+| Date   | Change Description   |
+| ------ | -------------------- |
+| <date> | Research created from research.example.md |

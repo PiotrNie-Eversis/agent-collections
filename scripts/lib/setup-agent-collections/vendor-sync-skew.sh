@@ -39,7 +39,7 @@ _sync_mjs_supports_flag() {
 }
 
 # Agent ids _run_adapter_sync / run_pi_stage will pass that an older vendored
-# pin may not know. Today only pi (AC-14): its generator ships in
+# pin may not know. Today only pi: its generator ships in
 # adapters/pi/generate.mjs and sync.mjs must list it under --agents.
 _adapter_sync_extra_agent_ids() {
   if echo ",${SELECTED_AGENTS:-}," | grep -q ',pi,'; then
@@ -166,7 +166,7 @@ _align_clean_vendor_to_installer_head() {
 }
 
 # Product guard: on --upgrade/--sync + submodule, never call an old sync.mjs with
-# new flags or with an agent id it does not know (pi, AC-14).
+# new flags or with an agent id it does not know (pi).
 align_vendor_sync_cli_or_die() {
   [[ "${VENDOR_MODE:-}" == "submodule" ]] || return 0
   [[ "${ARG_UPGRADE:-false}" == "true" || "${ARG_SYNC:-false}" == "true" ]] || return 0
@@ -198,8 +198,8 @@ align_vendor_sync_cli_or_die() {
   done
   [[ ${#missing[@]} -eq 0 && ${#missing_agents[@]} -eq 0 ]] && return 0
 
-  # Flags are reported first (pre-AC-14 message); a pin that only lacks an
-  # agent id is reported as "Rejected agent id".
+  # Flags are reported first (the message from before Pi support was added);
+  # a pin that only lacks an agent id is reported as "Rejected agent id".
   local flag_list="${missing[*]-}" kind="flag"
   if [[ ${#missing[@]} -eq 0 ]]; then
     flag_list="${missing_agents[*]}"
